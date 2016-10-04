@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir;
+package uk.nhs.fhir.resourcehandlers;
 
 import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
@@ -42,7 +42,7 @@ import uk.nhs.fhir.datalayer.MongoIF;
 public class StrutureDefinitionResourceProvider implements IResourceProvider {
     MongoIF myMongo = null;
 
-    StrutureDefinitionResourceProvider(MongoIF mongoInterface) {
+    public StrutureDefinitionResourceProvider(MongoIF mongoInterface) {
         myMongo = mongoInterface;
     }
 

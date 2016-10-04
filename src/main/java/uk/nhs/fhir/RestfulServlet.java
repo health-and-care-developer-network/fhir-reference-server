@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir;
 
+import uk.nhs.fhir.resourcehandlers.StrutureDefinitionResourceProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import java.util.ArrayList;
