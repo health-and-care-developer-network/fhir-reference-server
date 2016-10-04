@@ -21,20 +21,30 @@ import ca.uhn.fhir.model.dstu2.valueset.IssueSeverityEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
+import java.util.List;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import uk.nhs.fhir.datalayer.MongoIF;
 
 /**
  *
  * @author Tim Coates
  */
 public class StrutureDefinitionResourceProvider implements IResourceProvider {
+    MongoIF myMongo = null;
+
+    StrutureDefinitionResourceProvider(MongoIF mongoInterface) {
+        myMongo = mongoInterface;
+    }
 
     /**
      * Get the Type that this IResourceProvider handles, so that the servlet
@@ -89,6 +99,10 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
 
     /**
      * Instance level GET of a resource...
+     * This needs to get a Structure Definition resource by name, so will
+     * respond to for example:
+     * 
+     * /StructureDefinition/nrls-documentreference-1-0
      *
      * @param theId ID value identifying the resource.
      *
@@ -96,6 +110,33 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
      */
     @Read
     public StructureDefinition getResourceById(@IdParam IdDt theId) {
-        throw new NotImplementedException("Not yet built");
+        String name = theId.getIdPart().toString();
+        StructureDefinition foundItem = myMongo.getSingleStructureDefinitionByName(name);
+        return foundItem;
+    }
+    
+    /**
+     * Search by name, so will respond to queries of the form:
+     * /StructureDefinition?name:contains=blah
+     * 
+     * @param theNamePart
+     * @return 
+     */
+    @Search
+    public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name=StructureDefinition.SP_NAME) StringParam theNamePart) {
+        List<StructureDefinition> foundList = myMongo.getMatchByName(theNamePart);
+        return foundList;
+    }
+    
+    /**
+     * Overall search, will return ALL Structure Definitions so responds to:
+     * /StructureDefinition
+     * 
+     * @return 
+     */
+    @Search
+    public List<StructureDefinition> getAllStructureDefinitions() {
+        List<StructureDefinition> foundList = myMongo.getAll();
+        return foundList;
     }
 }

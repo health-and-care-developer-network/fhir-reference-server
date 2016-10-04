@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import uk.nhs.fhir.datalayer.MongoIF;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -35,6 +36,7 @@ import javax.servlet.annotation.WebServlet;
 public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final long serialVersionUID = 1L;
+    MongoIF mongoInterface = null;
     
     /**
     * This is where we start, called when our servlet is first initialised.
@@ -45,8 +47,10 @@ public class RestfulServlet extends RestfulServer {
     */
     @Override
     protected void initialize() throws ServletException {
+        
+        mongoInterface = new MongoIF();
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionResourceProvider());
+        resourceProviders.add(new StrutureDefinitionResourceProvider(mongoInterface));
         setResourceProviders(resourceProviders);
         LOG.info("resourceProviders added");
     }
