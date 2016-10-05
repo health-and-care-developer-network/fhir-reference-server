@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IIdType;
+import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 
 /**
  *
@@ -21,6 +22,13 @@ import org.hl7.fhir.instance.model.api.IIdType;
  */
 public class PlainContent extends InterceptorAdapter {
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
+    ProfileWebHandler myWebber = null;
+    
+    public PlainContent(ProfileWebHandler webber) {
+        myWebber = webber;
+    }
+    
+    
     
     @Override
     public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) {
@@ -47,8 +55,13 @@ public class PlainContent extends InterceptorAdapter {
             pw = theResponse.getWriter();
             pw.append("Hello browser, clearly you were looking for a: " + theRequestDetails.getResourceName());
             
-            String id = theRequestDetails.getId().getIdPart();
-            pw.append(id);
+            //String id = theRequestDetails.getId().getIdPart();
+            pw.append(myWebber.getAllNames());
+            //if(id == null) {
+            //    pw.append("id Was null");
+            //} else {
+                //pw.append(id);
+            //}
         } catch (IOException ex) {
             LOG.info("" + ex.getMessage());
         }

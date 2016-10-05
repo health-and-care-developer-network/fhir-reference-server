@@ -102,7 +102,26 @@ public class MongoIF {
         }        
         LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
         return list;
-
+    }
+    
+    public List<String> getAllNames() {
+        LOG.info("Getting all StructureDefinitions");
+        
+        List<String> list = new ArrayList<String>();
+        
+        Cursor cursor;
+        cursor = profiles.find();
+        try {
+            while(cursor.hasNext()) {
+                LOG.info("Got one...");
+                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                list.add(foundDocRef.getName());
+            }
+        } finally {
+            cursor.close();
+        }        
+        LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");
+        return list;
     }
 
 }

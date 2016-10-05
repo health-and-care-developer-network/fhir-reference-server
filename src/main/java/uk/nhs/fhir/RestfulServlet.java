@@ -27,6 +27,7 @@ import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
 import uk.nhs.fhir.resourcehandlers.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
+import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 
 /**
@@ -54,6 +55,8 @@ public class RestfulServlet extends RestfulServer {
     protected void initialize() throws ServletException {
         
         mongoInterface = new MongoIF();
+        ProfileWebHandler webber = new ProfileWebHandler(mongoInterface);
+        
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(mongoInterface));
         resourceProviders.add(new PatientProvider(mongoInterface));
@@ -61,7 +64,7 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new PractitionerProvider(mongoInterface));
         resourceProviders.add(new OrganizationProvider(mongoInterface));
         setResourceProviders(resourceProviders);
-        registerInterceptor(new PlainContent());
+        registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");
     }
 }
