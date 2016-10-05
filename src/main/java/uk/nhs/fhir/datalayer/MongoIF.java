@@ -59,6 +59,7 @@ public class MongoIF {
     }
 
     public List<StructureDefinition> getMatchByName(StringParam theNamePart) {
+        // db.getCollection('profiles').find({name: theNamePart})
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
