@@ -31,50 +31,68 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
-import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.MongoIF;
+import uk.nhs.fhir.validator.Validator;
 
 /**
  *
  * @author Tim Coates
  */
 public class StrutureDefinitionResourceProvider implements IResourceProvider {
+
     MongoIF myMongo = null;
 
+//<editor-fold defaultstate="collapsed" desc="Housekeeping code">
+    /**
+     * Constructor, which tell us which mongo data source we're working with.
+     *
+     * @param mongoInterface
+     */
     public StrutureDefinitionResourceProvider(MongoIF mongoInterface) {
         myMongo = mongoInterface;
     }
 
     /**
-     * Get the Type that this IResourceProvider handles, so that the servlet
-     * can say it handles that type.
-     * 
+     * Get the Type that this IResourceProvider handles, so that the servlet can say it handles that type.
+     *
      * @return Class type, used in generating Conformance profile resource.
      */
     @Override
     public Class<? extends IBaseResource> getResourceType() {
         return StructureDefinition.class;
     }
+//</editor-fold>
 
+//<editor-fold defaultstate="collapsed" desc="Validation">
     /**
      * Code to call the validation process, whatever that happens to be...
      *
      * See: http://hapifhir.io/doc_rest_operations.html#Type_Level_-_Validate
      *
-     * @param resourceWeAreTesting
+     * @param resourceToTest
      * @param theMode
      * @param theProfile
      * @return
      */
     @Validate
-    public MethodOutcome validatePatient(@ResourceParam StructureDefinition resourceWeAreTesting,
+    public MethodOutcome validateStructureDefinition(@ResourceParam StructureDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
 
+        Validator myValidator = new Validator();
+
+        List<String> problemsFound = myValidator.validateResource(resourceToTest, theProfile);
+
+        if(problemsFound.isEmpty()) {
+            // Celebrate
+        } else {
+            // Weep
+        }
+
         // Actually do our validation: The UnprocessableEntityException
         // results in an HTTP 422, which is appropriate for business rule failure
-        if(resourceWeAreTesting.getIdentifierFirstRep().isEmpty()) {
+        if(resourceToTest.getIdentifierFirstRep().isEmpty()) {
             /* It is also possible to pass an OperationOutcome resource
              * to the UnprocessableEntityException if you want to return
              * a custom populated OperationOutcome. Otherwise, a simple one
@@ -91,17 +109,16 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
         OperationOutcome outcome = new OperationOutcome();
         outcome.addIssue().setSeverity(IssueSeverityEnum.WARNING).setDiagnostics("One minor issue detected");
 
-
         retVal.setOperationOutcome(outcome);
 
         return retVal;
     }
+//</editor-fold>
 
+//<editor-fold defaultstate="collapsed" desc="RESTFul operations">
     /**
-     * Instance level GET of a resource...
-     * This needs to get a Structure Definition resource by name, so will
-     * respond to for example:
-     * 
+     * Instance level GET of a resource... This needs to get a Structure Definition resource by name, so will respond to for example:
+     *
      * /StructureDefinition/nrls-documentreference-1-0
      *
      * @param theId ID value identifying the resource.
@@ -114,29 +131,29 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
         StructureDefinition foundItem = myMongo.getSingleStructureDefinitionByName(name);
         return foundItem;
     }
-    
+
     /**
-     * Search by name, so will respond to queries of the form:
-     * /StructureDefinition?name:contains=blah
-     * 
+     * Search by name, so will respond to queries of the form: /StructureDefinition?name:contains=blah
+     *
      * @param theNamePart
-     * @return 
+     * @return
      */
     @Search
-    public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name=StructureDefinition.SP_NAME) StringParam theNamePart) {
+    public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
         List<StructureDefinition> foundList = myMongo.getMatchByName(theNamePart);
         return foundList;
     }
-    
+
     /**
-     * Overall search, will return ALL Structure Definitions so responds to:
-     * /StructureDefinition
-     * 
-     * @return 
+     * Overall search, will return ALL Structure Definitions so responds to: /StructureDefinition
+     *
+     * @return
      */
     @Search
     public List<StructureDefinition> getAllStructureDefinitions() {
         List<StructureDefinition> foundList = myMongo.getAll();
         return foundList;
     }
+//</editor-fold>
+
 }
