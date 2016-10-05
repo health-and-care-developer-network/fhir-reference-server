@@ -18,34 +18,39 @@ package uk.nhs.fhir.datalayer;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.rest.param.StringParam;
+import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Tim Coates
  */
 public class MongoIF {
+    private static final Logger LOG = Logger.getLogger(MongoIF.class.getName());
+
     MongoClient mongoClient;
     DB db;
-    DBCollection docRefCollection;
-    DBCollection orgCollection;
+    DBCollection profiles;
+    DBCollection examples;
     FhirContext ctx;
     String host = "155.230.220.40";
-    int port = 28015;
-    
+    int port = 80;
+
     /**
      * Constructor to set up our connection to a mongoDB database
-     * 
+     *
      */
     public MongoIF() {
+        LOG.info("Connecting to MongoDB at: " + host + " : " + port);
         mongoClient = new MongoClient(host, port);
         db = mongoClient.getDB("mydb");
-        docRefCollection = db.getCollection("StructureDefinitions");
-        orgCollection = db.getCollection("Examples");
-        
+        profiles = db.getCollection("profiles");
+        examples = db.getCollection("examples");
         ctx = FhirContext.forDstu2();
     }
 
@@ -58,7 +63,27 @@ public class MongoIF {
     }
 
     public List<StructureDefinition> getAll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info("Getting all StructureDefinitions");
+        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
+        
+        
+        Cursor cursor = profiles.find();
+        try {
+            while(cursor.hasNext()) {
+                LOG.info("Got one...");
+                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                list.add(foundDocRef);
+            }
+        } finally {
+            cursor.close();
+        }
+        
+        StructureDefinition foundDocRef = new StructureDefinition();
+        list.add(foundDocRef);
+        
+        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
+        return list;
+
     }
-    
+
 }

@@ -31,6 +31,7 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
+import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.MongoIF;
 import uk.nhs.fhir.validator.Validator;
@@ -40,6 +41,7 @@ import uk.nhs.fhir.validator.Validator;
  * @author Tim Coates
  */
 public class StrutureDefinitionResourceProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(StrutureDefinitionResourceProvider.class.getName());
 
     MongoIF myMongo = null;
 
@@ -151,6 +153,7 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
      */
     @Search
     public List<StructureDefinition> getAllStructureDefinitions() {
+        LOG.info("Request for ALL StructureDefinition objects");
         List<StructureDefinition> foundList = myMongo.getAll();
         return foundList;
     }
