@@ -61,6 +61,7 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new PractitionerProvider(mongoInterface));
         resourceProviders.add(new OrganizationProvider(mongoInterface));
         setResourceProviders(resourceProviders);
+        registerInterceptor(new PlainContent());
         LOG.info("resourceProviders added");
     }
 }

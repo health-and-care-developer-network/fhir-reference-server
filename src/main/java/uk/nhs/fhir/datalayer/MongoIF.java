@@ -18,9 +18,11 @@ package uk.nhs.fhir.datalayer;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.rest.param.StringParam;
+import com.mongodb.BasicDBObject;
 import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +40,8 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "155.231.220.40";
-    int port = 80;
+    String host = "localhost";
+    int port = 28015;
 
     /**
      * Constructor to set up our connection to a mongoDB database
@@ -55,12 +57,31 @@ public class MongoIF {
     }
 
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info("Getting StructureDefinitions with name=" + name);
+        BasicDBObject query = new BasicDBObject("name", name);
+        DBObject found = profiles.findOne(query);
+        StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource(found.toString());
+        return foundDocRef;
     }
 
     public List<StructureDefinition> getMatchByName(StringParam theNamePart) {
-        // db.getCollection('profiles').find({name: theNamePart})
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info("Getting StructureDefinitions with name=" + theNamePart);
+        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
+        
+        Cursor cursor;
+        BasicDBObject query = new BasicDBObject("name", theNamePart);
+        cursor = profiles.find(query);
+        try {
+            if(cursor.hasNext()) {
+                LOG.info("Got it...");
+                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                list.add(foundDocRef);
+            }
+        } finally {
+            cursor.close();
+        }        
+        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
+        return list;
     }
 
     public List<StructureDefinition> getAll() {
@@ -68,7 +89,8 @@ public class MongoIF {
         
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
-        Cursor cursor = profiles.find();
+        Cursor cursor;
+        cursor = profiles.find();
         try {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
