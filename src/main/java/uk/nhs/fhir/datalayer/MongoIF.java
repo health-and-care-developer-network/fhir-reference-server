@@ -38,7 +38,7 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "155.230.220.40";
+    String host = "155.231.220.40";
     int port = 80;
 
     /**
