@@ -13,7 +13,6 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.hl7.fhir.instance.model.api.IIdType;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 
 /**
