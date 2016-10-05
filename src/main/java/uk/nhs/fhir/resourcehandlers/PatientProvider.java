@@ -20,7 +20,7 @@ import uk.nhs.fhir.validator.Validator;
  *
  * @author tim.coates@hscic.gov.uk
  */
-public class PatientResourceProvider implements IResourceProvider {
+public class PatientProvider implements IResourceProvider {
 
     MongoIF myMongo = null;
 
@@ -30,7 +30,7 @@ public class PatientResourceProvider implements IResourceProvider {
      *
      * @param mongoInterface
      */
-    public PatientResourceProvider(MongoIF mongoInterface) {
+    public PatientProvider(MongoIF mongoInterface) {
         myMongo = mongoInterface;
     }
 

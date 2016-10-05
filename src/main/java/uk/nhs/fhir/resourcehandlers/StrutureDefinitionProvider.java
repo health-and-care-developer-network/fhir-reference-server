@@ -40,8 +40,8 @@ import uk.nhs.fhir.validator.Validator;
  *
  * @author Tim Coates
  */
-public class StrutureDefinitionResourceProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(StrutureDefinitionResourceProvider.class.getName());
+public class StrutureDefinitionProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
 
     MongoIF myMongo = null;
 
@@ -51,7 +51,7 @@ public class StrutureDefinitionResourceProvider implements IResourceProvider {
      *
      * @param mongoInterface
      */
-    public StrutureDefinitionResourceProvider(MongoIF mongoInterface) {
+    public StrutureDefinitionProvider(MongoIF mongoInterface) {
         myMongo = mongoInterface;
     }
 

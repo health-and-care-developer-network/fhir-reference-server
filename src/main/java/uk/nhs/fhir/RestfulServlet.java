@@ -23,8 +23,11 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import uk.nhs.fhir.datalayer.MongoIF;
-import uk.nhs.fhir.resourcehandlers.PatientResourceProvider;
-import uk.nhs.fhir.resourcehandlers.StrutureDefinitionResourceProvider;
+import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
+import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
+import uk.nhs.fhir.resourcehandlers.PatientProvider;
+import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
+import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -52,8 +55,11 @@ public class RestfulServlet extends RestfulServer {
         
         mongoInterface = new MongoIF();
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionResourceProvider(mongoInterface));
-        resourceProviders.add(new PatientResourceProvider(mongoInterface));
+        resourceProviders.add(new StrutureDefinitionProvider(mongoInterface));
+        resourceProviders.add(new PatientProvider(mongoInterface));
+        resourceProviders.add(new DocumentReferenceProvider(mongoInterface));
+        resourceProviders.add(new PractitionerProvider(mongoInterface));
+        resourceProviders.add(new OrganizationProvider(mongoInterface));
         setResourceProviders(resourceProviders);
         LOG.info("resourceProviders added");
     }

@@ -64,8 +64,8 @@ public class MongoIF {
 
     public List<StructureDefinition> getAll() {
         LOG.info("Getting all StructureDefinitions");
-        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
+        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
         Cursor cursor = profiles.find();
         try {
@@ -76,11 +76,7 @@ public class MongoIF {
             }
         } finally {
             cursor.close();
-        }
-        
-        StructureDefinition foundDocRef = new StructureDefinition();
-        list.add(foundDocRef);
-        
+        }        
         LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
         return list;
 
