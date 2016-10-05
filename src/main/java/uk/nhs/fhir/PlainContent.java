@@ -52,8 +52,10 @@ public class PlainContent extends InterceptorAdapter {
 
         try {
             theResponse.setStatus(200);
+            theResponse.addHeader("Content-Type", "text/html");
+                    
             pw = theResponse.getWriter();
-            pw.append("Hello browser, clearly you were looking for a: " + theRequestDetails.getResourceName());
+            pw.append("<html><body>Hello browser, clearly you were looking for a: " + theRequestDetails.getResourceName());
             
             //String id = theRequestDetails.getId().getIdPart();
             pw.append(myWebber.getAllNames());
@@ -62,6 +64,7 @@ public class PlainContent extends InterceptorAdapter {
             //} else {
                 //pw.append(id);
             //}
+            pw.append("</body></html>");
         } catch (IOException ex) {
             LOG.info("" + ex.getMessage());
         }
