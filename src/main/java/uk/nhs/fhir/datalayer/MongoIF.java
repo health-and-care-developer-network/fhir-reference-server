@@ -40,8 +40,8 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "localhost";
-    int port = 28015;
+    String host = "155.231.220.40";
+    int port = 80;
 
     /**
      * Constructor to set up our connection to a mongoDB database
@@ -105,7 +105,7 @@ public class MongoIF {
     }
     
     public List<String> getAllNames() {
-        LOG.info("Getting all StructureDefinitions");
+        LOG.info("Getting all StructureDefinition Names");
         
         List<String> list = new ArrayList<String>();
         
