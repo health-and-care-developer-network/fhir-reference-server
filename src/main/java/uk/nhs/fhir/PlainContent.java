@@ -32,13 +32,7 @@ public class PlainContent extends InterceptorAdapter {
     @Override
     public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) {
         PrintWriter pw = null;
-        
-        Enumeration headerNames = theRequest.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String key = (String) headerNames.nextElement();
-            String value = theRequest.getHeader(key);
-            LOG.info(key + " : " + value);
-        }
+
         String mimes = theRequest.getHeader("accept");
         
         if (mimes == null) {
@@ -52,18 +46,11 @@ public class PlainContent extends InterceptorAdapter {
         try {
             theResponse.setStatus(200);
             theResponse.addHeader("Content-Type", "text/html");
-                    
+            theResponse.setContentType("text/html");
             pw = theResponse.getWriter();
-            pw.append("<html><body>Hello browser, clearly you were looking for a: " + theRequestDetails.getResourceName());
-            
-            //String id = theRequestDetails.getId().getIdPart();
+            pw.append("<html><body>Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
             pw.append(myWebber.getAllNames());
-            //if(id == null) {
-            //    pw.append("id Was null");
-            //} else {
-                //pw.append(id);
-            //}
-            pw.append("</body></html>");
+            pw.append("</ul></body></html>");
         } catch (IOException ex) {
             LOG.info("" + ex.getMessage());
         }

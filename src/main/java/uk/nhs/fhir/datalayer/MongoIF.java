@@ -115,7 +115,7 @@ public class MongoIF {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
                 StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add("<li>" + foundDocRef.getName() + "</li>");
+                list.add("<li><a href='" + foundDocRef.getUrl() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
             }
         } finally {
             cursor.close();
