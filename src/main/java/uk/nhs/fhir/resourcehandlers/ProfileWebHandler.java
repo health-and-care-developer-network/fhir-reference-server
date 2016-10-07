@@ -5,6 +5,7 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import java.util.List;
 import uk.nhs.fhir.datalayer.MongoIF;
 
@@ -29,5 +30,10 @@ public class ProfileWebHandler {
             sb.append("<br />");
         }
         return sb.toString();
+    }
+    
+    public StructureDefinition getSDByName(String name) {
+        StructureDefinition sd = mymongo.getSingleStructureDefinitionByName(name);
+        return sd;
     }
 }

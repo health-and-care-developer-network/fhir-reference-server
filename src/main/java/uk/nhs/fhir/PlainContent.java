@@ -5,6 +5,8 @@
  */
 package uk.nhs.fhir;
 
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import java.io.IOException;
@@ -45,12 +47,32 @@ public class PlainContent extends InterceptorAdapter {
 
         try {
             theResponse.setStatus(200);
-            theResponse.addHeader("Content-Type", "text/html");
             theResponse.setContentType("text/html");
             pw = theResponse.getWriter();
-            pw.append("<html><body>Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
-            pw.append(myWebber.getAllNames());
-            pw.append("</ul></body></html>");
+            pw.append("<html><body>");
+            if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
+                pw.append("Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+                StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
+                pw.append("<ul>");
+                pw.append("<li>url: " + sd.getUrl() + "</li>");
+                pw.append("<li>version: " + sd.getVersion() + "</li>");
+                pw.append("<li>name: " + sd.getName() + "</li>");
+                pw.append("<li>publisher: " + sd.getPublisher() + "</li>");
+                pw.append("<li>description: " + sd.getDescription() + "</li>");
+                pw.append("<li>requirements: " + sd.getRequirements() + "</li>");
+                pw.append("<li>status: " + sd.getStatus() + "</li>");
+                pw.append("<li>experimental: " + sd.getExperimental() + "</li>");
+                pw.append("<li>date: " + sd.getDate() + "</li>");
+                pw.append("<li>fhirVersion: " + sd.getFhirVersion() + "</li>");
+                pw.append(sd.getText().getDivAsString());
+                
+                pw.append("");
+            } else {
+                pw.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+                pw.append(myWebber.getAllNames());
+                pw.append("</ul>");
+            }
+            pw.append("</body></html>");
         } catch (IOException ex) {
             LOG.info("" + ex.getMessage());
         }
