@@ -24,9 +24,12 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import static com.mongodb.client.model.Filters.regex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import org.bson.conversions.Bson;
 
 /**
  *
@@ -40,8 +43,10 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "mymongo";
-    int port = 27017;
+    //String host = "mymongo";
+    //int port = 27017;
+    String host = "localhost";
+    int port = 28015;
 
     /**
      * Constructor to set up our connection to a mongoDB database
@@ -64,16 +69,25 @@ public class MongoIF {
         return foundDocRef;
     }
 
-    public List<StructureDefinition> getMatchByName(StringParam theNamePart) {
+    /**
+     * This is the method to do a search based on name, ie to find where
+     * name:contains=[parameter]
+     * 
+     * @param theNamePart
+     * @return 
+     */
+    public List<StructureDefinition> getMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
         Cursor cursor;
-        BasicDBObject query = new BasicDBObject("name", theNamePart);
+        BasicDBObject query = new BasicDBObject();
+        query.append("$regex", "^(?)" + Pattern.quote(theNamePart));
+        query.append("$options", "i");
         cursor = profiles.find(query);
         try {
-            if(cursor.hasNext()) {
-                LOG.info("Got it...");
+            while(cursor.hasNext()) {
+                LOG.info("Got one...");
                 StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
                 list.add(foundDocRef);
             }
@@ -124,4 +138,37 @@ public class MongoIF {
         return list;
     }
 
+
+    /**
+     * This is the method to search by name, e.g. name:contains=Patient
+     * 
+     * @param theNamePart
+     * @return 
+     */
+    public List<String> getAllNames(String theNamePart) {
+        LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
+        
+        List<String> list = new ArrayList<String>();
+        
+        Cursor cursor;
+
+        BasicDBObject regexQuery = new BasicDBObject();
+        regexQuery.put("name",
+            new BasicDBObject("$regex", Pattern.quote(theNamePart))
+            .append("$options", "i"));
+    
+        cursor = profiles.find(regexQuery);
+        try {
+            while(cursor.hasNext()) {
+                LOG.info("Got one...");
+                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                list.add("<li><a href='/fhir/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
+            }
+        } finally {
+            if(cursor != null)
+                cursor.close();
+        }        
+        LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");
+        return list;
+    }
 }

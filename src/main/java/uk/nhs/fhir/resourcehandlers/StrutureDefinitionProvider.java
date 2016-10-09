@@ -142,7 +142,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Search
     public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-        List<StructureDefinition> foundList = myMongo.getMatchByName(theNamePart);
+        List<StructureDefinition> foundList = myMongo.getMatchByName(theNamePart.toString());
         return foundList;
     }
 

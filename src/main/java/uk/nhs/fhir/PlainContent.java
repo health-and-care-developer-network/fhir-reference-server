@@ -12,6 +12,7 @@ import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,8 +69,20 @@ public class PlainContent extends InterceptorAdapter {
                 
                 pw.append("");
             } else {
+                Map<String, String[]> params = theRequestDetails.getParameters();
+                
                 pw.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
-                pw.append(myWebber.getAllNames());
+
+                if(params.containsKey("name") || params.containsKey("name:contains")) {
+                    if(params.containsKey("name")) {
+                        pw.append(myWebber.getAllNames(params.get("name")[0]));
+                    }
+                    if(params.containsKey("name:contains")) {
+                        pw.append(myWebber.getAllNames(params.get("name:contains")[0]));
+                    }
+                } else {
+                    pw.append(myWebber.getAllNames());
+                }
                 pw.append("</ul>");
             }
             pw.append("</body></html>");
