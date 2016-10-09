@@ -17,19 +17,16 @@ package uk.nhs.fhir.datalayer;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.rest.param.StringParam;
 import com.mongodb.BasicDBObject;
 import com.mongodb.Cursor;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import static com.mongodb.client.model.Filters.regex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.bson.conversions.Bson;
 
 /**
  *
@@ -61,6 +58,11 @@ public class MongoIF {
         ctx = FhirContext.forDstu2();
     }
 
+    /**
+     * Gets a specific one
+     * @param name
+     * @return 
+     */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
         LOG.info("Getting StructureDefinitions with name=" + name);
         BasicDBObject query = new BasicDBObject("name", name);
@@ -80,11 +82,13 @@ public class MongoIF {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
-        Cursor cursor;
-        BasicDBObject query = new BasicDBObject();
-        query.append("$regex", "^(?)" + Pattern.quote(theNamePart));
-        query.append("$options", "i");
-        cursor = profiles.find(query);
+        BasicDBObject regexQuery = new BasicDBObject();
+        regexQuery.put("name",
+            new BasicDBObject("$regex", Pattern.quote(theNamePart))
+            .append("$options", "i"));
+    
+        Cursor cursor = profiles.find(regexQuery);
+        
         try {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
@@ -98,6 +102,11 @@ public class MongoIF {
         return list;
     }
 
+    /**
+     * Gets a full list of StructureDefinition objects
+     * 
+     * @return 
+     */
     public List<StructureDefinition> getAll() {
         LOG.info("Getting all StructureDefinitions");
         
@@ -118,6 +127,11 @@ public class MongoIF {
         return list;
     }
     
+    /**
+     * Gets a full list of names for the web view of /StructureDefinition requests.
+     * 
+     * @return 
+     */
     public List<String> getAllNames() {
         LOG.info("Getting all StructureDefinition Names");
         
@@ -150,14 +164,12 @@ public class MongoIF {
         
         List<String> list = new ArrayList<String>();
         
-        Cursor cursor;
-
         BasicDBObject regexQuery = new BasicDBObject();
         regexQuery.put("name",
             new BasicDBObject("$regex", Pattern.quote(theNamePart))
             .append("$options", "i"));
     
-        cursor = profiles.find(regexQuery);
+        Cursor cursor = profiles.find(regexQuery);
         try {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
