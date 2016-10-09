@@ -40,8 +40,8 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "155.231.220.40";
-    int port = 80;
+    String host = "mymongo";
+    int port = 27017;
 
     /**
      * Constructor to set up our connection to a mongoDB database
