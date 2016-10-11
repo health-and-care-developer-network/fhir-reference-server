@@ -40,7 +40,7 @@ public class MongoIF {
     DBCollection profiles;
     DBCollection examples;
     FhirContext ctx;
-    String host = "webmongo";
+    String host = "mymongo";
     int port = 27017;
     //String host = "localhost";
     //int port = 28015;
