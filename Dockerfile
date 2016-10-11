@@ -2,7 +2,7 @@
 # This uses a base image from jetty, which can run war files...
 FROM jetty
 # Adds my war into the image
-ADD ./target/fhir-1.0-SNAPSHOT.war /var/lib/jetty/webapps/fhir-1.0-SNAPSHOT.war
+ADD ./target/fhir-1.0-SNAPSHOT.war /var/lib/jetty/webapps/ROOT.war
 # Says that when it runs, it's port 80 needs to be available
 EXPOSE 8080
 
