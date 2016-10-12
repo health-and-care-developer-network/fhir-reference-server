@@ -143,7 +143,7 @@ public class MongoIF {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
                 StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add("<li><a href='/fhir/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
+                list.add("<li><a href='/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
             }
         } finally {
             cursor.close();
@@ -174,7 +174,7 @@ public class MongoIF {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
                 StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add("<li><a href='/fhir/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
+                list.add("<li><a href='/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
             }
         } finally {
             if(cursor != null)
