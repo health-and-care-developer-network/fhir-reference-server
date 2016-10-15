@@ -1,10 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Health and Social Care Information Centre.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.DocumentReference;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Validate;
@@ -12,9 +23,12 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.MongoIF;
 import uk.nhs.fhir.validator.Validator;
+import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  *
@@ -23,6 +37,8 @@ import uk.nhs.fhir.validator.Validator;
 public class DocumentReferenceProvider implements IResourceProvider {
 
     MongoIF myMongo = null;
+    ValidatorManager myVMgr = null;
+    FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
     /**
@@ -30,8 +46,10 @@ public class DocumentReferenceProvider implements IResourceProvider {
      *
      * @param mongoInterface
      */
-    public DocumentReferenceProvider(MongoIF mongoInterface) {
+    public DocumentReferenceProvider(MongoIF mongoInterface, ValidatorManager vMgr) {
         myMongo = mongoInterface;
+        myVMgr = vMgr;
+        ctx = FhirContext.forDstu2();
     }
 
     /**
@@ -60,19 +78,26 @@ public class DocumentReferenceProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam DocumentReference resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-
-        Validator myValidator = new Validator();
-
-        List<String> problemsFound = myValidator.validateResource(resourceToTest, theProfile);
-
-        if(problemsFound.isEmpty()) {
-            // Celebrate
-        } else {
-            // Weep
+        
+        MethodOutcome retVal = null;
+        try {
+            
+            String resourceString = ctx.newXmlParser().encodeResourceToString(resourceToTest);
+            Validator myValidator = myVMgr.getValidator();
+            List<String> problemsFound = myValidator.validateXml(theProfile, resourceString);
+            
+            if(problemsFound.isEmpty()) {
+                // Celebrate
+            } else {
+                // Weep
+            }
+            
+            // This method returns a MethodOutcome object
+            retVal = new MethodOutcome();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(DocumentReferenceProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // This method returns a MethodOutcome object
-        MethodOutcome retVal = new MethodOutcome();
         return retVal;
     }
 //</editor-fold>

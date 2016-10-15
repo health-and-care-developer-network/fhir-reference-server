@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.IssueSeverityEnum;
@@ -31,10 +32,12 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.MongoIF;
 import uk.nhs.fhir.validator.Validator;
+import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  *
@@ -44,6 +47,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
 
     MongoIF myMongo = null;
+    ValidatorManager myVMgr = null;
+    FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
     /**
@@ -51,8 +56,10 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      *
      * @param mongoInterface
      */
-    public StrutureDefinitionProvider(MongoIF mongoInterface) {
+    public StrutureDefinitionProvider(MongoIF mongoInterface, ValidatorManager vMgr) {
         myMongo = mongoInterface;
+        myVMgr = vMgr;
+        ctx = FhirContext.forDstu2();
     }
 
     /**
@@ -81,38 +88,42 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam StructureDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-
-        Validator myValidator = new Validator();
-
-        List<String> problemsFound = myValidator.validateResource(resourceToTest, theProfile);
-
-        if(problemsFound.isEmpty()) {
-            // Celebrate
-        } else {
-            // Weep
+        MethodOutcome retVal = null;
+        try {
+            String resourceString = ctx.newXmlParser().encodeResourceToString(resourceToTest);
+            Validator myValidator = myVMgr.getValidator();
+            
+            List<String> problemsFound = myValidator.validateXml(theProfile, resourceString);
+            
+            if(problemsFound.isEmpty()) {
+                // Celebrate
+            } else {
+                // Weep
+            }
+            
+            // Actually do our validation: The UnprocessableEntityException
+            // results in an HTTP 422, which is appropriate for business rule failure
+            if(resourceToTest.getIdentifierFirstRep().isEmpty()) {
+                /* It is also possible to pass an OperationOutcome resource
+                * to the UnprocessableEntityException if you want to return
+                * a custom populated OperationOutcome. Otherwise, a simple one
+                * is created using the string supplied below.
+                */
+                throw new UnprocessableEntityException("No identifier supplied");
+            }
+            
+            // This method returns a MethodOutcome object
+            retVal = new MethodOutcome();
+            
+            // You may also add an OperationOutcome resource to return
+            // This part is optional though:
+            OperationOutcome outcome = new OperationOutcome();
+            outcome.addIssue().setSeverity(IssueSeverityEnum.WARNING).setDiagnostics("One minor issue detected");
+            
+            retVal.setOperationOutcome(outcome);
+        } catch (Exception ex) {
+            Logger.getLogger(StrutureDefinitionProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // Actually do our validation: The UnprocessableEntityException
-        // results in an HTTP 422, which is appropriate for business rule failure
-        if(resourceToTest.getIdentifierFirstRep().isEmpty()) {
-            /* It is also possible to pass an OperationOutcome resource
-             * to the UnprocessableEntityException if you want to return
-             * a custom populated OperationOutcome. Otherwise, a simple one
-             * is created using the string supplied below.
-             */
-            throw new UnprocessableEntityException("No identifier supplied");
-        }
-
-        // This method returns a MethodOutcome object
-        MethodOutcome retVal = new MethodOutcome();
-
-        // You may also add an OperationOutcome resource to return
-        // This part is optional though:
-        OperationOutcome outcome = new OperationOutcome();
-        outcome.addIssue().setSeverity(IssueSeverityEnum.WARNING).setDiagnostics("One minor issue detected");
-
-        retVal.setOperationOutcome(outcome);
-
         return retVal;
     }
 //</editor-fold>
