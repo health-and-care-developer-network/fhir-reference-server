@@ -22,17 +22,14 @@ import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.MongoIF;
-import uk.nhs.fhir.validator.Validator;
+import uk.nhs.fhir.validator.ValidatorFacade;
 import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  *
- * @author tim.coates@hscic.gov.uk
+ * @author Tim Coates
  */
 public class PractitionerProvider implements IResourceProvider {
 
@@ -79,27 +76,10 @@ public class PractitionerProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam Practitioner resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        MethodOutcome retVal = null;
-        try {
-            String resourceString = ctx.newXmlParser().encodeResourceToString(resourceToTest);
-            Validator myValidator = myVMgr.getValidator();
-
-            List<String> problemsFound = myValidator.validateXml(theProfile, resourceString);
-
-            if (problemsFound.isEmpty()) {
-                // Celebrate
-            } else {
-                // Weep
-            }
-
-            // This method returns a MethodOutcome object
-            retVal = new MethodOutcome();
-
-        } catch (Exception ex) {
-            Logger.getLogger(PractitionerProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return retVal;
-    }
+        
+        ValidatorFacade myFacade = new ValidatorFacade();
+        MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
+        return retVal;    }
 //</editor-fold>
 
 }

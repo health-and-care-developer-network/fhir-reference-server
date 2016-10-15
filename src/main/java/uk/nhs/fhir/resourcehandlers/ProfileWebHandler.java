@@ -22,7 +22,7 @@ import uk.nhs.fhir.datalayer.MongoIF;
 
 /**
  *
- * @author tim
+ * @author Tim Coates
  */
 public class ProfileWebHandler {
     private static final Logger LOG = Logger.getLogger(ProfileWebHandler.class.getName());
