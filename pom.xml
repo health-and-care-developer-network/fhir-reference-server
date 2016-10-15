@@ -30,6 +30,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>org.hl7.fhir</groupId>
+            <artifactId>validator</artifactId>
+            <version>1.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>

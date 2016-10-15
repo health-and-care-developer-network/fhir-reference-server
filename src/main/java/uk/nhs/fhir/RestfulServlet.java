@@ -29,6 +29,7 @@ import uk.nhs.fhir.resourcehandlers.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
+import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -43,6 +44,7 @@ public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final long serialVersionUID = 1L;
     MongoIF mongoInterface = null;
+    ValidatorManager vManager = null;
     
     /**
     * This is where we start, called when our servlet is first initialised.
@@ -54,15 +56,26 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void initialize() throws ServletException {
         
+        // We create one link to the mongodb database, which we'll pass to each
+        // resource type handler as we create them
         mongoInterface = new MongoIF();
+        
+        // We also create a validatorManager which we'll also pass to each
+        // resource type handler as we create them
+        try {
+            vManager = ValidatorManager.getInstance();
+        } catch (Throwable ex) {
+            LOG.severe(ex.getMessage());
+        }
+                
         ProfileWebHandler webber = new ProfileWebHandler(mongoInterface);
         
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionProvider(mongoInterface));
-        resourceProviders.add(new PatientProvider(mongoInterface));
-        resourceProviders.add(new DocumentReferenceProvider(mongoInterface));
-        resourceProviders.add(new PractitionerProvider(mongoInterface));
-        resourceProviders.add(new OrganizationProvider(mongoInterface));
+        resourceProviders.add(new StrutureDefinitionProvider(mongoInterface, vManager));
+        resourceProviders.add(new PatientProvider(mongoInterface, vManager));
+        resourceProviders.add(new DocumentReferenceProvider(mongoInterface, vManager));
+        resourceProviders.add(new PractitionerProvider(mongoInterface, vManager));
+        resourceProviders.add(new OrganizationProvider(mongoInterface, vManager));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");
