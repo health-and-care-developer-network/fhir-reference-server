@@ -20,8 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import org.hl7.fhir.dstu2.model.StringType;
 import org.hl7.fhir.dstu2.model.OperationOutcome;
-import org.hl7.fhir.dstu2.utils.ResourceUtilities;
-import org.hl7.fhir.dstu2.validation.ValidationEngine
+import org.hl7.fhir.dstu2.validation.ValidationEngine;
         
 /**
  *
