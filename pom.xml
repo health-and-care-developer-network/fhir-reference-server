@@ -13,6 +13,11 @@
     <dependencies>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
             <version>2.0</version>
             <type>jar</type>
@@ -33,7 +38,7 @@
             <groupId>org.hl7.fhir</groupId>
             <artifactId>validator</artifactId>
             <version>1.0</version>
-            <scope>runtime</scope>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

@@ -21,9 +21,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
 import ca.uhn.fhir.model.dstu2.valueset.IssueSeverityEnum;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
 
 /**
  *
@@ -31,7 +29,6 @@ import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
  */
 public class ValidatorFacade {
     private static final Logger LOG = Logger.getLogger(ValidatorFacade.class.getName());
-
     FhirContext ctx = null;
 
     public ValidatorFacade() {
@@ -42,23 +39,18 @@ public class ValidatorFacade {
         MethodOutcome results = new MethodOutcome();
 
         try {
-
             String resourceString = ctx.newXmlParser().encodeResourceToString(resource);
             Validator myValidator = myVMgr.getValidator();
             List<String> problemsFound = myValidator.validateXml(profileURL, resourceString);
 
-            if (problemsFound.isEmpty()) {
-                // Celebrate
-            } else {
+            if (problemsFound.isEmpty() == false) {
+                OperationOutcome outcome = new OperationOutcome();
                 for(String problem : problemsFound) {
-                    LOG.severe(problem);
-                    OperationOutcome outcome = new OperationOutcome();
+                    LOG.warning(problem);
                     outcome.addIssue().setSeverity(IssueSeverityEnum.WARNING).setDiagnostics(problem);
-                    results.setOperationOutcome(outcome);
                 }
+                results.setOperationOutcome(outcome);
             }
-
-            // This method returns a MethodOutcome object
         } catch (Exception ex) {
             LOG.severe("Exception calling validator: " + ex.getMessage());
         }

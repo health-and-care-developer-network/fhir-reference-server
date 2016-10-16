@@ -79,7 +79,8 @@ public class PractitionerProvider implements IResourceProvider {
         
         ValidatorFacade myFacade = new ValidatorFacade();
         MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
-        return retVal;    }
+        return retVal;
+    }
 //</editor-fold>
 
 }
