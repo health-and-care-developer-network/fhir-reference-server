@@ -16,11 +16,16 @@
 package uk.nhs.fhir.validator;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hl7.fhir.dstu2.model.StringType;
 import org.hl7.fhir.dstu2.model.OperationOutcome;
 import org.hl7.fhir.dstu2.validation.ValidationEngine;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.xml.sax.SAXException;
         
 /**
  *
@@ -52,16 +57,31 @@ public class Validator {
     Integer getIdentifier() { return identifier; }
     
     private void loadDefinitions()
-            throws Exception
     {
         byte[] buffer = new byte[DEFINITIONSBUFFER];
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(VALIDATORDEFINITIONS));
         int r = -1;
-        while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
-            os.write(buffer, 0, r);
+        
+        try {
+            while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
+                os.write(buffer, 0, r);
+            }
+            try {
+                engine.readDefinitions(os.toByteArray());
+            } catch (IOException ex) {
+                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SAXException ex) {
+                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FHIRException ex) {
+                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        engine.readDefinitions(os.toByteArray());
+        
+        
+
     }
     
     private ArrayList<String> validate(boolean xml, String p, byte[] d)
