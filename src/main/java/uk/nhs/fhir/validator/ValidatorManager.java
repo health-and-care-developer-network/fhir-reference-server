@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 package uk.nhs.fhir.validator;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.xml.sax.SAXException;
+import static uk.nhs.fhir.validator.Validator.DEFINITIONSBUFFER;
 /**
  *
  * @author damian
  */
 public class ValidatorManager {
-
+    protected static final String VALIDATORDEFINITIONS = "validation.xml.zip";
     private static final String VALIDATORPOOLSIZE = "uk.nhs.fhir.validator.poolsize";
     private static final int DEFAULTPOOLSIZE = 3;
     private static ValidatorManager validatorFactory = new ValidatorManager();
@@ -58,21 +67,28 @@ public class ValidatorManager {
     
     private ValidatorManager()
     {
-        free = new LinkedList<>();
-        used = new HashMap<>();
-        String p = System.getProperty(VALIDATORPOOLSIZE);
-        int poolSize = (p == null) ? DEFAULTPOOLSIZE : Integer.parseInt(p);
-        for (int i = 0; i < poolSize; i++) {
-            Integer id = new Integer(i);
-            Validator v = null;
-            try {
-                v = new Validator(id, this);
+        try {
+            free = new LinkedList<>();
+            used = new HashMap<>();
+            String p = System.getProperty(VALIDATORPOOLSIZE);
+            int poolSize = (p == null) ? DEFAULTPOOLSIZE : Integer.parseInt(p);
+            //==== Read the buffer once...
+            byte[] buffer = new byte[DEFINITIONSBUFFER];
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(VALIDATORDEFINITIONS));
+            int r = -1;
+            while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
+                os.write(buffer, 0, r);
             }
-            catch (Throwable t) {
-                bootError = t;
-                return;
+            //===
+            
+            for (int i = 0; i < poolSize; i++) {
+                Validator v = new Validator(i, this, os.toByteArray());
+                free.add(v);
             }
-            free.add(v);
+        } catch (IOException | SAXException | URISyntaxException | FHIRException ex) {
+            Logger.getLogger(ValidatorManager.class.getName()).log(Level.SEVERE, null, ex);
+            bootError = ex;
         }
     }
 }
