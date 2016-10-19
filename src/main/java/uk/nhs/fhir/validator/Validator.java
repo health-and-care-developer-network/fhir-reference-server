@@ -18,6 +18,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,45 +45,18 @@ public class Validator {
     private Integer identifier = null;
     private ValidatorManager manager = null;
     
-    Validator(Integer n, ValidatorManager m) 
-            throws Throwable
+    Validator(int n, ValidatorManager m, byte[] definitionsBuffer)
+            throws IOException, SAXException, URISyntaxException, FHIRException
     {
-        identifier = n;
+        identifier = new Integer(n);
         manager = m;
         engine = new ValidationEngine();
-        loadDefinitions();
+        engine.readDefinitions(definitionsBuffer);
         engine.connectToTSServer(txUrl == null ? DEFAULT_FHIR_TERMINOLOGY_SERVER : txUrl);
     }
   
     Integer getIdentifier() { return identifier; }
     
-    private void loadDefinitions()
-    {
-        byte[] buffer = new byte[DEFINITIONSBUFFER];
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(VALIDATORDEFINITIONS));
-        int r = -1;
-        
-        try {
-            while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
-                os.write(buffer, 0, r);
-            }
-            try {
-                engine.readDefinitions(os.toByteArray());
-            } catch (IOException ex) {
-                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SAXException ex) {
-                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (FHIRException ex) {
-                Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-
-    }
     
     private ArrayList<String> validate(boolean xml, String p, byte[] d)
             throws Exception
