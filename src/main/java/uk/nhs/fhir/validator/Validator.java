@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
  * @author damian
  */
 public class Validator {
+    private static final Logger LOG = Logger.getLogger(Validator.class.getName());
     protected static final String VALIDATORDEFINITIONS = "validation.xml.zip";
     protected static final int DEFINITIONSBUFFER = 2048000;
     protected static final String DEFAULT_FHIR_TERMINOLOGY_SERVER = "http://fhir2.healthintersections.com.au/open";
@@ -48,32 +49,46 @@ public class Validator {
     Validator(int n, ValidatorManager m, byte[] definitionsBuffer)
             throws IOException, SAXException, URISyntaxException, FHIRException
     {
+        LOG.log(Level.INFO, "Creating validator: #{0}", n);
         identifier = new Integer(n);
         manager = m;
         engine = new ValidationEngine();
+        if(engine != null){
+            LOG.info("Validation engine created");
+        }
         engine.readDefinitions(definitionsBuffer);
         engine.connectToTSServer(txUrl == null ? DEFAULT_FHIR_TERMINOLOGY_SERVER : txUrl);
+        LOG.info("Connected to terminology server");
     }
   
     Integer getIdentifier() { return identifier; }
     
     
-    private ArrayList<String> validate(boolean xml, String p, byte[] d)
-            throws Exception
-    {
-        if (engine == null)
+    private ArrayList<String> validate(boolean xml, String p, byte[] d) throws Exception {
+        LOG.info("validate method called");
+        if (engine == null) {
             throw new Exception("No validation engine");
+        }
+        
         ArrayList<String> results = null;
+        LOG.info("Resetting the engine");
         engine.reset();
-        if (p != null)
+        if (p != null) {
+            LOG.info("Loading profile");
             engine.loadProfile(p);
+        }
+        LOG.info("Setting source");
         engine.setSource(d);
+        LOG.info("About to ask engine to process data...");
         if (xml)
             engine.processXml();
         else
             engine.processJson();
+        
+        LOG.info("Engine has finished processing");
         OperationOutcome outcome = engine.getOutcome();
         if (outcome != null) {
+            LOG.info("Faults found, creating results");
             results = new ArrayList<>();
             for (OperationOutcome.OperationOutcomeIssueComponent ooic : outcome.getIssue()) {
                 boolean pass = true;
@@ -86,8 +101,12 @@ public class Validator {
                 }
                 results.add(octext.toString());
             }
+        } else {
+            LOG.info("completed with no faults found");
         }
+        LOG.info("Recycling this validator");
         manager.recycleValidator(identifier);
+        LOG.info("validation completed");
         return results;
     }
     

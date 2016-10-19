@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package uk.nhs.fhir.validator;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import static uk.nhs.fhir.validator.Validator.DEFINITIONSBUFFER;
  * @author damian
  */
 public class ValidatorManager {
+    private static final Logger LOG = Logger.getLogger(ValidatorManager.class.getName());
     protected static final String VALIDATORDEFINITIONS = "validation.xml.zip";
     private static final String VALIDATORPOOLSIZE = "uk.nhs.fhir.validator.poolsize";
     private static final int DEFAULTPOOLSIZE = 3;
@@ -42,23 +44,30 @@ public class ValidatorManager {
     public static ValidatorManager getInstance() 
             throws Throwable
     {
+        LOG.info("ValidatorManager instance requested");
         if (bootError != null)
             throw bootError;
         return validatorFactory; 
     }
+    
     public synchronized Validator getValidator()
             throws RuntimeException
     {
-        if (free.isEmpty())
+        LOG.info("Validator requested");
+        if (free.isEmpty()) {
+            LOG.warning("NONE AVAILABLE");
             throw new RuntimeException("No validator instances available, try again later");
+        }
         
         Validator v = free.removeFirst();
         used.put(v.getIdentifier(), v);
+        LOG.log(Level.INFO, "returning validator: #{0}", v.getIdentifier());
         return v;
     }
     
     synchronized void recycleValidator(Integer i) 
     {
+        LOG.log(Level.INFO, "Recycling validator: #{0}", i);
         Validator v = used.get(i);
         if (v == null)
             return;
@@ -67,12 +76,12 @@ public class ValidatorManager {
     
     private ValidatorManager()
     {
+        LOG.info("Creating new ValidatorManager with pool size: " + VALIDATORPOOLSIZE);
         try {
             free = new LinkedList<>();
             used = new HashMap<>();
             String p = System.getProperty(VALIDATORPOOLSIZE);
             int poolSize = (p == null) ? DEFAULTPOOLSIZE : Integer.parseInt(p);
-            //==== Read the buffer once...
             byte[] buffer = new byte[DEFINITIONSBUFFER];
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(VALIDATORDEFINITIONS));
@@ -80,14 +89,16 @@ public class ValidatorManager {
             while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
                 os.write(buffer, 0, r);
             }
-            //===
+            byte[] validationFileData = os.toByteArray();
+            LOG.log(Level.INFO, "Read validation file of size : {0} bytes into memory", validationFileData.length);
             
             for (int i = 0; i < poolSize; i++) {
-                Validator v = new Validator(i, this, os.toByteArray());
+                LOG.info("Requesting a new validator to add to my pool...");
+                Validator v = new Validator(i, this, validationFileData);
                 free.add(v);
             }
         } catch (IOException | SAXException | URISyntaxException | FHIRException ex) {
-            Logger.getLogger(ValidatorManager.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "Exception caught in ValidatorManager constructor: {0}", ex.getMessage());
             bootError = ex;
         }
     }
