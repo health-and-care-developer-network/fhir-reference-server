@@ -37,10 +37,12 @@ public class ValidatorFacade {
 
     public MethodOutcome Validate(BaseResource resource, String profileURL, ValidatorManager myVMgr) {
         MethodOutcome results = new MethodOutcome();
-
+        LOG.info("VadatorFacade asked to validate resource of type: " + resource.getResourceName());
         try {
             String resourceString = ctx.newXmlParser().encodeResourceToString(resource);
+            LOG.info("Requesting validator");
             Validator myValidator = myVMgr.getValidator();
+            LOG.info("A validator was retrieved, asking it to validate...");
             List<String> problemsFound = myValidator.validateXml(profileURL, resourceString);
 
             if (problemsFound.isEmpty() == false) {
@@ -52,7 +54,7 @@ public class ValidatorFacade {
                 results.setOperationOutcome(outcome);
             }
         } catch (Exception ex) {
-            LOG.severe("Exception calling validator: " + ex.getMessage());
+            LOG.severe("Exception caught in VvalidatorFacade : " + ex.getMessage());
         }
         return results;
     }
