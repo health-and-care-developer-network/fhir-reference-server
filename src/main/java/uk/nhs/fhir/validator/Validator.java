@@ -66,7 +66,7 @@ public class Validator {
     Integer getIdentifier() { return identifier; }
     
     
-    ArrayList<String> validate(String p, byte[] d) throws Exception {
+    ArrayList<String> doValidate(String p, byte[] d) throws Exception {
         LOG.info("validate method called");
         if (engine == null) {
             throw new Exception("No validation engine");
