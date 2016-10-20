@@ -22,6 +22,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.hl7.fhir.dstu2.model.StringType;
 import org.hl7.fhir.dstu2.model.OperationOutcome;
 import org.hl7.fhir.dstu2.validation.ValidationEngine;
@@ -64,7 +66,7 @@ public class Validator {
     Integer getIdentifier() { return identifier; }
     
     
-    private ArrayList<String> validate(boolean xml, String p, byte[] d) throws Exception {
+    ArrayList<String> validate(String p, byte[] d) throws Exception {
         LOG.info("validate method called");
         if (engine == null) {
             throw new Exception("No validation engine");
@@ -80,10 +82,19 @@ public class Validator {
         LOG.info("Setting source");
         engine.setSource(d);
         LOG.info("About to ask engine to process data...");
-        if (xml)
+        try {
             engine.processXml();
-        else
-            engine.processJson();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformerException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FHIRException ex) {
+            Logger.getLogger(Validator.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         LOG.info("Engine has finished processing");
         OperationOutcome outcome = engine.getOutcome();
@@ -108,54 +119,5 @@ public class Validator {
         manager.recycleValidator(identifier);
         LOG.info("validation completed");
         return results;
-    }
-    
-    public ArrayList<String> validateXml(String p, byte[] d)
-            throws Exception
-    {
-        return validate(true, p, d);
-    }
-    
-    public ArrayList<String> validateXml(String p, String d)
-            throws Exception
-    {
-        return validate(true, p, d.getBytes());
-    }
-
-    public ArrayList<String> validateJson(String p, byte[] d)
-            throws Exception
-    {
-        return validate(false, p, d);
-    }
-    
-    public ArrayList<String> validateJson(String p, String d)
-            throws Exception
-    {
-        return validate(false, p, d.getBytes());
-    }
-    
-    private byte[] readStream(InputStream i)
-            throws Exception
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte [] buffer = new byte[DEFINITIONSBUFFER];
-        BufferedInputStream bis = new BufferedInputStream(i);
-        int r = -1;
-        while ((r = bis.read(buffer, 0, DEFINITIONSBUFFER)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        return baos.toByteArray();
-    }
-    
-    public ArrayList<String> validateXml(String p, InputStream i)
-            throws Exception
-    {
-        return validate(true, p, readStream(i));
-    }
-    
-    public ArrayList<String> validateJson(String p, InputStream i)
-            throws Exception
-    {
-        return validate(false, p, readStream(i));
     }    
 }

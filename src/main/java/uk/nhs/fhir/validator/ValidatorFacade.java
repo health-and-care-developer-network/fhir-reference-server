@@ -43,7 +43,7 @@ public class ValidatorFacade {
             LOG.info("Requesting validator");
             Validator myValidator = myVMgr.getValidator();
             LOG.info("A validator was retrieved, asking it to validate...");
-            List<String> problemsFound = myValidator.validateXml(profileURL, resourceString);
+            List<String> problemsFound = myValidator.validate(profileURL, resourceString.getBytes());
 
             if (problemsFound.isEmpty() == false) {
                 OperationOutcome outcome = new OperationOutcome();
