@@ -34,41 +34,29 @@ public class NewMain {
     }
 
     void run() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<table>\n");
         try {
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
-                    .newInstance();
+            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(new File("c:\\users\\tico3\\account.profile.xml"));
-            
-            NodeList snapshot = document.getElementsByTagName("snapshot");
-            Node node = snapshot.item(0);
-            Element node1 = (Element) snapshot.item(0);
-            NodeList elements = node1.getElementsByTagName("element");
 
+            NodeList names = document.getElementsByTagName("name");
+            Node name = names.item(0);
+            NamedNodeMap typeAttributes = name.getAttributes();
+            String resourceName = typeAttributes.getNamedItem("value").getTextContent();
+
+            NodeList snapshot = document.getElementsByTagName("snapshot");
+            Element node = (Element) snapshot.item(0);
+            NodeList elements = node.getElementsByTagName("element");
 
             // Here we're looping through the elements...
             for(int i = 0; i < elements.getLength(); i++) {
                 Element element = (Element) elements.item(i);
-                if(element.getNodeType() == Node.ELEMENT_NODE) {
-                    // Get the name of it...
-                    NodeList path = element.getElementsByTagName("path");
-                    NamedNodeMap attributes = path.item(0).getAttributes();
-                    System.out.println("[" + attributes.getNamedItem("value").getTextContent() + "]");
-                    
-                    // Get the type...
-                    NodeList type = element.getElementsByTagName("type");
-                    Element typeElement = (Element) type.item(0);
-                    
-                    NodeList codeElement = typeElement.getElementsByTagName("code");
-                    Element typecodeElement = (Element) codeElement.item(0);
-                    
-                    NamedNodeMap typeAttributes = typecodeElement.getAttributes();
-                    System.out.println("[" + typeAttributes.getNamedItem("value").getTextContent() + "]\n");
-                    
-                }
+                sb.append(MakeRow(element, resourceName));
             }
 
-            
         } catch (SAXException ex) {
             Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -76,6 +64,69 @@ public class NewMain {
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
         }
+        sb.append("</table>\n");
+        System.out.println(sb.toString());
     }
 
+    String MakeRow(Element element, String resName) {
+        StringBuilder sb = new StringBuilder();
+
+        if(element.getNodeType() == Node.ELEMENT_NODE) {
+
+            // Get the name of it...
+            NodeList path = element.getElementsByTagName("path");
+            NamedNodeMap attributes = path.item(0).getAttributes();
+            String elementName = attributes.getNamedItem("value").getTextContent();
+            
+            if(elementName.equals(resName + ".id")
+                    || elementName.equals(resName + ".meta")
+                    || elementName.equals(resName + "implicitRules")
+                    || elementName.equals(resName + ".language")
+                    || elementName.equals(resName + ".text")) {
+                return "";
+            }
+
+            // Get the type...
+            NodeList type = element.getElementsByTagName("type");
+            Element typeElement = (Element) type.item(0);
+            NodeList codeElement = typeElement.getElementsByTagName("code");
+            Element typecodeElement = (Element) codeElement.item(0);
+            NamedNodeMap typeAttributes = typecodeElement.getAttributes();
+            String typeName = typeAttributes.getNamedItem("value").getTextContent();
+
+            sb.append(" <tr>\n");
+            sb.append("  <td>");
+
+            if(elementName.equals(resName)) {
+                sb.append("<img title=\"Resource\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJBSURBVDjLhdKxa5NBGMfx713yvkmbJnaoFiSF4mJTh06Kg4OgiyCCRXCof4YIdXdxFhQVHPo3OFSoUx0FySQttaVKYq2NbdO8ed/L3fM4JG3tYPvAcfBw9+HHPWdUlf/V0tLSqKo+EpEHInJFRIohhDUR+RBCeDM7O7ua55QSkRfVanVufHyckZERrLV0Op2Zra2tmXq9fg+YsmcAdyYnJykUCke9OI6ZmJgghHAZ4KwE3ntPs9mkVCohIjQaDWq1GiEEAM5KoHEcY62lVCrRarUoFotUKpUjIL/y/uqXYmV62ph/LSVrr30P4bEFcM4B0Ov1jk547/uAUTs1ceNdZIwB7V/GGHz6+9LXxY96eDiEgHMOY8xJAK8p4grZz5cElwNbwZgyxYu3EFM01lriOCZJEqIoIooiALIsGwA9Y1UcwcWoKNLdpLu9zvbnBWqNBhuvn5EDUmB0EH/1E2TZw5U+YLQovkun+Ytsaw1xCbnCOap334LC7s4Oe/ttvA+ICLmhMXRxDufczUECS37oAuevPwUEVFFp4/eXkXSdYc2IopSepnjtUh5/wg9gfn6+OQBUNaRIUkfDHhraSLoBKqikIF3yHJDLHaAkFOLciVHnyVAVj/S2Ub/XRyQD9aAZKgkaOohvo6ENgykcA07VEFDfQv1uf4W9Y8y30bCPhg4qKZJtMnjTPqBO/vhkZ7h3EJeRslWNQMqgY2jIAIfa/m5sIKSpqpPsGEiz599e3b+GchtD+bSvjQJm2SG6cNj6C+QmaxAek5tyAAAAAElFTkSuQmCC\">");
+            } else {
+                if(typeName.equals("string")
+                        || typeName.equals("code")) {
+                    sb.append("<img title=\"Primitive Data Type\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gYBFzI0BrFQCwAAAERJREFUOMtj/P//PwMlgImBQjDwBrCcOnWKokBgYWBgYDCU+06W5i8MUggvnH/EOVJjAW4AuQHJ+O75LYqikXE0LzAAALePEntTkEoSAAAAAElFTkSuQmCC\">");
+                }
+                if(typeName.equals("Identifier")
+                        || typeName.equals("CodeableConcept")
+                        || typeName.equals("Coding")
+                        || typeName.equals("Quantity")
+                        || typeName.equals("Money")
+                        || typeName.equals("Period")
+                        || typeName.equals("Money")) {
+                    sb.append("<img title=\"Data Type\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7\">");
+                }
+                if(typeName.equals("Reference")) {
+                    sb.append("<img title=\"Reference to another Resource\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC\">");
+                }
+            }
+            sb.append(elementName)
+                    .append("</td>\n");
+            sb.append("  <td>Flags</td>\n");
+            sb.append("  <td>Card</td>\n");
+            sb.append("  <td>")
+                    .append(typeName)
+                    .append("</td>\n");
+            sb.append(" </tr>");
+        }
+
+        return sb.toString();
+    }
 }
