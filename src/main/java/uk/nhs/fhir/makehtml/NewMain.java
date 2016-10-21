@@ -82,7 +82,11 @@ public class NewMain {
                     || elementName.equals(resName + ".meta")
                     || elementName.equals(resName + "implicitRules")
                     || elementName.equals(resName + ".language")
-                    || elementName.equals(resName + ".text")) {
+                    || elementName.equals(resName + ".text")
+                    || elementName.equals(resName + ".contained")
+                    || elementName.equals(resName + ".extension")
+                    || elementName.equals(resName + ".modifierExtension")
+                    || elementName.equals(resName + ".implicitRules")) {
                 return "";
             }
 
@@ -124,7 +128,7 @@ public class NewMain {
             sb.append("  <td>")
                     .append(typeName)
                     .append("</td>\n");
-            sb.append(" </tr>");
+            sb.append(" </tr>\n");
         }
 
         return sb.toString();
