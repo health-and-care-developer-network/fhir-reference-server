@@ -117,7 +117,7 @@ public class NewMain {
             sb.append(" <tr>\n");
             sb.append("  <td>");
             
-            
+            // Here we draw the tree line items.
             if(lastItem) {
                 sb.append("<img xmlns=\"http://www.w3.org/1999/xhtml\" style=\"background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC\" />");
             } else {
