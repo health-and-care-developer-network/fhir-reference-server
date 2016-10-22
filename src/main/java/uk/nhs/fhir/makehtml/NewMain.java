@@ -37,10 +37,17 @@ public class NewMain {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<table border='0' cellpadding='0'>\n");
+        sb.append(" <tr>\n");
+        sb.append("  <td>Name</td>\n");
+        sb.append("  <td>Flags</td>\n");
+        sb.append("  <td>Card</td>\n");
+        sb.append("  <td>Type</td>\n");
+        sb.append("  <td>Description & Constraints</td>\n");
+        sb.append(" </tr>\n");
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document document = docBuilder.parse(new File("c:\\users\\tico3\\account.profile.xml"));
+            Document document = docBuilder.parse(new File("C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\allergyintolerance.profile.xml"));
 
             NodeList names = document.getElementsByTagName("name");
             Node name = names.item(0);
@@ -78,8 +85,7 @@ public class NewMain {
 
             // Get the name of it...
             NodeList path = element.getElementsByTagName("path");
-            NamedNodeMap attributes = path.item(0).getAttributes();
-            String elementName = attributes.getNamedItem("value").getTextContent();
+            String elementName = getElementValue((Element) path.item(0));
             
             if(elementName.equals(resName + ".id")
                     || elementName.equals(resName + ".meta")
@@ -98,9 +104,16 @@ public class NewMain {
             Element typeElement = (Element) type.item(0);
             NodeList codeElement = typeElement.getElementsByTagName("code");
             Element typecodeElement = (Element) codeElement.item(0);
-            NamedNodeMap typeAttributes = typecodeElement.getAttributes();
-            String typeName = typeAttributes.getNamedItem("value").getTextContent();
+            String typeName = getElementValue(typecodeElement);
 
+            // Get the cardinality...
+            NodeList minList = element.getElementsByTagName("min");
+            Element minElement = (Element) minList.item(0);
+            String min = getElementValue(minElement);
+            NodeList maxList = element.getElementsByTagName("max");
+            Element maxElement = (Element) maxList.item(0);
+            String max = getElementValue(maxElement);
+            
             sb.append(" <tr>\n");
             sb.append("  <td>");
             
@@ -116,6 +129,7 @@ public class NewMain {
             if(elementName.equals(resName)) {
                 sb.append("<img xmlns=\"http://www.w3.org/1999/xhtml\" title=\"Resource\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJBSURBVDjLhdKxa5NBGMfx713yvkmbJnaoFiSF4mJTh06Kg4OgiyCCRXCof4YIdXdxFhQVHPo3OFSoUx0FySQttaVKYq2NbdO8ed/L3fM4JG3tYPvAcfBw9+HHPWdUlf/V0tLSqKo+EpEHInJFRIohhDUR+RBCeDM7O7ua55QSkRfVanVufHyckZERrLV0Op2Zra2tmXq9fg+YsmcAdyYnJykUCke9OI6ZmJgghHAZ4KwE3ntPs9mkVCohIjQaDWq1GiEEAM5KoHEcY62lVCrRarUoFotUKpUjIL/y/uqXYmV62ph/LSVrr30P4bEFcM4B0Ov1jk547/uAUTs1ceNdZIwB7V/GGHz6+9LXxY96eDiEgHMOY8xJAK8p4grZz5cElwNbwZgyxYu3EFM01lriOCZJEqIoIooiALIsGwA9Y1UcwcWoKNLdpLu9zvbnBWqNBhuvn5EDUmB0EH/1E2TZw5U+YLQovkun+Ytsaw1xCbnCOap334LC7s4Oe/ttvA+ICLmhMXRxDufczUECS37oAuevPwUEVFFp4/eXkXSdYc2IopSepnjtUh5/wg9gfn6+OQBUNaRIUkfDHhraSLoBKqikIF3yHJDLHaAkFOLciVHnyVAVj/S2Ub/XRyQD9aAZKgkaOohvo6ENgykcA07VEFDfQv1uf4W9Y8y30bCPhg4qKZJtMnjTPqBO/vhkZ7h3EJeRslWNQMqgY2jIAIfa/m5sIKSpqpPsGEiz599e3b+GchtD+bSvjQJm2SG6cNj6C+QmaxAek5tyAAAAAElFTkSuQmCC\" />");
             } else {
+                elementName = elementName.substring(elementName.indexOf(".")+1);
                 if(typeName.equals("string")
                         || typeName.equals("code")) {
                     sb.append("<img title=\"Primitive Data Type\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gYBFzI0BrFQCwAAAERJREFUOMtj/P//PwMlgImBQjDwBrCcOnWKokBgYWBgYDCU+06W5i8MUggvnH/EOVJjAW4AuQHJ+O75LYqikXE0LzAAALePEntTkEoSAAAAAElFTkSuQmCC\">");
@@ -135,8 +149,15 @@ public class NewMain {
             }
             sb.append(elementName)
                     .append("</td>\n");
-            sb.append("  <td>Flags</td>\n");
-            sb.append("  <td>Card</td>\n");
+            sb.append("  <td>Flags</td>\n")
+                    
+                    ;
+            sb.append("  <td>");
+            sb.append(min)
+                    .append("..")
+                    .append(max);
+            
+            sb.append("</td>\n");
             sb.append("  <td>")
                     .append(typeName)
                     .append("</td>\n");
@@ -147,5 +168,12 @@ public class NewMain {
         }
 
         return sb.toString();
+    }
+    
+    // Get the 'value' attribute of an element
+    String getElementValue(Element item) {
+        NamedNodeMap typeAttributes = item.getAttributes();
+        String value = typeAttributes.getNamedItem("value").getTextContent();
+        return value;
     }
 }
