@@ -7,6 +7,7 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,6 +45,8 @@ public class NewMain {
         sb.append("  <td>Type</td>\n");
         sb.append("  <td>Description & Constraints</td>\n");
         sb.append(" </tr>\n");
+        
+        ArrayList<MyElement> elementList = new ArrayList<MyElement>();
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -61,12 +64,22 @@ public class NewMain {
             // Here we're looping through the elements...
             for(int i = 0; i < elements.getLength(); i++) {
                 Element element = (Element) elements.item(i);
-                if(i == elements.getLength() -1) {
-                    sb.append(MakeRow(element, resourceName, true));
-                } else {
-                    sb.append(MakeRow(element, resourceName, false));
+                String elementName = getElementName(element);
+                elementList.add(new MyElement(elementName, resourceName));
+            }
+            
+            // We should have a list of ALL Elements, including those we don't display!
+            
+            // Set the last item to be 'last'
+            elementList.get(elementList.size()-1).setIsLast(true);
+            
+            // Now work through and see if any have 'children...
+            for(int i=0; i <= elementList.size(); i++) {
+                if(elementList.get(i).getLocalName().contains(".")) {
+                    // We're looking at child elements
                 }
             }
+            
         } catch (SAXException ex) {
             Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -184,5 +197,11 @@ public class NewMain {
         NamedNodeMap typeAttributes = item.getAttributes();
         String value = typeAttributes.getNamedItem("value").getTextContent();
         return value;
+    }
+    
+    String getElementName(Element item){
+        NodeList pathsList = item.getElementsByTagName("path");
+        Element node = (Element) pathsList.item(0);
+        return getElementValue(node);
     }
 }
