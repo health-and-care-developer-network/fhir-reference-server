@@ -50,8 +50,8 @@ public class NewMain {
         
         StructureDefinition structureDefinitionResource = null;
         
-        //String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\NRLS-DocumentReference-1-0.xml";
-        String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\allergyintolerance.profile.xml";
+        String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\NRLS-DocumentReference-1-0.xml";
+        //String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\allergyintolerance.profile.xml";
 
         StringBuilder sb = new StringBuilder();
         //sb.append("<html>\n<body>\n");
