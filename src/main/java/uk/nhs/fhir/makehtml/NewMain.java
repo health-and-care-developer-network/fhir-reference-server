@@ -5,9 +5,16 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import java.awt.event.ItemListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -40,19 +47,22 @@ public class NewMain {
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     void run() {
-
-        String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\NRLS-DocumentReference-1-0.xml";
+        
+        StructureDefinition structureDefinitionResource = null;
+        
+        //String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\NRLS-DocumentReference-1-0.xml";
+        String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\allergyintolerance.profile.xml";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<html>\n<body>\n");
-        sb.append("<div>");
+        //sb.append("<html>\n<body>\n");
+        sb.append("<div xmlns=\"http://www.w3.org/1999/xhtml\">");
         sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
         sb.append("  <tr>\n");
         sb.append("   <th>Name</th>\n");
         sb.append("   <th>Flags</th>\n");
         sb.append("   <th>Card.</th>\n");
         sb.append("   <th>Type</th>\n");
-        sb.append("   <th>Description & Constraints</th>\n");
+        sb.append("   <th>Description &amp; Constraints</th>\n");
         sb.append("  </tr>\n");
 
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
@@ -62,8 +72,8 @@ public class NewMain {
             Document document = docBuilder.parse(new File(fileName));
 
             // We already have a text block, abort...
-            NodeList narrative = document.getElementsByTagName("text");
-            if(narrative.getLength() == 0) {
+            //NodeList narrative = document.getElementsByTagName("text");
+            //if(narrative.getLength() == 0) {
 
                 NodeList names = document.getElementsByTagName("name");
                 Node name = names.item(0);
@@ -268,7 +278,7 @@ public class NewMain {
                         sb.append("   </tr>\n");
                     }
                 }
-            }
+            //}
 
         } catch (SAXException ex) {
             Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
@@ -279,8 +289,22 @@ public class NewMain {
         }
         sb.append(" </table>\n");
         sb.append("</div>");
-        sb.append("</body>\n</html>\n");
-        writeFile(sb);
+        //sb.append("</body>\n</html>\n");
+        
+        FhirContext ctx = FhirContext.forDstu2();
+        
+        try {
+            structureDefinitionResource = (StructureDefinition) ctx.newXmlParser().parseResource(new BufferedReader(new FileReader(fileName)));
+            NarrativeDt textElement = new NarrativeDt();
+            textElement.setStatus(NarrativeStatusEnum.GENERATED);
+            textElement.setDiv(sb.toString());
+            structureDefinitionResource.setText(textElement);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        System.out.println(structureDefinitionResource.getResourceName());
     }
 
     String getElementName(Element item) {
