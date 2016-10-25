@@ -43,7 +43,7 @@ public class NewMain {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<html>\n <body>\n");
-        sb.append("  <table border='0' cellpadding='0'>\n");
+        sb.append("  <table border='0' cellpadding='0' cellspacing='0'>\n");
         sb.append("   <tr>\n");
         sb.append("    <th>Name</th>\n");
         sb.append("    <th>Flags</th>\n");
@@ -93,7 +93,7 @@ public class NewMain {
                     sb.append("   <tr>\n");
                     
                     // Make a cell for the tree images and the name
-                    sb.append("    <td>");
+                    sb.append("    <td style=\"padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">");
                     // Tree and object type images need to go here
                     // Simplest cases...
 //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 1 elements">
@@ -241,22 +241,22 @@ public class NewMain {
                     sb.append("</td>\n");
                     
                     // Now the flags column
-                    sb.append("    <td>");
+                    sb.append("    <td style=\"padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">");
                     sb.append(item.getFlags());
                     sb.append("</td>\n");
                     
                     // Now the Cardinality column
-                    sb.append("    <td>");
+                    sb.append("    <td style=\"padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">");
                     sb.append(item.getCardinality());
                     sb.append("</td>\n");
                     
                     // Now the type column
-                    sb.append("    <td>");
+                    sb.append("    <td style=\"padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">");
                     sb.append(item.getTypeName());
                     sb.append("</td>\n");
 
                     // And now the description
-                    sb.append("    <td>");
+                    sb.append("    <td style=\"padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">");
                     sb.append(item.getDescription());
                     sb.append("</td>\n");
                     
@@ -315,7 +315,7 @@ public class NewMain {
         if(summaryList.getLength() > 0) {
             Element summary = (Element) summaryList.item(0);
             if(summary.getAttribute("value").equals("true")) {
-                flags = flags + "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"This element is included in summaries\">Σ</span>\n";
+                flags = flags + "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"This element is included in summaries\">&Sigma;</span>\n";
             }
         }
         
