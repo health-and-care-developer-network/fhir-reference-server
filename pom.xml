@@ -10,6 +10,23 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
+    <!-- See: https://devcenter.heroku.com/articles/local-maven-dependencies -->
+    <repositories>
+	    <repository>
+	        <id>project.local</id>
+	        <name>Local project JAR file dependencies</name>
+	        <releases>
+		        <enabled>true</enabled>
+		        <checksumPolicy>ignore</checksumPolicy>
+		    </releases>
+		    <snapshots>
+		        <enabled>false</enabled>
+		    </snapshots>
+	        <url>file://${project.basedir}/repo</url>
+	    </repository>
+	</repositories>
+    
     <dependencies>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
