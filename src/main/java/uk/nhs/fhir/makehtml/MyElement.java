@@ -115,11 +115,16 @@ public class MyElement {
     }
     
     public String getNiceTitle() {
-        return "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"" + myHover + "\">" + localName + "</span>";
+        return "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"" + cleanHoverText(myHover) + "\">" + localName + "</span>";
     }
     
     public String getDescription() {
         return this.myDescription;                
+    }
+    
+    private static String cleanHoverText(String hover) {
+    	return hover.replace("\"", "&quot;");
+    	
     }
 //</editor-fold>
 }
