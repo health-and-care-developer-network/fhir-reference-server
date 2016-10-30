@@ -18,6 +18,7 @@ public class MyElement {
     private String typeName;
     private int level;
     private boolean display;
+
     private String myCardinality;
     private String myFlags;
     private String myDescription;
@@ -73,6 +74,10 @@ public class MyElement {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
     public String getFullName() {
         return fullName;
     }
