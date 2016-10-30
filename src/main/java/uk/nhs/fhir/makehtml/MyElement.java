@@ -24,8 +24,13 @@ public class MyElement {
     private String myDescription;
     private String myHover;
     private String fullName;
+    private boolean changed = false;
 
-    public MyElement(String newName, String cardinality, String typeName, String theFlags, String description, String hover) {        
+    public boolean isChanged() {
+        return changed;
+    }
+
+    public MyElement(String newName, String cardinality, String typeName, String theFlags, String description, String hover, boolean hasChanged) {        
         // Set what level of indentation we're at...
         this.level = StringUtils.countMatches(newName, ".");
         
@@ -52,6 +57,9 @@ public class MyElement {
         
         // Set the title
         this.myDescription = description;
+        
+        // Set whether we've been changed from the base resource...
+        this.changed = hasChanged;
         
         // If it's the root resource then clearly we're going to be showing it...
         if(this.level == 0) {

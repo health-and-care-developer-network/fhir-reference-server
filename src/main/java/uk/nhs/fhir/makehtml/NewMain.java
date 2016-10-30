@@ -47,8 +47,6 @@ public class NewMain implements Constants {
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     private void run() {
-        //String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\NRLS-DocumentReference-1-0.xml";
-        //String fileName = "C:\\Users\\tico3\\NetBeansProjects\\MakeHTML\\src\\main\\resources\\uk\\nhs\\fhir\\makehtml\\allergyintolerance.profile.xml";
         String filename = "/uk/nhs/fhir/makehtml/NRLS-DocumentReference-1-0.xml";
 
         StringBuilder sb = new StringBuilder();
@@ -80,6 +78,13 @@ public class NewMain implements Constants {
             Element node = (Element) snapshot.item(0);
             NodeList elements = node.getElementsByTagName("element");
 
+            NodeList differential = document.getElementsByTagName("differential");
+            Element diffNode = (Element) differential.item(0);
+            NodeList diffElements = diffNode.getElementsByTagName("element");
+            
+            //for(int i = 0; i < diffElements.getLength(); i++) {    
+            //}
+            
             // Here we're looping through the elements...
             for (int i = 0; i < elements.getLength(); i++) {
                 Element element = (Element) elements.item(i);
@@ -89,8 +94,21 @@ public class NewMain implements Constants {
                 String flags = getFlags(element);
                 String description = getTitle(element);
                 String hoverText = getDescription(element);
-                elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText));
+                
+                boolean hasChanged = false;
+                for(int j = 0; j < diffElements.getLength(); j++) {
+                    Element diffElement = (Element) diffElements.item(j);
+                    if(getElementName(diffElement).equals(elementName)) {
+                        hasChanged = true;
+                    }
+                }
+
+                elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
             }
+            
+            
+
+
 
             int mutedAtLevel = 100;
             for (int i = 0; i < elementList.size(); i++) {
@@ -424,7 +442,13 @@ public class NewMain implements Constants {
                     sb.append(BUNDLE);
                 }
 
-                sb.append(item.getNiceTitle());
+                if(item.isChanged()) {
+                    sb.append("<b>");
+                    sb.append(item.getNiceTitle());
+                    sb.append("</b>");
+                } else {
+                    sb.append(item.getNiceTitle());
+                }
                 sb.append(END_TABLE_CELL);
 
                 // Now the flags column
