@@ -22,6 +22,7 @@ public class MyElement {
     private String myFlags;
     private String myDescription;
     private String myHover;
+    private String fullName;
 
     public MyElement(String newName, String cardinality, String typeName, String theFlags, String description, String hover) {        
         // Set what level of indentation we're at...
@@ -38,6 +39,9 @@ public class MyElement {
 
         // Set the flags
         this.myFlags = theFlags;
+        
+        // Store the full name
+        this.fullName = newName;
         
         // Extract the local name from after the last dot.
         if(level > 0)
@@ -69,6 +73,9 @@ public class MyElement {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    public String getFullName() {
+        return fullName;
+    }
     
     public int getLevel() {
         return level;
