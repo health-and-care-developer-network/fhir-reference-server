@@ -176,9 +176,9 @@ public class NewMain implements Constants {
                                         if(d == 2) {
                                             twoContinues = true;
                                         }
-                                        //if(d == 1) {
-                                        //    break;
-                                        //}
+                                        if(d == 1) {
+                                            break;
+                                        }
                                     }
     //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 3 elements">
                                     if(item.getLevel() == 3) {
@@ -218,9 +218,9 @@ public class NewMain implements Constants {
                                             if(d == 3) {
                                                 threeContinues = true;
                                             }
-                                            //if(d == 1 || d == 2) {
-                                            //    break;
-                                            //}
+                                            if(d == 1 || d == 2) {
+                                                break;
+                                            }
                                         }
     //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 4 elements">
                                         if(item.getLevel() == 4) {
@@ -250,9 +250,9 @@ public class NewMain implements Constants {
                                                 if(d == 4) {
                                                     fourContinues = true;
                                                 }
-                                                //if(d == 1 || d == 2 || d == 3) {
-                                                //    break;
-                                                //}
+                                                if(d == 1 || d == 2 || d == 3) {
+                                                    break;
+                                                }
                                             }
     //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 5 elements">
                                             if(item.getLevel() == 5) {
@@ -285,9 +285,9 @@ public class NewMain implements Constants {
                                                     if(d == 5) {
                                                         fiveContinues = true;
                                                     }
-                                                    //if(d == 1 || d == 2 || d == 3 || d == 4) {
-                                                    //    break;
-                                                    //}
+                                                    if(d == 1 || d == 2 || d == 3 || d == 4) {
+                                                        break;
+                                                    }
                                                 }   
     //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 6 elements">
                                                 if(item.getLevel() == 6) {
