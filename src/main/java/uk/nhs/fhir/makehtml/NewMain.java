@@ -27,6 +27,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
 
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
@@ -47,7 +48,8 @@ public class NewMain implements Constants {
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     private void run() {
-        String filename = "/uk/nhs/fhir/makehtml/NRLS-DocumentReference-1-0.xml";
+        //String filename = "/uk/nhs/fhir/makehtml/NRLS-DocumentReference-1-0.xml";
+        String filename = "/uk/nhs/fhir/makehtml/patient.profile.xml";
 
         StringBuilder sb = new StringBuilder();
         sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -95,6 +97,7 @@ public class NewMain implements Constants {
                 String description = getTitle(element);
                 String hoverText = getDescription(element);
                 
+                // Here we loop through the differential elements to see if this element has been changed by this profile
                 boolean hasChanged = false;
                 for(int j = 0; j < diffElements.getLength(); j++) {
                     Element diffElement = (Element) diffElements.item(j);
@@ -102,13 +105,17 @@ public class NewMain implements Constants {
                         hasChanged = true;
                     }
                 }
-
-                elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                
+                // Catch elements which can be of multiple types...
+                if(typeName.equals("Multiple_Type_Choice")) {
+                    ArrayList<String> types = getElementTypeList(element);
+                    for(String type : types) {
+                        elementList.add(new MyElement(elementName + "." + type, cardinality, typeName, flags, description, hoverText, hasChanged));
+                    }
+                } else {
+                    elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                }
             }
-            
-            
-
-
 
             int mutedAtLevel = 100;
             for (int i = 0; i < elementList.size(); i++) {

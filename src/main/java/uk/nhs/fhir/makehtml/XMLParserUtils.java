@@ -1,6 +1,8 @@
 package uk.nhs.fhir.makehtml;
 
+import java.util.ArrayList;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -28,6 +30,10 @@ public class XMLParserUtils {
     protected static String getElementTypeName(Element element) {
         String typeName = null;
         NodeList typesList = element.getElementsByTagName("type");
+        if(typesList.getLength() > 1) {
+            return "Multiple_Type_Choice";
+        }
+        
         if(typesList.getLength() > 0) {
             Element node = (Element) typesList.item(0);
             NodeList codeList = node.getElementsByTagName("code");
@@ -37,6 +43,18 @@ public class XMLParserUtils {
         return typeName;
     }
 
+    protected static ArrayList<String> getElementTypeList(Element element) {
+        ArrayList<String> types = new ArrayList<String>();
+        NodeList typesList = element.getElementsByTagName("type");
+        for(int i = 0; i < typesList.getLength(); i++) {
+            Element node = (Element) typesList.item(i);
+            NodeList codeList = node.getElementsByTagName("code");
+            Element subNode = (Element) codeList.item(0);
+            types.add(subNode.getAttribute("value"));
+        }
+        return types;
+    }
+    
     protected static String getFlags(Element element) {
         String flags = "";
 
