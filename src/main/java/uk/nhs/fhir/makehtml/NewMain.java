@@ -55,11 +55,11 @@ public class NewMain implements Constants {
         sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
         sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
         sb.append("  <tr>\n");
-        sb.append("   <th>Name</th>\n");
-        sb.append("   <th>Flags</th>\n");
-        sb.append("   <th>Card.</th>\n");
-        sb.append("   <th>Type</th>\n");
-        sb.append("   <th>Description &amp; Constraints</th>\n");
+        sb.append("   <th style=\"font-size: small;\">Name</th>\n");
+        sb.append("   <th style=\"font-size: small;\">Flags</th>\n");
+        sb.append("   <th style=\"font-size: small;\">Card.</th>\n");
+        sb.append("   <th style=\"font-size: small;\">Type</th>\n");
+        sb.append("   <th style=\"font-size: small;\">Description &amp; Constraints</th>\n");
         sb.append("  </tr>\n");
 
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
@@ -415,6 +415,8 @@ public class NewMain implements Constants {
                 if (item.getLevel() == 0) {
                     sb.append(RESOURCE);
                 }
+                
+                DataTypes thisType = null;
 
                 if (item.getTypeName() != null) {
                     // If a simle datatype...
@@ -429,6 +431,7 @@ public class NewMain implements Constants {
                             || item.getTypeName().equals("uri")
                             || item.getTypeName().equals("integer")) {
                         sb.append(BASETYPE);
+                        thisType = DataTypes.Simple;
                     }
                     // If a Resource Type...
                     if (item.getTypeName().equals("Identifier")
@@ -443,9 +446,11 @@ public class NewMain implements Constants {
                             || item.getTypeName().equals("Period")
                             || item.getTypeName().equals("Coding")) {
                         sb.append(DATATYPE);
+                        thisType = DataTypes.Resource;
                     }
                     if(item.getTypeName().equals("Reference")) {
                         sb.append(REFERENCE);
+                        thisType = DataTypes.Reference;
                     }
                     if(item.getTypeName().equals("Multiple_Type_Choice")) {
                         sb.append(CHOICETYPE);
@@ -477,7 +482,19 @@ public class NewMain implements Constants {
                 // Now the type column
                 sb.append(START_TABLE_CELL);
                 if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
-                    sb.append(item.getTypeName());
+                    if(thisType == DataTypes.Resource) {
+                        sb.append("<a href=\"https://www.hl7.org/fhir/" + item.getTypeName().toLowerCase() + ".html\">");
+                        sb.append(item.getTypeName());
+                        sb.append("</a>");
+                    } else {
+                        if(thisType == DataTypes.Reference) {
+                            sb.append("<a href=\"https://www.hl7.org/fhir/references.html\">");
+                            sb.append(item.getTypeName());
+                            sb.append("</a>");
+                        } else {
+                            sb.append(item.getTypeName());
+                        }
+                    }
                 }                
                 sb.append(END_TABLE_CELL);
 
