@@ -17,6 +17,16 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
+        <dependency>
+		    <groupId>org.anarres.graphviz</groupId>
+		    <artifactId>graphviz-parser</artifactId>
+		    <version>1.0.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.anarres.graphviz</groupId>
+		    <artifactId>graphviz-builder</artifactId>
+		    <version>1.0.4</version>
+		</dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
