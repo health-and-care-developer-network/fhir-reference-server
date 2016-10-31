@@ -36,7 +36,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">DocumentReference</td> 
@@ -51,7 +51,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Identifier</td> 
@@ -67,7 +67,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
@@ -84,7 +84,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -99,7 +99,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -115,7 +115,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -131,7 +131,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -147,7 +147,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -163,7 +163,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -179,7 +179,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -193,7 +193,7 @@
                   <span title="Establishes the namespace in which set of possible id values is unique.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -209,7 +209,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -225,7 +225,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Period</td> 
@@ -240,7 +240,7 @@
                   <span title="The start of the period. The boundary is inclusive.">start</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -255,7 +255,7 @@
                   <span title="The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.">end</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -265,13 +265,13 @@
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzMPbYccAgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAMElEQVQ4y+3OQREAIBDDwAv+PQcFFN5MIyCzqHMKUGVCpMFLK97heq+gggoq+EiwAVjvMhFGmlEUAAAAAElFTkSuQmCC"/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Organization that issued/manages the identifier.">assigner</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -286,7 +286,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -301,7 +301,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -316,7 +316,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Identifier</td> 
@@ -332,7 +332,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
@@ -349,7 +349,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -364,7 +364,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -380,7 +380,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -396,7 +396,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -412,7 +412,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -428,7 +428,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -444,7 +444,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -458,7 +458,7 @@
                   <span title="Establishes the namespace in which set of possible id values is unique.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -472,7 +472,7 @@
                   <span title="The portion of the identifier typically displayed to the user and which is unique within the context of the system.">value</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -488,7 +488,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Period</td> 
@@ -503,7 +503,7 @@
                   <span title="The start of the period. The boundary is inclusive.">start</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -518,7 +518,7 @@
                   <span title="The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.">end</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -528,13 +528,13 @@
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzMPbYccAgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAMElEQVQ4y+3OQREAIBDDwAv+PQcFFN5MIyCzqHMKUGVCpMFLK97heq+gggoq+EiwAVjvMhFGmlEUAAAAAElFTkSuQmCC"/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Organization that issued/manages the identifier.">assigner</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -549,7 +549,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -564,7 +564,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -573,13 +573,13 @@
             <tr> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="The document will be about the existance of a patients end of life (EOL) record(s) stored on any EPaCCs. ">subject</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -594,7 +594,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -610,7 +610,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -627,7 +627,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -644,7 +644,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -661,7 +661,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -678,7 +678,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -695,7 +695,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -710,7 +710,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -724,7 +724,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -739,7 +739,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -754,7 +754,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -769,7 +769,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -784,7 +784,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -799,7 +799,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -808,13 +808,13 @@
             <tr> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Identifies who is responsible for adding the information to the document.">author</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -823,13 +823,13 @@
             <tr> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Identifies the organization or group who is responsible for ongoing maintenance of and access to the document.">custodian</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -845,7 +845,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -859,7 +859,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -868,13 +868,13 @@
             <tr> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Which person or organization authenticates that this document is valid.">authenticator</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -889,7 +889,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -902,7 +902,7 @@
                   <span title="When the document reference was created.">indexed</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">instant</td> 
@@ -917,7 +917,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
@@ -933,7 +933,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -947,7 +947,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -962,7 +962,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -977,7 +977,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -992,7 +992,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1007,7 +1007,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1022,7 +1022,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1037,7 +1037,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
@@ -1052,7 +1052,7 @@
                   <span title="The type of relationship that this document has with anther document.">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1062,13 +1062,13 @@
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzMPbYccAgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAMElEQVQ4y+3OQREAIBDDwAv+PQcFFN5MIyCzqHMKUGVCpMFLK97heq+gggoq+EiwAVjvMhFGmlEUAAAAAElFTkSuQmCC"/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="The target document of this relationship.">target</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -1083,7 +1083,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1098,7 +1098,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1113,7 +1113,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1128,7 +1128,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -1144,7 +1144,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -1161,7 +1161,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1178,7 +1178,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1195,7 +1195,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1212,7 +1212,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1229,7 +1229,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1244,7 +1244,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">BackboneElement</td> 
@@ -1260,7 +1260,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Attachment</td> 
@@ -1277,7 +1277,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1293,7 +1293,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">base64Binary</td> 
@@ -1310,7 +1310,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1327,7 +1327,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">unsignedInt</td> 
@@ -1343,7 +1343,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">base64Binary</td> 
@@ -1360,7 +1360,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1377,7 +1377,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -1393,7 +1393,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -1408,7 +1408,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1423,7 +1423,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1438,7 +1438,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1453,7 +1453,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1468,7 +1468,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1483,7 +1483,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">BackboneElement</td> 
@@ -1493,13 +1493,13 @@
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII="/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Describes the clinical encounter or type of care that the document content is associated with.">encounter</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -1514,7 +1514,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1529,7 +1529,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1545,7 +1545,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -1560,7 +1560,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -1576,7 +1576,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1592,7 +1592,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1608,7 +1608,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1624,7 +1624,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1640,7 +1640,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1656,7 +1656,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Period</td> 
@@ -1671,7 +1671,7 @@
                   <span title="The start of the period. The boundary is inclusive.">start</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -1686,7 +1686,7 @@
                   <span title="The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.">end</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -1702,7 +1702,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -1719,7 +1719,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -1737,7 +1737,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1755,7 +1755,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1773,7 +1773,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1791,7 +1791,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">1..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1809,7 +1809,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1825,7 +1825,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -1840,7 +1840,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -1856,7 +1856,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -1872,7 +1872,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1888,7 +1888,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -1904,7 +1904,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1920,7 +1920,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -1930,13 +1930,13 @@
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII="/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzI3XJ6V3QAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+2RsQ0AIAzDav7/2VzQwoCY4iWbZSmo1QGoUgNMghvWaIejPQW/CrrNCylIwcOCDYfLNRcNer4SAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="The Patient Information as known when the document was published. May be a reference to a version specific, or contained.">sourcePatientInfo</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -1951,7 +1951,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1966,7 +1966,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -1982,7 +1982,7 @@
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..0</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">BackboneElement</td> 
@@ -1997,7 +1997,7 @@
                   <span title="Related identifier to this DocumentReference. If both id and ref are present they shall refer to the same thing.">identifier</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Identifier</td> 
@@ -2013,7 +2013,7 @@
                   <span title="The purpose of this identifier.">use</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
@@ -2030,7 +2030,7 @@
                   <span title="A coded type for the identifier that can be used to determine which identifier to use for a specific purpose.">type</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">CodeableConcept</td> 
@@ -2047,7 +2047,7 @@
                   <span title="A reference to a code defined by a terminology system.">coding</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Coding</td> 
@@ -2065,7 +2065,7 @@
                   <span title="The identification of the code system that defines the meaning of the symbol in the code.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -2083,7 +2083,7 @@
                   <span title="The version of the code system which was used when choosing this code. Note that a well-maintained code system does not need the version reported, because the meaning of codes is consistent across versions. However this cannot consistently be assured. and when the meaning is not guaranteed to be consistent, the version SHOULD be exchanged.">version</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2101,7 +2101,7 @@
                   <span title="A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).">code</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">code</td> 
@@ -2119,7 +2119,7 @@
                   <span title="A representation of the meaning of the code in the system, following the rules of the system.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2137,7 +2137,7 @@
                   <span title="Indicates that this coding was chosen by a user directly - i.e. off a pick list of available items (codes or displays).">userSelected</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">boolean</td> 
@@ -2153,7 +2153,7 @@
                   <span title="Establishes the namespace in which set of possible id values is unique.">system</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">uri</td> 
@@ -2169,7 +2169,7 @@
                   <span title="The portion of the identifier typically displayed to the user and which is unique within the context of the system.">value</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2185,7 +2185,7 @@
                   <span title="Time period during which identifier is/was valid for use.">period</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Period</td> 
@@ -2202,7 +2202,7 @@
                   <span title="The start of the period. The boundary is inclusive.">start</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -2219,7 +2219,7 @@
                   <span title="The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time.">end</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">dateTime</td> 
@@ -2231,13 +2231,13 @@
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII="/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzMPbYccAgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAMElEQVQ4y+3OQREAIBDDwAv+PQcFFN5MIyCzqHMKUGVCpMFLK97heq+gggoq+EiwAVjvMhFGmlEUAAAAAElFTkSuQmCC"/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <b>
                      <span title="Organization that issued/manages the identifier.">assigner</span>
                   </b>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -2254,7 +2254,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2271,7 +2271,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2282,11 +2282,11 @@
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII="/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII="/>
                   <img style="background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC"/>
-                  <img title="Data Type" style="background-color: white; background-color: inherit; margin-right: 2px;" alt="." class="hierarchy" src="data: image/png;base64,R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7"/>
+                  <img title="Reference to another Resource" style="background-color: white; background-color: inherit" alt="." class="hierarchy" src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAFxJREFUOE/NjEEOACEIA/0o/38GGw+agoXYeNnDJDCUDnd/gkoFKhWozJiZI3gLwY6rAgxhsPKTPUzycTl8lAryMyMsVQG6TFi6cHULyz8KOjC7OIQKlQpU3uPjAwhX2CCcGsgOAAAAAElFTkSuQmCC"/>
                   <span title="Related Resource to this DocumentReference. If both id and ref are present they shall refer to the same thing.">ref</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Reference</td> 
@@ -2302,7 +2302,7 @@
                   <span title="A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with '#') refer to contained resources.">reference</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -2318,7 +2318,7 @@
                   <span title="Plain text narrative that identifies the resource in addition to the resource reference.">display</span>
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 

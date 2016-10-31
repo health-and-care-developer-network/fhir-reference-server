@@ -433,10 +433,15 @@ public class NewMain implements Constants {
                             || item.getTypeName().equals("BackboneElement")
                             || item.getTypeName().equals("HumanName")
                             || item.getTypeName().equals("Period")
-                            || item.getTypeName().equals("Reference")
                             || item.getTypeName().equals("Coding")) {
                         sb.append(DATATYPE);
                     }
+                    if(item.getTypeName().equals("Reference")) {
+                        sb.append(REFERENCE);
+                    }
+                    if(item.getTypeName().equals("MultType")) {
+                        sb.append(CHOICETYPE);
+                    }                
                 } else {
                     // Seems to be a special case, used in eg Bundle resource types
                     sb.append(BUNDLE);
