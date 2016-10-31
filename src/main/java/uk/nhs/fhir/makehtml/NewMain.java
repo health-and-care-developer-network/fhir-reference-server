@@ -109,8 +109,9 @@ public class NewMain implements Constants {
                 // Catch elements which can be of multiple types...
                 if(typeName.equals("Multiple_Type_Choice")) {
                     ArrayList<String> types = getElementTypeList(element);
+                    elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
                     for(String type : types) {
-                        elementList.add(new MyElement(elementName + "." + type, cardinality, typeName, flags, description, hoverText, hasChanged));
+                        elementList.add(new MyElement(elementName + "." + type, "", type, flags, "", "", hasChanged));
                     }
                 } else {
                     elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
@@ -446,7 +447,7 @@ public class NewMain implements Constants {
                     if(item.getTypeName().equals("Reference")) {
                         sb.append(REFERENCE);
                     }
-                    if(item.getTypeName().equals("MultType")) {
+                    if(item.getTypeName().equals("Multiple_Type_Choice")) {
                         sb.append(CHOICETYPE);
                     }                
                 } else {
@@ -475,7 +476,9 @@ public class NewMain implements Constants {
 
                 // Now the type column
                 sb.append(START_TABLE_CELL);
-                sb.append(item.getTypeName());
+                if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
+                    sb.append(item.getTypeName());
+                }                
                 sb.append(END_TABLE_CELL);
 
                 // And now the description
