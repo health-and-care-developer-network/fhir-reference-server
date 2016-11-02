@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+
+import uk.nhs.fhir.datalayer.DataSourceFactory;
+import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.MongoIF;
 import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
@@ -43,7 +46,7 @@ import uk.nhs.fhir.validator.ValidatorManager;
 public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final long serialVersionUID = 1L;
-    MongoIF mongoInterface = null;
+    Datasource dataSource = null;
     ValidatorManager vManager = null;
     
     /**
@@ -56,9 +59,9 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void initialize() throws ServletException {
         
-        // We create one link to the mongodb database, which we'll pass to each
-        // resource type handler as we create them
-        mongoInterface = new MongoIF();
+        // We create an instance of our persistent layer (either MongoDB or
+    	// Filesystem), which we'll pass to each resource type handler as we create them
+        dataSource = DataSourceFactory.getDataSource();
         
         // We also create a validatorManager which we'll also pass to each
         // resource type handler as we create them
@@ -68,14 +71,14 @@ public class RestfulServlet extends RestfulServer {
             LOG.severe(ex.getMessage());
         }
                 
-        ProfileWebHandler webber = new ProfileWebHandler(mongoInterface);
+        ProfileWebHandler webber = new ProfileWebHandler(dataSource);
         
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionProvider(mongoInterface, vManager));
-        resourceProviders.add(new PatientProvider(mongoInterface, vManager));
-        resourceProviders.add(new DocumentReferenceProvider(mongoInterface, vManager));
-        resourceProviders.add(new PractitionerProvider(mongoInterface, vManager));
-        resourceProviders.add(new OrganizationProvider(mongoInterface, vManager));
+        resourceProviders.add(new StrutureDefinitionProvider(dataSource, vManager));
+        resourceProviders.add(new PatientProvider(dataSource, vManager));
+        resourceProviders.add(new DocumentReferenceProvider(dataSource, vManager));
+        resourceProviders.add(new PractitionerProvider(dataSource, vManager));
+        resourceProviders.add(new OrganizationProvider(dataSource, vManager));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");

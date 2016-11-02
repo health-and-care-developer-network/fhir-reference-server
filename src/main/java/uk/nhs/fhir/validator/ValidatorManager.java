@@ -34,7 +34,7 @@ public class ValidatorManager {
     private static final Logger LOG = Logger.getLogger(ValidatorManager.class.getName());
     protected static final String VALIDATORDEFINITIONS = "validation.xml.zip";
     private static final String VALIDATORPOOLSIZE = "uk.nhs.fhir.validator.poolsize";
-    private static final int DEFAULTPOOLSIZE = 3;
+    private static final int DEFAULTPOOLSIZE = 1;
     private static ValidatorManager validatorFactory = new ValidatorManager();
     private static Throwable bootError = null;
     

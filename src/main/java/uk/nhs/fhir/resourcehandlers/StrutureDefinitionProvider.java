@@ -31,7 +31,8 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.List;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import uk.nhs.fhir.datalayer.MongoIF;
+
+import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.validator.ValidatorFacade;
 import uk.nhs.fhir.validator.ValidatorManager;
 
@@ -42,7 +43,7 @@ import uk.nhs.fhir.validator.ValidatorManager;
 public class StrutureDefinitionProvider implements IResourceProvider {
     private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
 
-    MongoIF myMongo = null;
+    Datasource myDatasource = null;
     ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
@@ -50,10 +51,10 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     /**
      * Constructor, which tell us which mongo data source we're working with.
      *
-     * @param mongoInterface
+     * @param dataSource
      */
-    public StrutureDefinitionProvider(MongoIF mongoInterface, ValidatorManager vMgr) {
-        myMongo = mongoInterface;
+    public StrutureDefinitionProvider(Datasource dataSource, ValidatorManager vMgr) {
+        myDatasource = dataSource;
         myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }
@@ -104,7 +105,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Read
     public StructureDefinition getResourceById(@IdParam IdDt theId) {
         String name = theId.getIdPart().toString();
-        StructureDefinition foundItem = myMongo.getSingleStructureDefinitionByName(name);
+        StructureDefinition foundItem = myDatasource.getSingleStructureDefinitionByName(name);
         return foundItem;
     }
 
@@ -116,7 +117,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Search
     public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-        List<StructureDefinition> foundList = myMongo.getMatchByName(theNamePart.getValue());
+        List<StructureDefinition> foundList = myDatasource.getMatchByName(theNamePart.getValue());
         return foundList;
     }
 
@@ -128,7 +129,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<StructureDefinition> getAllStructureDefinitions() {
         LOG.info("Request for ALL StructureDefinition objects");
-        List<StructureDefinition> foundList = myMongo.getAll();
+        List<StructureDefinition> foundList = myDatasource.getAll();
         return foundList;
     }
 //</editor-fold>

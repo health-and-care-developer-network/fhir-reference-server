@@ -23,7 +23,8 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import uk.nhs.fhir.datalayer.MongoIF;
+
+import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.validator.ValidatorFacade;
 import uk.nhs.fhir.validator.ValidatorManager;
 
@@ -33,7 +34,7 @@ import uk.nhs.fhir.validator.ValidatorManager;
  */
 public class DocumentReferenceProvider implements IResourceProvider {
 
-    MongoIF myMongo = null;
+    Datasource myDataSource = null;
     ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
@@ -41,10 +42,10 @@ public class DocumentReferenceProvider implements IResourceProvider {
     /**
      * Constructor, which tell us which mongo data source we're working with.
      *
-     * @param mongoInterface
+     * @param dataSource
      */
-    public DocumentReferenceProvider(MongoIF mongoInterface, ValidatorManager vMgr) {
-        myMongo = mongoInterface;
+    public DocumentReferenceProvider(Datasource dataSource, ValidatorManager vMgr) {
+        myDataSource = dataSource;
         myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }

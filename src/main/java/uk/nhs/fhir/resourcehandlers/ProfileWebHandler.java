@@ -16,9 +16,10 @@
 package uk.nhs.fhir.resourcehandlers;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import uk.nhs.fhir.datalayer.Datasource;
+
 import java.util.List;
 import java.util.logging.Logger;
-import uk.nhs.fhir.datalayer.MongoIF;
 
 /**
  *
@@ -27,15 +28,15 @@ import uk.nhs.fhir.datalayer.MongoIF;
 public class ProfileWebHandler {
     private static final Logger LOG = Logger.getLogger(ProfileWebHandler.class.getName());
     
-    MongoIF mymongo = null;
+    Datasource myDataSource = null;
 
-    public ProfileWebHandler(MongoIF mongoInterface) {
-        mymongo = mongoInterface;
+    public ProfileWebHandler(Datasource dataSource) {
+        myDataSource = dataSource;
     }
     
     public String getAllNames() {
         LOG.info("Called: ProfileWebHandler.getAllNames()");
-        List<String> myNames = mymongo.getAllNames();
+        List<String> myNames = myDataSource.getAllNames();
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -47,7 +48,7 @@ public class ProfileWebHandler {
 
     public String getAllNames(String namePart) {
         LOG.info("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myNames = mymongo.getAllNames(namePart);
+        List<String> myNames = myDataSource.getAllNames(namePart);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -59,7 +60,7 @@ public class ProfileWebHandler {
         
     public StructureDefinition getSDByName(String name) {
         LOG.info("Called: ProfileWebHandler.getSDByName(String name)");
-        StructureDefinition sd = mymongo.getSingleStructureDefinitionByName(name);
+        StructureDefinition sd = myDataSource.getSingleStructureDefinitionByName(name);
         return sd;
     }
 }
