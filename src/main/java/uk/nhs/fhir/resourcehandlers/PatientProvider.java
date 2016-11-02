@@ -75,8 +75,8 @@ public class PatientProvider implements IResourceProvider {
      */
     @Validate
     public MethodOutcome validateStructureDefinition(@ResourceParam Patient resourceToTest,
-            @Validate.Mode ValidationModeEnum theMode,
-            @Validate.Profile String theProfile) {
+                                     @Validate.Mode ValidationModeEnum theMode,
+                                     @Validate.Profile String theProfile) {
         
         ValidatorFacade myFacade = new ValidatorFacade();
         MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
