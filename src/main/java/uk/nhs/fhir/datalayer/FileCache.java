@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -75,7 +76,7 @@ public class FileCache {
 		            newFileList.add(files[i].getName());
 		            
 		            // Add the profile itself
-		            StructureDefinition profile = FHIRResourceHandler.loadProfileFromFile(files[i]);
+		            StructureDefinition profile = FHIRUtils.loadProfileFromFile(files[i]);
 		            newProfileList.add(profile);
 		        }
 		        /*else if (files[i].isDirectory()) {

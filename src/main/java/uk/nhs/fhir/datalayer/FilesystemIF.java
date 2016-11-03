@@ -19,6 +19,7 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -50,7 +51,7 @@ public class FilesystemIF implements Datasource {
     	LOG.info("Getting StructureDefinitions with name=" + name +
         			" looking for file: " + profilePath + "/" + filename);
         
-    	StructureDefinition foundDocRef = FHIRResourceHandler.loadProfileFromFile(filename);
+    	StructureDefinition foundDocRef = FHIRUtils.loadProfileFromFile(filename);
         return foundDocRef;
     }
 

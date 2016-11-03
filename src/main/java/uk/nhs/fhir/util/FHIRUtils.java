@@ -1,4 +1,4 @@
-package uk.nhs.fhir.datalayer;
+package uk.nhs.fhir.util;
 
 import java.io.File;
 
@@ -6,9 +6,8 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
-import uk.nhs.fhir.util.FileLoader;
 
-public class FHIRResourceHandler {
+public class FHIRUtils {
 	
 	private static FhirContext ctx = FhirContext.forDstu2();
 	
