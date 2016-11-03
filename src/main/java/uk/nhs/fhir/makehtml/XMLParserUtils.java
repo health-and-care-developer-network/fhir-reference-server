@@ -30,8 +30,27 @@ public class XMLParserUtils {
     protected static String getElementTypeName(Element element) {
         String typeName = null;
         NodeList typesList = element.getElementsByTagName("type");
+        
         if(typesList.getLength() > 1) {
-            return "Multiple_Type_Choice";
+            // Multiple types either it's a Reference to one of many types
+            // or it truly can be one of many types...
+            Element node = (Element) typesList.item(0);
+            NodeList codeList = node.getElementsByTagName("code");
+            Element subNode = (Element) codeList.item(0);
+            if(subNode.getAttribute("value").equals("Reference")) {
+                // We now know it's a Reference to one of many types...
+                typeName = "Reference";
+                
+                for(int t = 0; t < typesList.getLength(); t++) {
+                    Element typeItem = (Element) typesList.item(t);
+                    NodeList codes = node.getElementsByTagName("profile");
+                    Element profile = (Element) codes.item(0);
+                    String prof = profile.getAttribute("value");
+                    typeName = typeName + prof;
+                }                
+            } else {
+                return "Multiple_Type_Choice";
+            }
         }
         
         if(typesList.getLength() > 0) {

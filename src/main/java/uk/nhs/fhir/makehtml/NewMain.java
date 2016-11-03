@@ -49,7 +49,7 @@ public class NewMain implements Constants {
 
     private void run() {
         //String filename = "/uk/nhs/fhir/makehtml/NRLS-DocumentReference-1-0.xml";
-        String filename = "/uk/nhs/fhir/makehtml/patient.profile.xml";
+        String filename = "/uk/nhs/fhir/makehtml/account.profile.xml";
 
         StringBuilder sb = new StringBuilder();
         sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -114,7 +114,12 @@ public class NewMain implements Constants {
                         elementList.add(new MyElement(elementName + "." + type, "", type, flags, "", "", hasChanged));
                     }
                 } else {
-                    elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                    
+                    if(typeName.equals("Reference")) {
+                        elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                    } else {
+                        elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                    }
                 }
             }
 
