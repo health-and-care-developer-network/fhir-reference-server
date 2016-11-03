@@ -52,20 +52,25 @@ public class FileLoader {
      * @return String containing content of specified file
      */
     public static String loadFile(final File file) {
+    	logger.info("Loading file: " + file.getAbsolutePath());
         String defaultEncoding = PropertyReader.getProperty("fileEncoding");
     	InputStream inputStream;
+    	Reader inputStreamReader;
     	ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();
 		try {
 			inputStream = new FileInputStream(file);
+			String charsetName = defaultEncoding;
 			
 			// Use commons.io to deal with byte-order-marker if present
 			BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-			ByteOrderMark bom = bOMInputStream.getBOM();
-		    String charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
-		    
+			if (bOMInputStream.hasBOM()) {
+				ByteOrderMark bom = bOMInputStream.getBOM();
+			    charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
+			}
+			
 		    logger.info("Loading file using encoding: " + charsetName);
 		    
-	    	Reader inputStreamReader = new InputStreamReader(inputStream, charsetName);
+	    	inputStreamReader = new InputStreamReader(bOMInputStream, charsetName);
 	    	int data = inputStreamReader.read();
 	    	while(data != -1){
 	    	    bOutStream.write(data);

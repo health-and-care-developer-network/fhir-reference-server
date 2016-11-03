@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
+import uk.nhs.fhir.util.FileLoader;
 
 /**
  *
@@ -35,69 +36,87 @@ import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 public class PlainContent extends InterceptorAdapter {
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ProfileWebHandler myWebber = null;
+    private String template = null;
     
     public PlainContent(ProfileWebHandler webber) {
         myWebber = webber;
+        template = FileLoader.loadFileOnClasspath("/template/devnet.html");
     }
     
     
     
     @Override
     public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) {
-        PrintWriter pw = null;
+        PrintWriter outputStream = null;
 
         String mimes = theRequest.getHeader("accept");
         
         if (mimes == null) {
+        	LOG.info("No accept header set, assume a non-browser client.");
             return true;
         } else {
             if (mimes.contains("html") == false) {
-                return true;
+            	LOG.info("Accept header set, but without html, so assume a non-browser client.");
+            	return true;
             }
         }
 
+        LOG.info("This appears to be a browser, generate some HTML to return.");
+        
+        StringBuffer content = new StringBuffer();
+	    
         try {
-            theResponse.setStatus(200);
-            theResponse.setContentType("text/html");
-            pw = theResponse.getWriter();
-            pw.append("<html><body>");
+            //content = theResponse.getWriter();
+            //content.append("<html><body>");
             if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
-                pw.append("Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+                content.append("Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
                 StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
-                pw.append("<ul>");
-                pw.append("<li>url: " + sd.getUrl() + "</li>");
-                pw.append("<li>version: " + sd.getVersion() + "</li>");
-                pw.append("<li>name: " + sd.getName() + "</li>");
-                pw.append("<li>publisher: " + sd.getPublisher() + "</li>");
-                pw.append("<li>description: " + sd.getDescription() + "</li>");
-                pw.append("<li>requirements: " + sd.getRequirements() + "</li>");
-                pw.append("<li>status: " + sd.getStatus() + "</li>");
-                pw.append("<li>experimental: " + sd.getExperimental() + "</li>");
-                pw.append("<li>date: " + sd.getDate() + "</li>");
-                pw.append("<li>fhirVersion: " + sd.getFhirVersion() + "</li>");
-                pw.append(sd.getText().getDivAsString());
+                content.append("<ul>");
+                content.append("<li>url: " + sd.getUrl() + "</li>");
+                content.append("<li>version: " + sd.getVersion() + "</li>");
+                content.append("<li>name: " + sd.getName() + "</li>");
+                content.append("<li>publisher: " + sd.getPublisher() + "</li>");
+                content.append("<li>description: " + sd.getDescription() + "</li>");
+                content.append("<li>requirements: " + sd.getRequirements() + "</li>");
+                content.append("<li>status: " + sd.getStatus() + "</li>");
+                content.append("<li>experimental: " + sd.getExperimental() + "</li>");
+                content.append("<li>date: " + sd.getDate() + "</li>");
+                content.append("<li>fhirVersion: " + sd.getFhirVersion() + "</li>");
+                content.append(sd.getText().getDivAsString());
                 
-                pw.append("");
+                content.append("");
             } else {
                 Map<String, String[]> params = theRequestDetails.getParameters();
                 
-                pw.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+                content.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
 
                 if(params.containsKey("name") || params.containsKey("name:contains")) {
                     if(params.containsKey("name")) {
-                        pw.append(myWebber.getAllNames(params.get("name")[0]));
+                        content.append(myWebber.getAllNames(params.get("name")[0]));
                     }
                     if(params.containsKey("name:contains")) {
-                        pw.append(myWebber.getAllNames(params.get("name:contains")[0]));
+                        content.append(myWebber.getAllNames(params.get("name:contains")[0]));
                     }
                 } else {
-                    pw.append(myWebber.getAllNames());
+                    content.append(myWebber.getAllNames());
                 }
-                pw.append("</ul>");
+                content.append("</ul>");
             }
-            pw.append("</body></html>");
+            
+            // Initialise the output
+            theResponse.setStatus(200);
+    	    theResponse.setContentType("text/html");
+    		outputStream = theResponse.getWriter();
+    		
+    		// Put the content into our template
+    	    String outputString = template;
+            outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
+            
+            // Send it to the output
+            outputStream.append(outputString);
+            
         } catch (IOException ex) {
-            LOG.info("" + ex.getMessage());
+            LOG.severe("Error sending response: " + ex.getMessage());
         }
         return false;
     }

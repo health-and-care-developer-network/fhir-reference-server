@@ -99,7 +99,10 @@ public class FilesystemIF implements Datasource {
     public List<String> getAllNames(String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
+        LOG.info("Getting full list of profiles first");
         List<String> profileList = FileCache.getNameList();
+        
+        LOG.info("Now filtering the list to those matching our criteria");
         ArrayList<String> matches = new ArrayList<String>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
@@ -114,6 +117,7 @@ public class FilesystemIF implements Datasource {
                matches.add(profileName);
             }
         }
+        LOG.info("Returning matches");
         return matches;
     }
 }
