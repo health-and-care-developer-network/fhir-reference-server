@@ -22,9 +22,11 @@ import ca.uhn.fhir.parser.DataFormatException;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -36,15 +38,7 @@ public class FilesystemIF implements Datasource {
 
     private String profilePath = PropertyReader.getProperty("profilePath");
     private String examplesPath = PropertyReader.getProperty("examplesPath");
-    private FhirContext ctx;
-
-    /**
-     * Constructor to set up our connection to a mongoDB database
-     *
-     */
-    public FilesystemIF() {
-        ctx = FhirContext.forDstu2();
-    }
+    
 
     /**
      * Gets a specific one
@@ -52,20 +46,11 @@ public class FilesystemIF implements Datasource {
      * @return 
      */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
-        LOG.info("Getting StructureDefinitions with name=" + name +
-        			" looking for file: " + profilePath + "/" + name);
-        //TODO: Clean the string to avoid building malicious file paths from the querystring..
-        String resource = FileLoader.loadFile(profilePath + "/" + name);
-        //System.out.println(resource);
-        StructureDefinition foundDocRef = null;
-        try {
-        	foundDocRef =
-        			(StructureDefinition) ctx.newXmlParser().parseResource(resource);
-        } catch (ConfigurationException e) {
-        	e.printStackTrace();
-        } catch (DataFormatException e) {
-        	e.printStackTrace();
-        }
+    	String filename = FileLoader.cleanFilename(name);
+    	LOG.info("Getting StructureDefinitions with name=" + name +
+        			" looking for file: " + profilePath + "/" + filename);
+        
+    	StructureDefinition foundDocRef = FHIRResourceHandler.loadProfileFromFile(filename);
         return foundDocRef;
     }
 
@@ -79,51 +64,18 @@ public class FilesystemIF implements Datasource {
     public List<StructureDefinition> getMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
-        /*
-        BasicDBObject regexQuery = new BasicDBObject();
-        regexQuery.put("name",
-            new BasicDBObject("$regex", Pattern.quote(theNamePart))
-            .append("$options", "i"));
-    
-        Cursor cursor = profiles.find(regexQuery);
-        
-        try {
-            while(cursor.hasNext()) {
-                LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add(foundDocRef);
-            }
-        } finally {
-            cursor.close();
-        }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");*/
         return list;
     }
 
     /**
-     * Gets a full list of StructureDefinition objects
+     * Gets a full list of StructureDefinition objects. Not especially performant, and
+     * could certainly be cached in memory to improve performance and reduce disk io.
      * 
      * @return 
      */
     public List<StructureDefinition> getAll() {
         LOG.info("Getting all StructureDefinitions");
-        
-        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
-        
-        /*Cursor cursor;
-        cursor = profiles.find();
-        try {
-            while(cursor.hasNext()) {
-                LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add(foundDocRef);
-            }
-        } finally {
-            cursor.close();
-        }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
-        */
-        return list;
+        return FileCache.getProfiles();
     }
     
     /**
@@ -133,22 +85,7 @@ public class FilesystemIF implements Datasource {
      */
     public List<String> getAllNames() {
         LOG.info("Getting all StructureDefinition Names");
-        
-        List<String> list = new ArrayList<String>();
-        
-        /*Cursor cursor;
-        cursor = profiles.find();
-        try {
-            while(cursor.hasNext()) {
-                LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add("<li><a href='/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
-            }
-        } finally {
-            cursor.close();
-        }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");*/
-        return list;
+        return FileCache.getNameList();
     }
 
 
@@ -161,25 +98,21 @@ public class FilesystemIF implements Datasource {
     public List<String> getAllNames(String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
-        List<String> list = new ArrayList<String>();
+        List<String> profileList = FileCache.getNameList();
+        ArrayList<String> matches = new ArrayList<String>();
         
-        /*BasicDBObject regexQuery = new BasicDBObject();
-        regexQuery.put("name",
-            new BasicDBObject("$regex", Pattern.quote(theNamePart))
-            .append("$options", "i"));
-    
-        Cursor cursor = profiles.find(regexQuery);
-        try {
-            while(cursor.hasNext()) {
-                LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
-                list.add("<li><a href='/FHIR/StructureDefinition/" + foundDocRef.getName() + "'>" + foundDocRef.getName() + "</a> - " + foundDocRef.getUrl() + "</li>");
+        String pattern = "(.*)" + theNamePart + "(.*)";
+        
+        for (String profileName : profileList) {
+        	// Create a Pattern object
+            Pattern r = Pattern.compile(pattern);
+
+            // Now create matcher object.
+            Matcher m = r.matcher(profileName);
+            if (m.find()) {
+               matches.add(profileName);
             }
-        } finally {
-            if(cursor != null)
-                cursor.close();
-        }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");*/
-        return list;
+        }
+        return matches;
     }
 }

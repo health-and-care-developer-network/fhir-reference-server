@@ -125,4 +125,14 @@ public class FileLoader {
     	return input.replace((char)28, (char)39)
     			    .replace((char)29, (char)39);
     }
+    
+    /**
+     * This method will remove any illegal characters from a filename to avoid any injection of
+     * script characters etc. when requesting a file using a parameter from the querystring.
+     * @param input string to clean
+     * @return cleaned string
+     */
+    public static String cleanFilename(String input) {
+    	return input.replaceAll("[^a-zA-Z0-9.-]", "_");
+    }
 }
