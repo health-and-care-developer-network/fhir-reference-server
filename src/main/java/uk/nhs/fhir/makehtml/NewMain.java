@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getQuantityType;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getReferenceTypes;
 
 import uk.nhs.fhir.util.FileLoader;
@@ -119,7 +120,12 @@ public class NewMain implements Constants {
                         String newtypeName = getReferenceTypes(element);
                         elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
                     } else {
-                        elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                        if(typeName.equals("Quantity")) {
+                            String newtypeName = getQuantityType(element);
+                            elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
+                        } else {
+                            elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                        }
                     }
                 }
             }
@@ -152,6 +158,8 @@ public class NewMain implements Constants {
             // Now work through and draw each element
             for (int i = 0; i < elementList.size(); i++) {
                 MyElement item = (MyElement) elementList.get(i);
+                
+                if(item.isDisplay()) {
 
                 sb.append(START_TABLE_ROW);
 
@@ -450,6 +458,7 @@ public class NewMain implements Constants {
                             || item.getType().equals("BackboneElement")
                             || item.getType().equals("HumanName")
                             || item.getType().equals("Period")
+                            || item.getType().equals("Money")
                             || item.getType().equals("Coding")) {
                         sb.append(DATATYPE);
                         thisType = DataTypes.Resource;
@@ -510,6 +519,7 @@ public class NewMain implements Constants {
                 sb.append(END_TABLE_CELL);
 
                 sb.append(END_TABLE_ROW);
+            }
             }
             //}
 

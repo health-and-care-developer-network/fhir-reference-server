@@ -146,7 +146,18 @@ public class XMLParserUtils {
         }
         return result;
     }
+
+    protected static String getQuantityType(Element element) {
+        NodeList typesList = element.getElementsByTagName("type");
+        Element atype = (Element) typesList.item(0);
+        NodeList profileList = atype.getElementsByTagName("profile");
+        Element profileName = (Element) profileList.item(0);
+        String result = profileName.getAttribute("value");
+        result = decorateProfileName(result);
+        return result;
+    }
     
+
     private static String decorateProfileName(String profileName) {
         String result = "<a href='" + profileName + "'>";
         result = result + profileName.substring(profileName.lastIndexOf("/")+1);
