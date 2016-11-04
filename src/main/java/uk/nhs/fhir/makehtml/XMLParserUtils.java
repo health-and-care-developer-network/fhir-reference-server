@@ -156,7 +156,6 @@ public class XMLParserUtils {
         result = decorateProfileName(result);
         return result;
     }
-    
 
     private static String decorateProfileName(String profileName) {
         String result = "<a href='" + profileName + "'>";

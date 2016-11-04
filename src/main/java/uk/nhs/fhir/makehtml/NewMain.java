@@ -50,8 +50,8 @@ public class NewMain implements Constants {
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     private void run() {
-        //String filename = "/uk/nhs/fhir/makehtml/NRLS-DocumentReference-1-0.xml";
-        String filename = "/uk/nhs/fhir/makehtml/account.profile.xml";
+        String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
+        //String filename = "/uk/nhs/fhir/makehtml/account.profile.xml";
 
         StringBuilder sb = new StringBuilder();
         sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -442,6 +442,7 @@ public class NewMain implements Constants {
                             || item.getType().equals("unsignedInt")
                             || item.getType().equals("string")
                             || item.getType().equals("decimal")
+                            || item.getType().equals("base64Binary")
                             || item.getType().equals("uri")
                             || item.getType().equals("integer")) {
                         sb.append(BASETYPE);
@@ -507,7 +508,7 @@ public class NewMain implements Constants {
                             sb.append(item.getTypeName());
                             sb.append("</a>");
                         } else {
-                            sb.append(item.getTypeName());
+                            sb.append(decorateTypeName(item.getTypeName()));
                         }
                     }
                 }                
@@ -540,5 +541,25 @@ public class NewMain implements Constants {
         // And finally let's also wrap our HTML and write it to another file to see how it looks...
         String html = "<html>\n<body>\n" + sb.toString() + "</body>\n</html>";
         FileWriter.writeFile("output.html", html.getBytes());
+    }
+    
+    private String decorateTypeName(String type) {
+        if(type.equals("string"))
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#string'>string</a>";
+        if(type.equals("code"))
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#code'>code</a>";
+        if(type.equals("uri"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#uri'>uri</a>";
+        if(type.equals("base64Binary"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#base64Binary'>base64Binary</a>";
+        if(type.equals("instant"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#instant'>instant</a>";
+        if(type.equals("unsignedInt"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#unsignedInt'>unsignedInt</a>";
+        if(type.equals("dateTime"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#dateTime'>dateTime</a>";
+        if(type.equals("boolean"))
+            return"<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
+        return type;
     }
 }
