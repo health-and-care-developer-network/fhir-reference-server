@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  *
@@ -37,10 +38,12 @@ public class PlainContent extends InterceptorAdapter {
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ProfileWebHandler myWebber = null;
     private String template = null;
+    private String fhirServerNotice = null;
     
     public PlainContent(ProfileWebHandler webber) {
         myWebber = webber;
-        template = FileLoader.loadFileOnClasspath("/template/devnet.html");
+        template = FileLoader.loadFileOnClasspath("/template/profiles.html");
+        fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
     }
     
     
@@ -60,16 +63,27 @@ public class PlainContent extends InterceptorAdapter {
             	return true;
             }
         }
+        
+        if (theRequestDetails.getOperation() != null) {
+	        if (theRequestDetails.getOperation().equals("metadata")) {
+	        	// We don't have any rendered version of the conformance profile as yet, so just return it in raw form
+	        	return true;
+	        }
+        }
 
         LOG.info("This appears to be a browser, generate some HTML to return.");
         
         StringBuffer content = new StringBuffer();
 	    
         try {
+        	
+        	String resourceType = theRequestDetails.getResourceName();
             //content = theResponse.getWriter();
             //content.append("<html><body>");
             if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
-                content.append("Hello browser, clearly you were looking for a: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+            	content.append("<div class='fhirServerGeneratedContent'>");
+                content.append(fhirServerNotice);
+                content.append("<h2 class='resourceType'>" + resourceType + "</h2><ul>");
                 StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
                 content.append("<ul>");
                 content.append("<li>url: " + sd.getUrl() + "</li>");
@@ -83,24 +97,27 @@ public class PlainContent extends InterceptorAdapter {
                 content.append("<li>date: " + sd.getDate() + "</li>");
                 content.append("<li>fhirVersion: " + sd.getFhirVersion() + "</li>");
                 content.append(sd.getText().getDivAsString());
-                
-                content.append("");
+                content.append("</div>");
             } else {
                 Map<String, String[]> params = theRequestDetails.getParameters();
                 
-                content.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
-
+                content.append("<div class='fhirServerGeneratedContent'>");
+                content.append(fhirServerNotice);
+                //content.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
+                content.append("<h2 class='resourceType'>" + resourceType + "</h2><ul>");
+                
                 if(params.containsKey("name") || params.containsKey("name:contains")) {
                     if(params.containsKey("name")) {
-                        content.append(myWebber.getAllNames(params.get("name")[0]));
+                        content.append(myWebber.getAllNames(resourceType, params.get("name")[0]));
                     }
                     if(params.containsKey("name:contains")) {
-                        content.append(myWebber.getAllNames(params.get("name:contains")[0]));
+                        content.append(myWebber.getAllNames(resourceType, params.get("name:contains")[0]));
                     }
                 } else {
-                    content.append(myWebber.getAllNames());
+                    content.append(myWebber.getAllNames(resourceType));
                 }
                 content.append("</ul>");
+                content.append("</div>");
             }
             
             // Initialise the output

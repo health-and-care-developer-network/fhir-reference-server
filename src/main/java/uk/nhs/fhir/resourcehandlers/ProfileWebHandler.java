@@ -34,25 +34,25 @@ public class ProfileWebHandler {
         myDataSource = dataSource;
     }
     
-    public String getAllNames() {
+    public String getAllNames(String resourceType) {
         LOG.info("Called: ProfileWebHandler.getAllNames()");
         List<String> myNames = myDataSource.getAllNames();
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
-            sb.append(name);
+            sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
             sb.append("<br />");
         }
         return sb.toString();
     }
 
-    public String getAllNames(String namePart) {
+    public String getAllNames(String resourceType, String namePart) {
         LOG.info("Called: ProfileWebHandler.getAllNames(String namePart)");
         List<String> myNames = myDataSource.getAllNames(namePart);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
-            sb.append(name);
+            sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
             sb.append("<br />");
         }
         return sb.toString();

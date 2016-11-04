@@ -42,7 +42,7 @@ import uk.nhs.fhir.validator.ValidatorManager;
  * 
  * @author Tim Coates
  */
-@WebServlet(urlPatterns = {"/FHIR/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final long serialVersionUID = 1L;
