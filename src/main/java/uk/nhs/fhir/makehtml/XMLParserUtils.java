@@ -125,9 +125,32 @@ public class XMLParserUtils {
     
     protected static String getReferenceTypes(Element element) {
         String result = "";
+        ArrayList<String> profiles = new ArrayList<String>();
         NodeList typesList = element.getElementsByTagName("type");
+        for(int i = 0; i < typesList.getLength(); i++) {
+            Element atype = (Element) typesList.item(i);
+            NodeList profileList = atype.getElementsByTagName("profile");
+            Element profileName = (Element) profileList.item(0);
+            profiles.add(profileName.getAttribute("value"));
+        }
         
+        result = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a>";
         
+        if(profiles.size() > 0) {
+            result = result + "(";
+            for(int i = 0; i < profiles.size()-1; i++) {
+                result = result + decorateProfileName(profiles.get(i)) + " | ";
+            }
+            result = result + decorateProfileName(profiles.get(profiles.size()-1));
+            result = result + ")";
+        }
+        return result;
+    }
+    
+    private static String decorateProfileName(String profileName) {
+        String result = "<a href='" + profileName + "'>";
+        result = result + profileName.substring(profileName.lastIndexOf("/")+1);
+        result = result + "</a>";
         return result;
     }
 }

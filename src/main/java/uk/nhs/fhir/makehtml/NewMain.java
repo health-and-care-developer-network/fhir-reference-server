@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getReferenceTypes;
 
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
@@ -109,16 +110,16 @@ public class NewMain implements Constants {
                 // Catch elements which can be of multiple types...
                 if(typeName.equals("Multiple_Type_Choice")) {
                     ArrayList<String> types = getElementTypeList(element);
-                    elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                    elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                     for(String type : types) {
-                        elementList.add(new MyElement(elementName + "." + type, "", type, flags, "", "", hasChanged));
+                        elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
                     }
                 } else {
                     if(typeName.equals("Reference")) {
-                        typeName = getReferenceTypes(element);
-                        elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                        String newtypeName = getReferenceTypes(element);
+                        elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
                     } else {
-                        elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
+                        elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                     }
                 }
             }
@@ -425,39 +426,39 @@ public class NewMain implements Constants {
 
                 if (item.getTypeName() != null) {
                     // If a simle datatype...
-                    if (item.getTypeName().equals("boolean")
-                            || item.getTypeName().equals("code")
-                            || item.getTypeName().equals("date")
-                            || item.getTypeName().equals("dateTime")
-                            || item.getTypeName().equals("instant")
-                            || item.getTypeName().equals("unsignedInt")
-                            || item.getTypeName().equals("string")
-                            || item.getTypeName().equals("decimal")
-                            || item.getTypeName().equals("uri")
-                            || item.getTypeName().equals("integer")) {
+                    if (item.getType().equals("boolean")
+                            || item.getType().equals("code")
+                            || item.getType().equals("date")
+                            || item.getType().equals("dateTime")
+                            || item.getType().equals("instant")
+                            || item.getType().equals("unsignedInt")
+                            || item.getType().equals("string")
+                            || item.getType().equals("decimal")
+                            || item.getType().equals("uri")
+                            || item.getType().equals("integer")) {
                         sb.append(BASETYPE);
                         thisType = DataTypes.Simple;
                     }
                     // If a Resource Type...
-                    if (item.getTypeName().equals("Identifier")
-                            || item.getTypeName().equals("ContactPoint")
-                            || item.getTypeName().equals("Address")
-                            || item.getTypeName().equals("CodeableConcept")
-                            || item.getTypeName().equals("Attachment")
-                            || item.getTypeName().equals("Resource")
-                            || item.getTypeName().equals("Signature")
-                            || item.getTypeName().equals("BackboneElement")
-                            || item.getTypeName().equals("HumanName")
-                            || item.getTypeName().equals("Period")
-                            || item.getTypeName().equals("Coding")) {
+                    if (item.getType().equals("Identifier")
+                            || item.getType().equals("ContactPoint")
+                            || item.getType().equals("Address")
+                            || item.getType().equals("CodeableConcept")
+                            || item.getType().equals("Attachment")
+                            || item.getType().equals("Resource")
+                            || item.getType().equals("Signature")
+                            || item.getType().equals("BackboneElement")
+                            || item.getType().equals("HumanName")
+                            || item.getType().equals("Period")
+                            || item.getType().equals("Coding")) {
                         sb.append(DATATYPE);
                         thisType = DataTypes.Resource;
                     }
-                    if(item.getTypeName().equals("Reference")) {
+                    if(item.getType().equals("Reference")) {
                         sb.append(REFERENCE);
                         thisType = DataTypes.Reference;
                     }
-                    if(item.getTypeName().equals("Multiple_Type_Choice")) {
+                    if(item.getType().equals("Multiple_Type_Choice")) {
                         sb.append(CHOICETYPE);
                     }                
                 } else {

@@ -18,6 +18,7 @@ public class MyElement {
     private String typeName;
     private int level;
     private boolean display;
+    private String type;
 
     private String myCardinality;
     private String myFlags;
@@ -30,7 +31,7 @@ public class MyElement {
         return changed;
     }
 
-    public MyElement(String newName, String cardinality, String typeName, String theFlags, String description, String hover, boolean hasChanged) {        
+    public MyElement(String newName, String cardinality, String newType, String typeName, String theFlags, String description, String hover, boolean hasChanged) {        
         // Set what level of indentation we're at...
         this.level = StringUtils.countMatches(newName, ".");
         
@@ -41,6 +42,7 @@ public class MyElement {
         this.myCardinality = cardinality;
         
         // Set type name
+        this.type = newType;
         this.typeName = typeName;
 
         // Set the flags
@@ -81,7 +83,13 @@ public class MyElement {
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">    
+    public String getType() {
+        return type;
+    }
+
+
+        
     public void setDisplay(boolean display) {
         this.display = display;
     }
