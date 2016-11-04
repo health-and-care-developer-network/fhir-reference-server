@@ -22,7 +22,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">DomainResource</td> 
@@ -34,7 +34,7 @@
                   <span title="The metadata about the resource. This is content that is maintained by the infrastructure. Changes to the content may not always be associated with version changes to the resource.">meta</span>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Meta</td> 
@@ -85,7 +85,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..*</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -102,7 +102,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 
@@ -117,7 +117,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -134,7 +134,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                   <span title="This element is a modifier element">?!</span>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
@@ -150,7 +150,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -167,7 +167,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -183,7 +183,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">Quantity</td> 
@@ -198,7 +198,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -215,7 +215,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -232,7 +232,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
@@ -249,7 +249,7 @@
                   </b>
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">
-                  <span title="This element is included in summaries">Σ</span> 
+                  <span title="This element is included in summaries">?</span> 
                </td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">0..1</td> 
                <td style="font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;">string</td> 

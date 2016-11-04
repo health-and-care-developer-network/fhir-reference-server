@@ -122,4 +122,12 @@ public class XMLParserUtils {
         }
         return description;
     }
+    
+    protected static String getReferenceTypes(Element element) {
+        String result = "";
+        NodeList typesList = element.getElementsByTagName("type");
+        
+        
+        return result;
+    }
 }

@@ -114,8 +114,8 @@ public class NewMain implements Constants {
                         elementList.add(new MyElement(elementName + "." + type, "", type, flags, "", "", hasChanged));
                     }
                 } else {
-                    
                     if(typeName.equals("Reference")) {
+                        typeName = getReferenceTypes(element);
                         elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
                     } else {
                         elementList.add(new MyElement(elementName, cardinality, typeName, flags, description, hoverText, hasChanged));
