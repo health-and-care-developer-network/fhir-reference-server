@@ -23,4 +23,4 @@ VOLUME /opt/fhir
 
 # If you are using the filesystem persistence instead of MongoDB, use this
 # command to run the container:
-# docker run -d -p 80:8080 -v /opt/fhir:/opt/fhir --myfhir myfhir
+# docker run -d -p 80:8080 -v /opt/fhir:/opt/fhir --name myfhir myfhir
