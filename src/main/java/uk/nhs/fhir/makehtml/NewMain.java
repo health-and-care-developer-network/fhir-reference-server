@@ -1,11 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Health and Social Care Information Centre.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.nhs.fhir.makehtml;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import java.io.File;
 import java.io.FilenameFilter;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getDescription;
@@ -17,7 +26,6 @@ import static uk.nhs.fhir.makehtml.XMLParserUtils.getTitle;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -551,7 +559,6 @@ public class NewMain implements Constants {
         FileWriter.writeFile("output.html", html.getBytes());
         return augmentedResource;
     }
-
 
     /**
      * Process a directory of Profile files.
