@@ -73,7 +73,8 @@ public class FileCache {
 		            LOG.info("Reading profile file into cache: " + files[i].getName());
 		            
 		            // Add it to the name list
-		            newFileList.add(files[i].getName());
+		            String name = files[i].getName();
+		            newFileList.add(FileLoader.removeFileExtension(name));
 		            
 		            // Add the profile itself
 		            StructureDefinition profile = FHIRUtils.loadProfileFromFile(files[i]);

@@ -140,4 +140,17 @@ public class FileLoader {
     public static String cleanFilename(String input) {
     	return input.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
+
+    /**
+     * Removes the extension from a filename
+     * @param filename
+     * @return
+     */
+    public static String removeFileExtension(String filename) {
+    	int idx = filename.lastIndexOf('.');
+    	if (idx>0) {
+    		return filename.substring(0, idx);
+    	}
+    	return filename;
+    }
 }

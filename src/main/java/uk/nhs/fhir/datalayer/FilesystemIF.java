@@ -39,6 +39,7 @@ public class FilesystemIF implements Datasource {
 
     private String profilePath = PropertyReader.getProperty("profilePath");
     private String examplesPath = PropertyReader.getProperty("examplesPath");
+    private String fileExtension = PropertyReader.getProperty("fileExtension");
     
 
     /**
@@ -48,6 +49,9 @@ public class FilesystemIF implements Datasource {
      */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
     	String filename = FileLoader.cleanFilename(name);
+    	
+    	filename = filename + fileExtension;
+    	
     	LOG.info("Getting StructureDefinitions with name=" + name +
         			" looking for file: " + profilePath + "/" + filename);
         
