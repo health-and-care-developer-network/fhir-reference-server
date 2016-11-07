@@ -43,6 +43,7 @@ import uk.nhs.fhir.util.FileWriter;
  */
 public class NewMain implements Constants {
     private static final String fileExtension = ".xml";
+    private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     /**
      * Main entry point.
@@ -50,11 +51,15 @@ public class NewMain implements Constants {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        NewMain instance = new NewMain();
-        String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
-        instance.run(filename);
+        
+        if(args.length == 2) {
+            String inputDir = args[0];
+            String outputDir = args[1];
+            NewMain instance = new NewMain();
+            //String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
+            instance.processDirectory(inputDir, outputDir);
+        }
     }
-    private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
     /**
      * Process a specific file.
@@ -63,8 +68,6 @@ public class NewMain implements Constants {
      */
     private String run(String filename) {
         
-        //String filename = "/uk/nhs/fhir/makehtml/account.profile.xml";
-
         StringBuilder sb = new StringBuilder();
         sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
         sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
@@ -533,14 +536,8 @@ public class NewMain implements Constants {
                     sb.append(END_TABLE_ROW);
                 }
             }
-            //}
-
-        } catch (SAXException ex) {
-            Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            LOG.severe("Exception thrown: " + ex.getMessage());
         }
         sb.append(" </table>\n");
         sb.append("</div>");
