@@ -69,6 +69,13 @@ public class FilesystemIF implements Datasource {
     public List<StructureDefinition> getMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
+        
+        List<String> matchingNames = getAllNames(theNamePart);
+        
+        for (String name : matchingNames) {
+        	list.add(getSingleStructureDefinitionByName(name));
+        }
+        
         return list;
     }
 
