@@ -65,7 +65,6 @@ public class NewMain implements Constants {
             String inputDir = args[0];
             String outputDir = args[1];
             NewMain instance = new NewMain();
-            //String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
             instance.processDirectory(inputDir, outputDir);
         }
     }
@@ -92,7 +91,8 @@ public class NewMain implements Constants {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document document = docBuilder.parse(FileLoader.loadFile(filename));
+            //String fileContents =  FileLoader.loadFile(filename);
+            Document document = docBuilder.parse(filename);
 
             // We already have a text block, abort...
             //NodeList narrative = document.getElementsByTagName("text");
@@ -103,17 +103,17 @@ public class NewMain implements Constants {
             String resourceName = typeAttributes.getNamedItem("value").getTextContent();
 
             NodeList snapshot = document.getElementsByTagName("snapshot");
-            Element node = (Element) snapshot.item(0);
-            NodeList elements = node.getElementsByTagName("element");
+            Element snapshotNode = (Element) snapshot.item(0);
+            NodeList elements = snapshotNode.getElementsByTagName("element");
+            int snapshotElementCount = elements.getLength();
 
             NodeList differential = document.getElementsByTagName("differential");
             Element diffNode = (Element) differential.item(0);
             NodeList diffElements = diffNode.getElementsByTagName("element");
+            int diffElementCount = diffElements.getLength();
 
-            //for(int i = 0; i < diffElements.getLength(); i++) {    
-            //}
             // Here we're looping through the elements...
-            for(int i = 0; i < elements.getLength(); i++) {
+            for(int i = 0; i < snapshotElementCount; i++) {
                 Element element = (Element) elements.item(i);
                 String elementName = getElementName(element);
                 String cardinality = getElementCardinality(element);
@@ -124,13 +124,19 @@ public class NewMain implements Constants {
 
                 // Here we loop through the differential elements to see if this element has been changed by this profile
                 boolean hasChanged = false;
-                for(int j = 0; j < diffElements.getLength(); j++) {
+                for(int j = 0; j < diffElementCount; j++) {
                     Element diffElement = (Element) diffElements.item(j);
-                    if(getElementName(diffElement).equals(elementName)) {
-                        hasChanged = true;
+                    if(diffElement != null) {
+                        if(getElementName(diffElement).equals(elementName)) {
+                            hasChanged = true;
+                        }
                     }
                 }
 
+                if(typeName == null) {
+                    LOG.info("It's NULL???");
+                }
+                
                 // Catch elements which can be of multiple types...
                 if(typeName.equals("Multiple_Type_Choice")) {
                     ArrayList<String> types = getElementTypeList(element);
