@@ -92,7 +92,7 @@ public class NewMain implements Constants {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document document = docBuilder.parse(FileLoader.loadFileOnClasspathAsStream(filename));
+            Document document = docBuilder.parse(FileLoader.loadFile(filename));
 
             // We already have a text block, abort...
             //NodeList narrative = document.getElementsByTagName("text");
@@ -552,7 +552,7 @@ public class NewMain implements Constants {
         sb.append("</div>");
 
         // Now, create a StructureDefinition resource, add our test section to the top, and serialise it back out
-        String augmentedResource = ResourceBuilder.addTextSectionToResource(FileLoader.loadFileOnClasspath(filename), sb.toString());
+        String augmentedResource = ResourceBuilder.addTextSectionToResource(FileLoader.loadFile(filename), sb.toString());
         //FileWriter.writeFile("output.xml", augmentedResource.getBytes());
 
         // And finally let's also wrap our HTML and write it to another file to see how it looks...

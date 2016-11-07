@@ -23,21 +23,21 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 
 public class ResourceBuilder {
-	
-	private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
-	
-	protected static String addTextSectionToResource(String resourceXML, String textSection) {
+
+    private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+
+    protected static String addTextSectionToResource(String resourceXML, String textSection) {
         FhirContext ctx = FhirContext.forDstu2();
         StructureDefinition structureDefinitionResource = null;
-        
+
         structureDefinitionResource = (StructureDefinition) ctx.newXmlParser().parseResource(resourceXML);
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv(textSection);
         structureDefinitionResource.setText(textElement);
-        
+
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(structureDefinitionResource);
         return serialised;
-	}
-	
+    }
+
 }
