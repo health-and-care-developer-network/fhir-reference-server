@@ -5,6 +5,9 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import java.io.File;
+import java.io.FilenameFilter;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getDescription;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementCardinality;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementName;
@@ -39,18 +42,27 @@ import uk.nhs.fhir.util.FileWriter;
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain implements Constants {
+    private static final String fileExtension = ".xml";
 
     /**
+     * Main entry point.
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         NewMain instance = new NewMain();
-        instance.run();
+        String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
+        instance.run(filename);
     }
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
-    private void run() {
-        String filename = "/uk/nhs/fhir/makehtml/nrls/NRLS-DocumentReference-1-0.xml";
+    /**
+     * Process a specific file.
+     * 
+     * @param filename 
+     */
+    private String run(String filename) {
+        
         //String filename = "/uk/nhs/fhir/makehtml/account.profile.xml";
 
         StringBuilder sb = new StringBuilder();
@@ -85,12 +97,11 @@ public class NewMain implements Constants {
             NodeList differential = document.getElementsByTagName("differential");
             Element diffNode = (Element) differential.item(0);
             NodeList diffElements = diffNode.getElementsByTagName("element");
-            
+
             //for(int i = 0; i < diffElements.getLength(); i++) {    
             //}
-            
             // Here we're looping through the elements...
-            for (int i = 0; i < elements.getLength(); i++) {
+            for(int i = 0; i < elements.getLength(); i++) {
                 Element element = (Element) elements.item(i);
                 String elementName = getElementName(element);
                 String cardinality = getElementCardinality(element);
@@ -98,7 +109,7 @@ public class NewMain implements Constants {
                 String flags = getFlags(element);
                 String description = getTitle(element);
                 String hoverText = getDescription(element);
-                
+
                 // Here we loop through the differential elements to see if this element has been changed by this profile
                 boolean hasChanged = false;
                 for(int j = 0; j < diffElements.getLength(); j++) {
@@ -107,7 +118,7 @@ public class NewMain implements Constants {
                         hasChanged = true;
                     }
                 }
-                
+
                 // Catch elements which can be of multiple types...
                 if(typeName.equals("Multiple_Type_Choice")) {
                     ArrayList<String> types = getElementTypeList(element);
@@ -131,13 +142,13 @@ public class NewMain implements Constants {
             }
 
             int mutedAtLevel = 100;
-            for (int i = 0; i < elementList.size(); i++) {
+            for(int i = 0; i < elementList.size(); i++) {
 
                 MyElement item = (MyElement) elementList.get(i);
-                if (item.isDisplay() == false) {
+                if(item.isDisplay() == false) {
                     mutedAtLevel = item.getLevel();
                 } else {
-                    if (item.getLevel() > mutedAtLevel) {
+                    if(item.getLevel() > mutedAtLevel) {
                         item.setDisplay(false);
                     } else {
                         mutedAtLevel = 100;
@@ -145,9 +156,9 @@ public class NewMain implements Constants {
                 }
             }
 
-            for (int i = 0; i < elementList.size(); i++) {
+            for(int i = 0; i < elementList.size(); i++) {
                 MyElement item = (MyElement) elementList.get(i);
-                if (item.isDisplay() == false) {
+                if(item.isDisplay() == false) {
                     elementList.remove(i);
                 }
             }
@@ -156,204 +167,152 @@ public class NewMain implements Constants {
             elementList.get(elementList.size() - 1).setIsLast(true);
 
             // Now work through and draw each element
-            for (int i = 0; i < elementList.size(); i++) {
+            for(int i = 0; i < elementList.size(); i++) {
                 MyElement item = (MyElement) elementList.get(i);
-                
+
                 if(item.isDisplay()) {
 
-                sb.append(START_TABLE_ROW);
+                    sb.append(START_TABLE_ROW);
 
-                // Make a cell for the tree images and the name
-                sb.append(START_TABLE_CELL);
+                    // Make a cell for the tree images and the name
+                    sb.append(START_TABLE_CELL);
                             // Tree and object type images need to go here
-                // Simplest cases...
-                //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 1 elements">
-                if (item.getLevel() == 1) {
-                    if (i == elementList.size() - 1) {
-                        // This is the last item, so:
-                        sb.append(CORNER);
-                    } else {
-                        sb.append(LINEWITHT);
-                    }
-                } else {
-                    //</editor-fold>
-                    boolean oneContinues = false;
-                    for (int n = i; n < elementList.size(); n++) {
-                        int d = elementList.get(n).getLevel();
-                        if (d == 1) {
-                            // We need to show the level 1 line continuing beside our line
-                            oneContinues = true;
-                            break;
-                        }
-                    }
-                    //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 2 elements">
-                    if (item.getLevel() == 2) {
-                        if (i == elementList.size() - 1) {
-                            // It's the last item so a spacer then the 'end corner'
-                            sb.append(SPACER);
+                    // Simplest cases...
+                    //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 1 elements">
+                    if(item.getLevel() == 1) {
+                        if(i == elementList.size() - 1) {
+                            // This is the last item, so:
                             sb.append(CORNER);
                         } else {
-
-                            if (oneContinues) {
-                                sb.append(LINE);
-                            } else {
-                                sb.append(SPACER);
-                            }
-                            if (elementList.get(i + 1).getLevel() == 1) {
-                                // We're the last at level 2, so corner
-                                sb.append(CORNER);
-                            } else {
-                                // Here we need to determine whether this is the last at level two
-                                boolean lastOfTwos = false;
-                                for (int n = i; n < elementList.size(); n++) {
-                                    if (elementList.get(n).getLevel() == 1) {
-                                        lastOfTwos = true;
-                                        break;
-                                    }
-                                }
-                                if (lastOfTwos) {
-                                    sb.append(CORNER);
-                                } else {
-                                    sb.append(LINEWITHT);
-                                }
-                            }
+                            sb.append(LINEWITHT);
                         }
                     } else {
-    //</editor-fold>
-                        // Now figure out what level two is doing...
-                        boolean twoContinues = false;
-                        for (int n = i; n < elementList.size(); n++) {
+                        //</editor-fold>
+                        boolean oneContinues = false;
+                        for(int n = i; n < elementList.size(); n++) {
                             int d = elementList.get(n).getLevel();
-                            if (d == 2) {
-                                twoContinues = true;
-                            }
-                            if (d == 1) {
+                            if(d == 1) {
+                                // We need to show the level 1 line continuing beside our line
+                                oneContinues = true;
                                 break;
                             }
                         }
-                        //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 3 elements">
-                        if (item.getLevel() == 3) {
-                            if (i == elementList.size() - 1) {
-                                // It's the last item so two spacers then the 'end corner'
-                                sb.append(SPACER);
+                        //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 2 elements">
+                        if(item.getLevel() == 2) {
+                            if(i == elementList.size() - 1) {
+                                // It's the last item so a spacer then the 'end corner'
                                 sb.append(SPACER);
                                 sb.append(CORNER);
                             } else {
-                                // Now figure out whether there are more level one elements to come, so do we continue the very left leg of the tree?
-                                if (oneContinues) {  // We have more items coming at Level one, so continue the tree...
-                                    sb.append(LINE);
-                                } else {
-                                    // No more at Level one, so we add a spacer...
-                                    sb.append(SPACER);
-                                }
-                                if (twoContinues) {  // We have more items coming at Level two, so continue the tree...
+
+                                if(oneContinues) {
                                     sb.append(LINE);
                                 } else {
                                     sb.append(SPACER);
                                 }
-                                // Now just figure out whether we're the last at Level 3, and add icon...
-                                if (elementList.get(i + 1).getLevel() != 3) {
-                                    // We're last, add a corner
+                                if(elementList.get(i + 1).getLevel() == 1) {
+                                    // We're the last at level 2, so corner
                                     sb.append(CORNER);
                                 } else {
-                                    sb.append(LINEWITHT);
-                                }
-
-                            }
-                        } else {
-    //</editor-fold>
-                            // Now figure out what level three is doing
-                            boolean threeContinues = false;
-                            for (int n = i; n < elementList.size(); n++) {
-                                int d = elementList.get(n).getLevel();
-                                if (d == 3) {
-                                    threeContinues = true;
-                                }
-                                if (d == 1 || d == 2) {
-                                    break;
-                                }
-                            }
-                            //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 4 elements">
-                            if (item.getLevel() == 4) {
-                                if (i == elementList.size() - 1) {
-                                    // It's the last item so two spacers then the 'end corner'
-                                    sb.append(SPACER);
-                                    sb.append(SPACER);
-                                    sb.append(SPACER);
-                                    sb.append(CORNER);
-                                } else {
-
-// Now figure out whether there are more level one elements to come, so do we continue the very left leg of the tree?
-                                    if (oneContinues) {  // We have more items coming at Level one, so continue the tree...
-                                        sb.append(LINE);
-                                    } else {
-                                        // No more at Level one, so we add a spacer...
-                                        sb.append(SPACER);
+                                    // Here we need to determine whether this is the last at level two
+                                    boolean lastOfTwos = false;
+                                    for(int n = i; n < elementList.size(); n++) {
+                                        if(elementList.get(n).getLevel() == 1) {
+                                            lastOfTwos = true;
+                                            break;
+                                        }
                                     }
-                                    if (twoContinues) {  // We have more items coming at Level two, so continue the tree...
-                                        sb.append(LINE);
-                                    } else {
-                                        sb.append(SPACER);
-                                    }
-                                    if (threeContinues) {  // We have more items coming at Level two, so continue the tree...
-                                        sb.append(LINE);
-                                    } else {
-                                        sb.append(SPACER);
-                                    }
-                                    // Now just figure out whether we're the last at Level 4, and add icon...
-                                    if (elementList.get(i + 1).getLevel() != 4) {
-                                        // We're last, add a corner
+                                    if(lastOfTwos) {
                                         sb.append(CORNER);
                                     } else {
                                         sb.append(LINEWITHT);
                                     }
                                 }
+                            }
+                        } else {
+    //</editor-fold>
+                            // Now figure out what level two is doing...
+                            boolean twoContinues = false;
+                            for(int n = i; n < elementList.size(); n++) {
+                                int d = elementList.get(n).getLevel();
+                                if(d == 2) {
+                                    twoContinues = true;
+                                }
+                                if(d == 1) {
+                                    break;
+                                }
+                            }
+                            //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 3 elements">
+                            if(item.getLevel() == 3) {
+                                if(i == elementList.size() - 1) {
+                                    // It's the last item so two spacers then the 'end corner'
+                                    sb.append(SPACER);
+                                    sb.append(SPACER);
+                                    sb.append(CORNER);
+                                } else {
+                                    // Now figure out whether there are more level one elements to come, so do we continue the very left leg of the tree?
+                                    if(oneContinues) {  // We have more items coming at Level one, so continue the tree...
+                                        sb.append(LINE);
+                                    } else {
+                                        // No more at Level one, so we add a spacer...
+                                        sb.append(SPACER);
+                                    }
+                                    if(twoContinues) {  // We have more items coming at Level two, so continue the tree...
+                                        sb.append(LINE);
+                                    } else {
+                                        sb.append(SPACER);
+                                    }
+                                    // Now just figure out whether we're the last at Level 3, and add icon...
+                                    if(elementList.get(i + 1).getLevel() != 3) {
+                                        // We're last, add a corner
+                                        sb.append(CORNER);
+                                    } else {
+                                        sb.append(LINEWITHT);
+                                    }
+
+                                }
                             } else {
     //</editor-fold>
-                                // Now figure out what level four is doing
-                                boolean fourContinues = false;
-                                for (int n = i; n < elementList.size(); n++) {
+                                // Now figure out what level three is doing
+                                boolean threeContinues = false;
+                                for(int n = i; n < elementList.size(); n++) {
                                     int d = elementList.get(n).getLevel();
-                                    if (d == 4) {
-                                        fourContinues = true;
+                                    if(d == 3) {
+                                        threeContinues = true;
                                     }
-                                    if (d == 1 || d == 2 || d == 3) {
+                                    if(d == 1 || d == 2) {
                                         break;
                                     }
                                 }
-                                //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 5 elements">
-                                if (item.getLevel() == 5) {
-                                    if (i == elementList.size() - 1) {
+                                //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 4 elements">
+                                if(item.getLevel() == 4) {
+                                    if(i == elementList.size() - 1) {
                                         // It's the last item so two spacers then the 'end corner'
-                                        sb.append(SPACER);
                                         sb.append(SPACER);
                                         sb.append(SPACER);
                                         sb.append(SPACER);
                                         sb.append(CORNER);
                                     } else {
 
-                                        if (oneContinues) {  // We have more items coming at Level one, s ocontinue the tree...
+// Now figure out whether there are more level one elements to come, so do we continue the very left leg of the tree?
+                                        if(oneContinues) {  // We have more items coming at Level one, so continue the tree...
+                                            sb.append(LINE);
+                                        } else {
+                                            // No more at Level one, so we add a spacer...
+                                            sb.append(SPACER);
+                                        }
+                                        if(twoContinues) {  // We have more items coming at Level two, so continue the tree...
                                             sb.append(LINE);
                                         } else {
                                             sb.append(SPACER);
                                         }
-                                        if (twoContinues) {  // We have more items coming at Level two, s ocontinue the tree...
+                                        if(threeContinues) {  // We have more items coming at Level two, so continue the tree...
                                             sb.append(LINE);
                                         } else {
                                             sb.append(SPACER);
                                         }
-                                        if (threeContinues) {  // We have more items coming at Level three, s ocontinue the tree...
-                                            sb.append(LINE);
-                                        } else {
-                                            sb.append(SPACER);
-                                        }
-                                        if (fourContinues) {  // We have more items coming at Level four, s ocontinue the tree...
-                                            sb.append(LINE);
-                                        } else {
-                                            sb.append(SPACER);
-                                        }
-                                        // Now just figure out whether we're the last at Level 5, and add icon...
-                                        if (elementList.get(i + 1).getLevel() != 5) {
+                                        // Now just figure out whether we're the last at Level 4, and add icon...
+                                        if(elementList.get(i + 1).getLevel() != 4) {
                                             // We're last, add a corner
                                             sb.append(CORNER);
                                         } else {
@@ -362,165 +321,217 @@ public class NewMain implements Constants {
                                     }
                                 } else {
     //</editor-fold>
-                                    // Now figure out what level five is doing
-                                    boolean fiveContinues = false;
-                                    for (int n = i; n < elementList.size(); n++) {
+                                    // Now figure out what level four is doing
+                                    boolean fourContinues = false;
+                                    for(int n = i; n < elementList.size(); n++) {
                                         int d = elementList.get(n).getLevel();
-                                        if (d == 5) {
-                                            fiveContinues = true;
+                                        if(d == 4) {
+                                            fourContinues = true;
                                         }
-                                        if (d == 1 || d == 2 || d == 3 || d == 4) {
+                                        if(d == 1 || d == 2 || d == 3) {
                                             break;
                                         }
                                     }
-                                    //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 6 elements">
-                                    if(i == elementList.size() - 1) {
-                                        // It's the last item so two spacers then the 'end corner'
-                                        sb.append(SPACER);
-                                        sb.append(SPACER);
-                                        sb.append(SPACER);
-                                        sb.append(SPACER);
-                                        sb.append(SPACER);
-                                        sb.append(CORNER);
-                                    } else {
-                                        if (item.getLevel() == 6) {
-                                            if (oneContinues) {  // We have more items coming at Level one, s ocontinue the tree...
+                                    //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 5 elements">
+                                    if(item.getLevel() == 5) {
+                                        if(i == elementList.size() - 1) {
+                                            // It's the last item so two spacers then the 'end corner'
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(CORNER);
+                                        } else {
+
+                                            if(oneContinues) {  // We have more items coming at Level one, s ocontinue the tree...
                                                 sb.append(LINE);
                                             } else {
                                                 sb.append(SPACER);
                                             }
-                                            if (twoContinues) {  // We have more items coming at Level two, s ocontinue the tree...
+                                            if(twoContinues) {  // We have more items coming at Level two, s ocontinue the tree...
                                                 sb.append(LINE);
                                             } else {
                                                 sb.append(SPACER);
                                             }
-                                            if (threeContinues) {  // We have more items coming at Level three, s ocontinue the tree...
+                                            if(threeContinues) {  // We have more items coming at Level three, s ocontinue the tree...
                                                 sb.append(LINE);
                                             } else {
                                                 sb.append(SPACER);
                                             }
-                                            if (fourContinues) {  // We have more items coming at Level four, s ocontinue the tree...
+                                            if(fourContinues) {  // We have more items coming at Level four, s ocontinue the tree...
                                                 sb.append(LINE);
                                             } else {
                                                 sb.append(SPACER);
                                             }
-                                            if (fiveContinues) {  // We have more items coming at Level five, s ocontinue the tree...
-                                                sb.append(LINE);
-                                            } else {
-                                                sb.append(SPACER);
-                                            }
-                                            if(elementList.get(i + 1).getLevel() != 6) {
+                                            // Now just figure out whether we're the last at Level 5, and add icon...
+                                            if(elementList.get(i + 1).getLevel() != 5) {
                                                 // We're last, add a corner
                                                 sb.append(CORNER);
                                             } else {
                                                 sb.append(LINEWITHT);
                                             }
                                         }
+                                    } else {
+    //</editor-fold>
+                                        // Now figure out what level five is doing
+                                        boolean fiveContinues = false;
+                                        for(int n = i; n < elementList.size(); n++) {
+                                            int d = elementList.get(n).getLevel();
+                                            if(d == 5) {
+                                                fiveContinues = true;
+                                            }
+                                            if(d == 1 || d == 2 || d == 3 || d == 4) {
+                                                break;
+                                            }
+                                        }
+                                        //<editor-fold defaultstate="collapsed" desc="Handle tree icons for Level 6 elements">
+                                        if(i == elementList.size() - 1) {
+                                            // It's the last item so two spacers then the 'end corner'
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(SPACER);
+                                            sb.append(CORNER);
+                                        } else {
+                                            if(item.getLevel() == 6) {
+                                                if(oneContinues) {  // We have more items coming at Level one, s ocontinue the tree...
+                                                    sb.append(LINE);
+                                                } else {
+                                                    sb.append(SPACER);
+                                                }
+                                                if(twoContinues) {  // We have more items coming at Level two, s ocontinue the tree...
+                                                    sb.append(LINE);
+                                                } else {
+                                                    sb.append(SPACER);
+                                                }
+                                                if(threeContinues) {  // We have more items coming at Level three, s ocontinue the tree...
+                                                    sb.append(LINE);
+                                                } else {
+                                                    sb.append(SPACER);
+                                                }
+                                                if(fourContinues) {  // We have more items coming at Level four, s ocontinue the tree...
+                                                    sb.append(LINE);
+                                                } else {
+                                                    sb.append(SPACER);
+                                                }
+                                                if(fiveContinues) {  // We have more items coming at Level five, s ocontinue the tree...
+                                                    sb.append(LINE);
+                                                } else {
+                                                    sb.append(SPACER);
+                                                }
+                                                if(elementList.get(i + 1).getLevel() != 6) {
+                                                    // We're last, add a corner
+                                                    sb.append(CORNER);
+                                                } else {
+                                                    sb.append(LINEWITHT);
+                                                }
+                                            }
+                                        }
+                                        //</editor-fold>
                                     }
-                                    //</editor-fold>
-                                }
 
+                                }
                             }
                         }
                     }
-                }
 
-                // Simple case, the base resource node...
-                if (item.getLevel() == 0) {
-                    sb.append(RESOURCE);
-                }
-                
-                DataTypes thisType = null;
-
-                if (item.getTypeName() != null) {
-                    // If a simle datatype...
-                    if (item.getType().equals("boolean")
-                            || item.getType().equals("code")
-                            || item.getType().equals("date")
-                            || item.getType().equals("dateTime")
-                            || item.getType().equals("instant")
-                            || item.getType().equals("unsignedInt")
-                            || item.getType().equals("string")
-                            || item.getType().equals("decimal")
-                            || item.getType().equals("base64Binary")
-                            || item.getType().equals("uri")
-                            || item.getType().equals("integer")) {
-                        sb.append(BASETYPE);
-                        thisType = DataTypes.Simple;
+                    // Simple case, the base resource node...
+                    if(item.getLevel() == 0) {
+                        sb.append(RESOURCE);
                     }
-                    // If a Resource Type...
-                    if (item.getType().equals("Identifier")
-                            || item.getType().equals("ContactPoint")
-                            || item.getType().equals("Address")
-                            || item.getType().equals("CodeableConcept")
-                            || item.getType().equals("Attachment")
-                            || item.getType().equals("Resource")
-                            || item.getType().equals("Signature")
-                            || item.getType().equals("BackboneElement")
-                            || item.getType().equals("HumanName")
-                            || item.getType().equals("Period")
-                            || item.getType().equals("Money")
-                            || item.getType().equals("Coding")) {
-                        sb.append(DATATYPE);
-                        thisType = DataTypes.Resource;
-                    }
-                    if(item.getType().equals("Reference")) {
-                        sb.append(REFERENCE);
-                        thisType = DataTypes.Reference;
-                    }
-                    if(item.getType().equals("Multiple_Type_Choice")) {
-                        sb.append(CHOICETYPE);
-                    }                
-                } else {
-                    // Seems to be a special case, used in eg Bundle resource types
-                    sb.append(BUNDLE);
-                }
 
-                if(item.isChanged()) {
-                    sb.append("<b>");
-                    sb.append(item.getNiceTitle());
-                    sb.append("</b>");
-                } else {
-                    sb.append(item.getNiceTitle());
-                }
-                sb.append(END_TABLE_CELL);
+                    DataTypes thisType = null;
 
-                // Now the flags column
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getFlags());
-                sb.append(END_TABLE_CELL);
-
-                // Now the Cardinality column
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getCardinality());
-                sb.append(END_TABLE_CELL);
-
-                // Now the type column
-                sb.append(START_TABLE_CELL);
-                if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
-                    if(thisType == DataTypes.Resource) {
-                        sb.append("<a href=\"https://www.hl7.org/fhir/" + item.getTypeName().toLowerCase() + ".html\">");
-                        sb.append(item.getTypeName());
-                        sb.append("</a>");
+                    if(item.getTypeName() != null) {
+                        // If a simle datatype...
+                        if(item.getType().equals("boolean")
+                                || item.getType().equals("code")
+                                || item.getType().equals("date")
+                                || item.getType().equals("dateTime")
+                                || item.getType().equals("instant")
+                                || item.getType().equals("unsignedInt")
+                                || item.getType().equals("string")
+                                || item.getType().equals("decimal")
+                                || item.getType().equals("base64Binary")
+                                || item.getType().equals("uri")
+                                || item.getType().equals("integer")) {
+                            sb.append(BASETYPE);
+                            thisType = DataTypes.Simple;
+                        }
+                        // If a Resource Type...
+                        if(item.getType().equals("Identifier")
+                                || item.getType().equals("ContactPoint")
+                                || item.getType().equals("Address")
+                                || item.getType().equals("CodeableConcept")
+                                || item.getType().equals("Attachment")
+                                || item.getType().equals("Resource")
+                                || item.getType().equals("Signature")
+                                || item.getType().equals("BackboneElement")
+                                || item.getType().equals("HumanName")
+                                || item.getType().equals("Period")
+                                || item.getType().equals("Money")
+                                || item.getType().equals("Coding")) {
+                            sb.append(DATATYPE);
+                            thisType = DataTypes.Resource;
+                        }
+                        if(item.getType().equals("Reference")) {
+                            sb.append(REFERENCE);
+                            thisType = DataTypes.Reference;
+                        }
+                        if(item.getType().equals("Multiple_Type_Choice")) {
+                            sb.append(CHOICETYPE);
+                        }
                     } else {
-                        if(thisType == DataTypes.Reference) {
-                            sb.append("<a href=\"https://www.hl7.org/fhir/references.html\">");
+                        // Seems to be a special case, used in eg Bundle resource types
+                        sb.append(BUNDLE);
+                    }
+
+                    if(item.isChanged()) {
+                        sb.append("<b>");
+                        sb.append(item.getNiceTitle());
+                        sb.append("</b>");
+                    } else {
+                        sb.append(item.getNiceTitle());
+                    }
+                    sb.append(END_TABLE_CELL);
+
+                    // Now the flags column
+                    sb.append(START_TABLE_CELL);
+                    sb.append(item.getFlags());
+                    sb.append(END_TABLE_CELL);
+
+                    // Now the Cardinality column
+                    sb.append(START_TABLE_CELL);
+                    sb.append(item.getCardinality());
+                    sb.append(END_TABLE_CELL);
+
+                    // Now the type column
+                    sb.append(START_TABLE_CELL);
+                    if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
+                        if(thisType == DataTypes.Resource) {
+                            sb.append("<a href=\"https://www.hl7.org/fhir/" + item.getTypeName().toLowerCase() + ".html\">");
                             sb.append(item.getTypeName());
                             sb.append("</a>");
                         } else {
-                            sb.append(decorateTypeName(item.getTypeName()));
+                            if(thisType == DataTypes.Reference) {
+                                sb.append("<a href=\"https://www.hl7.org/fhir/references.html\">");
+                                sb.append(item.getTypeName());
+                                sb.append("</a>");
+                            } else {
+                                sb.append(decorateTypeName(item.getTypeName()));
+                            }
                         }
                     }
-                }                
-                sb.append(END_TABLE_CELL);
+                    sb.append(END_TABLE_CELL);
 
-                // And now the description
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getDescription());
-                sb.append(END_TABLE_CELL);
+                    // And now the description
+                    sb.append(START_TABLE_CELL);
+                    sb.append(item.getDescription());
+                    sb.append(END_TABLE_CELL);
 
-                sb.append(END_TABLE_ROW);
-            }
+                    sb.append(END_TABLE_ROW);
+                }
             }
             //}
 
@@ -536,30 +547,68 @@ public class NewMain implements Constants {
 
         // Now, create a StructureDefinition resource, add our test section to the top, and serialise it back out
         String augmentedResource = ResourceBuilder.addTextSectionToResource(FileLoader.loadFileOnClasspath(filename), sb.toString());
-        FileWriter.writeFile("output.xml", augmentedResource.getBytes());
+        //FileWriter.writeFile("output.xml", augmentedResource.getBytes());
 
         // And finally let's also wrap our HTML and write it to another file to see how it looks...
         String html = "<html>\n<body>\n" + sb.toString() + "</body>\n</html>";
         FileWriter.writeFile("output.html", html.getBytes());
+        return augmentedResource;
     }
-    
+
+
+    /**
+     * Process a directory of Profile files.
+     * 
+     * @param profilePath 
+     */
+    private void processDirectory(String profilePath, String outPath) {        
+        File folder = new File(profilePath);
+        File[] allProfiles = folder.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(fileExtension);
+            }
+        });
+        
+        for(File thisFile : allProfiles) {
+            if(thisFile.isFile()) {
+                String outFilename = outPath + thisFile.getName();
+                String result = run(thisFile.getPath());
+                FileWriter.writeFile(outFilename, result.getBytes());
+            }
+        }
+    }
+
+    /**
+     * Dress up a type name so it provides a link back to the definition.
+     * 
+     * @param type
+     * @return 
+     */
     private String decorateTypeName(String type) {
-        if(type.equals("string"))
+        if(type.equals("string")) {
             return "<a href='https://www.hl7.org/fhir/datatypes.html#string'>string</a>";
-        if(type.equals("code"))
+        }
+        if(type.equals("code")) {
             return "<a href='https://www.hl7.org/fhir/datatypes.html#code'>code</a>";
-        if(type.equals("uri"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#uri'>uri</a>";
-        if(type.equals("base64Binary"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#base64Binary'>base64Binary</a>";
-        if(type.equals("instant"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#instant'>instant</a>";
-        if(type.equals("unsignedInt"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#unsignedInt'>unsignedInt</a>";
-        if(type.equals("dateTime"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#dateTime'>dateTime</a>";
-        if(type.equals("boolean"))
-            return"<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
+        }
+        if(type.equals("uri")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#uri'>uri</a>";
+        }
+        if(type.equals("base64Binary")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#base64Binary'>base64Binary</a>";
+        }
+        if(type.equals("instant")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#instant'>instant</a>";
+        }
+        if(type.equals("unsignedInt")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#unsignedInt'>unsignedInt</a>";
+        }
+        if(type.equals("dateTime")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#dateTime'>dateTime</a>";
+        }
+        if(type.equals("boolean")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
+        }
         return type;
     }
 }
