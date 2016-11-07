@@ -16,6 +16,7 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
+import static java.io.File.separatorChar;
 import java.io.FilenameFilter;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getDescription;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementCardinality;
@@ -575,8 +576,9 @@ public class NewMain implements Constants {
         
         for(File thisFile : allProfiles) {
             if(thisFile.isFile()) {
-                String outFilename = outPath + thisFile.getName();
-                String result = run(thisFile.getPath());
+                String inFile = thisFile.getPath();
+                String outFilename = outPath + separatorChar + thisFile.getName();
+                String result = run(inFile);
                 FileWriter.writeFile(outFilename, result.getBytes());
             }
         }
