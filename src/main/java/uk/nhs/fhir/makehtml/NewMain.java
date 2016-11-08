@@ -489,7 +489,8 @@ public class NewMain implements Constants {
                                 || item.getType().equals("HumanName")
                                 || item.getType().equals("Period")
                                 || item.getType().equals("Money")
-                                || item.getType().equals("Coding")) {
+                                || item.getType().equals("Coding")
+                                || item.getType().equals("Annotation")) {
                             sb.append(DATATYPE);
                             thisType = DataTypes.Resource;
                         }
