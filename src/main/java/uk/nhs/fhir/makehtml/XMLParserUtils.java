@@ -32,14 +32,21 @@ public class XMLParserUtils {
     }
 
     protected static String getElementCardinality(Element element) {
+        String min;
+        String max;
+        String cardinality;
         NodeList minList = element.getElementsByTagName("min");
         Element node = (Element) minList.item(0);
-        String min = node.getAttribute("value");
-
-        NodeList maxList = element.getElementsByTagName("max");
-        node = (Element) maxList.item(0);
-        String max = node.getAttribute("value");
-        return min + ".." + max;
+        if(node != null) {
+            min = node.getAttribute("value");
+            NodeList maxList = element.getElementsByTagName("max");
+            node = (Element) maxList.item(0);
+            max = node.getAttribute("value");
+            cardinality = min + ".." + max;
+        } else {
+            cardinality = "???";
+        }
+        return cardinality;
     }
 
     protected static String getElementTypeName(Element element) {
