@@ -135,6 +135,7 @@ public class NewMain implements Constants {
 
                 if(typeName == null) {
                     LOG.info("It's NULL???");
+                    typeName = "see link";
                 }
                 
                 // Catch elements which can be of multiple types...
