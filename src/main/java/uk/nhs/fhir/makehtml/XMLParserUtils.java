@@ -63,6 +63,9 @@ public class XMLParserUtils {
             Element node = (Element) typesList.item(0);
             NodeList codeList = node.getElementsByTagName("code");
             Element subNode = (Element) codeList.item(0);
+            
+            // TODO: Here we need to check whether they're ALL Reference types, or it's a mixture
+            // TODO: wil also affect other multiple type types, one or more could be a reference?
             if(subNode.getAttribute("value").equals("Reference")) {
                 // We now know it's a Reference to one of many types...
                 typeName = "Reference";
