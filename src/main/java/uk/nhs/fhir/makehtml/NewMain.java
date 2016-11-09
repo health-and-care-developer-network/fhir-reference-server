@@ -559,6 +559,7 @@ public class NewMain implements Constants {
         sb.append(" </table>\n");
         sb.append("</div>");
 
+        LOG.info("\n=========================================\nhtml generated, now adding to resource\n=========================================");
         // Now, create a StructureDefinition resource, add our test section to the top, and serialise it back out
         String augmentedResource = ResourceBuilder.addTextSectionToResource(FileLoader.loadFile(filename), sb.toString());
         //FileWriter.writeFile("output.xml", augmentedResource.getBytes());
@@ -586,6 +587,7 @@ public class NewMain implements Constants {
             if(thisFile.isFile()) {
                 String inFile = thisFile.getPath();
                 String outFilename = outPath + separatorChar + thisFile.getName();
+                LOG.info("\n\n=========================================\nProcessing file: " + inFile + "\n=========================================");
                 String result = run(inFile);
                 FileWriter.writeFile(outFilename, result.getBytes());
             }

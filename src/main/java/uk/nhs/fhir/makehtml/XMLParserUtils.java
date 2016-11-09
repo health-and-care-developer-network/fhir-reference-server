@@ -16,6 +16,7 @@
 package uk.nhs.fhir.makehtml;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,6 +26,9 @@ import org.w3c.dom.NodeList;
  * @author Adam Hatherly
  */
 public class XMLParserUtils {
+    private static final Logger LOG = Logger.getLogger(XMLParserUtils.class.getName());
+    
+    
     protected static String getElementName(Element item) {
         NodeList pathsList = item.getElementsByTagName("path");
         Element node = (Element) pathsList.item(0);
@@ -146,7 +150,16 @@ public class XMLParserUtils {
             Element atype = (Element) typesList.item(i);
             NodeList profileList = atype.getElementsByTagName("profile");
             Element profileName = (Element) profileList.item(0);
-            profiles.add(profileName.getAttribute("value"));
+            if(profileName != null) {
+                String attrName = profileName.getAttribute("value");
+                if(attrName != null) {
+                    profiles.add(profileName.getAttribute("value"));
+                } else {
+                    LOG.warning("Profile type for this reference has no type name");
+                }
+            } else {
+                LOG.warning("No Profile type found for this reference");
+            }
         }
         
         result = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a>";
