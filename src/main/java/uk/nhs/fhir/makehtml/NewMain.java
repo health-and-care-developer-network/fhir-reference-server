@@ -77,14 +77,14 @@ public class NewMain implements Constants {
     private String run(String filename) {
         
         StringBuilder sb = new StringBuilder();
-        sb.append("<div style=\"font-family: sans-serif;\" xmlns=\"http://www.w3.org/1999/xhtml\">");
+        sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>");
         sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
         sb.append("  <tr>\n");
-        sb.append("   <th style=\"font-size: small;\">Name</th>\n");
-        sb.append("   <th style=\"font-size: small;\">Flags</th>\n");
-        sb.append("   <th style=\"font-size: small;\">Card.</th>\n");
-        sb.append("   <th style=\"font-size: small;\">Type</th>\n");
-        sb.append("   <th style=\"font-size: small;\">Description &amp; Constraints</th>\n");
+        sb.append("   <th style='font-size: small;'>Name</th>\n");
+        sb.append("   <th style='font-size: small;'>Flags</th>\n");
+        sb.append("   <th style='font-size: small;'>Card.</th>\n");
+        sb.append("   <th style='font-size: small;'>Type</th>\n");
+        sb.append("   <th style='font-size: small;'>Description &amp; Constraints</th>\n");
         sb.append("  </tr>\n");
 
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
@@ -529,14 +529,10 @@ public class NewMain implements Constants {
                     sb.append(START_TABLE_CELL);
                     if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
                         if(thisType == DataTypes.Resource) {
-                            sb.append("<a href=\"https://www.hl7.org/fhir/" + item.getTypeName().toLowerCase() + ".html\">");
-                            sb.append(item.getTypeName());
-                            sb.append("</a>");
+                            sb.append(decorateResourceName(item.getTypeName()));
                         } else {
                             if(thisType == DataTypes.Reference) {
-                                sb.append("<a href=\"https://www.hl7.org/fhir/references.html\">");
-                                sb.append(item.getTypeName());
-                                sb.append("</a>");
+                                sb.append("<a href='https://www.hl7.org/fhir/references.html'>" + item.getTypeName() + "</a>");
                             } else {
                                 sb.append(decorateTypeName(item.getTypeName()));
                             }
@@ -601,37 +597,24 @@ public class NewMain implements Constants {
      * @param type
      * @return 
      */
-    private String decorateTypeName(String type) {
-        if(type.equals("string")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#string'>string</a>";
-        }
-        if(type.equals("code")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#code'>code</a>";
-        }
-        if(type.equals("uri")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#uri'>uri</a>";
-        }
-        if(type.equals("base64Binary")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#base64Binary'>base64Binary</a>";
-        }
-        if(type.equals("instant")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#instant'>instant</a>";
-        }
-        if(type.equals("unsignedInt")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#unsignedInt'>unsignedInt</a>";
-        }
-        if(type.equals("dateTime")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#dateTime'>dateTime</a>";
-        }
-        if(type.equals("boolean")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
-        }
-        if(type.equals("decimal")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#decimal'>decimal</a>";
-        }
-        if(type.equals("positiveInt")) {
-            return "<a href='https://www.hl7.org/fhir/datatypes.html#positiveInt'>positiveInt</a>";
-        }
-        return type;
+    private String decorateTypeName(String type) {        
+        if(type.equals("string") ||
+            type.equals("code") ||
+            type.equals("uri") ||
+            type.equals("base64Binary") ||
+            type.equals("instant") ||
+            type.equals("unsignedInt") ||
+            type.equals("dateTime") ||
+            type.equals("boolean") ||
+            type.equals("decimal") ||
+            type.equals("positiveInt")
+            ){
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#" + type + "'>" + type + "</a>";
+        } else
+            return type;
+    }
+    
+    private String decorateResourceName(String type) {
+        return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
     }
 }
