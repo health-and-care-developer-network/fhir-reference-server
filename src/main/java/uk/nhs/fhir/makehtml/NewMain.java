@@ -626,6 +626,12 @@ public class NewMain implements Constants {
         if(type.equals("boolean")) {
             return "<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
         }
+        if(type.equals("decimal")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#decimal'>decimal</a>";
+        }
+        if(type.equals("positiveInt")) {
+            return "<a href='https://www.hl7.org/fhir/datatypes.html#positiveInt'>positiveInt</a>";
+        }
         return type;
     }
 }
