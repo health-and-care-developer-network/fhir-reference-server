@@ -134,7 +134,7 @@ public class NewMain implements Constants {
                 }
 
                 if(typeName == null) {
-                    LOG.info("It's NULL???");
+                    LOG.info("typeName is NULL for Element: " + elementName + " in resource: " + filename);
                     typeName = "see link";
                 }
                 
