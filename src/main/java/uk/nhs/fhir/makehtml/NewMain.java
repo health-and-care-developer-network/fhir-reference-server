@@ -91,7 +91,6 @@ public class NewMain implements Constants {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            //String fileContents =  FileLoader.loadFile(filename);
             Document document = docBuilder.parse(filename);
 
             // We already have a text block, abort...
@@ -561,7 +560,9 @@ public class NewMain implements Constants {
 
         LOG.info("\n=========================================\nhtml generated, now adding to resource\n=========================================");
         // Now, create a StructureDefinition resource, add our test section to the top, and serialise it back out
-        String augmentedResource = ResourceBuilder.addTextSectionToResource(FileLoader.loadFile(filename), sb.toString());
+        String originalResource = FileLoader.loadFile(filename);
+        String textBlock = sb.toString();
+        String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, textBlock);
         //FileWriter.writeFile("output.xml", augmentedResource.getBytes());
 
         // And finally let's also wrap our HTML and write it to another file to see how it looks...

@@ -134,7 +134,7 @@ public class XMLParserUtils {
         NodeList titleList = element.getElementsByTagName("short");
         if(titleList.getLength() > 0) {
             Element subNode = (Element) titleList.item(0);
-            title = subNode.getAttribute("value");
+            title = subNode.getAttribute("value").replace("&", "&amp;");
         }
         return title;
     }
@@ -144,7 +144,7 @@ public class XMLParserUtils {
         NodeList descList = element.getElementsByTagName("definition");
         if(descList.getLength() > 0) {
             Element subNode = (Element) descList.item(0);
-            description = subNode.getAttribute("value");
+            description = subNode.getAttribute("value").replace("&", "&amp;");
         }
         return description;
     }
