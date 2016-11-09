@@ -566,8 +566,8 @@ public class NewMain implements Constants {
         //FileWriter.writeFile("output.xml", augmentedResource.getBytes());
 
         // And finally let's also wrap our HTML and write it to another file to see how it looks...
-        String html = "<html>\n<body>\n" + sb.toString() + "</body>\n</html>";
-        FileWriter.writeFile("output.html", html.getBytes());
+        //String html = "<html>\n<body>\n" + sb.toString() + "</body>\n</html>";
+        //FileWriter.writeFile("output.html", html.getBytes());
         return augmentedResource;
     }
 
