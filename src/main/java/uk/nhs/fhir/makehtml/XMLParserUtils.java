@@ -61,25 +61,61 @@ public class XMLParserUtils {
             // Multiple types either it's a Reference to one of many types
             // or it truly can be one of many types...
             Element node = (Element) typesList.item(0);
-            NodeList codeList = node.getElementsByTagName("code");
-            Element subNode = (Element) codeList.item(0);
+            // TODO: We need to loop through these, not go on typesList.item(0)
             
+            
+            NodeList codeList = node.getElementsByTagName("code");
+            Element subNode;
+            
+
             // TODO: Here we need to check whether they're ALL Reference types, or it's a mixture
             // TODO: wil also affect other multiple type types, one or more could be a reference?
-            if(subNode.getAttribute("value").equals("Reference")) {
-                // We now know it's a Reference to one of many types...
-                typeName = "Reference";
+            
+
+            // check if any are of type Reference...
+            boolean aReference = false;
+            for(int i = 0; i < codeList.getLength(); i++) {
+                subNode = (Element) codeList.item(i);
+                if(subNode.getAttribute("value").equals("Reference")) {
+                    aReference = true;
+                }
+            }
+
+            // If we have at least one Reference, check if they all are...
+            if(aReference) {
+                // Check if they're all of type Reference...
+                boolean allReferences = true;
+                for(int i = 0; i < codeList.getLength(); i++) {
+                    subNode = (Element) codeList.item(i);
+                    if(!subNode.getAttribute("value").equals("Reference")) {
+                        allReferences = false;
+                    }
+                }
                 
-                for(int t = 0; t < typesList.getLength(); t++) {
-                    Element typeItem = (Element) typesList.item(t);
-                    NodeList codes = node.getElementsByTagName("profile");
-                    Element profile = (Element) codes.item(0);
-                    String prof = profile.getAttribute("value");
-                    typeName = typeName + prof;
-                }                
+                // Now if they are all Reference type, continue as before...
+                if(allReferences) {
+                    // We now know it's a Reference to one of many types...
+                    typeName = "Reference";
+                
+                    for(int t = 0; t < typesList.getLength(); t++) {
+                        Element typeItem = (Element) typesList.item(t);
+                        NodeList codes = node.getElementsByTagName("profile");
+                        Element profile = (Element) codes.item(0);
+                        String prof = profile.getAttribute("value");
+                        typeName = typeName + prof;
+                    }
+                } else {
+                    // Here we have a mixture of types...
+                    LOG.info("Mixed up types here:");
+                }
             } else {
+                // No reference in sight, continue as before...
                 return "Multiple_Type_Choice";
             }
+            
+            
+            
+
         }
         
         if(typesList.getLength() > 0) {
