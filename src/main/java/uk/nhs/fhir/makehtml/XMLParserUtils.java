@@ -58,28 +58,22 @@ public class XMLParserUtils {
         ArrayList<String> profiles = new ArrayList<String>();
         ArrayList<String> types = new ArrayList<String>();
         
+        NodeList names = element.getElementsByTagName("path");
+        Element nameValue = (Element) names.item(0);
+        LOG.info("Element name: " + nameValue.getAttribute("value"));
+        
         NodeList typesList = element.getElementsByTagName("type");
         if(typesList.getLength() > 1) {
-            //Element node;
-            // Multiple types either it's a Reference to one of many types
-            // or it truly can be one of many types...
-            //Element node = (Element) typesList.item(0);
-            // TODO: We need to loop through these, not go on typesList.item(0)
-            
-            
-            ///NodeList codeList = node.getElementsByTagName("code");
-            //Element subNode;
-            
-
-            // TODO: Here we need to check whether they're ALL Reference types, or it's a mixture
-            // TODO: wil also affect other multiple type types, one or more could be a reference?
-            
 
             // check if any are of type Reference...
             boolean aReference = false;
             for(int i = 0; i < typesList.getLength(); i++) {
                 Element node = (Element) typesList.item(i);
-                String thisType = node.getAttribute("value");
+
+                // Here we get the contained element called 'code'
+                NodeList codes = node.getElementsByTagName("code");
+                Element thisCode = (Element) codes.item(0);
+                String thisType = thisCode.getAttribute("value");
                 
                 // If it's a new type we don't already have, then add it to our list of types
                 if(!types.contains(thisType)) {
@@ -102,20 +96,25 @@ public class XMLParserUtils {
             Element theCodeElement = (Element) codeList.item(0);
             String thisType = theCodeElement.getAttribute("value");
             types.add(thisType);
-            if(thisType.equals("Reference")){
-                NodeList profilesList = theCodeElement.getElementsByTagName("profile");
+            if(thisType.equals("Reference")) {
+                NodeList profilesList = typeNode.getElementsByTagName("profile");
                 Element profileNode = (Element) profilesList.item(0);
                 String profileName = profileNode.getAttribute("value");
                 profiles.add(profileName);
             }
-            
-            
-            // TODO: Incorporate the type finding and decorating in here.
-            for(String type : types) {
-                typeName = typeName + " | " + type;
-            }
         }
-        
+
+        // TODO: Incorporate the type finding and decorating in here.
+        for(String type : types) {
+            typeName = typeName + " | " + type;
+            if(type.equals("Reference")) {
+                typeName = typeName + " ( ";
+                for(int i = 0; i < profiles.size()-1; i++) {
+                    typeName = typeName + profiles.get(i) + " | ";
+                }
+                typeName = typeName + profiles.get(profiles.size()-1) + " ) ";
+            }
+        }   
         return typeName;
     }
 
