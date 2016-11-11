@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 /**
  * Utility methods for parsing XML content
@@ -63,7 +64,10 @@ public class XMLParserUtils {
         LOG.info("Element name: " + nameValue.getAttribute("value"));
         
         NodeList typesList = element.getElementsByTagName("type");
-        if(typesList.getLength() > 1) {
+        if (typesList.getLength() == 0) {
+        	// We have no types at all - could be a slice
+        	// TODO: Handle slicing
+        } else if(typesList.getLength() > 1) {
 
             // check if any are of type Reference...
             boolean aReference = false;
@@ -137,7 +141,7 @@ public class XMLParserUtils {
         if(summaryList.getLength() > 0) {
             Element summary = (Element) summaryList.item(0);
             if(summary.getAttribute("value").equals("true")) {
-                flags = flags + "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"This element is included in summaries\">&Sigma;</span>\n";
+                flags = flags + "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"This element is included in summaries\">&#931;</span>\n";
             }
         }
 
@@ -164,7 +168,9 @@ public class XMLParserUtils {
         NodeList titleList = element.getElementsByTagName("short");
         if(titleList.getLength() > 0) {
             Element subNode = (Element) titleList.item(0);
-            title = subNode.getAttribute("value").replace("&", "&amp;");
+            //LOG.info("TITLE = " + subNode.getAttribute("value"));
+            //LOG.info("TITLE ESCAPED = " + escapeHtml4(subNode.getAttribute("value")));
+            title = escapeHtml4(subNode.getAttribute("value"));
         }
         return title;
     }
@@ -174,7 +180,7 @@ public class XMLParserUtils {
         NodeList descList = element.getElementsByTagName("definition");
         if(descList.getLength() > 0) {
             Element subNode = (Element) descList.item(0);
-            description = subNode.getAttribute("value").replace("&", "&amp;");
+            description = escapeHtml4(subNode.getAttribute("value"));
         }
         return description;
     }

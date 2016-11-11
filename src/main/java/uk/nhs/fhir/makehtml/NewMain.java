@@ -556,6 +556,7 @@ public class NewMain implements Constants {
 
         LOG.info("\n=========================================\nhtml generated, now adding to resource\n=========================================");
         // Now, create a StructureDefinition resource, add our test section to the top, and serialise it back out
+        FileWriter.writeFile("output.xml", sb.toString().getBytes());
         String originalResource = FileLoader.loadFile(filename);
         String textBlock = sb.toString();
         String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, textBlock);
