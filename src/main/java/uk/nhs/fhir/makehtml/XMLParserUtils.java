@@ -55,20 +55,18 @@ public class XMLParserUtils {
     }
 
     protected static String getElementTypeName(Element element) {
-        String typeName = null;
+    	String typeName = null;
         ArrayList<String> profiles = new ArrayList<String>();
         ArrayList<String> types = new ArrayList<String>();
         
         NodeList names = element.getElementsByTagName("path");
         Element nameValue = (Element) names.item(0);
-        LOG.info("Element name: " + nameValue.getAttribute("value"));
         
         NodeList typesList = element.getElementsByTagName("type");
         if (typesList.getLength() == 0) {
         	// We have no types at all - could be a slice
         	// TODO: Handle slicing
         } else if(typesList.getLength() > 1) {
-
             // check if any are of type Reference...
             boolean aReference = false;
             for(int i = 0; i < typesList.getLength(); i++) {
@@ -94,7 +92,7 @@ public class XMLParserUtils {
             }
             
         } else {
-            // Simple mode where we only have on type element!
+        	// Simple mode where we only have on type element!
             Element typeNode = (Element) typesList.item(0);
             NodeList codeList = typeNode.getElementsByTagName("code");
             Element theCodeElement = (Element) codeList.item(0);
@@ -110,7 +108,11 @@ public class XMLParserUtils {
 
         // TODO: Incorporate the type finding and decorating in here.
         for(String type : types) {
-            typeName = typeName + " | " + type;
+            if (typeName != null) {
+            	typeName = typeName + " | " + type;
+            } else {
+            	typeName = type;
+            }
             if(type.equals("Reference")) {
                 typeName = typeName + " ( ";
                 for(int i = 0; i < profiles.size()-1; i++) {
@@ -168,8 +170,6 @@ public class XMLParserUtils {
         NodeList titleList = element.getElementsByTagName("short");
         if(titleList.getLength() > 0) {
             Element subNode = (Element) titleList.item(0);
-            //LOG.info("TITLE = " + subNode.getAttribute("value"));
-            //LOG.info("TITLE ESCAPED = " + escapeHtml4(subNode.getAttribute("value")));
             title = escapeHtml4(subNode.getAttribute("value"));
         }
         return title;
@@ -223,8 +223,13 @@ public class XMLParserUtils {
         Element atype = (Element) typesList.item(0);
         NodeList profileList = atype.getElementsByTagName("profile");
         Element profileName = (Element) profileList.item(0);
-        String result = profileName.getAttribute("value");
-        result = decorateProfileName(result);
+        String result = "";
+        try {
+	        result = profileName.getAttribute("value");
+	        result = decorateProfileName(result);
+        } catch (NullPointerException npe) {
+        	LOG.severe("Unable to get value attribute for element: " + element.getNodeName() + " with profile: " + profileName);
+        }
         return result;
     }
 

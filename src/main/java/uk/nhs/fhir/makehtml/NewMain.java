@@ -80,10 +80,10 @@ public class NewMain implements Constants {
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>");
         sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
         sb.append("  <tr>\n");
-        sb.append("   <th style='font-size: small;'>Name</th>\n");
+        sb.append("   <th style='font-size: small;' width='250px'>Name</th>\n");
         sb.append("   <th style='font-size: small;'>Flags</th>\n");
         sb.append("   <th style='font-size: small;'>Card.</th>\n");
-        sb.append("   <th style='font-size: small;'>Type</th>\n");
+        sb.append("   <th style='font-size: small;' width='250px'>Type</th>\n");
         sb.append("   <th style='font-size: small;'>Description &amp; Constraints</th>\n");
         sb.append("  </tr>\n");
 
@@ -142,7 +142,7 @@ public class NewMain implements Constants {
                     ArrayList<String> types = getElementTypeList(element);
                     elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                     for(String type : types) {
-                        elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
+                    	elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
                     }
                 } else {
                     if(typeName.equals("Reference")) {

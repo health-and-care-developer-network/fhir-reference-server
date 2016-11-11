@@ -23,7 +23,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MyElement {
 
-    private String localName;
+    @Override
+	public String toString() {
+		return "MyElement [localName=" + localName + ", fullName=" + fullName + ", isLast=" + isLast + ", typeName=" + typeName + ", level="
+				+ level + ", display=" + display + ", type=" + type + ", myCardinality=" + myCardinality + ", myFlags="
+				+ myFlags + ", myDescription=" + myDescription + ", myHover=" + myHover
+				+ ", changed=" + changed + "]";
+	}
+
+	private String localName;
     private boolean isLast;
     private String typeName;
     private int level;
