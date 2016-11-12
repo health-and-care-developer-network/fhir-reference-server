@@ -7,12 +7,9 @@ REGISTRY_HOST=$1
 TARGET_HOST=$2
 GITHUB_URL=$3
 BRANCH=$4
-PATH=$5
+IN_PATH=$5
 
 IMAGE_NAME=fhir-make-html
-
-# Java command line parameters
-PARAMS=
 
 REGISTRY_URL=$REGISTRY_HOST:5000
 
@@ -37,4 +34,4 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-temp:/source \
 	-v /docker-data/fhir-profiles/profiles:/generated \
-	$REGISTRY_URL/$IMAGE_NAME $GITHUB_URL $BRANCH $PATH
+	$REGISTRY_URL/$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH
