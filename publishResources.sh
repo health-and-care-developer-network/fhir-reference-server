@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# build.sh registryhostname targethostname branch path
+# publishResources.sh registryhostname targethostname github_url branch path
 
 REGISTRY_HOST=$1
 TARGET_HOST=$2
@@ -36,5 +36,5 @@ docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
 docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-temp:/source \
-	-v /docker-data/fhir-profiles:/generated \
+	-v /docker-data/fhir-profiles/profiles:/generated \
 	$REGISTRY_URL/$IMAGE_NAME $GITHUB_URL $BRANCH $PATH
