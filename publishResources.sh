@@ -28,7 +28,6 @@ else
 fi
 
 # Run the publisher to generate the FHIR content
-set -e # Stop on error
 docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
 docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
