@@ -27,6 +27,10 @@ public class FHIRUtils {
         try {
         	profile =
         			(StructureDefinition) ctx.newXmlParser().parseResource(resource);
+        	// Add an ID using the filename as the ID
+        	String id = FileLoader.removeFileExtension(file.getName());
+        	profile.setId(id);
+        	
         } catch (ConfigurationException e) {
         	e.printStackTrace();
         } catch (DataFormatException e) {

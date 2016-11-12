@@ -16,6 +16,7 @@
 package uk.nhs.fhir.datalayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -182,5 +183,10 @@ public class MongoIF implements Datasource {
         }        
         LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");
         return list;
+    }
+    
+    public HashMap<String, List<String>> getAllNamesByBaseResource() {
+    	//TODO: Implement this for Mongo
+    	return null;
     }
 }

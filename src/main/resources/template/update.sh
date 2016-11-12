@@ -9,8 +9,10 @@ then
 else
   wget --convert-links --output-document=devnet.html $DN_URL  # Download page
 
+  # Add custom styles
+  sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link rel="stylesheet" href="\/style.css"\/>' devnet.html
+
   # Update breadcrumbs
-  
   NEW_CRUMBS="<span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"https:\/\/developer.nhs.uk\/\" rel=\"v:url\" property=\"v:title\">Home<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"></span></li>    <li><span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"https:\/\/developer.nhs.uk\/\/apis\/\" rel=\"v:url\" property=\"v:title\">APIs<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"><\/span><\/li>     <li> <strong class=\"breadcrumb_last\">$ROOT_CRUMB<\/strong><\/span><\/span><\/li><\/ul>	<\/div><!--end wrapper-->"
   sed -i '/typeof=\"v:Breadcrumb\"/c\'"$NEW_CRUMBS"'' devnet.html
 

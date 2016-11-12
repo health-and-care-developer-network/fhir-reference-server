@@ -17,7 +17,9 @@ package uk.nhs.fhir.resourcehandlers;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.util.PropertyReader;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,10 +30,14 @@ import java.util.logging.Logger;
 public class ProfileWebHandler {
     private static final Logger LOG = Logger.getLogger(ProfileWebHandler.class.getName());
     
+    private static String startOfBaseResourceBox = null;
+    private static String endOfBaseResourceBox = null;
     Datasource myDataSource = null;
 
     public ProfileWebHandler(Datasource dataSource) {
         myDataSource = dataSource;
+        startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
+        endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
     }
     
     public String getAllNames(String resourceType) {
@@ -43,6 +49,24 @@ public class ProfileWebHandler {
             sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
             sb.append("<br />");
         }
+        return sb.toString();
+    }
+    
+    public String getAllGroupedNames(String resourceType) {
+        LOG.info("Called: ProfileWebHandler.getAlGroupedNames()");
+        HashMap<String, List<String>> myNames = myDataSource.getAllNamesByBaseResource();
+        StringBuilder sb = new StringBuilder();
+        
+        for(String base : myNames.keySet()) {
+        	sb.append(startOfBaseResourceBox);
+        	sb.append(base);
+        	sb.append(endOfBaseResourceBox);
+        	for(String name : myNames.get(base)) {
+                sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
+            }
+        	sb.append("</ul></section></div></div>");
+        }
+        LOG.info(sb.toString());
         return sb.toString();
     }
 

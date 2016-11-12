@@ -2,6 +2,7 @@ package uk.nhs.fhir;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,6 +14,7 @@ import uk.nhs.fhir.util.FileLoader;
 @WebServlet(urlPatterns = {"/index.html", ""}, displayName = "FHIR Server Home Page", loadOnStartup = 1)
 public class IndexServlet extends javax.servlet.http.HttpServlet {
 	
+	private static final Logger LOG = Logger.getLogger(IndexServlet.class.getName());
 	private String template = null;
 	
 	@Override
@@ -25,6 +27,8 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		PrintWriter outputStream = null;
 		StringBuffer content = new StringBuffer();
+		
+		LOG.info("Requested URL: " + req.getRequestURL());
 		
 		// Page content
 		content.append("<p><a href=\"StructureDefinition\">List all StructureDefinitions</a></p>");

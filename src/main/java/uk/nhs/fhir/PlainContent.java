@@ -39,11 +39,13 @@ public class PlainContent extends InterceptorAdapter {
     ProfileWebHandler myWebber = null;
     private String template = null;
     private String fhirServerNotice = null;
+    private String fhirServerWarning = null;
     
     public PlainContent(ProfileWebHandler webber) {
         myWebber = webber;
         template = FileLoader.loadFileOnClasspath("/template/profiles.html");
         fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
+        fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
     }
     
     
@@ -74,50 +76,13 @@ public class PlainContent extends InterceptorAdapter {
         LOG.info("This appears to be a browser, generate some HTML to return.");
         
         StringBuffer content = new StringBuffer();
-	    
+        String resourceType = theRequestDetails.getResourceName();
+        
         try {
-        	
-        	String resourceType = theRequestDetails.getResourceName();
-            //content = theResponse.getWriter();
-            //content.append("<html><body>");
-            if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
-            	content.append("<div class='fhirServerGeneratedContent'>");
-                content.append(fhirServerNotice);
-                content.append("<h2 class='resourceType'>" + resourceType + "</h2><ul>");
-                StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
-                content.append("<ul>");
-                content.append("<li>url: " + sd.getUrl() + "</li>");
-                content.append("<li>version: " + sd.getVersion() + "</li>");
-                content.append("<li>name: " + sd.getName() + "</li>");
-                content.append("<li>publisher: " + sd.getPublisher() + "</li>");
-                content.append("<li>description: " + sd.getDescription() + "</li>");
-                content.append("<li>requirements: " + sd.getRequirements() + "</li>");
-                content.append("<li>status: " + sd.getStatus() + "</li>");
-                content.append("<li>experimental: " + sd.getExperimental() + "</li>");
-                content.append("<li>date: " + sd.getDate() + "</li>");
-                content.append("<li>fhirVersion: " + sd.getFhirVersion() + "</li>");
-                content.append(sd.getText().getDivAsString());
-                content.append("</div>");
+        	if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
+        		renderSingleResource(theRequestDetails, content, resourceType);
             } else {
-                Map<String, String[]> params = theRequestDetails.getParameters();
-                
-                content.append("<div class='fhirServerGeneratedContent'>");
-                content.append(fhirServerNotice);
-                //content.append("Hello browser, clearly you were looking for resources of type: <b>" + theRequestDetails.getResourceName() + "</b><br /><ul>");
-                content.append("<h2 class='resourceType'>" + resourceType + "</h2><ul>");
-                
-                if(params.containsKey("name") || params.containsKey("name:contains")) {
-                    if(params.containsKey("name")) {
-                        content.append(myWebber.getAllNames(resourceType, params.get("name")[0]));
-                    }
-                    if(params.containsKey("name:contains")) {
-                        content.append(myWebber.getAllNames(resourceType, params.get("name:contains")[0]));
-                    }
-                } else {
-                    content.append(myWebber.getAllNames(resourceType));
-                }
-                content.append("</ul>");
-                content.append("</div>");
+                renderListOfResources(theRequestDetails, content, resourceType);
             }
             
             // Initialise the output
@@ -136,5 +101,60 @@ public class PlainContent extends InterceptorAdapter {
             LOG.severe("Error sending response: " + ex.getMessage());
         }
         return false;
+    }
+    
+    private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+    	
+        //content = theResponse.getWriter();
+        //content.append("<html><body>");
+    		StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
+        	content.append("<div class='fhirServerGeneratedContent'>");
+        	content.append(fhirServerWarning);
+        	content.append(fhirServerNotice);
+            content.append("<h2 class='resourceType'>" + sd.getName() + " (" + resourceType + ")</h2>");
+            
+            content.append("<div class='resourceSummary'>");
+            content.append("<ul>");
+            content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
+            content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
+            content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
+            content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
+            content.append("<li>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
+            content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
+            content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
+            content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
+            content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
+            content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
+            content.append("</div>");
+            
+            content.append(sd.getText().getDivAsString());
+            content.append("</div>");
+    }
+    
+    private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+    	Map<String, String[]> params = theRequestDetails.getParameters();
+        
+        content.append("<div class='fhirServerGeneratedContent'>");
+        content.append(fhirServerWarning);
+        content.append(fhirServerNotice);
+        content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2><ul>");
+        
+        if(params.containsKey("name") || params.containsKey("name:contains")) {
+            if(params.containsKey("name")) {
+                content.append(myWebber.getAllNames(resourceType, params.get("name")[0]));
+            }
+            if(params.containsKey("name:contains")) {
+                content.append(myWebber.getAllNames(resourceType, params.get("name:contains")[0]));
+            }
+        } else {
+            //content.append(myWebber.getAllNames(resourceType));
+            content.append(myWebber.getAllGroupedNames(resourceType));
+        }
+        content.append("</ul>");
+        content.append("</div>");
+    }
+    
+    private static Object printIfNotNull(Object input) {
+    	return (input == null)?"":input;
     }
 }

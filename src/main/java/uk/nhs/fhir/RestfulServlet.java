@@ -17,11 +17,16 @@ package uk.nhs.fhir;
 
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
@@ -32,6 +37,7 @@ import uk.nhs.fhir.resourcehandlers.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
+import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
@@ -48,8 +54,26 @@ public class RestfulServlet extends RestfulServer {
     private static final long serialVersionUID = 1L;
     Datasource dataSource = null;
     ValidatorManager vManager = null;
-    
-    /**
+	private static String css = FileLoader.loadFileOnClasspath("/style.css");
+	
+    @Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+    	LOG.info("Requested URI: " + request.getRequestURI());
+    	
+    	if (request.getRequestURI().equals("/style.css")) {
+    		// Special case processing for the stylesheet as we are grabbing all URLs
+    		response.setStatus(200);
+            response.setContentType("text/css");
+    		PrintWriter outputStream = response.getWriter();
+    		outputStream.append(css);
+    	} else {    	
+    		super.doGet(request, response);
+    	}
+	}
+
+
+	/**
     * This is where we start, called when our servlet is first initialised.
     * For simplicity, we do the datastore setup once here.
     * 

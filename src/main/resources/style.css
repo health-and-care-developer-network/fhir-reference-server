@@ -1,0 +1,25 @@
+.one_third.tree_wrap {
+    min-height: 0px !IMPORTANT;
+}
+
+h2.resourceType {
+    padding-top: 20px;
+    padding-bottom: 2pc;
+}
+
+.fhirServerWarning {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #f2dede;
+    border-color: #eed3d7;
+    color: #b94a48;
+    padding: 15px;
+}
+.fhirServerNotice {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #f3fa8e;
+    border-color: #e9f271;
+    color: #ce5c00;
+    padding: 15px;
+}

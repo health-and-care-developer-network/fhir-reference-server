@@ -3,6 +3,7 @@ package uk.nhs.fhir.datalayer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -43,6 +44,34 @@ public class FileCache {
 			updateCache();
 		}
 		return profileFileList;
+	}
+	
+	public static HashMap<String, List<String>> getGroupedNameList() {
+		if (updateRequired()) {
+			updateCache();
+		}
+		
+		LOG.info("Creating HashMap");
+		HashMap<String, List<String>> result = new HashMap<String, List<String>>();
+		try {
+			for (StructureDefinition sd : profileList) {
+				String base = sd.getConstrainedType();
+				String name = sd.getName();
+				if (result.containsKey(base)) {
+					List<String> entry = result.get(base);
+					entry.add(name);
+				} else {
+					List<String> entry = new ArrayList<String>();
+					entry.add(name);
+					result.put(base, entry);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.severe("ERROR: " + e.getMessage());
+		}
+		LOG.info("Generated HashMap: " + result.toString());
+		return result;
 	}
 		
 	private static boolean updateRequired() {

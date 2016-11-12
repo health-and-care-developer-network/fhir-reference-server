@@ -25,6 +25,7 @@ import uk.nhs.fhir.util.PropertyReader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -98,6 +99,17 @@ public class FilesystemIF implements Datasource {
     public List<String> getAllNames() {
         LOG.info("Getting all StructureDefinition Names");
         return FileCache.getNameList();
+    }
+    
+    /**
+     * Gets a full list of names grouped by base resource for the web view 
+     * of /StructureDefinition requests.
+     * 
+     * @return 
+     */
+    public HashMap<String, List<String>> getAllNamesByBaseResource() {
+        LOG.info("Getting all StructureDefinition Names by base resource");
+        return FileCache.getGroupedNameList();
     }
 
 
