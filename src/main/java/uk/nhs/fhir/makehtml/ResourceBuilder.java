@@ -39,10 +39,12 @@ public class ResourceBuilder {
 
         // Here (while we have the resource in as a StructureDefinition) we resolve any invalid (c) character in the Copyright section too!
         String copyRight = structureDefinitionResource.getCopyrightElement().getValue();
-        copyRight = copyRight.replace("©", "&copy;");
-        copyRight = copyRight.replace("\\u00a9", "&copy;");
-        structureDefinitionResource.setCopyright(copyRight);
-
+        if(copyRight != null) {
+            copyRight = copyRight.replace("©", "&copy;");
+            copyRight = copyRight.replace("\\u00a9", "&copy;");
+            structureDefinitionResource.setCopyright(copyRight);
+        }
+        
         serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(structureDefinitionResource);
         return serialised;
     }

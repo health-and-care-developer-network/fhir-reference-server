@@ -33,4 +33,9 @@ public interface Constants {
 	
 	public static final String START_TABLE_ROW = "  <tr>\n";
 	public static final String END_TABLE_ROW   = "   </tr>\n";
+        
+        // Set the set of base types which we'll use a simple icon to annotate in the html tree
+        public static final String[] BASERESOURCETYPES = new String[] {"boolean", "code", "date", "dateTime", "instant", "unsignedInt", "string", "decimal", "base64Binary", "uri", "integer"};
+        // Set the Resource types for which we use a 'cube' icon in the html tree
+        public static final String[] RESOURCETYPES = new String[] {"Identifier", "ContactPoint", "Address", "CodeableConcept", "Attachment", "Resource", "Signature", "BackboneElement", "HumanName", "Period", "Money", "Coding", "Annotation"};
 }

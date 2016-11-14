@@ -27,6 +27,7 @@ import static uk.nhs.fhir.makehtml.XMLParserUtils.getTitle;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,8 +101,8 @@ public class NewMain implements Constants {
         NodeList differential = document.getElementsByTagName("differential");
         Element diffNode = (Element) differential.item(0);
         NodeList diffElements = diffNode.getElementsByTagName("element");
-        int diffElementCount = diffElements.getLength();
         
+        // First we process all the elements...
         for(int i = 0; i < snapshotElementCount; i++) {
             Element element = (Element) elements.item(i);
             String elementName = getElementName(element);
@@ -111,23 +112,14 @@ public class NewMain implements Constants {
             String description = getTitle(element);
             String hoverText = getDescription(element);
             
-            // Here we loop through the differential elements to see if this element has been changed by this profile
-            boolean hasChanged = false;
-            for(int j = 0; j < diffElementCount; j++) {
-                Element diffElement = (Element) diffElements.item(j);
-                if(diffElement != null) {
-                    if(getElementName(diffElement).equals(elementName)) {
-                        hasChanged = true;
-                    }
-                }
-            }
+            boolean hasChanged = CheckIfModified(diffElements, elementName);
             
             if(typeName == null) {
-                //LOG.info("typeName is NULL for Element: " + elementName + " in resource: " + filename);
+                LOG.info("typeName is NULL for Element: " + elementName );
                 typeName = "see link";
             }
             
-            // Catch elements which can be of multiple types...
+            // Catch vrious elements which can be of multiple types or other oddities...
             if(typeName.equals("Multiple_Type_Choice")) {
                 ArrayList<String> types = getElementTypeList(element);
                 elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
@@ -143,24 +135,26 @@ public class NewMain implements Constants {
                         String newtypeName = getQuantityType(element);
                         elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
                     } else {
+                        // This is for all other types
                         elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                     }
                 }
             }
         }
+        
+        // Now we start thinking about adding the elements to the output...
         int mutedAtLevel = 100;
-        for(int i = 0; i < elementList.size(); i++) {
-
-                MyElement item = (MyElement) elementList.get(i);
-                if(item.isDisplay() == false) {
-                    mutedAtLevel = item.getLevel();
+        for(MyElement elementList1 : elementList) {
+            MyElement item = (MyElement) elementList1;
+            if(item.isDisplay() == false) {
+                mutedAtLevel = item.getLevel();
+            } else {
+                if(item.getLevel() > mutedAtLevel) {
+                    item.setDisplay(false);
                 } else {
-                    if(item.getLevel() > mutedAtLevel) {
-                        item.setDisplay(false);
-                    } else {
-                        mutedAtLevel = 100;
-                    }
+                    mutedAtLevel = 100;
                 }
+            }
         }
         for(int i = 0; i < elementList.size(); i++) {
             MyElement item = (MyElement) elementList.get(i);
@@ -432,7 +426,6 @@ public class NewMain implements Constants {
                                     }
                                     //</editor-fold>
                                 }
-                                
                             }
                         }
                     }
@@ -444,45 +437,28 @@ public class NewMain implements Constants {
                 }
                 
                 DataTypes thisType = null;
-                
-                if(item.getTypeName() != null) {
+                String thisTypeName = item.getTypeName(); 
+                if(thisTypeName != null) {
                     // If a simle datatype...
-                    if(item.getType().equals("boolean")
-                            || item.getType().equals("code")
-                            || item.getType().equals("date")
-                            || item.getType().equals("dateTime")
-                            || item.getType().equals("instant")
-                            || item.getType().equals("unsignedInt")
-                            || item.getType().equals("string")
-                            || item.getType().equals("decimal")
-                            || item.getType().equals("base64Binary")
-                            || item.getType().equals("uri")
-                            || item.getType().equals("integer")) {
+                    if(Arrays.asList(BASERESOURCETYPES).contains(thisTypeName))
+                    {
                         sb.append(BASETYPE);
                         thisType = DataTypes.Simple;
                     }
-                    // If a Resource Type...
-                    if(item.getType().equals("Identifier")
-                            || item.getType().equals("ContactPoint")
-                            || item.getType().equals("Address")
-                            || item.getType().equals("CodeableConcept")
-                            || item.getType().equals("Attachment")
-                            || item.getType().equals("Resource")
-                            || item.getType().equals("Signature")
-                            || item.getType().equals("BackboneElement")
-                            || item.getType().equals("HumanName")
-                            || item.getType().equals("Period")
-                            || item.getType().equals("Money")
-                            || item.getType().equals("Coding")
-                            || item.getType().equals("Annotation")) {
+
+                    if(Arrays.asList(RESOURCETYPES).contains(thisTypeName))
+                    {
                         sb.append(DATATYPE);
                         thisType = DataTypes.Resource;
                     }
-                    if(item.getType().equals("Reference")) {
+
+                    // If a Resource Type...
+                    if(thisTypeName.equals("Reference")) {
                         sb.append(REFERENCE);
                         thisType = DataTypes.Reference;
                     }
-                    if(item.getType().equals("Multiple_Type_Choice")) {
+                    
+                    if(thisTypeName.equals("Multiple_Type_Choice")) {
                         sb.append(CHOICETYPE);
                     }
                 } else {
@@ -531,6 +507,21 @@ public class NewMain implements Constants {
 
         LOG.info("\n=========================================\nhtml generated\n=========================================");
         return sb.toString();
+    }
+
+    protected boolean CheckIfModified(NodeList diffElements, String elementName) {
+        int diffElementCount = diffElements.getLength();
+        // Here we loop through the differential elements to see if this element has been changed by this profile
+        boolean hasChanged = false;
+        for(int j = 0; j < diffElementCount; j++) {
+            Element diffElement = (Element) diffElements.item(j);
+            if(diffElement != null) {
+                if(getElementName(diffElement).equals(elementName)) {
+                    hasChanged = true;
+                }
+            }
+        }
+        return hasChanged;
     }
 
     /**
