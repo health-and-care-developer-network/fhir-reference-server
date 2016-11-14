@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
 public class XMLParserUtilsTest {
     Document document;
     Element element;
+    Element elementReference;
+    Element elementQuantity;
     public XMLParserUtilsTest() {
     }
     
@@ -72,11 +74,70 @@ public class XMLParserUtilsTest {
                 "      </type>\n" +
                 "      <isSummary value=\"true\"/>\n" +
                 "    </element>\n" +
+                "    <element>\n" +
+                "      <path value=\"Account.subject\"/>\n" +
+                "      <short value=\"What is account tied to?\"/>\n" +
+                "      <definition value=\"Identifies the patient, device, practitioner, location or other object the account is associated with.\"/>\n" +
+                "      <alias value=\"target\"/>\n" +
+                "      <min value=\"0\"/>\n" +
+                "      <max value=\"1\"/>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Device\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Practitioner\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Location\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/HealthcareService\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Organization\"/>\n" +
+                "      </type>\n" +
+                "      <isSummary value=\"true\"/>\n" +
+                "    </element>\n" +
+                "    <element>\n" +
+                "      <path value=\"Order.when.schedule.repeat.bounds[x]\" />\n" +
+                "      <short value=\"Length/Range of lengths, or (Start and/or end) limits\" />\n" +
+                "      <definition value=\"Either a duration for the length of the timing schedule, a range of possible length, or outer bounds for start and/or end limits of the timing schedule.\" />\n" +
+                "      <min value=\"0\" />\n" +
+                "      <max value=\"1\" />\n" +
+                "      <base>\n" +
+                "        <path value=\"Timing.repeat.bounds[x]\" />\n" +
+                "        <min value=\"0\" />\n" +
+                "        <max value=\"1\" />\n" +
+                "      </base>\n" +
+                "      <type>\n" +
+                "        <code value=\"Quantity\" />\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Duration\" />\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Range\" />\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Period\" />\n" +
+                "      </type>\n" +
+                "      <isSummary value=\"true\" />\n" +
+                "      <mapping>\n" +
+                "        <identity value=\"rim\" />\n" +
+                "        <map value=\"IVL(TS) used in a QSI\" />\n" +
+                "      </mapping>\n" +
+                "    </element>\n" +
                 "  </snapshot>\n" +
                 "  <differential>\n" +
                 "    <element>\n" +
                 "      <path value=\"Account\"/>\n" +
-                "      <short value=\"This Account\"/>\n" +
                 "      <definition value=\"A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centres, etc.\"/>\n" +
                 "      <min value=\"0\"/>\n" +
                 "      <max value=\"*\"/>\n" +
@@ -101,6 +162,8 @@ public class XMLParserUtilsTest {
         Element snapshotNode = (Element) snapshot.item(0);
         NodeList elements = snapshotNode.getElementsByTagName("element");
         element = (Element) elements.item(0);
+        elementReference = (Element) elements.item(2);
+        elementQuantity =  (Element) elements.item(3);
     }
     
     @After
@@ -180,7 +243,7 @@ public class XMLParserUtilsTest {
     @Test
     public void testGetDescription() {
         System.out.println("getDescription");
-        String expResult = "A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centres, etc.\"/>\n";
+        String expResult = "A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centres, etc.";
         String result = XMLParserUtils.getDescription(element);
         assertEquals(expResult, result);
     }
@@ -191,13 +254,17 @@ public class XMLParserUtilsTest {
     @Test
     public void testGetReferenceTypes() {
         System.out.println("getReferenceTypes");
-        Element element = null;
-        String expResult = "";
-        String result = XMLParserUtils.getReferenceTypes(element);
+        String expResult = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a>("
+                + "<a href='http://hl7.org/fhir/StructureDefinition/Patient'>Patient</a> | "
+                + "<a href='http://hl7.org/fhir/StructureDefinition/Device'>Device</a> | "
+                + "<a href='http://hl7.org/fhir/StructureDefinition/Practitioner'>Practitioner</a> | "
+                + "<a href='http://hl7.org/fhir/StructureDefinition/Location'>Location</a> | "
+                + "<a href='http://hl7.org/fhir/StructureDefinition/HealthcareService'>HealthcareService</a> | "
+                + "<a href='http://hl7.org/fhir/StructureDefinition/Organization'>Organization</a>)";
+        String result = XMLParserUtils.getReferenceTypes(elementReference);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
+
 
     /**
      * Test of getQuantityType method, of class XMLParserUtils.
@@ -205,12 +272,9 @@ public class XMLParserUtilsTest {
     @Test
     public void testGetQuantityType() {
         System.out.println("getQuantityType");
-        Element element = null;
-        String expResult = "";
-        String result = XMLParserUtils.getQuantityType(element);
+        String expResult = "<a href='http://hl7.org/fhir/StructureDefinition/Duration'>Duration</a>";
+        String result = XMLParserUtils.getQuantityType(elementQuantity);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
     
 }
