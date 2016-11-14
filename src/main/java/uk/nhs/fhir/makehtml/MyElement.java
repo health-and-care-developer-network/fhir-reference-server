@@ -16,22 +16,15 @@
 package uk.nhs.fhir.makehtml;
 
 import org.apache.commons.lang3.StringUtils;
+import static uk.nhs.fhir.makehtml.Constants.END_TABLE_CELL;
+import static uk.nhs.fhir.makehtml.Constants.START_TABLE_CELL;
 
 /**
  *
  * @author tim.coates@hscic.gov.uk
  */
 public class MyElement {
-
-    @Override
-	public String toString() {
-		return "MyElement [localName=" + localName + ", fullName=" + fullName + ", isLast=" + isLast + ", typeName=" + typeName + ", level="
-				+ level + ", display=" + display + ", type=" + type + ", myCardinality=" + myCardinality + ", myFlags="
-				+ myFlags + ", myDescription=" + myDescription + ", myHover=" + myHover
-				+ ", changed=" + changed + "]";
-	}
-
-	private String localName;
+    private String localName;
     private boolean isLast;
     private String typeName;
     private int level;
@@ -44,7 +37,14 @@ public class MyElement {
     private String myHover;
     private String fullName;
     private boolean changed = false;
-
+    
+    @Override
+    public String toString() {
+            return "MyElement [localName=" + localName + ", fullName=" + fullName + ", isLast=" + isLast + ", typeName=" + typeName + ", level="
+                            + level + ", display=" + display + ", type=" + type + ", myCardinality=" + myCardinality + ", myFlags="
+                            + myFlags + ", myDescription=" + myDescription + ", myHover=" + myHover
+                            + ", changed=" + changed + "]";
+    }
     public boolean isChanged() {
         return changed;
     }
@@ -105,8 +105,6 @@ public class MyElement {
     public String getType() {
         return type;
     }
-
-
         
     public void setDisplay(boolean display) {
         this.display = display;
@@ -151,9 +149,23 @@ public class MyElement {
     public String getFlags() {
         return myFlags;
     }
+    
+    public String getHTMLWrappedFlags() {
+        String result = START_TABLE_CELL;
+        result= result + this.myFlags;
+        result= result + END_TABLE_CELL;
+        return result;
+    }
 
     public String getCardinality() {
         return myCardinality;
+    }
+    
+    public String getHTMLWrappedCardinality() {
+        String result = START_TABLE_CELL;
+        result= result + this.myCardinality;
+        result= result + END_TABLE_CELL;
+        return result;
     }
 
     public boolean isDisplay() {
@@ -166,6 +178,13 @@ public class MyElement {
     
     public String getDescription() {
         return this.myDescription;                
+    }
+    
+    public String getHTMLWrappedDescription(){
+        String result = START_TABLE_CELL;
+        result= result + this.myDescription;
+        result= result + END_TABLE_CELL;
+        return result;
     }
     
     private static String cleanHoverText(String hover) {

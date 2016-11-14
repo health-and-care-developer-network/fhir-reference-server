@@ -21,6 +21,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.nhs.fhir.makehtml.Constants.END_TABLE_CELL;
+import static uk.nhs.fhir.makehtml.Constants.START_TABLE_CELL;
 
 /**
  *
@@ -265,6 +267,42 @@ public class MyElementTest {
         MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
         String expResult = "The description";
         String result = instance.getDescription();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getHTMLWrappedFlags method, of class MyElement.
+     */
+    @Test
+    public void testGetHTMLWrappedFlags() {
+        System.out.println("getHTMLWrappedFlags");
+        MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
+        String expResult = START_TABLE_CELL + "FlagsHere" + END_TABLE_CELL;
+        String result = instance.getHTMLWrappedFlags();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getHTMLWrappedCardinality method, of class MyElement.
+     */
+    @Test
+    public void testGetHTMLWrappedCardinality() {
+        System.out.println("getHTMLWrappedCardinality");
+        MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
+        String expResult = START_TABLE_CELL + "1..1" + END_TABLE_CELL;
+        String result = instance.getHTMLWrappedCardinality();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getHTMLWrappedDescription method, of class MyElement.
+     */
+    @Test
+    public void testGetHTMLWrappedDescription() {
+        System.out.println("getHTMLWrappedDescription");
+        MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
+        String expResult = START_TABLE_CELL + "The description" + END_TABLE_CELL;
+        String result = instance.getHTMLWrappedDescription();
         assertEquals(expResult, result);
     }
     

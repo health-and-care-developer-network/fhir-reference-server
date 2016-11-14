@@ -500,14 +500,10 @@ public class NewMain implements Constants {
                 sb.append(END_TABLE_CELL);
                 
                 // Now the flags column
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getFlags());
-                sb.append(END_TABLE_CELL);
+                sb.append(item.getHTMLWrappedFlags());
                 
                 // Now the Cardinality column
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getCardinality());
-                sb.append(END_TABLE_CELL);
+                sb.append(item.getHTMLWrappedCardinality());
                 
                 // Now the type column
                 sb.append(START_TABLE_CELL);
@@ -525,9 +521,7 @@ public class NewMain implements Constants {
                 sb.append(END_TABLE_CELL);
                 
                 // And now the description
-                sb.append(START_TABLE_CELL);
-                sb.append(item.getDescription());
-                sb.append(END_TABLE_CELL);
+                sb.append(item.getHTMLWrappedDescription());
                 
                 sb.append(END_TABLE_ROW);
             }
