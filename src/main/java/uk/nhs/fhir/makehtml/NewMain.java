@@ -180,12 +180,23 @@ public class NewMain implements Constants {
                         // This is the last item, so:
                         sb.append(CORNER);
                     } else {
-                        sb.append(LINEWITHT);
+                        // Here we need to check whether any items after this are at level one, if not it's corner time.
+                        boolean l1Continues = false;
+                        for(int n = i+1; n < elementList.size(); n++) {
+                            if(elementList.get(n).getLevel() == 1) {
+                                l1Continues = true;
+                            }
+                        }
+                        if(l1Continues) {
+                            sb.append(LINEWITHT);
+                        } else {
+                            sb.append(CORNER);    
+                        }
                     }
                 } else {
                     //</editor-fold>
                     boolean oneContinues = false;
-                    for(int n = i; n < elementList.size(); n++) {
+                    for(int n = i+1; n < elementList.size(); n++) {
                         int d = elementList.get(n).getLevel();
                         if(d == 1) {
                             // We need to show the level 1 line continuing beside our line
@@ -211,17 +222,17 @@ public class NewMain implements Constants {
                                 sb.append(CORNER);
                             } else {
                                 // Here we need to determine whether this is the last at level two
-                                boolean lastOfTwos = false;
-                                for(int n = i; n < elementList.size(); n++) {
-                                    if(elementList.get(n).getLevel() == 1) {
-                                        lastOfTwos = true;
+                                boolean l2Continues = false;
+                                for(int n = i+1; n < elementList.size(); n++) {
+                                    if(elementList.get(n).getLevel() == 2) {
+                                        l2Continues = true;
                                         break;
                                     }
                                 }
-                                if(lastOfTwos) {
-                                    sb.append(CORNER);
-                                } else {
+                                if(l2Continues) {
                                     sb.append(LINEWITHT);
+                                } else {
+                                    sb.append(CORNER);
                                 }
                             }
                         }
@@ -229,7 +240,7 @@ public class NewMain implements Constants {
                         //</editor-fold>
                         // Now figure out what level two is doing...
                         boolean twoContinues = false;
-                        for(int n = i; n < elementList.size(); n++) {
+                        for(int n = i+1; n < elementList.size(); n++) {
                             int d = elementList.get(n).getLevel();
                             if(d == 2) {
                                 twoContinues = true;
