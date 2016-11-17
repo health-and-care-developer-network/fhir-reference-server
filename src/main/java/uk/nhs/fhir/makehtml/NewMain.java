@@ -596,24 +596,17 @@ public class NewMain implements Constants {
      * @param type
      * @return 
      */
-    private String decorateTypeName(String type) {        
-        if(type.equals("string") ||
-            type.equals("code") ||
-            type.equals("uri") ||
-            type.equals("base64Binary") ||
-            type.equals("instant") ||
-            type.equals("unsignedInt") ||
-            type.equals("dateTime") ||
-            type.equals("boolean") ||
-            type.equals("decimal") ||
-            type.equals("positiveInt")
-            ){
+    public String decorateTypeName(String type) {
+        if(type.equals("DomainResource")) {
+            return "<a href='https://www.hl7.org/fhir/domainresource.html'>" + type + "</a>";
+        }
+        if(Arrays.asList(BASERESOURCETYPES).contains(type)) {
             return "<a href='https://www.hl7.org/fhir/datatypes.html#" + type + "'>" + type + "</a>";
         } else
             return type;
     }
     
-    private String decorateResourceName(String type) {
+    public String decorateResourceName(String type) {
         return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
     }
 }
