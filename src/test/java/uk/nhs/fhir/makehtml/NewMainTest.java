@@ -7,6 +7,7 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -146,6 +147,39 @@ public class NewMainTest {
                 "      </type>\n" +
                 "      <isSummary value=\"true\"/>\n" +
                 "    </element>\n" +
+                "    <element>\n" +
+                "      <path value=\"Account.subject\"/>\n" +
+                "      <short value=\"What is account tied to?\"/>\n" +
+                "      <definition value=\"Identifies the patient, device, practitioner, location or other object the account is associated with.\"/>\n" +
+                "      <alias value=\"target\"/>\n" +
+                "      <min value=\"0\"/>\n" +
+                "      <max value=\"1\"/>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Device\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Practitioner\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Location\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/HealthcareService\"/>\n" +
+                "      </type>\n" +
+                "      <type>\n" +
+                "        <code value=\"Reference\"/>\n" +
+                "        <profile value=\"http://hl7.org/fhir/StructureDefinition/Organization\"/>\n" +
+                "      </type>\n" +
+                "      <isSummary value=\"true\"/>\n" +
+                "    </element>\n" +
                 "  </differential>\n" +
                 "</StructureDefinition>";
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -170,24 +204,6 @@ public class NewMainTest {
     public void tearDown() {
     }
 
-
-    /**
-     * Test of CheckIfModified method, of class NewMain.
-     */
-    @Test
-    public void testCheckIfModified() {
-        System.out.println("CheckIfModified");
-        
-        String elementName = "Account";
-        NewMain instance = new NewMain();
-        boolean expResult = true;
-        boolean result = instance.CheckIfModified(difflist, elementName);
-        assertEquals(expResult, result);
-        expResult = false;
-        elementName = "NotFindableElementName";
-        result = instance.CheckIfModified(difflist, elementName);
-        assertEquals(expResult, result);
-    }
 
     /**
      * Test of decorateTypeName method, of class NewMain.
@@ -224,6 +240,25 @@ public class NewMainTest {
         String expResult = "<a href='https://www.hl7.org/fhir/anythinghere.html'>AnythingHere</a>";
         String result = instance.decorateResourceName(type);
         assertEquals(expResult, result);
+    }
+
+
+    /**
+     * Test of GetChangedNodes method, of class NewMain.
+     */
+    @Test
+    public void testGetChangedNodes() {
+        System.out.println("GetChangedNodes");
+        NewMain instance = new NewMain();
+
+        ArrayList<String> result = instance.GetChangedNodes(document);
+        assertEquals(2, result.size());
+        
+        assertTrue(result.contains("Account"));
+        
+        assertTrue(result.contains("Account.subject"));
+        
+        assertFalse(result.contains("Should.Not.Find.Me"));
     }
     
 }

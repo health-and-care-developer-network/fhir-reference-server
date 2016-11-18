@@ -98,9 +98,10 @@ public class NewMain implements Constants {
         Element snapshotNode = (Element) snapshot.item(0);
         NodeList elements = snapshotNode.getElementsByTagName("element");
         int snapshotElementCount = elements.getLength();
-        NodeList differential = document.getElementsByTagName("differential");
-        Element diffNode = (Element) differential.item(0);
-        NodeList diffElements = diffNode.getElementsByTagName("element");
+        
+        // Now get a list of the names of elements which show as having been changed by this profile...
+        ArrayList<String> changedNodes = GetChangedNodes(document);
+        
         
         // First we process all the elements...
         for(int i = 0; i < snapshotElementCount; i++) {
@@ -112,7 +113,7 @@ public class NewMain implements Constants {
             String description = getTitle(element);
             String hoverText = getDescription(element);
             
-            boolean hasChanged = CheckIfModified(diffElements, elementName);
+            boolean hasChanged = changedNodes.contains(elementName);
             
             if(typeName == null) {
                 LOG.info("typeName is NULL for Element: " + elementName );
@@ -523,21 +524,6 @@ public class NewMain implements Constants {
         return sb.toString();
     }
 
-    protected boolean CheckIfModified(NodeList diffElements, String elementName) {
-        int diffElementCount = diffElements.getLength();
-        // Here we loop through the differential elements to see if this element has been changed by this profile
-        boolean hasChanged = false;
-        for(int j = 0; j < diffElementCount; j++) {
-            Element diffElement = (Element) diffElements.item(j);
-            if(diffElement != null) {
-                if(getElementName(diffElement).equals(elementName)) {
-                    hasChanged = true;
-                }
-            }
-        }
-        return hasChanged;
-    }
-
     /**
      * Routine to read in an XML file to an org.w3c.dom.Document.
      * 
@@ -608,5 +594,38 @@ public class NewMain implements Constants {
     
     public String decorateResourceName(String type) {
         return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
+    }
+
+    /**
+     * Method to get a list of the names of the elements which are listed in
+     * the differential section of a StructureDefinition, ie those which
+     * have been changed.
+     * 
+     * @param document A org.w3c.dom.Document
+     * @return Returns an ArrayList of Strings holding the (full dot separated) element names.
+     */
+    protected ArrayList<String> GetChangedNodes(Document document) {
+        ArrayList<String> names = new ArrayList<String>();
+        // Get a list of any elements called differential
+        NodeList differential = document.getElementsByTagName("differential");
+        
+        if(differential.getLength() > 0) {
+            // Get the first one (there should only be one!
+            Element diffNode = (Element) differential.item(0);
+            
+            // Get the elements within the differential section
+            NodeList diffElements = diffNode.getElementsByTagName("element");
+
+            for(int i = 0; i < diffElements.getLength(); i++) {
+                Element diffElement = (Element) diffElements.item(i);
+                if(diffElement != null) {
+                    String name = getElementName(diffElement);
+                    if(name != null) {
+                        names.add(name);
+                    }
+                }
+            }
+        }
+        return names;
     }
 }
