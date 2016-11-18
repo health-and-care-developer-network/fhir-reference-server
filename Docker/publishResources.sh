@@ -1,23 +1,25 @@
 #!/bin/bash
 
 # Usage:
-# publishResources.sh registryhostname targethostname github_url branch path
+# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname
 
-REGISTRY_HOST=$1
-TARGET_HOST=$2
-GITHUB_URL=$3
-BRANCH=$4
-IN_PATH=$5
+GITHUB_URL=$1
+BRANCH=$2
+IN_PATH=$3
+OLD_URL=$4
+NEW_URL=$5
+REGISTRY_HOST=$6
+TARGET_HOST=$7
 
 IMAGE_NAME=fhir-make-html
-
-REGISTRY_URL=$REGISTRY_HOST:5000
 
 if [ -z $REGISTRY_HOST ]
 then
   REGISTRY_PREFIX=""
+  REGISTRY_URL=""
 else
   REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
+  REGISTRY_URL=$REGISTRY_HOST:5000/
 fi
 
 if [ -z $TARGET_HOST ]
@@ -33,4 +35,5 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-profiles/temp \
 	-v /docker-data/fhir-profiles/profiles:/generated \
-	$REGISTRY_URL/$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH
+	$REGISTRY_URL$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL
+
