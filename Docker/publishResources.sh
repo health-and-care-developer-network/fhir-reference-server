@@ -30,7 +30,10 @@ else
 fi
 
 # Run the publisher to generate the FHIR content
-docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
+if [ -z $REGISTRY_HOST ]
+then
+	docker $TARGET_PREFIX pull $REGISTRY_URL$IMAGE_NAME
+fi
 docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-profiles/temp \
