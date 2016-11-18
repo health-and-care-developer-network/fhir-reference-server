@@ -31,6 +31,6 @@ fi
 docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
 docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
-	-v /docker-data/fhir-temp:/source \
+	-v /docker-data/fhir-profiles/temp \
 	-v /docker-data/fhir-profiles/profiles:/generated \
 	$REGISTRY_URL/$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH
