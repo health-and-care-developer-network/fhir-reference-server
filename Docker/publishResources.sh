@@ -11,7 +11,7 @@ NEW_URL=$5
 REGISTRY_HOST=$6
 TARGET_HOST=$7
 
-IMAGE_NAME=fhir-make-html
+IMAGE_NAME="nhsd/fhir-make-html"
 
 if [ -z $REGISTRY_HOST ]
 then

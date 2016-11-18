@@ -3,7 +3,7 @@
 # Usage:
 # build.sh registryhostname
 
-TAGNAME="fhir-make-html"
+TAGNAME="nhsd/fhir-make-html"
 BUILDFOLDER="."
 
 source $(dirname $0)/lib/build.sh
