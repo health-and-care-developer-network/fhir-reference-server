@@ -17,5 +17,5 @@ git checkout $BRANCH
 sed -i -- "s|$OLD_URL|$NEW_URL|g" /source/files/StructureDefinitions/*
 
 cd /usr/makehtml
-java -cp ./target/MakeHTML-1.0-SNAPSHOT.jar uk.nhs.fhir.makehtml.NewMain /source/files/$REPO_PATH /generated
+java -cp ./MakeHTML-1.0-SNAPSHOT.jar uk.nhs.fhir.makehtml.NewMain /source/files/$REPO_PATH /generated
 
