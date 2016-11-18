@@ -29,24 +29,39 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 public class XMLParserUtils {
     private static final Logger LOG = Logger.getLogger(XMLParserUtils.class.getName());
     
-    
+    /**
+     * Gets the name of an element from the XML Element
+     * 
+     * @param item the <element>...</element> section from a StructureDefinition
+     * @return String holding the name
+     */
     protected static String getElementName(Element item) {
-        NodeList pathsList = item.getElementsByTagName("path");
-        Element node = (Element) pathsList.item(0);
-        return node.getAttribute("value");
+        Element node = (Element) item.getElementsByTagName("path").item(0);
+        if(node != null)
+            return node.getAttribute("value");
+        else {
+            LOG.warning("getElementName() couldn't find a path element for an element.");
+            return "";
+        }
     }
 
+    /**
+     * Gets the name of an element from the XML Element
+     * 
+     * @param item the <element>...</element> section from a StructureDefinition
+     * @return 
+     */
     protected static String getElementCardinality(Element element) {
-        String min;
-        String max;
+        String min = "";
+        String max = "";
         String cardinality;
-        NodeList minList = element.getElementsByTagName("min");
-        Element node = (Element) minList.item(0);
+        Element node = (Element) element.getElementsByTagName("min").item(0);
         if(node != null) {
             min = node.getAttribute("value");
-            NodeList maxList = element.getElementsByTagName("max");
-            node = (Element) maxList.item(0);
-            max = node.getAttribute("value");
+            node = (Element) element.getElementsByTagName("max").item(0);
+            if(node != null) {
+                max = node.getAttribute("value");
+            }
             cardinality = min + ".." + max;
         } else {
             cardinality = "???";
@@ -54,13 +69,18 @@ public class XMLParserUtils {
         return cardinality;
     }
 
+    /**
+     * Gets the Type Name of an element from the XML Element
+     * 
+     * @param item the <element>...</element> section from a StructureDefinition
+     * @return 
+     */
     protected static String getElementTypeName(Element element) {
     	String typeName = null;
         ArrayList<String> profiles = new ArrayList<String>();
         ArrayList<String> types = new ArrayList<String>();
         
-        NodeList names = element.getElementsByTagName("path");
-        Element nameValue = (Element) names.item(0);
+        Element nameValue = (Element) element.getElementsByTagName("path").item(0);
         
         NodeList typesList = element.getElementsByTagName("type");
         if (typesList.getLength() == 0) {
@@ -73,8 +93,7 @@ public class XMLParserUtils {
                 Element node = (Element) typesList.item(i);
 
                 // Here we get the contained element called 'code'
-                NodeList codes = node.getElementsByTagName("code");
-                Element thisCode = (Element) codes.item(0);
+                Element thisCode = (Element) node.getElementsByTagName("code").item(0);
                 String thisType = thisCode.getAttribute("value");
                 
                 // If it's a new type we don't already have, then add it to our list of types
@@ -83,8 +102,7 @@ public class XMLParserUtils {
                 }
                 if(thisType.equals("Reference")) {
                     // If it's a Reference, get the profile for it and add to our list of Profiles
-                    NodeList profileElements = node.getElementsByTagName("profile");
-                    Element profileElement = (Element) profileElements.item(0);
+                    Element profileElement = (Element) node.getElementsByTagName("profile").item(0);
                     String prof = profileElement.getAttribute("value");
                     profiles.add(prof);
                     aReference = true;
@@ -94,13 +112,11 @@ public class XMLParserUtils {
         } else {
         	// Simple mode where we only have on type element!
             Element typeNode = (Element) typesList.item(0);
-            NodeList codeList = typeNode.getElementsByTagName("code");
-            Element theCodeElement = (Element) codeList.item(0);
+            Element theCodeElement = (Element) typeNode.getElementsByTagName("code").item(0);
             String thisType = theCodeElement.getAttribute("value");
             types.add(thisType);
             if(thisType.equals("Reference")) {
-                NodeList profilesList = typeNode.getElementsByTagName("profile");
-                Element profileNode = (Element) profilesList.item(0);
+                Element profileNode = (Element) typeNode.getElementsByTagName("profile").item(0);
                 String profileName = profileNode.getAttribute("value");
                 profiles.add(profileName);
             }
@@ -124,18 +140,29 @@ public class XMLParserUtils {
         return typeName;
     }
 
+    /**
+     * Gets the Type Names of an element from the XML Element (which has multiple types)
+     * 
+     * @param item the <element>...</element> section from a StructureDefinition
+     * @return 
+     */
     protected static ArrayList<String> getElementTypeList(Element element) {
         ArrayList<String> types = new ArrayList<String>();
         NodeList typesList = element.getElementsByTagName("type");
         for(int i = 0; i < typesList.getLength(); i++) {
             Element node = (Element) typesList.item(i);
-            NodeList codeList = node.getElementsByTagName("code");
-            Element subNode = (Element) codeList.item(0);
+            Element subNode = (Element) node.getElementsByTagName("code").item(0);
             types.add(subNode.getAttribute("value"));
         }
         return types;
     }
     
+    /**
+     * Gets the Flags of an element from the XML Element
+     * 
+     * @param item the <element>...</element> section from a StructureDefinition
+     * @return 
+     */
     protected static String getFlags(Element element) {
         String flags = "";
 
@@ -191,8 +218,7 @@ public class XMLParserUtils {
         NodeList typesList = element.getElementsByTagName("type");
         for(int i = 0; i < typesList.getLength(); i++) {
             Element atype = (Element) typesList.item(i);
-            NodeList profileList = atype.getElementsByTagName("profile");
-            Element profileName = (Element) profileList.item(0);
+            Element profileName = (Element) atype.getElementsByTagName("profile").item(0);
             if(profileName != null) {
                 String attrName = profileName.getAttribute("value");
                 if(attrName != null) {
@@ -221,8 +247,7 @@ public class XMLParserUtils {
     protected static String getQuantityType(Element element) {
         NodeList typesList = element.getElementsByTagName("type");
         Element atype = (Element) typesList.item(0);
-        NodeList profileList = atype.getElementsByTagName("profile");
-        Element profileName = (Element) profileList.item(0);
+        Element profileName = (Element) atype.getElementsByTagName("profile").item(0);
         String result = "";
         try {
 	        result = profileName.getAttribute("value");

@@ -26,6 +26,7 @@ import static uk.nhs.fhir.makehtml.XMLParserUtils.getFlags;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getTitle;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -97,38 +98,40 @@ public class NewMain implements Constants {
         // First we process all the elements...
         for(int i = 0; i < snapshotElementCount; i++) {
             Element element = (Element) elements.item(i);
-            String elementName = getElementName(element);
-            String cardinality = getElementCardinality(element);
-            String typeName = getElementTypeName(element);
-            String flags = getFlags(element);
-            String description = getTitle(element);
-            String hoverText = getDescription(element);
-            
-            boolean hasChanged = changedNodes.contains(elementName);
-            
-            if(typeName == null) {
-                LOG.info("typeName is NULL for Element: " + elementName );
-                typeName = "see link";
-            }
-            
-            // Catch vrious elements which can be of multiple types or other oddities...
-            if(typeName.equals("Multiple_Type_Choice")) {
-                ArrayList<String> types = getElementTypeList(element);
-                elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
-                for(String type : types) {
-                    elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
+            if(element != null) {
+                String elementName = getElementName(element);
+                String cardinality = getElementCardinality(element);
+                String typeName = getElementTypeName(element);
+                String flags = getFlags(element);
+                String description = getTitle(element);
+                String hoverText = getDescription(element);
+                
+                boolean hasChanged = changedNodes.contains(elementName);
+                
+                if(typeName == null) {
+                    LOG.info("typeName is NULL for Element: " + elementName);
+                    typeName = "see link";
                 }
-            } else {
-                if(typeName.equals("Reference")) {
-                    String newtypeName = getReferenceTypes(element);
-                    elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
+
+                // Catch vrious elements which can be of multiple types or other oddities...
+                if(typeName.equals("Multiple_Type_Choice")) {
+                    ArrayList<String> types = getElementTypeList(element);
+                    elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                    for(String type : types) {
+                        elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
+                    }
                 } else {
-                    if(typeName.equals("Quantity")) {
-                        String newtypeName = getQuantityType(element);
+                    if(typeName.equals("Reference")) {
+                        String newtypeName = getReferenceTypes(element);
                         elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
                     } else {
-                        // This is for all other types
-                        elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                        if(typeName.equals("Quantity")) {
+                            String newtypeName = getQuantityType(element);
+                            elementList.add(new MyElement(elementName, cardinality, typeName, newtypeName, flags, description, hoverText, hasChanged));
+                        } else {
+                            // This is for all other types
+                            elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                        }
                     }
                 }
             }
@@ -562,7 +565,11 @@ public class NewMain implements Constants {
                 String originalResource = FileLoader.loadFile(inFile);
         
                 String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, result);
-                FileWriter.writeFile(outFilename, augmentedResource.getBytes());
+                try {
+                    FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException ex) {
+                    LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                }
             }
         }
     }
