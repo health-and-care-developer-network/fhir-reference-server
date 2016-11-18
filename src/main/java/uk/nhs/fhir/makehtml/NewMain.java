@@ -79,23 +79,14 @@ public class NewMain implements Constants {
     private String run(Document document) {
         
         StringBuilder sb = new StringBuilder();
-        sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>");
-        sb.append(" <table border='0' cellpadding='0' cellspacing='0'>\n");
-        sb.append("  <tr>\n");
-        sb.append("   <th style='font-size: small;' width='250px'>Name</th>\n");
-        sb.append("   <th style='font-size: small;'>Flags</th>\n");
-        sb.append("   <th style='font-size: small;'>Card.</th>\n");
-        sb.append("   <th style='font-size: small;' width='250px'>Type</th>\n");
-        sb.append("   <th style='font-size: small;'>Description &amp; Constraints</th>\n");
-        sb.append("  </tr>\n");
-
+        sb.append(TABLESTART);
+        
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
-        NodeList names = document.getElementsByTagName("name");
-        Node name = names.item(0);
+        Node name = document.getElementsByTagName("name").item(0);
+        
         NamedNodeMap typeAttributes = name.getAttributes();
-        String resourceName = typeAttributes.getNamedItem("value").getTextContent();
-        NodeList snapshot = document.getElementsByTagName("snapshot");
-        Element snapshotNode = (Element) snapshot.item(0);
+        Element snapshotNode = (Element) document.getElementsByTagName("snapshot").item(0);
+
         NodeList elements = snapshotNode.getElementsByTagName("element");
         int snapshotElementCount = elements.getLength();
         
