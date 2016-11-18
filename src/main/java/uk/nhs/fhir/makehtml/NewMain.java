@@ -15,21 +15,23 @@
  */
 package uk.nhs.fhir.makehtml;
 
-import java.io.File;
 import static java.io.File.separatorChar;
-import java.io.FilenameFilter;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getDescription;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementCardinality;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementName;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeName;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getFlags;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getQuantityType;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getReferenceTypes;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getTitle;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,9 +44,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getQuantityType;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getReferenceTypes;
 
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
@@ -64,11 +63,15 @@ public class NewMain implements Constants {
      */
     public static void main(String[] args) {
         
-        if(args.length == 2) {
+    	if((args.length == 2) || (args.length == 3)) {
             String inputDir = args[0];
             String outputDir = args[1];
+            String newBaseURL = null;
+            if (args.length == 3) {
+            	newBaseURL = args[2];
+            }
             NewMain instance = new NewMain();
-            instance.processDirectory(inputDir, outputDir);
+            instance.processDirectory(inputDir, outputDir, newBaseURL);
         }
     }
 
@@ -546,7 +549,7 @@ public class NewMain implements Constants {
      * 
      * @param profilePath 
      */
-    private void processDirectory(String profilePath, String outPath) {        
+    private void processDirectory(String profilePath, String outPath, String newBaseURL) {        
         File folder = new File(profilePath);
         File[] allProfiles = folder.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -564,7 +567,7 @@ public class NewMain implements Constants {
                 
                 String originalResource = FileLoader.loadFile(inFile);
         
-                String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, result);
+                String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, result, newBaseURL);
                 try {
                     FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
                 } catch (UnsupportedEncodingException ex) {

@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 public class ResourceBuilder {
 
-    protected static String addTextSectionToResource(String resourceXML, String textSection) {
+    protected static String addTextSectionToResource(String resourceXML, String textSection, String newBaseURL) {
         String serialised = null;
         FhirContext ctx = FhirContext.forDstu2();
         StructureDefinition structureDefinitionResource = null;
@@ -43,6 +43,15 @@ public class ResourceBuilder {
             copyRight = copyRight.replace("©", "&copy;");
             copyRight = copyRight.replace("\\u00a9", "&copy;");
             structureDefinitionResource.setCopyright(copyRight);
+        }
+        
+        if (newBaseURL != null) {
+        	String resourceName = structureDefinitionResource.getName();
+        	if (newBaseURL.endsWith("/")) {
+        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
+        	}
+        	//structureDefinitionResource.setBase(newBaseURL);
+        	structureDefinitionResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
         }
         
         serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(structureDefinitionResource);
