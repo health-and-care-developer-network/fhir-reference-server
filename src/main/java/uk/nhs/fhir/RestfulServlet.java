@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.MongoIF;
 import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
 import uk.nhs.fhir.resourcehandlers.PatientProvider;
@@ -38,7 +37,6 @@ import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -53,7 +51,7 @@ public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final long serialVersionUID = 1L;
     Datasource dataSource = null;
-    ValidatorManager vManager = null;
+    
 	private static String css = FileLoader.loadFileOnClasspath("/style.css");
 	
     @Override
@@ -86,23 +84,15 @@ public class RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
     	// Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-        
-        // We also create a validatorManager which we'll also pass to each
-        // resource type handler as we create them
-        try {
-            vManager = ValidatorManager.getInstance();
-        } catch (Throwable ex) {
-            LOG.severe(ex.getMessage());
-        }
-                
+                        
         ProfileWebHandler webber = new ProfileWebHandler(dataSource);
         
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionProvider(dataSource, vManager));
-        resourceProviders.add(new PatientProvider(dataSource, vManager));
-        resourceProviders.add(new DocumentReferenceProvider(dataSource, vManager));
-        resourceProviders.add(new PractitionerProvider(dataSource, vManager));
-        resourceProviders.add(new OrganizationProvider(dataSource, vManager));
+        resourceProviders.add(new StrutureDefinitionProvider(dataSource));
+        resourceProviders.add(new PatientProvider(dataSource));
+        resourceProviders.add(new DocumentReferenceProvider(dataSource));
+        resourceProviders.add(new PractitionerProvider(dataSource));
+        resourceProviders.add(new OrganizationProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");

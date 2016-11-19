@@ -30,11 +30,10 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.List;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.validator.ValidatorFacade;
-import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  *
@@ -44,7 +43,6 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
 
     Datasource myDatasource = null;
-    ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
@@ -53,9 +51,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public StrutureDefinitionProvider(Datasource dataSource, ValidatorManager vMgr) {
+    public StrutureDefinitionProvider(Datasource dataSource) {
         myDatasource = dataSource;
-        myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }
 
@@ -85,10 +82,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam StructureDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        
-        ValidatorFacade myFacade = new ValidatorFacade();
-        MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
-        return retVal;
+        throw new NotImplementedException("");
     }
 //</editor-fold>
 

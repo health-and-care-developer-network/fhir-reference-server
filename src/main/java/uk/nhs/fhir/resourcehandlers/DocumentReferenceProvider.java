@@ -22,11 +22,10 @@ import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.validator.ValidatorFacade;
-import uk.nhs.fhir.validator.ValidatorManager;
 
 /**
  *
@@ -35,7 +34,6 @@ import uk.nhs.fhir.validator.ValidatorManager;
 public class DocumentReferenceProvider implements IResourceProvider {
 
     Datasource myDataSource = null;
-    ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
@@ -44,9 +42,8 @@ public class DocumentReferenceProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public DocumentReferenceProvider(Datasource dataSource, ValidatorManager vMgr) {
+    public DocumentReferenceProvider(Datasource dataSource) {
         myDataSource = dataSource;
-        myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }
 
@@ -76,10 +73,8 @@ public class DocumentReferenceProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam DocumentReference resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        
-        ValidatorFacade myFacade = new ValidatorFacade();
-        MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
-        return retVal;
+
+        throw new NotImplementedException("");
     }
 //</editor-fold>
     
