@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Health and Social Care Information Centre.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package uk.nhs.fhir.validator;
 
@@ -24,8 +34,10 @@ import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 
 /**
- *
- * @author tim
+ * This class can in theory be used to validate any resource. It is called from the
+ *  various resource handlers, to do the validation process.
+ * 
+ * @author Tim Coates
  */
 public class ValidateAny {
     private static final Logger LOG = Logger.getLogger(ValidateAny.class.getName());
@@ -37,7 +49,7 @@ public class ValidateAny {
                 @Validate.Profile String theProfile) {
         FhirValidator validator = ctx.newValidator();
         
-        // Create some modules and register them
+        // Create some validation modules and register them
         IValidatorModule module1 = new SchemaBaseValidator(ctx);
         validator.registerValidatorModule(module1);
         
@@ -45,14 +57,13 @@ public class ValidateAny {
         FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
 
         // ... with our own profile loader implementation
-        IValidationSupport valSupport = new ProfileLoader();
+        IValidationSupport valSupport = new ProfileLoader(); // This is our custom profile loader
         ValidationSupportChain support = new ValidationSupportChain(new DefaultProfileValidationSupport(), valSupport);
-        instanceValidator.setValidationSupport(support);
-        
+        instanceValidator.setValidationSupport(support);        
         validator.registerValidatorModule(instanceValidator);
         
+        // We also validate against schematrons ?
         validator.setValidateAgainstStandardSchematron(true);
-        // TODO: These two lines don't yet work :-(
         IValidatorModule module2 = new SchematronBaseValidator(ctx);
         validator.registerValidatorModule(module2);
 
