@@ -19,6 +19,9 @@ import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.validation.schematron.SchematronBaseValidator;
 import java.util.logging.Logger;
+import org.hl7.fhir.instance.hapi.validation.DefaultProfileValidationSupport;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 
 /**
  *
@@ -40,6 +43,12 @@ public class ValidateAny {
         
         // NB we also do instance validation...
         FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
+
+        // ... with our own profile loader implementation
+        IValidationSupport valSupport = new ProfileLoader();
+        ValidationSupportChain support = new ValidationSupportChain(new DefaultProfileValidationSupport(), valSupport);
+        instanceValidator.setValidationSupport(support);
+        
         validator.registerValidatorModule(instanceValidator);
         
         validator.setValidateAgainstStandardSchematron(true);
