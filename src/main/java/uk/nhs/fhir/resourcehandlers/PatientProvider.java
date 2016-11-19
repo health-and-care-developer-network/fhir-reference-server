@@ -16,24 +16,17 @@
 package uk.nhs.fhir.resourcehandlers;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.IValidatorModule;
-import ca.uhn.fhir.validation.SchemaBaseValidator;
-import ca.uhn.fhir.validation.ValidationResult;
-import ca.uhn.fhir.validation.schematron.SchematronBaseValidator;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.NotImplementedException;
-import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
@@ -80,39 +73,16 @@ public class PatientProvider implements IResourceProvider {
      * @return
      */
     @Validate
-    public MethodOutcome validateStructureDefinition(@ResourceParam Patient resourceToTest,
-                                     @Validate.Mode ValidationModeEnum theMode,
-                                     @Validate.Profile String theProfile) {
-        FhirValidator validator = ctx.newValidator();
- 
-        // Create some modules and register them
-        IValidatorModule module1 = new SchemaBaseValidator(ctx);
-        validator.registerValidatorModule(module1);
+    public MethodOutcome validateStructureDefinition(
+            @ResourceParam Patient resourceToTest,
+            @Validate.Mode ValidationModeEnum theMode,
+            @Validate.Profile String theProfile) { 
         
-        // NB we also do instance validation...
-        FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
-        validator.registerValidatorModule(instanceValidator);
-
-        
-        
-        // TODO: These don't yet work :-(
-        //IValidatorModule module2 = new SchematronBaseValidator(ctx);
-        //validator.registerValidatorModule(module2);
-
-        // Pass a resource in to be validated. The resource can
-        // be an IBaseResource instance, or can be a raw String
-        // containing a serialized resource as text.
-        ValidationResult result = validator.validateWithResult(resourceToTest);
-        
-        
-        MethodOutcome retval = new MethodOutcome();        
-        if (result.isSuccessful()) {
-           LOG.info("Validation passed");
-        } else {
-           LOG.warning("Validation failed");
-           OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();        
-           retval.setOperationOutcome(oo);
-        }
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(
+                ctx,
+                resourceToTest,
+                theMode,
+                theProfile);
         return retval;
     }
 //</editor-fold>
