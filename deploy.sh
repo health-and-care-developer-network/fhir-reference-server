@@ -36,8 +36,8 @@ docker $TARGET_PREFIX run -p 8080:8080 --name $CONTAINER_NAME \
 	--restart=on-failure:5 \
         -m $MEMORYFLAG \
 	-c $CPUFLAG \
-	-v /docker-data/fhir-profiles:/opt/fhir
-	-v /docker-data/fhir-server-temp/jetty:/tmp/jetty
+	-v /docker-data/fhir-profiles:/opt/fhir \
+	-v /docker-data/fhir-server-temp/jetty:/tmp/jetty \
 	-d $REGISTRY_URL/$IMAGE_NAME
 
 
