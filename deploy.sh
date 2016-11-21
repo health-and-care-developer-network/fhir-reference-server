@@ -34,6 +34,7 @@ docker $TARGET_PREFIX rm $CONTAINER_NAME
 docker $TARGET_PREFIX run -p 8100:8080 --name $CONTAINER_NAME \
 	--restart=on-failure:5 \
 	-v /docker-data/fhir-profiles:/opt/fhir
+	-v /docker-data/fhir-server-temp/jetty:/tmp/jetty
 	-d $REGISTRY_URL/$IMAGE_NAME
 
 
