@@ -23,9 +23,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
@@ -38,7 +40,8 @@ public class ProfileLoader implements IValidationSupport {
 
     @Override
     public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext fc, ValueSet.ConceptSetComponent csc) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ValueSet vs = new ValueSet();
+        return vs.getExpansion();
     }
 
     /**
@@ -102,8 +105,8 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public <T extends IBaseResource> T fetchResource(FhirContext fc, Class<T> type, String string) {        
-// NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
-// just http fetch it even if we're fetching it from this server.
+        // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
+        // just http fetch it even if we're fetching it from this server.
         LOG.info("Requesting resource: " + string);
         StringBuilder result = new StringBuilder();
         try {
@@ -140,13 +143,50 @@ public class ProfileLoader implements IValidationSupport {
         return (T) T;
     }
 
+
+    /**
+     * We simply assume that if the CodeSystem begins with http://fhir.nhs.uk then we know about this
+     * CodeSyatem, and will be able to validate it's component parts.
+     * 
+     * @param fc A FHIR Context
+     * @param string The URL of the CodeSystem
+     * @return 
+     */
     @Override
-    public boolean isCodeSystemSupported(FhirContext fc, String string) {
-        throw new UnsupportedOperationException("ProfileLoader.isCodeSystemSupported() Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
+        if(theSystem.startsWith("http://fhir.nhs.uk/"))
+            return true;
+        else
+            return false;
     }
 
+    /**
+     * This method checks whether the code and display are acceptable pair in the specified
+     * system.
+     * 
+     * @param theContext    Our FHIR Context
+     * @param theCodeSystem The System we think the code and display exist in
+     * @param theCode       The code we're testing
+     * @param theDisplay    The display value we think matches that code
+     * 
+     * @return 
+     */
     @Override
-    public CodeValidationResult validateCode(FhirContext fc, String string, String string1, String string2) {
-        throw new UnsupportedOperationException("ProfileLoader.validateCode() Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CodeValidationResult validateCode(FhirContext theContext, String theCodeSystem, String theCode, String theDisplay) {
+        CodeValidationResult result;
+        ValueSet vs = fetchResource(theContext, ValueSet.class, theCodeSystem);
+        // Here see if we can find the code in the ValueSet...
+        ValueSet.ConceptDefinitionComponent definition = new ValueSet.ConceptDefinitionComponent();
+        definition.setDisplay(theDisplay);
+        List<ValueSet.ConceptDefinitionComponent> concepts = vs.getCodeSystem().getConcept();
+        for (ValueSet.ConceptDefinitionComponent concept : concepts) {
+            if(concept.getCode().equals(theCode)) {
+                if(concept.getDisplay().equals(theDisplay)){
+                    result = new CodeValidationResult(definition);
+                    return result;
+                }
+            }
+        }
+        return new CodeValidationResult(IssueSeverity.ERROR, "Code or display not matched: " + theCodeSystem + " / " + theCode + " / " + theDisplay);
     }
 }
