@@ -80,7 +80,7 @@ public class NewMain implements Constants {
      * 
      * @param filename 
      */
-    private String run(Document document) {
+    private String makeHTMLForStructureDefinition(Document document) {
         
         StringBuilder sb = new StringBuilder();
         sb.append(TABLESTART);
@@ -558,21 +558,43 @@ public class NewMain implements Constants {
         });
         
         for(File thisFile : allProfiles) {
+            String result = "";
             if(thisFile.isFile()) {
                 String inFile = thisFile.getPath();
                 String outFilename = outPath + separatorChar + thisFile.getName();
                 LOG.info("\n\n=========================================\nProcessing file: " + inFile + "\n=========================================");
                 Document thisDoc = ReadFile(inFile);
-                String result = run(thisDoc);
                 
-                String originalResource = FileLoader.loadFile(inFile);
-        
-                String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, result, newBaseURL);
-                try {
-                    FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException ex) {
-                    LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                // Here we need to see whether it's a StructureDefinition or a ValueSet...
+                int isStructureDefinition = thisDoc.getElementsByTagName("StructureDefinition").getLength();
+                if(isStructureDefinition > 0) {
+                    LOG.info("It's a StructureDefinition");
+                    result = makeHTMLForStructureDefinition(thisDoc);
+                    String originalResource = FileLoader.loadFile(inFile);
+
+                    String augmentedResource = ResourceBuilder.addTextSectionToResource(originalResource, result, newBaseURL);
+                    try {
+                        FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex) {
+                        LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                    }
                 }
+
+                int isValueSet = thisDoc.getElementsByTagName("ValueSet").getLength();
+                if(isValueSet > 0) {
+                    LOG.info("It's a ValueSet");
+                    result = makeHTMLForValueSet(thisDoc);
+                    String originalResource = FileLoader.loadFile(inFile);
+
+                    String augmentedResource = ResourceBuilder.addTextSectionToValueSet(originalResource, result, newBaseURL);
+                    try {
+                        FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex) {
+                        LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                    }
+                }
+                
+
             }
         }
     }
@@ -628,5 +650,55 @@ public class NewMain implements Constants {
             }
         }
         return names;
+    }
+
+    private String makeHTMLForValueSet(Document thisDoc) {
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
+        
+        // Add some general metadata to the div here?
+        NodeList versionSet = thisDoc.getElementsByTagName("version");
+        if(versionSet.getLength() > 0) { 
+            Element version = (Element) versionSet.item(0);
+            sb.append("<b>Version: " + version.getAttribute("value") + "</b><br>\n");
+        }
+        NodeList nameSet = thisDoc.getElementsByTagName("name");
+        if(nameSet.getLength() > 0) { 
+            Element name = (Element) nameSet.item(0);
+            sb.append("<b>Name: " + name.getAttribute("value") + "</b><br>\n");
+        }
+        NodeList publisherSet = thisDoc.getElementsByTagName("publisher");
+        if(publisherSet.getLength() > 0) { 
+            Element publisher = (Element) publisherSet.item(0);
+            sb.append("<b>Publisher: " + publisher.getAttribute("value") + "</b><br>\n");
+        }
+        
+        NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
+        
+        if(codeSystemSet.getLength() > 0) {
+            // We have a codeSystem in play
+            Element codeSystem = (Element) codeSystemSet.item(0);
+            NodeList concepts = codeSystem.getElementsByTagName("concept");
+            
+            if(concepts.getLength() > 0) {
+                sb.append("<ul>");
+                
+                for(int i = 0; i < concepts.getLength(); i++) {
+                    Element concept = (Element) concepts.item(i);
+                    sb.append("<li>");
+                    Element code = (Element) concept.getElementsByTagName("code").item(0);
+                    Element display = (Element) concept.getElementsByTagName("display").item(0);
+                    sb.append(code.getAttribute("value"));
+                    sb.append(": ");
+                    sb.append(display.getAttribute("value"));
+                    sb.append("</li>");
+                }
+                sb.append("</ul>");
+            }
+        }
+        sb.append("</div>\n");
+        return sb.toString();
     }
 }

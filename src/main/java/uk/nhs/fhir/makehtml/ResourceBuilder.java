@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -59,4 +60,35 @@ public class ResourceBuilder {
         return serialised;
     }
 
+    protected static String addTextSectionToValueSet(String vsXML, String textSection, String newBaseURL) {
+        String serialised = null;
+        FhirContext ctx = FhirContext.forDstu2();
+        ValueSet vsResource = null;
+        vsResource = (ValueSet) ctx.newXmlParser().parseResource(vsXML);
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv(textSection);
+        vsResource.setText(textElement);
+
+        // Here (while we have the resource in as a StructureDefinition) we resolve any invalid (c) character in the Copyright section too!
+        String copyRight = vsResource.getCopyrightElement().getValue();
+        if(copyRight != null) {
+            copyRight = copyRight.replace("©", "&copy;");
+            copyRight = copyRight.replace("\\u00a9", "&copy;");
+            vsResource.setCopyright(copyRight);
+        }
+        
+        if (newBaseURL != null) {
+        	String resourceName = vsResource.getName();
+        	if (newBaseURL.endsWith("/")) {
+        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
+        	}
+        	//structureDefinitionResource.setBase(newBaseURL);
+        	vsResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
+        }
+        
+        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(vsResource);
+        serialised = serialised.replace("Σ", "&#931;");
+        return serialised;
+    }
 }
