@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.instance.model.DomainResource;
 import org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -36,140 +37,174 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
  * @author Tim Coates
  */
 public class ProfileLoader implements IValidationSupport {
+
     private static final Logger LOG = Logger.getLogger(ProfileLoader.class.getName());
 
+    /**
+     * Need to be clear that this method is effectively stubbed out, pending
+     * some more details of what it's expected or required to do.
+     *
+     *
+     * @param fc
+     * @param csc
+     * @return
+     */
     @Override
     public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext fc, ValueSet.ConceptSetComponent csc) {
-        ValueSet vs = new ValueSet();
-        return vs.getExpansion();
+        return null;
     }
 
     /**
      * Method to fetch a remote ValueSet which is required for validation.
-     * 
-     * @param fc        Our current FHIR Context
-     * @param string    The URL of the ValueSet
-     * 
-     * @return          A ValueSet resource
+     *
+     * @param fc Our current FHIR Context
+     * @param string The URL of the ValueSet
+     *
+     * @return A ValueSet resource
      */
     @Override
     public ValueSet fetchCodeSystem(FhirContext fc, String string) {
         ValueSet theVS = new ValueSet();
 
-        LOG.info("Requesting ValueSet: " + string);
+        LOG.info("Checking in cache...");
+        theVS = (ValueSet) ResourceCache.getResource(string);
+        if (theVS != null) {
+            LOG.info(string + " Was in cache.");
+        } else {
+            LOG.info(string + " Was NOT in cache, will fetch it...");
 
-                StringBuilder result = new StringBuilder();
-        try {
-            URL url = new URL(string);
-            HttpURLConnection conn = null;
+            StringBuilder result = new StringBuilder();
             try {
-                conn = (HttpURLConnection) url.openConnection();
-            } catch (IOException ex) {
-                LOG.severe("Trying to fetch a ValueSet, IOException caught when trying to connect to : " + string);
-            }
-            if(conn != null) {   
-                conn.setRequestMethod("GET");
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                    
-                    int httpStatus = conn.getResponseCode();
-                    if(httpStatus == 200) {
-                        String line;
-                        while ((line = rd.readLine()) != null) {
-                            result.append(line);
-                        }
-                    } else {
-                        LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
-                    }
+                URL url = new URL(string);
+                HttpURLConnection conn = null;
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
                 } catch (IOException ex) {
-                    Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                    LOG.severe("Trying to fetch a ValueSet, IOException caught when trying to connect to : " + string);
                 }
+                if (conn != null) {
+                    conn.setRequestMethod("GET");
+                    try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+
+                        int httpStatus = conn.getResponseCode();
+                        if (httpStatus == 200) {
+                            String line;
+                            while ((line = rd.readLine()) != null) {
+                                result.append(line);
+                            }
+                        } else {
+                            LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } catch (ProtocolException ex) {
+                LOG.severe("Trying to fetch a ValueSet - ProtocolException: " + string);
+            } catch (MalformedURLException ex) {
+                LOG.severe("Trying to fetch a ValueSet - MalformedURLException: " + string);
             }
-        } catch (ProtocolException ex) {
-            LOG.severe("Trying to fetch a ValueSet - ProtocolException: " + string);
-        } catch (MalformedURLException ex) {
-            LOG.severe("Trying to fetch a ValueSet - MalformedURLException: " + string);
+
+            theVS = (ValueSet) fc.newXmlParser().parseResource(result.toString());
+            LOG.info("Adding ValueSet to cache");
+            ResourceCache.putResource(string, theVS);
         }
-        theVS = (ValueSet) fc.newXmlParser().parseResource(result.toString());
         return theVS;
     }
 
     /**
-     * Method to fetch a non-standard resource on demand, to be used as part of the validation.
-     * 
-     * @param <T>       The class of the resource being requested, likely to
-     *                      be a StructureDefinition or ValueSet
-     * @param fc        The FHIRContext we're working with.
-     * @param type      The class type.
-     * @param string    The 'name' of the resource, which should be a URL.
-     * @return          A Resource.
+     * Method to fetch a non-standard resource on demand, to be used as part of
+     * the validation.
+     *
+     * @param <T> The class of the resource being requested, likely to be a
+     * StructureDefinition or ValueSet
+     * @param fc The FHIRContext we're working with.
+     * @param type The class type.
+     * @param string The 'name' of the resource, which should be a URL.
+     * @return A Resource.
      */
     @Override
-    public <T extends IBaseResource> T fetchResource(FhirContext fc, Class<T> type, String string) {        
+    public <T extends IBaseResource> T fetchResource(FhirContext fc, Class<T> type, String string) {
         // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
         // just http fetch it even if we're fetching it from this server.
+        IBaseResource theResource = null;
         LOG.info("Requesting resource: " + string);
-        StringBuilder result = new StringBuilder();
-        try {
-            URL url = new URL(string);
-            HttpURLConnection conn = null;
+
+        theResource = ResourceCache.getResource(string);
+
+        LOG.info("Checking in cache...");
+        if (theResource != null) {
+            LOG.info(string + " Was in cache.");
+        } else {
+            LOG.info(string + " Was NOT in cache, will fetch it...");
+
+            StringBuilder result = new StringBuilder();
             try {
-                conn = (HttpURLConnection) url.openConnection();
-            } catch (IOException ex) {
-                LOG.severe("Trying to fetch a profile, IOException caught when trying to connect to : " + string);
-            }
-            if(conn != null) {   
-                conn.setRequestMethod("GET");
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                    
-                    int httpStatus = conn.getResponseCode();
-                    if(httpStatus == 200) {
-                        String line;
-                        while ((line = rd.readLine()) != null) {
-                            result.append(line);
-                        }
-                    } else {
-                        LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
-                    }
+                URL url = new URL(string);
+                HttpURLConnection conn = null;
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
                 } catch (IOException ex) {
-                    Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                    LOG.severe("Trying to fetch a profile, IOException caught when trying to connect to : " + string);
                 }
+                if (conn != null) {
+                    conn.setRequestMethod("GET");
+                    try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+
+                        int httpStatus = conn.getResponseCode();
+                        if (httpStatus == 200) {
+                            String line;
+                            while ((line = rd.readLine()) != null) {
+                                result.append(line);
+                            }
+                        } else {
+                            LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } catch (ProtocolException ex) {
+                LOG.severe("Trying to fetch a profile - ProtocolException: " + string);
+            } catch (MalformedURLException ex) {
+                LOG.severe("Trying to fetch a profile - MalformedURLException: " + string);
             }
-        } catch (ProtocolException ex) {
-            LOG.severe("Trying to fetch a profile - ProtocolException: " + string);
-        } catch (MalformedURLException ex) {
-            LOG.severe("Trying to fetch a profile - MalformedURLException: " + string);
+            theResource = fc.newXmlParser().parseResource(result.toString());
+
+            LOG.info("Adding resource to cache.");
+            ResourceCache.putResource(string, (DomainResource) theResource);
         }
-        IBaseResource T = fc.newXmlParser().parseResource(result.toString());
-        return (T) T;
+        return (T) theResource;
     }
 
-
     /**
-     * We simply assume that if the CodeSystem begins with http://fhir.nhs.uk then we know about this
-     * CodeSyatem, and will be able to validate it's component parts.
-     * 
+     * We simply assume that if the CodeSystem begins with http://fhir.nhs.uk
+     * then we know about this CodeSyatem, and will be able to validate it's
+     * component parts.
+     *
      * @param fc A FHIR Context
      * @param string The URL of the CodeSystem
-     * @return 
+     * @return
      */
     @Override
     public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
-        if(theSystem.startsWith("http://fhir.nhs.uk/"))
+        if (theSystem.startsWith("http://fhir.nhs.uk/")) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     /**
-     * This method checks whether the code and display are acceptable pair in the specified
-     * system.
-     * 
-     * @param theContext    Our FHIR Context
+     * This method checks whether the code and display are acceptable pair in
+     * the specified system.
+     *
+     * @param theContext Our FHIR Context
      * @param theCodeSystem The System we think the code and display exist in
-     * @param theCode       The code we're testing
-     * @param theDisplay    The display value we think matches that code
-     * 
-     * @return 
+     * @param theCode The code we're testing
+     * @param theDisplay The display value we think matches that code
+     *
+     * @return
      */
     @Override
     public CodeValidationResult validateCode(FhirContext theContext, String theCodeSystem, String theCode, String theDisplay) {
@@ -180,8 +215,8 @@ public class ProfileLoader implements IValidationSupport {
         definition.setDisplay(theDisplay);
         List<ValueSet.ConceptDefinitionComponent> concepts = vs.getCodeSystem().getConcept();
         for (ValueSet.ConceptDefinitionComponent concept : concepts) {
-            if(concept.getCode().equals(theCode)) {
-                if(concept.getDisplay().equals(theDisplay)){
+            if (concept.getCode().equals(theCode)) {
+                if (concept.getDisplay().equals(theDisplay)) {
                     result = new CodeValidationResult(definition);
                     return result;
                 }

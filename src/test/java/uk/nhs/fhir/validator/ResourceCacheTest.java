@@ -16,9 +16,8 @@
 package uk.nhs.fhir.validator;
 
 import ca.uhn.fhir.context.FhirContext;
-import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.ValueSet;
-import org.hl7.fhir.instance.model.ValueSet.ConceptSetComponent;
+import org.hl7.fhir.instance.model.DomainResource;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,11 +29,8 @@ import static org.junit.Assert.*;
  *
  * @author tim
  */
-public class ProfileLoaderTest {
-    
-    FhirContext fc;
-    ValueSet vs;
-    String vsURL = "https://raw.githubusercontent.com/nhsconnect/gpconnect-fhir/develop/ValueSets/gpconnect-error-or-warning-code-1.xml";
+public class ResourceCacheTest {
+
     String VALUESET = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ValueSet xmlns=\"http://hl7.org/fhir\">\n" +
         "  <id value=\"example-inline\"/>\n" +
         "  <meta>\n" +
@@ -101,13 +97,13 @@ public class ProfileLoaderTest {
         "    </concept>\n" +
         "  </codeSystem>\n" +
         "</ValueSet>";
-    
-    public ProfileLoaderTest() {
+        
+        
+    public ResourceCacheTest() {
     }
     
     @BeforeClass
     public static void setUpClass() {
-        
     }
     
     @AfterClass
@@ -116,8 +112,6 @@ public class ProfileLoaderTest {
     
     @Before
     public void setUp() {
-        fc = FhirContext.forDstu2Hl7Org();
-        vs = fc.newXmlParser().parseResource(ValueSet.class, VALUESET);
     }
     
     @After
@@ -125,75 +119,50 @@ public class ProfileLoaderTest {
     }
 
     /**
-     * Test of expandValueSet method, of class ProfileLoader.
+     * Test of getResource method, of class ResourceCache.
      */
     @Test
-    public void testExpandValueSet() {
-        System.out.println("expandValueSet");
-        ConceptSetComponent csc = new ConceptSetComponent();
-        csc.setSystem("http://acme.com/config/fhir/codesystems/internal");
-        ProfileLoader instance = new ProfileLoader();
-        ValueSet.ValueSetExpansionComponent expResult = null;
-        ValueSet.ValueSetExpansionComponent result = instance.expandValueSet(fc, csc);
+    public void testGetResource() {
+        System.out.println("getResource");
+        String identifier = "http://random.url.here/path/filename.xml";
+
+        // First we check that getting a random name gives us null.
+        DomainResource expResult = null;
+        DomainResource result = ResourceCache.getResource(identifier);
         assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of fetchCodeSystem method, of class ProfileLoader.
-     */
-    @Test
-    public void testFetchCodeSystem() {
-        System.out.println("fetchCodeSystem");
-        ProfileLoader instance = new ProfileLoader();        
-        ValueSet result = instance.fetchCodeSystem(fc, vsURL);
-        assertEquals(result.getCodeSystem().getSystem(), "http://fhir.nhs.net/ValueSet/gpconnect-error-or-warning-code-1");
-    }
-
-    /**
-     * Test of fetchResource method, of class ProfileLoader.
-     */
-    @Test
-    public void testFetchResource() {
-        System.out.println("fetchResource");
-        ProfileLoader instance = new ProfileLoader();
-        String expResult = "GP Connect Error or Warning Code";
-        ValueSet result = (ValueSet) instance.fetchResource(fc, ValueSet.class, vsURL);
-        assertEquals(expResult, result.getName());
-    }
-
-    /**
-     * Test of isCodeSystemSupported method, of class ProfileLoader.
-     */
-    @Test
-    public void testIsCodeSystemSupported() {
-        System.out.println("isCodeSystemSupported");
-        ProfileLoader instance = new ProfileLoader();
-        String theSystem = "http://fhir.nhs.uk/samplesystem";
-        boolean expResult = true;
-        boolean result = instance.isCodeSystemSupported(fc, theSystem);
-        assertEquals(expResult, result);
+                
+        // Now create a resource which we'll put in
+        ValueSet vs = FhirContext.forDstu2Hl7Org().newXmlParser().parseResource(ValueSet.class, VALUESET);
+        DomainResource resource = (DomainResource) vs;
+        ResourceCache.putResource(identifier, resource);
         
-        theSystem = vsURL;
-        expResult = false;
-        result = instance.isCodeSystemSupported(fc, theSystem);
-        assertEquals(expResult, result);
-
+        // And check that that gives us a resource
+        result = ResourceCache.getResource(identifier);
+        assertEquals(vs, result);
     }
 
     /**
-     * Test of validateCode method, of class ProfileLoader.
+     * Test of putResource method, of class ResourceCache.
      */
     @Test
-    public void testValidateCode() {
-        System.out.println("validateCode");
-        String theCodeSystem = "https://raw.githubusercontent.com/nhsconnect/gpconnect-fhir/develop/ValueSets/gpconnect-error-or-warning-code-1.xml";
-        String theCode = "GPC-001";
-        String theDisplay = "Not found";
-        ProfileLoader instance = new ProfileLoader();
-        IValidationSupport.CodeValidationResult result = instance.validateCode(fc, theCodeSystem, theCode, theDisplay);
-        assertTrue(result.isOk());
+    public void testPutResource() {
+        System.out.println("putResource");
+        String key = "http://made.up.host/path/name.json";
+
+        // Before we start, we check that getting the resource we're going to cache gets null
+        DomainResource result = ResourceCache.getResource(key);
+        assertEquals(result, null);
+        
+        // Create a valid resource to be cached
+        ValueSet vs = FhirContext.forDstu2Hl7Org().newXmlParser().parseResource(ValueSet.class, VALUESET);
+        DomainResource resource = (DomainResource) vs;
+        
+        // Now put the resource in the cache
+        ResourceCache.putResource(key, resource);
+        
+        // Get it back and see if we get the same thing back
+        result = ResourceCache.getResource(key);
+        assertEquals(result, resource);
     }
-
-
     
 }

@@ -12,6 +12,9 @@
     </properties>
     
     <!-- See: https://devcenter.heroku.com/articles/local-maven-dependencies -->
+    <!-- Required to use the locally deployed (as part of the application) JAR
+    file of HL7 structuredefinitions to validate against --> 
+    <!-- 
     <repositories>
         <repository>
             <id>project.local</id>
@@ -26,6 +29,7 @@
             <url>file://${project.basedir}/repo</url>
         </repository>
     </repositories>
+    -->
     
     <dependencies>
         
@@ -64,6 +68,7 @@
             <version>2.0</version>
             <type>jar</type>
         </dependency>
+        <!-- MongoDB libraries in case we opt to store files in MongoDB instead of file system -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
