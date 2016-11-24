@@ -55,6 +55,7 @@ public class ResourceBuilder {
         }
         
         serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(structureDefinitionResource);
+        serialised = serialised.replace("Σ", "&#931;");
         return serialised;
     }
 
