@@ -44,6 +44,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetName;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetPublisher;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetStatus;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetURL;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetVersion;
 
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
@@ -658,24 +663,51 @@ public class NewMain implements Constants {
         
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
         
-        // Add some general metadata to the div here?
-        NodeList versionSet = thisDoc.getElementsByTagName("version");
-        if(versionSet.getLength() > 0) { 
-            Element version = (Element) versionSet.item(0);
-            sb.append("<b>Version: " + version.getAttribute("value") + "</b><br>\n");
-        }
-        NodeList nameSet = thisDoc.getElementsByTagName("name");
-        if(nameSet.getLength() > 0) { 
-            Element name = (Element) nameSet.item(0);
-            sb.append("<b>Name: " + name.getAttribute("value") + "</b><br>\n");
-        }
-        NodeList publisherSet = thisDoc.getElementsByTagName("publisher");
-        if(publisherSet.getLength() > 0) { 
-            Element publisher = (Element) publisherSet.item(0);
-            sb.append("<b>Publisher: " + publisher.getAttribute("value") + "</b><br>\n");
-        }
+        // Here we need to get the name element
+        sb.append("<table>");
+        sb.append("<tr><td>Name:</td><td>" + getValueSetName(thisDoc) + "</td></tr>\n");
+        sb.append("<tr><td>Version:</td><td>" + getValueSetVersion(thisDoc) + "</td></tr>\n");
+                
+        sb.append("<tr><td>Publisher:</td><td>" + getValueSetPublisher(thisDoc) + "</td></tr>\n");
+        sb.append("<tr><td>URL:</td><td>" + getValueSetURL(thisDoc) + "</td></tr>\n");
+        sb.append("<tr><td>Status:</td><td>" + getValueSetStatus(thisDoc) + "</td></tr>\n");
+        sb.append("</table>");
         
+//<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
+        NodeList composeSet = thisDoc.getElementsByTagName("compose");
+        if(composeSet.getLength() > 0) {
+            sb.append("<h4>Composed from</h4>");
+            
+            Element composeElement = (Element) composeSet.item(0);
+            
+            NodeList composeImports = composeElement.getElementsByTagName("import");
+            NodeList composeIncludes = composeElement.getElementsByTagName("include");
+            NodeList composeExcludes = composeElement.getElementsByTagName("exclude");
+            
+            for(int i = 0; i < composeImports.getLength(); i++) {
+                Element importRef = (Element) composeImports.item(i);
+                sb.append("<b>Import:</b> " + importRef.getAttribute("value") + "<br />");
+            }
+            
+            for(int i = 0; i < composeIncludes.getLength(); i++) {
+                Element includeRef = (Element) composeIncludes.item(i);
+                
+                Element system = (Element) includeRef.getElementsByTagName("system").item(0);
+                String systemName = system.getAttribute("value");
+                
+                Element version = (Element) includeRef.getElementsByTagName("version").item(0);
+                String versionName = version.getAttribute("value");
+
+            }
+            
+            
+        }
+//</editor-fold>
+        
+        //<editor-fold defaultstate="collapsed" desc="Here we go through any codeSystem items">
         NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
+        
+        NodeList conceptMaps = thisDoc.getElementsByTagName("ConceptMap");
         
         if(codeSystemSet.getLength() > 0) {
             // We have a codeSystem in play
@@ -690,14 +722,63 @@ public class NewMain implements Constants {
                     sb.append("<li>");
                     Element code = (Element) concept.getElementsByTagName("code").item(0);
                     Element display = (Element) concept.getElementsByTagName("display").item(0);
-                    sb.append(code.getAttribute("value"));
+                    sb.append("<b>code:</b> " + code.getAttribute("value"));
                     sb.append(": ");
-                    sb.append(display.getAttribute("value"));
+                    sb.append("<b>display:</b> " + display.getAttribute("value"));
+                    
+                    for(int j = 0; j < conceptMaps.getLength(); j++) {
+                        Element thisMap = (Element) conceptMaps.item(j);
+                        
+                        // Get the name for this mapping...
+                        Element mapNameElement = (Element) thisMap.getElementsByTagName("name").item(0);
+                        String mapName = mapNameElement.getAttribute("value");
+                        
+                        // Get the target reference for it...
+                        Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
+                        Element targetReferenceInner = (Element) targetReferenceElement.getElementsByTagName("reference").item(0);
+                        String targetRefString = targetReferenceInner.getAttribute("value");
+                        
+                        
+                        NodeList mapItems = thisMap.getElementsByTagName("element");
+                        for(int k = 0; k< mapItems.getLength(); k++) {
+                            Element mapItem = (Element) mapItems.item(k);
+                            Element mapItemFirstCode = (Element) mapItem.getElementsByTagName("code").item(0);
+                            String mapItemCode = mapItemFirstCode.getAttribute("value");
+                            
+                            // Finally!!!
+                            if(mapItemCode.equals(code.getAttribute("value"))) {
+                                // We have a mapped value
+                                NodeList targetList = mapItem.getElementsByTagName("target");
+                                for(int l = 0; l < targetList.getLength(); l++) {
+                                    Element target = (Element) targetList.item(l);
+                                    
+                                    Element thisTargetCode = (Element) target.getElementsByTagName("code").item(0);
+                                    String thisTargetCodeValue = thisTargetCode.getAttribute("value");
+                                    
+                                    // Add the target code it maps to...
+                                    sb.append("<br />&nbsp;&nbsp; <b>maps to:</b> " + thisTargetCodeValue);
+                                    
+                                    
+                                    Element thisTargetEquiv = (Element) target.getElementsByTagName("equivalence").item(0);
+                                    String thisTargetEquivValue = thisTargetEquiv.getAttribute("value");
+                                    
+                                    // Now add how it is mapped
+                                    sb.append(" (" + thisTargetEquivValue + ") ");
+                                    
+                                    // Now add in which mapping
+                                    sb.append(" in " + mapName + " (referenced as: " + targetRefString + ")<br /><br />");
+                                }
+                                
+                            }
+                        }
+                    }
                     sb.append("</li>");
                 }
                 sb.append("</ul>");
             }
         }
+        //</editor-fold>
+        
         sb.append("</div>\n");
         return sb.toString();
     }

@@ -16,11 +16,16 @@
 package uk.nhs.fhir.makehtml;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import org.w3c.dom.Document;
 
 /**
  * Utility methods for parsing XML content
@@ -264,4 +269,70 @@ public class XMLParserUtils {
         result = result + "</a>";
         return result;
     }
+    
+    protected static String getValueSetName(Document theDoc) {
+        String name = null;
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile("/ValueSet/name/@value");
+            name = expr.evaluate(theDoc);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(XMLParserUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return name;
+    }
+    
+    protected static String getValueSetURL(Document theDoc) {
+        String url = null;
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile("/ValueSet/url/@value");
+            url = expr.evaluate(theDoc);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(XMLParserUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return url;       
+    }
+
+    protected static String getValueSetPublisher(Document theDoc) {
+        String publisher = null;
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile("/ValueSet/publisher/@value");
+            publisher = expr.evaluate(theDoc);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(XMLParserUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return publisher;       
+    }
+    
+    protected static String getValueSetStatus(Document theDoc) {
+        String status = null;
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile("/ValueSet/status/@value");
+            status = expr.evaluate(theDoc);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(XMLParserUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;       
+    }
+
+    protected static String getValueSetVersion(Document theDoc) {
+        String version = null;
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile("/ValueSet/version/@value");
+            version = expr.evaluate(theDoc);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(XMLParserUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return version;       
+    }
+
 }
