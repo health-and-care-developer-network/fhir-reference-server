@@ -10,16 +10,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.PropertyReader;
 
 @WebServlet(urlPatterns = {"/index.html", ""}, displayName = "FHIR Server Home Page", loadOnStartup = 1)
 public class IndexServlet extends javax.servlet.http.HttpServlet {
 	
 	private static final Logger LOG = Logger.getLogger(IndexServlet.class.getName());
 	private String template = null;
+    private String fhirServerNotice = null;
+    private String fhirServerWarning = null;
+    private static String startOfBaseResourceBox = null;
+    private static String endOfBaseResourceBox = null;
 	
 	@Override
 	public void init() throws ServletException {
 		template = FileLoader.loadFileOnClasspath("/template/index.html");
+        fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
+        fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
+        startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
+        endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
 		super.init();
 	}
 
@@ -31,9 +40,19 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		LOG.info("Requested URL: " + req.getRequestURL());
 		
 		// Page content
-		content.append("<p><a href=\"StructureDefinition\">List all StructureDefinitions</a></p>");
-		content.append("<p><a href=\"StructureDefinition?name:contains=ati\">List all StructureDefinitions with 'ati' in their name</a></p>");
-		content.append("<p><a href=\"metadata\">Conformance</a></p>");
+		content.append("<div class='fhirServer'>");
+    	content.append(fhirServerWarning);
+    	
+    	content.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
+    	outputFancyBox(content, "StructureDefinition", "StructureDefinition", "List all StructureDefinitions");
+    	outputFancyBox(content, "ValueSet", "#", "[Coming Soon] List all ValueSets");
+    	outputFancyBox(content, "OperationDefinition", "#", "[Coming Soon] List all OperationDefinition resources");
+    	outputFancyBox(content, "Conformance", "#", "[Coming Soon] List all Conformance resources");
+    	content.append("</div>");
+    	
+		content.append("<p><a href=\"metadata\">Download conformance resource for this FHIR server</a></p>");
+		
+		content.append("</div>");
 		
 		// Initialise the output
         resp.setStatus(200);
@@ -46,5 +65,20 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
         
         // Send it to the output
         outputStream.append(outputString);
+	}
+	
+	private void outputFancyBox(StringBuffer sb, String title, String url, String description) {
+    	
+		boolean showHyperlink = !(url.equals("#"));
+		
+		sb.append(startOfBaseResourceBox);
+    	sb.append(title);
+    	sb.append(endOfBaseResourceBox);
+        sb.append("<li>");
+        if (showHyperlink) sb.append("<a href='").append(url).append("'>");
+        sb.append(description);
+        if (showHyperlink) sb.append("</a>");
+        sb.append("</li>");
+    	sb.append("</ul></section></div></div>");
 	}
 }

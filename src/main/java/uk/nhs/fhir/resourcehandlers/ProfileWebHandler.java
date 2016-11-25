@@ -57,6 +57,8 @@ public class ProfileWebHandler {
         HashMap<String, List<String>> myNames = myDataSource.getAllNamesByBaseResource();
         StringBuilder sb = new StringBuilder();
         
+        sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
+        
         for(String base : myNames.keySet()) {
         	sb.append(startOfBaseResourceBox);
         	sb.append(base);
@@ -66,7 +68,9 @@ public class ProfileWebHandler {
             }
         	sb.append("</ul></section></div></div>");
         }
-        LOG.info(sb.toString());
+        
+        sb.append("</div>");
+        
         return sb.toString();
     }
 

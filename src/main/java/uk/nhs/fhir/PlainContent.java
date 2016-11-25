@@ -127,7 +127,10 @@ public class PlainContent extends InterceptorAdapter {
             content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
             content.append("</div>");
             
+            content.append("<div class='treeView'>");
             content.append(sd.getText().getDivAsString());
+            content.append("</div>");
+            
             content.append("</div>");
     }
     
