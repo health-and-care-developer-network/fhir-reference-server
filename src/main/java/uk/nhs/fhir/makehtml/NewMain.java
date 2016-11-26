@@ -673,36 +673,73 @@ public class NewMain implements Constants {
         sb.append("<tr><td>Status:</td><td>" + getValueSetStatus(thisDoc) + "</td></tr>\n");
         sb.append("</table>");
         
-//<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
+        //<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
         NodeList composeSet = thisDoc.getElementsByTagName("compose");
         if(composeSet.getLength() > 0) {
             sb.append("<h4>Composed from</h4>");
             
             Element composeElement = (Element) composeSet.item(0);
             
+            
+            // The compose can be one or more of Import, Inlude and Exclude sections
             NodeList composeImports = composeElement.getElementsByTagName("import");
             NodeList composeIncludes = composeElement.getElementsByTagName("include");
             NodeList composeExcludes = composeElement.getElementsByTagName("exclude");
             
+            // Imports is dead easy...
             for(int i = 0; i < composeImports.getLength(); i++) {
                 Element importRef = (Element) composeImports.item(i);
                 sb.append("<b>Import:</b> " + importRef.getAttribute("value") + "<br />");
             }
             
+            // Includes is more tricky...
             for(int i = 0; i < composeIncludes.getLength(); i++) {
                 Element includeRef = (Element) composeIncludes.item(i);
                 
                 Element system = (Element) includeRef.getElementsByTagName("system").item(0);
                 String systemName = system.getAttribute("value");
                 
-                Element version = (Element) includeRef.getElementsByTagName("version").item(0);
-                String versionName = version.getAttribute("value");
+                sb.append("<table><tr><td><b>Include:</b></td><td>" + systemName + "</td></tr>");
+                
+                NodeList filterList = includeRef.getElementsByTagName("filter");
+                for(int j = 0; j < filterList.getLength(); j++) {
+                    Element theFilter = (Element) filterList.item(j);
+                    Element property = (Element) theFilter.getElementsByTagName("property").item(0);
+                    Element op = (Element) theFilter.getElementsByTagName("op").item(0);
+                    Element value = (Element) theFilter.getElementsByTagName("value").item(0);
+                    
+                    sb.append("<tr><td>Property:</td><td>" + property.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Operation:</td><td>" + op.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Value:</td><td>" + value.getAttribute("value") + "</td></tr>");
+                }
+                sb.append("</table>");
+            }
 
+            // Excludes is identical to Includes...
+            for(int i = 0; i < composeExcludes.getLength(); i++) {
+                Element excludeRef = (Element) composeExcludes.item(i);
+                
+                Element system = (Element) excludeRef.getElementsByTagName("system").item(0);
+                String systemName = system.getAttribute("value");
+                
+                sb.append("<table><tr><td><b>Exclude:</b></td><td>" + systemName + "</td></tr>");
+                
+                NodeList filterList = excludeRef.getElementsByTagName("filter");
+                for(int j = 0; j < filterList.getLength(); j++) {
+                    Element theFilter = (Element) filterList.item(j);
+                    Element property = (Element) theFilter.getElementsByTagName("property").item(0);
+                    Element op = (Element) theFilter.getElementsByTagName("op").item(0);
+                    Element value = (Element) theFilter.getElementsByTagName("value").item(0);
+                    
+                    sb.append("<tr><td>Property:</td><td>" + property.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Operation:</td><td>" + op.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Value:</td><td>" + value.getAttribute("value") + "</td></tr>");
+                }
+                sb.append("</table>");
             }
             
-            
         }
-//</editor-fold>
+        //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Here we go through any codeSystem items">
         NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
