@@ -44,6 +44,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementValue;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetName;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetPublisher;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetStatus;
@@ -657,6 +659,13 @@ public class NewMain implements Constants {
         return names;
     }
 
+    /**
+     * Make the html narrative section for the ValueSet described in this XML
+     * 
+     * @param thisDoc   The XML Document as an org.w3c.dom.Document
+     * 
+     * @return          Valid xhtml fully describing the ValueSet
+     */
     private String makeHTMLForValueSet(Document thisDoc) {
         
         StringBuilder sb = new StringBuilder();
@@ -689,53 +698,41 @@ public class NewMain implements Constants {
             // Imports is dead easy...
             for(int i = 0; i < composeImports.getLength(); i++) {
                 Element importRef = (Element) composeImports.item(i);
-                sb.append("<b>Import:</b> " + importRef.getAttribute("value") + "<br />");
+                sb.append("<p><b>Import:</b> " + importRef.getAttribute("value") + "<br /></p>");
             }
             
             // Includes is more tricky...
             for(int i = 0; i < composeIncludes.getLength(); i++) {
                 Element includeRef = (Element) composeIncludes.item(i);
                 
-                Element system = (Element) includeRef.getElementsByTagName("system").item(0);
-                String systemName = system.getAttribute("value");
-                
-                sb.append("<table><tr><td><b>Include:</b></td><td>" + systemName + "</td></tr>");
+                sb.append("<p><table><tr><td><b>Include:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
                 
                 NodeList filterList = includeRef.getElementsByTagName("filter");
                 for(int j = 0; j < filterList.getLength(); j++) {
                     Element theFilter = (Element) filterList.item(j);
-                    Element property = (Element) theFilter.getElementsByTagName("property").item(0);
-                    Element op = (Element) theFilter.getElementsByTagName("op").item(0);
-                    Element value = (Element) theFilter.getElementsByTagName("value").item(0);
                     
-                    sb.append("<tr><td>Property:</td><td>" + property.getAttribute("value") + "</td></tr>");
-                    sb.append("<tr><td>Operation:</td><td>" + op.getAttribute("value") + "</td></tr>");
-                    sb.append("<tr><td>Value:</td><td>" + value.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
+                    sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
+                    sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
                 }
-                sb.append("</table>");
+                sb.append("</table></p>");
             }
 
             // Excludes is identical to Includes...
             for(int i = 0; i < composeExcludes.getLength(); i++) {
                 Element excludeRef = (Element) composeExcludes.item(i);
-                
-                Element system = (Element) excludeRef.getElementsByTagName("system").item(0);
-                String systemName = system.getAttribute("value");
-                
-                sb.append("<table><tr><td><b>Exclude:</b></td><td>" + systemName + "</td></tr>");
+                                
+                sb.append("<p><table><tr><td><b>Exclude:</b></td><td>" + getFirstNamedChildValue(excludeRef, "system") + "</td></tr>");
                 
                 NodeList filterList = excludeRef.getElementsByTagName("filter");
                 for(int j = 0; j < filterList.getLength(); j++) {
                     Element theFilter = (Element) filterList.item(j);
-                    Element property = (Element) theFilter.getElementsByTagName("property").item(0);
-                    Element op = (Element) theFilter.getElementsByTagName("op").item(0);
-                    Element value = (Element) theFilter.getElementsByTagName("value").item(0);
                     
-                    sb.append("<tr><td>Property:</td><td>" + property.getAttribute("value") + "</td></tr>");
-                    sb.append("<tr><td>Operation:</td><td>" + op.getAttribute("value") + "</td></tr>");
-                    sb.append("<tr><td>Value:</td><td>" + value.getAttribute("value") + "</td></tr>");
+                    sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
+                    sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
+                    sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
                 }
-                sb.append("</table>");
+                sb.append("</table></p>");
             }
             
         }
@@ -751,13 +748,15 @@ public class NewMain implements Constants {
             Element codeSystem = (Element) codeSystemSet.item(0);
             NodeList concepts = codeSystem.getElementsByTagName("concept");
             
+            sb.append("<p><b>CodeSystem:</b> " + getFirstNamedChildValue(codeSystem, "system") + "<br />");
+            
             if(concepts.getLength() > 0) {
                 sb.append("<ul>");
                 
                 for(int i = 0; i < concepts.getLength(); i++) {
                     Element concept = (Element) concepts.item(i);
                     sb.append("<li>");
-                    Element code = (Element) concept.getElementsByTagName("code").item(0);
+                    Element code = (Element) concept.getElementsByTagName("code").item(0);                    
                     Element display = (Element) concept.getElementsByTagName("display").item(0);
                     sb.append("<b>code:</b> " + code.getAttribute("value"));
                     sb.append(": ");
@@ -813,6 +812,28 @@ public class NewMain implements Constants {
                 }
                 sb.append("</ul>");
             }
+            sb.append("</p>");
+        }
+        //</editor-fold>
+        
+        //<editor-fold defaultstate="collapsed" desc="Here we handle an expansion section">
+        NodeList expansionList = thisDoc.getElementsByTagName("expansion");
+        if(expansionList.getLength() == 1) {
+            Element expansion = (Element) expansionList.item(0);
+            Element identifier = (Element) expansion.getElementsByTagName("identifier").item(0);
+            Element timestamp = (Element) expansion.getElementsByTagName("timestamp").item(0);
+            
+            sb.append("<p><h4>Expansion</h4>");
+            sb.append("<b>NB: Expansions are not fully catered for in generating the narrative section</b></ br>");
+            sb.append("identifier: " + identifier.getAttribute("value"));
+            sb.append("timestamp: " + timestamp.getAttribute("value"));
+            
+            NodeList totalList = expansion.getElementsByTagName("total");
+            if(totalList.getLength() == 1) {
+                Element totalEle = (Element) totalList.item(0);
+                sb.append("<b>total: </b>" + totalEle.getAttribute("value") + "<br />");
+            }
+            sb.append("</p>");
         }
         //</editor-fold>
         

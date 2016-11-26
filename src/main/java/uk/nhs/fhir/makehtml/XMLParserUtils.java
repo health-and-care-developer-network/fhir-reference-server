@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Utility methods for parsing XML content
@@ -270,6 +271,12 @@ public class XMLParserUtils {
         return result;
     }
     
+    /**
+     * Uses xpath to get the name from a ValueSet
+     * 
+     * @param theDoc
+     * @return 
+     */
     protected static String getValueSetName(Document theDoc) {
         String name = null;
         XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -283,6 +290,12 @@ public class XMLParserUtils {
         return name;
     }
     
+    /**
+     * Use xpath to get the url of a valueset
+     * 
+     * @param theDoc
+     * @return 
+     */
     protected static String getValueSetURL(Document theDoc) {
         String url = null;
         XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -296,6 +309,12 @@ public class XMLParserUtils {
         return url;       
     }
 
+    /**
+     * Use xpath to get the publisher of a valueset
+     * 
+     * @param theDoc
+     * @return 
+     */
     protected static String getValueSetPublisher(Document theDoc) {
         String publisher = null;
         XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -309,6 +328,12 @@ public class XMLParserUtils {
         return publisher;       
     }
     
+    /**
+     * Use xpath to get the status of a valueset
+     * 
+     * @param theDoc
+     * @return 
+     */
     protected static String getValueSetStatus(Document theDoc) {
         String status = null;
         XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -322,6 +347,12 @@ public class XMLParserUtils {
         return status;       
     }
 
+    /**
+     * Use xpath to get the version of a valueset
+     * 
+     * @param theDoc
+     * @return 
+     */
     protected static String getValueSetVersion(Document theDoc) {
         String version = null;
         XPathFactory xPathfactory = XPathFactory.newInstance();
@@ -335,4 +366,43 @@ public class XMLParserUtils {
         return version;       
     }
 
+    /**
+     * Gets the value attribute of a org.w3c.dom.Node
+     * 
+     * @param thisOne   A org.w3c.dom.Node
+     * @return          String or null
+     */
+    protected static String getElementValue(Node thisOne) {
+        String theValue = null;
+        if(thisOne != null) {
+            Element myElement = (Element) thisOne;
+            theValue = myElement.getAttribute("value");
+        }
+        return theValue;
+    }
+    
+    /**
+     * Gets the value attribute of the first matching Named child of a given element
+     * So for example:
+     * 
+     *   <parent>
+     *     <firstchild value="not this" />
+     *     <secondChild value="but this" />
+     *   </parent>
+     * 
+     *  getFirstNamedChildValue(parent, "secondChild") would return "but this"
+     * 
+     * @param thisOne
+     * @param name
+     * @return 
+     */
+    protected static String getFirstNamedChildValue(Node thisOne, String name) {
+        String theValue = null;
+        if(thisOne != null) {
+            Element thisElement = (Element) thisOne;
+            Node theElement = thisElement.getElementsByTagName(name).item(0);
+            theValue = getElementValue(theElement);
+        }        
+        return theValue;
+    }
 }
