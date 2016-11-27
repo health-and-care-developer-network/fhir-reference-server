@@ -93,9 +93,6 @@ public class NewMain implements Constants {
         sb.append(TABLESTART);
         
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
-        Node name = document.getElementsByTagName("name").item(0);
-        
-        NamedNodeMap typeAttributes = name.getAttributes();
         Element snapshotNode = (Element) document.getElementsByTagName("snapshot").item(0);
 
         NodeList elements = snapshotNode.getElementsByTagName("element");
@@ -757,29 +754,22 @@ public class NewMain implements Constants {
                     Element concept = (Element) concepts.item(i);
                     sb.append("<li>");
                     Element code = (Element) concept.getElementsByTagName("code").item(0);                    
-                    Element display = (Element) concept.getElementsByTagName("display").item(0);
                     sb.append("<b>code:</b> " + code.getAttribute("value"));
                     sb.append(": ");
-                    sb.append("<b>display:</b> " + display.getAttribute("value"));
+                    sb.append("<b>display:</b> " + getFirstNamedChildValue(concept, "display"));
                     
                     for(int j = 0; j < conceptMaps.getLength(); j++) {
                         Element thisMap = (Element) conceptMaps.item(j);
                         
                         // Get the name for this mapping...
-                        Element mapNameElement = (Element) thisMap.getElementsByTagName("name").item(0);
-                        String mapName = mapNameElement.getAttribute("value");
+                        String mapName = getFirstNamedChildValue(thisMap, "name");
                         
                         // Get the target reference for it...
                         Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
-                        Element targetReferenceInner = (Element) targetReferenceElement.getElementsByTagName("reference").item(0);
-                        String targetRefString = targetReferenceInner.getAttribute("value");
-                        
-                        
                         NodeList mapItems = thisMap.getElementsByTagName("element");
                         for(int k = 0; k< mapItems.getLength(); k++) {
                             Element mapItem = (Element) mapItems.item(k);
-                            Element mapItemFirstCode = (Element) mapItem.getElementsByTagName("code").item(0);
-                            String mapItemCode = mapItemFirstCode.getAttribute("value");
+                            String mapItemCode = getFirstNamedChildValue(mapItem, "code");
                             
                             // Finally!!!
                             if(mapItemCode.equals(code.getAttribute("value"))) {
@@ -787,24 +777,16 @@ public class NewMain implements Constants {
                                 NodeList targetList = mapItem.getElementsByTagName("target");
                                 for(int l = 0; l < targetList.getLength(); l++) {
                                     Element target = (Element) targetList.item(l);
-                                    
-                                    Element thisTargetCode = (Element) target.getElementsByTagName("code").item(0);
-                                    String thisTargetCodeValue = thisTargetCode.getAttribute("value");
-                                    
+                                                                        
                                     // Add the target code it maps to...
-                                    sb.append("<br />&nbsp;&nbsp; <b>maps to:</b> " + thisTargetCodeValue);
-                                    
-                                    
-                                    Element thisTargetEquiv = (Element) target.getElementsByTagName("equivalence").item(0);
-                                    String thisTargetEquivValue = thisTargetEquiv.getAttribute("value");
+                                    sb.append("<br />&nbsp;&nbsp; <b>maps to:</b> " + getFirstNamedChildValue(target, "code"));
                                     
                                     // Now add how it is mapped
-                                    sb.append(" (" + thisTargetEquivValue + ") ");
+                                    sb.append(" (" + getFirstNamedChildValue(target, "equivalence") + ") ");
                                     
                                     // Now add in which mapping
-                                    sb.append(" in " + mapName + " (referenced as: " + targetRefString + ")<br /><br />");
-                                }
-                                
+                                    sb.append(" in " + mapName + " (referenced as: " + getFirstNamedChildValue(targetReferenceElement, "reference") + ")<br /><br />");
+                                }                                
                             }
                         }
                     }
@@ -820,13 +802,10 @@ public class NewMain implements Constants {
         NodeList expansionList = thisDoc.getElementsByTagName("expansion");
         if(expansionList.getLength() == 1) {
             Element expansion = (Element) expansionList.item(0);
-            Element identifier = (Element) expansion.getElementsByTagName("identifier").item(0);
-            Element timestamp = (Element) expansion.getElementsByTagName("timestamp").item(0);
-            
             sb.append("<p><h4>Expansion</h4>");
             sb.append("<b>NB: Expansions are not fully catered for in generating the narrative section</b></ br>");
-            sb.append("identifier: " + identifier.getAttribute("value"));
-            sb.append("timestamp: " + timestamp.getAttribute("value"));
+            sb.append("identifier: " + getFirstNamedChildValue(expansion, "identifier"));
+            sb.append("timestamp: " + getFirstNamedChildValue(expansion, "timestamp"));
             
             NodeList totalList = expansion.getElementsByTagName("total");
             if(totalList.getLength() == 1) {
