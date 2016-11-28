@@ -604,7 +604,7 @@ public class NewMain implements Constants {
                     result = makeHTMLForOperationDefinition(thisDoc);
                     String originalResource = FileLoader.loadFile(inFile);
 
-                    String augmentedResource = ResourceBuilder.addTextSectionToValueSet(originalResource, result, newBaseURL);
+                    String augmentedResource = ResourceBuilder.addTextSectionTooperationDefinition(originalResource, result, newBaseURL);
                     try {
                         FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
                     } catch (UnsupportedEncodingException ex) {
@@ -841,9 +841,17 @@ public class NewMain implements Constants {
     private String makeHTMLForOperationDefinition(Document thisDoc) {
         StringBuilder sb = new StringBuilder();
         
+        Node root = thisDoc.getFirstChild();
+        
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
         // Here's where we need to do the magic...
         
+        sb.append("<table><tr><th>Name</th><th>Value</th></tr>");
+
+        sb.append("<tr><td>url</td><td>" + getFirstNamedChildValue(root, "url") + "</td></tr>");
+        
+        
+        sb.append("</table>");
         sb.append("</div>\n");
         return sb.toString();        
     }

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
@@ -88,6 +89,30 @@ public class ResourceBuilder {
         }
         
         serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(vsResource);
+        serialised = serialised.replace("Σ", "&#931;");
+        return serialised;
+    }
+
+    static String addTextSectionTooperationDefinition(String originalResource, String textSection, String newBaseURL) {
+        String serialised = null;
+        FhirContext ctx = FhirContext.forDstu2();
+        OperationDefinition opDefResource = null;
+        opDefResource = (OperationDefinition) ctx.newXmlParser().parseResource(originalResource);
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv(textSection);
+        opDefResource.setText(textElement);
+        
+        if (newBaseURL != null) {
+        	String resourceName = opDefResource.getName();
+        	if (newBaseURL.endsWith("/")) {
+        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
+        	}
+        	//structureDefinitionResource.setBase(newBaseURL);
+        	opDefResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
+        }
+        
+        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(opDefResource);
         serialised = serialised.replace("Σ", "&#931;");
         return serialised;
     }
