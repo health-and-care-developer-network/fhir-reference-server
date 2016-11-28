@@ -598,7 +598,19 @@ public class NewMain implements Constants {
                     }
                 }
                 
+                int isOperationDefinition = thisDoc.getElementsByTagName("OperationDefinition").getLength();
+                if(isOperationDefinition > 0) {
+                    LOG.info("It's an OperationDefinition");
+                    result = makeHTMLForOperationDefinition(thisDoc);
+                    String originalResource = FileLoader.loadFile(inFile);
 
+                    String augmentedResource = ResourceBuilder.addTextSectionToValueSet(originalResource, result, newBaseURL);
+                    try {
+                        FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex) {
+                        LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                    }
+                }
             }
         }
     }
@@ -818,5 +830,21 @@ public class NewMain implements Constants {
         
         sb.append("</div>\n");
         return sb.toString();
+    }
+
+    /**
+     * Method to generate the narrative section describing an OperationDefinition
+     * 
+     * @param thisDoc   The XML Document as an org.w3c.dom.Document
+     * @return          String holding an xhtml div
+     */
+    private String makeHTMLForOperationDefinition(Document thisDoc) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
+        // Here's where we need to do the magic...
+        
+        sb.append("</div>\n");
+        return sb.toString();        
     }
 }
