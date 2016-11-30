@@ -65,11 +65,11 @@ public class NewMain implements Constants {
 
     /**
      * Main entry point.
-     * 
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
+
     	if((args.length == 2) || (args.length == 3)) {
             String inputDir = args[0];
             String outputDir = args[1];
@@ -84,24 +84,24 @@ public class NewMain implements Constants {
 
     /**
      * Process a specific file.
-     * 
-     * @param filename 
+     *
+     * @param filename
      */
     private String makeHTMLForStructureDefinition(Document document) {
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append(TABLESTART);
-        
+
         ArrayList<MyElement> elementList = new ArrayList<MyElement>();
         Element snapshotNode = (Element) document.getElementsByTagName("snapshot").item(0);
 
         NodeList elements = snapshotNode.getElementsByTagName("element");
         int snapshotElementCount = elements.getLength();
-        
+
         // Now get a list of the names of elements which show as having been changed by this profile...
         ArrayList<String> changedNodes = GetChangedNodes(document);
-        
-        
+
+
         // First we process all the elements...
         for(int i = 0; i < snapshotElementCount; i++) {
             Element element = (Element) elements.item(i);
@@ -112,9 +112,9 @@ public class NewMain implements Constants {
                 String flags = getFlags(element);
                 String description = getTitle(element);
                 String hoverText = getDescription(element);
-                
+
                 boolean hasChanged = changedNodes.contains(elementName);
-                
+
                 if(typeName == null) {
                     LOG.info("typeName is NULL for Element: " + elementName);
                     typeName = "see link";
@@ -143,7 +143,7 @@ public class NewMain implements Constants {
                 }
             }
         }
-        
+
         // Now we start thinking about adding the elements to the output...
         int mutedAtLevel = 100;
         for(MyElement elementList1 : elementList) {
@@ -167,11 +167,11 @@ public class NewMain implements Constants {
         elementList.get(elementList.size() - 1).setIsLast(true);
         for(int i = 0; i < elementList.size(); i++) {
             MyElement item = (MyElement) elementList.get(i);
-            
+
             if(item.isDisplay()) {
-                
+
                 sb.append(START_TABLE_ROW);
-                
+
                 // Make a cell for the tree images and the name
                 sb.append(START_TABLE_CELL);
                 // Tree and object type images need to go here
@@ -192,7 +192,7 @@ public class NewMain implements Constants {
                         if(l1Continues) {
                             sb.append(LINEWITHT);
                         } else {
-                            sb.append(CORNER);    
+                            sb.append(CORNER);
                         }
                     }
                 } else {
@@ -281,7 +281,7 @@ public class NewMain implements Constants {
                                 } else {
                                     sb.append(LINEWITHT);
                                 }
-                                
+
                             }
                         } else {
                             //</editor-fold>
@@ -305,7 +305,7 @@ public class NewMain implements Constants {
                                     sb.append(SPACER);
                                     sb.append(CORNER);
                                 } else {
-                                    
+
 // Now figure out whether there are more level one elements to come, so do we continue the very left leg of the tree?
                                     if(oneContinues) {  // We have more items coming at Level one, so continue the tree...
                                         sb.append(LINE);
@@ -354,7 +354,7 @@ public class NewMain implements Constants {
                                         sb.append(SPACER);
                                         sb.append(CORNER);
                                     } else {
-                                        
+
                                         if(oneContinues) {  // We have more items coming at Level one, s ocontinue the tree...
                                             sb.append(LINE);
                                         } else {
@@ -446,14 +446,14 @@ public class NewMain implements Constants {
                         }
                     }
                 }
-                
+
                 // Simple case, the base resource node...
                 if(item.getLevel() == 0) {
                     sb.append(RESOURCE);
                 }
-                
+
                 DataTypes thisType = null;
-                String thisTypeName = item.getTypeName(); 
+                String thisTypeName = item.getTypeName();
                 if(thisTypeName != null) {
                     // If a simle datatype...
                     if(Arrays.asList(BASERESOURCETYPES).contains(thisTypeName))
@@ -473,7 +473,7 @@ public class NewMain implements Constants {
                         sb.append(REFERENCE);
                         thisType = DataTypes.Reference;
                     }
-                    
+
                     if(thisTypeName.equals("Multiple_Type_Choice")) {
                         sb.append(CHOICETYPE);
                     }
@@ -481,7 +481,7 @@ public class NewMain implements Constants {
                     // Seems to be a special case, used in eg Bundle resource types
                     sb.append(BUNDLE);
                 }
-                
+
                 if(item.isChanged()) {
                     sb.append("<b>");
                     sb.append(item.getNiceTitle());
@@ -490,13 +490,13 @@ public class NewMain implements Constants {
                     sb.append(item.getNiceTitle());
                 }
                 sb.append(END_TABLE_CELL);
-                
+
                 // Now the flags column
                 sb.append(item.getHTMLWrappedFlags());
-                
+
                 // Now the Cardinality column
                 sb.append(item.getHTMLWrappedCardinality());
-                
+
                 // Now the type column
                 sb.append(START_TABLE_CELL);
                 if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
@@ -511,10 +511,10 @@ public class NewMain implements Constants {
                     }
                 }
                 sb.append(END_TABLE_CELL);
-                
+
                 // And now the description
                 sb.append(item.getHTMLWrappedDescription());
-                
+
                 sb.append(END_TABLE_ROW);
             }
         }
@@ -527,7 +527,7 @@ public class NewMain implements Constants {
 
     /**
      * Routine to read in an XML file to an org.w3c.dom.Document.
-     * 
+     *
      * @param filename
      * @return a Document containing the specified file.
      */
@@ -550,17 +550,17 @@ public class NewMain implements Constants {
 
     /**
      * Process a directory of Profile files.
-     * 
-     * @param profilePath 
+     *
+     * @param profilePath
      */
-    private void processDirectory(String profilePath, String outPath, String newBaseURL) {        
+    private void processDirectory(String profilePath, String outPath, String newBaseURL) {
         File folder = new File(profilePath);
         File[] allProfiles = folder.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(fileExtension);
             }
         });
-        
+
         for(File thisFile : allProfiles) {
             String result = "";
             if(thisFile.isFile()) {
@@ -568,7 +568,7 @@ public class NewMain implements Constants {
                 String outFilename = outPath + separatorChar + thisFile.getName();
                 LOG.info("\n\n=========================================\nProcessing file: " + inFile + "\n=========================================");
                 Document thisDoc = ReadFile(inFile);
-                
+
                 // Here we need to see whether it's a StructureDefinition or a ValueSet...
                 int isStructureDefinition = thisDoc.getElementsByTagName("StructureDefinition").getLength();
                 if(isStructureDefinition > 0) {
@@ -597,7 +597,7 @@ public class NewMain implements Constants {
                         LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
                     }
                 }
-                
+
                 int isOperationDefinition = thisDoc.getElementsByTagName("OperationDefinition").getLength();
                 if(isOperationDefinition > 0) {
                     LOG.info("It's an OperationDefinition");
@@ -617,9 +617,9 @@ public class NewMain implements Constants {
 
     /**
      * Dress up a type name so it provides a link back to the definition.
-     * 
+     *
      * @param type
-     * @return 
+     * @return
      */
     public String decorateTypeName(String type) {
         if(type.equals("DomainResource")) {
@@ -627,19 +627,29 @@ public class NewMain implements Constants {
         }
         if(Arrays.asList(BASERESOURCETYPES).contains(type)) {
             return "<a href='https://www.hl7.org/fhir/datatypes.html#" + type + "'>" + type + "</a>";
-        } else
-            return type;
+        } else {
+            if(Arrays.asList(RESOURCETYPES).contains(type)){
+                return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
+            }
+            else
+                return type;
+        }
     }
-    
+
     public String decorateResourceName(String type) {
-        return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
+        if(Arrays.asList(RESOURCETYPES).contains(type)) {
+            return "<a href='https://www.hl7.org/fhir/" + type.toLowerCase() + ".html'>" + type + "</a>";
+        }
+        else {
+            return type;
+        }
     }
 
     /**
      * Method to get a list of the names of the elements which are listed in
      * the differential section of a StructureDefinition, ie those which
      * have been changed.
-     * 
+     *
      * @param document A org.w3c.dom.Document
      * @return Returns an ArrayList of Strings holding the (full dot separated) element names.
      */
@@ -647,11 +657,11 @@ public class NewMain implements Constants {
         ArrayList<String> names = new ArrayList<String>();
         // Get a list of any elements called differential
         NodeList differential = document.getElementsByTagName("differential");
-        
+
         if(differential.getLength() > 0) {
             // Get the first one (there should only be one!
             Element diffNode = (Element) differential.item(0);
-            
+
             // Get the elements within the differential section
             NodeList diffElements = diffNode.getElementsByTagName("element");
 
@@ -670,56 +680,56 @@ public class NewMain implements Constants {
 
     /**
      * Make the html narrative section for the ValueSet described in this XML
-     * 
+     *
      * @param thisDoc   The XML Document as an org.w3c.dom.Document
-     * 
+     *
      * @return          Valid xhtml fully describing the ValueSet
      */
     private String makeHTMLForValueSet(Document thisDoc) {
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
-        
+
         // Here we need to get the name element
         sb.append("<table>");
         sb.append("<tr><td>Name:</td><td>" + getValueSetName(thisDoc) + "</td></tr>\n");
         sb.append("<tr><td>Version:</td><td>" + getValueSetVersion(thisDoc) + "</td></tr>\n");
-                
+
         sb.append("<tr><td>Publisher:</td><td>" + getValueSetPublisher(thisDoc) + "</td></tr>\n");
         sb.append("<tr><td>URL:</td><td>" + getValueSetURL(thisDoc) + "</td></tr>\n");
         sb.append("<tr><td>Status:</td><td>" + getValueSetStatus(thisDoc) + "</td></tr>\n");
         sb.append("</table>");
-        
+
         //<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
         NodeList composeSet = thisDoc.getElementsByTagName("compose");
         if(composeSet.getLength() > 0) {
             sb.append("<h4>Composed from</h4>");
-            
+
             Element composeElement = (Element) composeSet.item(0);
-            
-            
+
+
             // The compose can be one or more of Import, Inlude and Exclude sections
             NodeList composeImports = composeElement.getElementsByTagName("import");
             NodeList composeIncludes = composeElement.getElementsByTagName("include");
             NodeList composeExcludes = composeElement.getElementsByTagName("exclude");
-            
+
             // Imports is dead easy...
             for(int i = 0; i < composeImports.getLength(); i++) {
                 Element importRef = (Element) composeImports.item(i);
                 sb.append("<p><b>Import:</b> " + importRef.getAttribute("value") + "<br /></p>");
             }
-            
+
             // Includes is more tricky...
             for(int i = 0; i < composeIncludes.getLength(); i++) {
                 Element includeRef = (Element) composeIncludes.item(i);
-                
+
                 sb.append("<p><table><tr><td><b>Include:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
-                
+
                 NodeList filterList = includeRef.getElementsByTagName("filter");
                 for(int j = 0; j < filterList.getLength(); j++) {
                     Element theFilter = (Element) filterList.item(j);
-                    
+
                     sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
                     sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
                     sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
@@ -730,75 +740,75 @@ public class NewMain implements Constants {
             // Excludes is identical to Includes...
             for(int i = 0; i < composeExcludes.getLength(); i++) {
                 Element excludeRef = (Element) composeExcludes.item(i);
-                                
+
                 sb.append("<p><table><tr><td><b>Exclude:</b></td><td>" + getFirstNamedChildValue(excludeRef, "system") + "</td></tr>");
-                
+
                 NodeList filterList = excludeRef.getElementsByTagName("filter");
                 for(int j = 0; j < filterList.getLength(); j++) {
                     Element theFilter = (Element) filterList.item(j);
-                    
+
                     sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
                     sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
                     sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
                 }
                 sb.append("</table></p>");
             }
-            
+
         }
         //</editor-fold>
-        
+
         //<editor-fold defaultstate="collapsed" desc="Here we go through any codeSystem items">
         NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
-        
+
         NodeList conceptMaps = thisDoc.getElementsByTagName("ConceptMap");
-        
+
         if(codeSystemSet.getLength() > 0) {
             // We have a codeSystem in play
             Element codeSystem = (Element) codeSystemSet.item(0);
             NodeList concepts = codeSystem.getElementsByTagName("concept");
-            
+
             sb.append("<p><b>CodeSystem:</b> " + getFirstNamedChildValue(codeSystem, "system") + "<br />");
-            
+
             if(concepts.getLength() > 0) {
                 sb.append("<ul>");
-                
+
                 for(int i = 0; i < concepts.getLength(); i++) {
                     Element concept = (Element) concepts.item(i);
                     sb.append("<li>");
-                    Element code = (Element) concept.getElementsByTagName("code").item(0);                    
+                    Element code = (Element) concept.getElementsByTagName("code").item(0);
                     sb.append("<b>code:</b> " + code.getAttribute("value"));
                     sb.append(": ");
                     sb.append("<b>display:</b> " + getFirstNamedChildValue(concept, "display"));
-                    
+
                     for(int j = 0; j < conceptMaps.getLength(); j++) {
                         Element thisMap = (Element) conceptMaps.item(j);
-                        
+
                         // Get the name for this mapping...
                         String mapName = getFirstNamedChildValue(thisMap, "name");
-                        
+
                         // Get the target reference for it...
                         Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
                         NodeList mapItems = thisMap.getElementsByTagName("element");
                         for(int k = 0; k< mapItems.getLength(); k++) {
                             Element mapItem = (Element) mapItems.item(k);
                             String mapItemCode = getFirstNamedChildValue(mapItem, "code");
-                            
+
                             // Finally!!!
                             if(mapItemCode.equals(code.getAttribute("value"))) {
                                 // We have a mapped value
                                 NodeList targetList = mapItem.getElementsByTagName("target");
                                 for(int l = 0; l < targetList.getLength(); l++) {
                                     Element target = (Element) targetList.item(l);
-                                                                        
+
                                     // Add the target code it maps to...
                                     sb.append("<br />&nbsp;&nbsp; <b>maps to:</b> " + getFirstNamedChildValue(target, "code"));
-                                    
+
                                     // Now add how it is mapped
                                     sb.append(" (" + getFirstNamedChildValue(target, "equivalence") + ") ");
-                                    
+
                                     // Now add in which mapping
                                     sb.append(" in " + mapName + " (referenced as: " + getFirstNamedChildValue(targetReferenceElement, "reference") + ")<br /><br />");
-                                }                                
+                                }
                             }
                         }
                     }
@@ -809,7 +819,7 @@ public class NewMain implements Constants {
             sb.append("</p>");
         }
         //</editor-fold>
-        
+
         //<editor-fold defaultstate="collapsed" desc="Here we handle an expansion section">
         NodeList expansionList = thisDoc.getElementsByTagName("expansion");
         if(expansionList.getLength() == 1) {
@@ -818,7 +828,7 @@ public class NewMain implements Constants {
             sb.append("<b>NB: Expansions are not fully catered for in generating the narrative section</b></ br>");
             sb.append("identifier: " + getFirstNamedChildValue(expansion, "identifier"));
             sb.append("timestamp: " + getFirstNamedChildValue(expansion, "timestamp"));
-            
+
             NodeList totalList = expansion.getElementsByTagName("total");
             if(totalList.getLength() == 1) {
                 Element totalEle = (Element) totalList.item(0);
@@ -827,32 +837,167 @@ public class NewMain implements Constants {
             sb.append("</p>");
         }
         //</editor-fold>
-        
+
         sb.append("</div>\n");
         return sb.toString();
     }
 
     /**
      * Method to generate the narrative section describing an OperationDefinition
-     * 
+     *
      * @param thisDoc   The XML Document as an org.w3c.dom.Document
      * @return          String holding an xhtml div
      */
     private String makeHTMLForOperationDefinition(Document thisDoc) {
         StringBuilder sb = new StringBuilder();
-        
-        Node root = thisDoc.getFirstChild();
-        
+
+        Element root = (Element) thisDoc.getFirstChild();
+
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
         // Here's where we need to do the magic...
-        
-        sb.append("<table><tr><th>Name</th><th>Value</th></tr>");
 
-        sb.append("<tr><td>url</td><td>" + getFirstNamedChildValue(root, "url") + "</td></tr>");
+        sb.append("<table style='font-family: sans-serif;'><tr><th>Name</th><th>Value</th></tr>");
+
+        sb.append(makeOpDefRow(root, "url", "URL", "Logical URL to reference this operation definition"));
+        sb.append(makeOpDefRow(root, "version", "Version", "Logical id for this version of the operation definition"));
+        sb.append(makeOpDefRow(root, "name", "Name", "Informal name for this operation"));
+        sb.append(makeOpDefRow(root, "status", "Status", "draft | active | retired"));
+        sb.append(makeOpDefRow(root, "kind", "Kind", "operation | query"));
+        sb.append(makeOpDefRow(root, "experimental", "Experimental", "If for testing purposes, not real usage"));
+        sb.append(makeOpDefRow(root, "publisher", "Publisher", "Name of the publisher (Organization or individual)"));
+        NodeList contacts = root.getElementsByTagName("contact");
+        if(contacts.getLength() > 0) {
+            sb.append("<tr><td colspan='2' style='border-bottom: 1px solid #ddd;'></td></tr>");
+            sb.append("<tr><td colspan='2'><b>Contacts</b></td></tr>");
+
+            for(int i=0; i<contacts.getLength(); i++) {
+                sb.append(makeOpDefRow(contacts.item(i), "name", "Name", "Name of a individual to contact"));
+                Element contact = (Element) contacts.item(i);
+                NodeList telecoms = contact.getElementsByTagName("telecom");
+                for(int j = 0; j < telecoms.getLength(); j++) {
+                    Element telecom = (Element) telecoms.item(j);
+                    sb.append(makeOpDefRow(telecom, "system", "Type", "phone | fax | email | pager | other"));
+                    sb.append(makeOpDefRow(telecom, "value", "Value", "The actual contact point details"));
+                    sb.append(makeOpDefRow(telecom, "use", "Use type", "home | work | temp | old | mobile - purpose of this contact point"));
+                }
+            }
+            sb.append("<tr><td colspan='2' style='border-bottom: 1px solid #ddd;'></td></tr>");
+        }
+
+        sb.append(makeOpDefRow(root, "date", "Date", "Date for this version of the operation definition"));
+        sb.append(makeOpDefRow(root, "description", "Description", "Natural language description of the operation"));
+        sb.append(makeOpDefRow(root, "requirements", "Requirements", "Why is this needed?"));
+        sb.append(makeOpDefRow(root, "idempotent", "Is idempotent", "Whether content is unchanged by operation"));
+        sb.append(makeOpDefRow(root, "code", "Code", "Name used to invoke the operation"));
+        sb.append(makeOpDefRow(root, "notes", "Notes", "Additional information about use"));
+        sb.append(makeOpDefRow(root, "base", "Base", "Marks this as a profile of the base"));
+        sb.append(makeOpDefRow(root, "system", "System", "Invoke at the system level?"));
         
+        // Here we need to show multiple reference types.
+        NodeList types = root.getElementsByTagName("type");
+        if(types.getLength() > 0) {
+            sb.append("<tr><td valign='top'><span title='Invoke at resource level for these type'>Type</span></td><td>");
+            for(int i = 0; i < types.getLength(); i++) {
+                Element type = (Element) types.item(i);
+                sb.append(decorateTypeName(type.getAttribute("value")) + "<br />");
+            }
+            sb.append("</td></tr>");
+        }
         
+        // sb.append(makeOpDefRow(root, "type", "Type"));
+        
+        sb.append(makeOpDefRow(root, "instance", "Instance", "Invoke on an instance?"));
+
+
         sb.append("</table>");
+
+        // Now we iterate through the Parameters
+        NodeList parameters = root.getElementsByTagName("parameter");
+        
+        if(parameters.getLength() > 0){
+            sb.append("<table style='font-family: sans-serif;'><tr><th colspan='2'>Parameters</th></tr>");
+            
+            for(int i = 0; i < parameters.getLength(); i++) {
+                Node parameter = parameters.item(i);
+                sb.append(makeParameterItem(parameter));
+            }
+            sb.append("</table>");
+        }
+
         sb.append("</div>\n");
-        return sb.toString();        
+        return sb.toString();
+    }
+
+    protected String makeOpDefRow(Node parentNode,String nodeName) {
+        String resultString = "";
+        String value = getFirstNamedChildValue(parentNode, nodeName);
+        if(value != null) {
+            resultString = ("<tr><td>" + nodeName + "</td><td>" + value + "</td></tr>");
+        }
+        return resultString;
+    }
+    
+    protected String makeOpDefRow(Node parentNode,String nodeName, String title) {
+        String resultString = "";
+        String value = getFirstNamedChildValue(parentNode, nodeName);
+        if(value != null) {
+            resultString = ("<tr><td>" + title + "</td><td>" + value + "</td></tr>");
+        }
+        return resultString;
+    }
+
+    protected String makeOpDefRow(Node parentNode,String nodeName, String title, String hover) {
+        String resultString = "";
+        String value = getFirstNamedChildValue(parentNode, nodeName);
+        if(value != null) {
+            resultString = ("<tr><td><span title='" + hover + "'>" + title + "</span></td><td>" + value + "</td></tr>");
+        }
+        return resultString;
+    }
+
+
+
+    /**
+     * Makes a set of table rows based on a passed Parameter item.
+     *
+     * Should look roughly like this:
+     *
+     * ----------------------------------------------
+     * Parameter Name                               |
+     * ----------------------------------------------
+     * Definition  | Definition text                |
+     * ----------------------------------------------
+     * Control     | Control text                   |
+     * ----------------------------------------------
+     * Type        | data type (as a link?)         |
+     * ----------------------------------------------
+     * Requirements| Req text, could be big!        |
+     * ----------------------------------------------
+     * Summary     | Included in summaries?         |
+     * ----------------------------------------------
+     * Comments    | Comments text                  |
+     * ----------------------------------------------
+     *
+     * @param parameter
+     * @return
+     */
+    protected String makeParameterItem(Node parameter) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<tr><td colspan='2' bgcolor='#f0f0f0'><span title='Name in Parameters.parameter.name or in URL'>");
+        sb.append(getFirstNamedChildValue(parameter, "name"));
+        sb.append("</span></td></tr>");
+
+        sb.append(makeOpDefRow(parameter, "documentation", "Documentation", "Description of meaning/use"));
+        sb.append(makeOpDefRow(parameter, "use", "Use", "in | out"));
+        sb.append(makeOpDefRow(parameter, "min", "Min", "Minimum Cardinality"));
+        sb.append(makeOpDefRow(parameter, "max", "Max", "Maximum Cardinality (a number or *)"));
+
+        String value = getFirstNamedChildValue(parameter, "type");
+        if(value != null) {
+            sb.append("<tr><td><span title='What type this parameter has'>Type</span></td><td>" + decorateTypeName(value) + "</td></tr>");
+        }
+        sb.append("<tr><td>&nbsp;</td><td></td></tr>");
+        return sb.toString();
     }
 }
