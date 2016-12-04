@@ -69,9 +69,9 @@ public class ProfileLoader implements IValidationSupport {
         LOG.info("Checking in cache...");
         theVS = (ValueSet) ResourceCache.getResource(string);
         if (theVS != null) {
-            LOG.info(string + " Was in cache.");
+            LOG.info("CodeSystem: " + string + " Was in cache.");
         } else {
-            LOG.info(string + " Was NOT in cache, will fetch it...");
+            LOG.info("CodeSystem: " + string + " Was NOT in cache, will fetch it...");
 
             StringBuilder result = new StringBuilder();
             try {
@@ -109,6 +109,7 @@ public class ProfileLoader implements IValidationSupport {
             LOG.info("Adding ValueSet to cache");
             ResourceCache.putResource(string, theVS);
         }
+        LOG.info("ValueSet fetched.");
         return theVS;
     }
 
@@ -127,16 +128,16 @@ public class ProfileLoader implements IValidationSupport {
     public <T extends IBaseResource> T fetchResource(FhirContext fc, Class<T> type, String string) {
         // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
         // just http fetch it even if we're fetching it from this server.
-        IBaseResource theResource = null;
+        DomainResource theResource = null;
         LOG.info("Requesting resource: " + string);
 
         theResource = ResourceCache.getResource(string);
 
-        LOG.info("Checking in cache...");
+        LOG.info("Checking for Resource in cache...");
         if (theResource != null) {
-            LOG.info(string + " Was in cache.");
+            LOG.info("Resource: " + string + " Was in cache.");
         } else {
-            LOG.info(string + " Was NOT in cache, will fetch it...");
+            LOG.info("Resource: " + string + " Was NOT in cache, will fetch it...");
 
             StringBuilder result = new StringBuilder();
             try {
@@ -145,7 +146,7 @@ public class ProfileLoader implements IValidationSupport {
                 try {
                     conn = (HttpURLConnection) url.openConnection();
                 } catch (IOException ex) {
-                    LOG.severe("Trying to fetch a profile, IOException caught when trying to connect to : " + string);
+                    LOG.severe("Trying to fetch a Resource, IOException caught when trying to connect to : " + string);
                 }
                 if (conn != null) {
                     conn.setRequestMethod("GET");
@@ -158,22 +159,31 @@ public class ProfileLoader implements IValidationSupport {
                                 result.append(line);
                             }
                         } else {
-                            LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
+                            LOG.warning("Got http status code: " + httpStatus + " when requesting Resource: " + string);
                         }
                     } catch (IOException ex) {
                         Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             } catch (ProtocolException ex) {
-                LOG.severe("Trying to fetch a profile - ProtocolException: " + string);
+                LOG.severe("Trying to fetch a Resource - ProtocolException: " + string);
             } catch (MalformedURLException ex) {
-                LOG.severe("Trying to fetch a profile - MalformedURLException: " + string);
+                LOG.severe("Trying to fetch a Resource - MalformedURLException: " + string);
             }
-            theResource = fc.newXmlParser().parseResource(result.toString());
-
-            LOG.info("Adding resource to cache.");
-            ResourceCache.putResource(string, (DomainResource) theResource);
+            
+            String xmlFileContents = result.toString();
+               
+            try {
+                FhirContext fcHL7 = FhirContext.forDstu2Hl7Org();
+                theResource = (DomainResource) fcHL7.newXmlParser().parseResource(type, xmlFileContents);
+                LOG.info("Adding Resource to cache.");
+                ResourceCache.putResource(string, (DomainResource) theResource);
+            } catch(Exception ex) {
+                LOG.severe("Exception thrown parsing resource: " + string);
+                LOG.severe(ex.getMessage());
+            }
         }
+        LOG.info("Resource fetched");
         return (T) theResource;
     }
 
