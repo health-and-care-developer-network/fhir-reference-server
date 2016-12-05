@@ -77,6 +77,10 @@ public class ValidateAny {
            LOG.info("Validation passed");
         } else {
            LOG.warning("Validation failed");
+           for(int i = 0; i < result.getMessages().size(); i++) {
+               LOG.warning(result.getMessages().get(i).toString());
+           }
+           
            OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();        
            retval.setOperationOutcome(oo);
         }

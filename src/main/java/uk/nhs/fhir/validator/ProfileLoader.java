@@ -66,12 +66,11 @@ public class ProfileLoader implements IValidationSupport {
     public ValueSet fetchCodeSystem(FhirContext fc, String string) {
         ValueSet theVS = new ValueSet();
 
-        LOG.info("Checking in cache...");
         theVS = (ValueSet) ResourceCache.getResource(string);
         if (theVS != null) {
-            LOG.info("CodeSystem: " + string + " Was in cache.");
+            LOG.fine("CodeSystem: " + string + " Was in cache.");
         } else {
-            LOG.info("CodeSystem: " + string + " Was NOT in cache, will fetch it...");
+            LOG.fine("CodeSystem: " + string + " Was NOT in cache, will fetch it...");
 
             StringBuilder result = new StringBuilder();
             try {
@@ -106,10 +105,10 @@ public class ProfileLoader implements IValidationSupport {
             }
 
             theVS = (ValueSet) fc.newXmlParser().parseResource(result.toString());
-            LOG.info("Adding ValueSet to cache");
+            LOG.fine("Adding ValueSet to cache");
             ResourceCache.putResource(string, theVS);
         }
-        LOG.info("ValueSet fetched.");
+        LOG.fine("ValueSet fetched.");
         return theVS;
     }
 
@@ -129,15 +128,14 @@ public class ProfileLoader implements IValidationSupport {
         // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
         // just http fetch it even if we're fetching it from this server.
         DomainResource theResource = null;
-        LOG.info("Requesting resource: " + string);
 
         theResource = ResourceCache.getResource(string);
 
-        LOG.info("Checking for Resource in cache...");
+        LOG.fine("Checking for Resource in cache...");
         if (theResource != null) {
-            LOG.info("Resource: " + string + " Was in cache.");
+            LOG.fine("Resource: " + string + " Was in cache.");
         } else {
-            LOG.info("Resource: " + string + " Was NOT in cache, will fetch it...");
+            LOG.fine("Resource: " + string + " Was NOT in cache, will fetch it...");
 
             StringBuilder result = new StringBuilder();
             try {
@@ -176,14 +174,14 @@ public class ProfileLoader implements IValidationSupport {
             try {
                 FhirContext fcHL7 = FhirContext.forDstu2Hl7Org();
                 theResource = (DomainResource) fcHL7.newXmlParser().parseResource(type, xmlFileContents);
-                LOG.info("Adding Resource to cache.");
+                LOG.fine("Adding Resource to cache.");
                 ResourceCache.putResource(string, (DomainResource) theResource);
             } catch(Exception ex) {
                 LOG.severe("Exception thrown parsing resource: " + string);
                 LOG.severe(ex.getMessage());
             }
         }
-        LOG.info("Resource fetched");
+        LOG.fine("Resource fetched");
         return (T) theResource;
     }
 
