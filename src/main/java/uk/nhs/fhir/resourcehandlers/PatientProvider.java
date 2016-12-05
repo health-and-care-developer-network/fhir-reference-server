@@ -78,11 +78,7 @@ public class PatientProvider implements IResourceProvider {
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) { 
         
-        MethodOutcome retval = ValidateAny.validateStructureDefinition(
-                ctx,
-                resourceToTest,
-                theMode,
-                theProfile);
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
     }
 //</editor-fold>

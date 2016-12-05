@@ -22,10 +22,10 @@ import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.validator.ValidateAny;
 /**
  *
  * @author Tim Coates
@@ -73,7 +73,9 @@ public class PractitionerProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam Practitioner resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        throw new NotImplementedException("");
+        
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        return retval;
     }
 //</editor-fold>
 

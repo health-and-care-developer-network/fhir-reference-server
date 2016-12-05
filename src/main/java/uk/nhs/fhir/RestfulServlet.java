@@ -30,12 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
-import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
-import uk.nhs.fhir.resourcehandlers.PatientProvider;
-import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
-import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
-import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.*;
+
 import uk.nhs.fhir.util.FileLoader;
 
 /**
@@ -93,6 +89,10 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new DocumentReferenceProvider(dataSource));
         resourceProviders.add(new PractitionerProvider(dataSource));
         resourceProviders.add(new OrganizationProvider(dataSource));
+        resourceProviders.add(new BundleProvider(dataSource));
+        resourceProviders.add(new ValueSetProvider(dataSource));
+        resourceProviders.add(new OperationDefinitionProvider(dataSource));
+        
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");

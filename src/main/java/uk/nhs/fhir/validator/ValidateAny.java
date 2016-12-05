@@ -16,25 +16,20 @@
 package uk.nhs.fhir.validator;
 
 import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
-import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.SchemaBaseValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue;
-import ca.uhn.fhir.model.dstu2.valueset.IssueSeverityEnum;
-import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.schematron.SchematronBaseValidator;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.DefaultProfileValidationSupport;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * This class can in theory be used to validate any resource. It is called from
@@ -45,12 +40,8 @@ import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 public class ValidateAny {
 
     private static final Logger LOG = Logger.getLogger(ValidateAny.class.getName());
-
-    public static MethodOutcome validateStructureDefinition(
-            FhirContext ctx,
-            @ResourceParam Patient resourceToTest,
-            @Validate.Mode ValidationModeEnum theMode,
-            @Validate.Profile String theProfile) {
+    
+    public static MethodOutcome validateStructureDefinition(FhirContext ctx, @ResourceParam IBaseResource resourceToTest) {
         MethodOutcome retval = new MethodOutcome();
         FhirValidator validator = ctx.newValidator();
 
@@ -72,9 +63,7 @@ public class ValidateAny {
         IValidatorModule module2 = new SchematronBaseValidator(ctx);
         validator.registerValidatorModule(module2);
 
-        // Pass a resource in to be validated. The resource can
-        // be an IBaseResource instance, or can be a raw String
-        // containing a serialized resource as text.
+        // Pass a resource in to be validated.
         ValidationResult result = validator.validateWithResult(resourceToTest);
 
         OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();

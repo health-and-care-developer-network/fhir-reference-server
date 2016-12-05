@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.DomainResource;
@@ -51,6 +50,7 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext fc, ValueSet.ConceptSetComponent csc) {
+        LOG.severe("Request to ProfileLoader.expandValueSet() for: " + csc.getSystem().toString() + "\nTHIS IS NOT YET IMPLEMENTED\n\n");
         return null;
     }
 
@@ -68,9 +68,9 @@ public class ProfileLoader implements IValidationSupport {
 
         theVS = (ValueSet) ResourceCache.getResource(string);
         if (theVS != null) {
-            LOG.fine("CodeSystem: " + string + " Was in cache.");
+            LOG.fine("CodeSystem: " + string + " was in cache.");
         } else {
-            LOG.fine("CodeSystem: " + string + " Was NOT in cache, will fetch it...");
+            LOG.fine("CodeSystem: " + string + " was NOT in cache, will fetch it...");
 
             StringBuilder result = new StringBuilder();
             try {
@@ -95,18 +95,18 @@ public class ProfileLoader implements IValidationSupport {
                             LOG.warning("Got http status code: " + httpStatus + " when requesting: " + string);
                         }
                     } catch (IOException ex) {
-                        Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        LOG.warning("IOException when trying to read from URL: " + string);
                     }
                 }
+                String resultXML = result.toString();
+                theVS = (ValueSet) fc.newXmlParser().parseResource(resultXML);
+                LOG.fine("Adding ValueSet: " + theVS.getName() + " to cache");
+                ResourceCache.putResource(string, theVS);
             } catch (ProtocolException ex) {
                 LOG.severe("Trying to fetch a ValueSet - ProtocolException: " + string);
             } catch (MalformedURLException ex) {
                 LOG.severe("Trying to fetch a ValueSet - MalformedURLException: " + string);
             }
-
-            theVS = (ValueSet) fc.newXmlParser().parseResource(result.toString());
-            LOG.fine("Adding ValueSet to cache");
-            ResourceCache.putResource(string, theVS);
         }
         LOG.fine("ValueSet fetched.");
         return theVS;
@@ -198,7 +198,7 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
-        if (theSystem.startsWith("http://fhir.nhs.uk/")) {
+        if(theSystem.startsWith("http://fhir.nhs.uk/")) {
             return true;
         } else {
             return false;

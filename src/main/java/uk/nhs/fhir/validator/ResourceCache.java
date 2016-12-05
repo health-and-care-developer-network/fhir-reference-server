@@ -33,6 +33,13 @@ public class ResourceCache {
 	
 	private static long lastUpdated = 0;
 	private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));	
+
+        /**
+         * Just make sure we can't instantiate the class.
+         * 
+         */
+        private ResourceCache() {
+        }
         
         /**
          * Get a specified resource.
@@ -70,11 +77,15 @@ public class ResourceCache {
          * @return 
          */
         private static boolean updateRequired() {
-            //long currentTime = System.currentTimeMillis();
-            //if (currentTime > (lastUpdated + updateInterval)) {
-            //    LOG.info("Cache needs updating");
-            //    return true;
-            //}
+            long currentTime = System.currentTimeMillis();
+            if(updateInterval == 0) {   // Fallback if config didnt work
+                updateInterval = 30000;
+            }
+            
+            if (currentTime > (lastUpdated + updateInterval)) {
+                LOG.fine("Cache needs updating");
+                return true;
+            }
             return false;
         }
 	
@@ -85,6 +96,7 @@ public class ResourceCache {
 	private synchronized static void flushCache() {
 		if (updateRequired()) {
                     profileFileList.clear();
+                    lastUpdated = System.currentTimeMillis();
 		}
 	}
 }

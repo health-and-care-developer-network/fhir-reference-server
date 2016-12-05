@@ -30,10 +30,10 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.List;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
@@ -82,7 +82,9 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam StructureDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        throw new NotImplementedException("");
+
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        return retval;
     }
 //</editor-fold>
 
