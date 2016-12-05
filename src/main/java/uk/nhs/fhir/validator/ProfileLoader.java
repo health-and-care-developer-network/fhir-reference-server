@@ -160,7 +160,7 @@ public class ProfileLoader implements IValidationSupport {
                             LOG.warning("Got http status code: " + httpStatus + " when requesting Resource: " + string);
                         }
                     } catch (IOException ex) {
-                        Logger.getLogger(ProfileLoader.class.getName()).log(Level.SEVERE, null, ex);
+                        LOG.warning("IOException when trying to read from URL: " + string);
                     }
                 }
             } catch (ProtocolException ex) {
@@ -170,18 +170,20 @@ public class ProfileLoader implements IValidationSupport {
             }
             
             String xmlFileContents = result.toString();
-               
-            try {
-                FhirContext fcHL7 = FhirContext.forDstu2Hl7Org();
-                theResource = (DomainResource) fcHL7.newXmlParser().parseResource(type, xmlFileContents);
-                LOG.fine("Adding Resource to cache.");
-                ResourceCache.putResource(string, (DomainResource) theResource);
-            } catch(Exception ex) {
-                LOG.severe("Exception thrown parsing resource: " + string);
-                LOG.severe(ex.getMessage());
+            if(xmlFileContents.equals("")) {
+                LOG.severe("Empty string, won't try to parse or cache it.");
+            } else {
+                try {
+                    FhirContext fcHL7 = FhirContext.forDstu2Hl7Org();
+                    theResource = (DomainResource) fcHL7.newXmlParser().parseResource(type, xmlFileContents);
+                    LOG.fine("Fetched Resource: " + string + " adding it to cache.");
+                    ResourceCache.putResource(string, (DomainResource) theResource);
+                } catch(Exception ex) {
+                    LOG.severe("Exception thrown parsing resource: " + string);
+                    LOG.severe(ex.getMessage());
+                }
             }
         }
-        LOG.fine("Resource fetched");
         return (T) theResource;
     }
 
