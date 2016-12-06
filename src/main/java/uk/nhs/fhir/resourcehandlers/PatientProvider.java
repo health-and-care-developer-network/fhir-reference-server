@@ -22,20 +22,20 @@ import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.validator.ValidatorFacade;
-import uk.nhs.fhir.validator.ValidatorManager;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
  * @author Tim Coates
  */
 public class PatientProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
 
     Datasource myDataSource = null;
-    ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
@@ -44,9 +44,8 @@ public class PatientProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public PatientProvider(Datasource dataSource, ValidatorManager vMgr) {
+    public PatientProvider(Datasource dataSource) {
         myDataSource = dataSource;
-        myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }
 
@@ -74,13 +73,13 @@ public class PatientProvider implements IResourceProvider {
      * @return
      */
     @Validate
-    public MethodOutcome validateStructureDefinition(@ResourceParam Patient resourceToTest,
-                                     @Validate.Mode ValidationModeEnum theMode,
-                                     @Validate.Profile String theProfile) {
+    public MethodOutcome validateStructureDefinition(
+            @ResourceParam Patient resourceToTest,
+            @Validate.Mode ValidationModeEnum theMode,
+            @Validate.Profile String theProfile) { 
         
-        ValidatorFacade myFacade = new ValidatorFacade();
-        MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
-        return retVal;
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        return retval;
     }
 //</editor-fold>
 

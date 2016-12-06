@@ -25,8 +25,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.validator.ValidatorFacade;
-import uk.nhs.fhir.validator.ValidatorManager;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
@@ -35,7 +34,6 @@ import uk.nhs.fhir.validator.ValidatorManager;
 public class DocumentReferenceProvider implements IResourceProvider {
 
     Datasource myDataSource = null;
-    ValidatorManager myVMgr = null;
     FhirContext ctx = null;
 
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
@@ -44,9 +42,8 @@ public class DocumentReferenceProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public DocumentReferenceProvider(Datasource dataSource, ValidatorManager vMgr) {
+    public DocumentReferenceProvider(Datasource dataSource) {
         myDataSource = dataSource;
-        myVMgr = vMgr;
         ctx = FhirContext.forDstu2();
     }
 
@@ -76,10 +73,9 @@ public class DocumentReferenceProvider implements IResourceProvider {
     public MethodOutcome validateStructureDefinition(@ResourceParam DocumentReference resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        
-        ValidatorFacade myFacade = new ValidatorFacade();
-        MethodOutcome retVal = myFacade.Validate(resourceToTest, theProfile, myVMgr);
-        return retVal;
+
+        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        return retval;
     }
 //</editor-fold>
     
