@@ -32,7 +32,8 @@ public class ResourceCache {
 	private static HashMap<String, DomainResource> profileFileList = new HashMap<String, DomainResource>();
 	
 	private static long lastUpdated = 0;
-	private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));	
+	private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
+        
 
         /**
          * Just make sure we can't instantiate the class.

@@ -24,12 +24,15 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.DomainResource;
 import org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  *
@@ -38,6 +41,26 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 public class ProfileLoader implements IValidationSupport {
 
     private static final Logger LOG = Logger.getLogger(ProfileLoader.class.getName());
+    private static String logLevel = PropertyReader.getProperty("logLevel");
+
+    /**
+     * Constructor, in which we do nothing more than set the logging level...
+     * 
+     */
+    public ProfileLoader() {
+       
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
+    }
 
     /**
      * Need to be clear that this method is effectively stubbed out, pending
@@ -168,7 +191,7 @@ public class ProfileLoader implements IValidationSupport {
             } catch (MalformedURLException ex) {
                 LOG.severe("Trying to fetch a Resource - MalformedURLException: " + string);
             }
-            
+
             String xmlFileContents = result.toString();
             if(xmlFileContents.equals("")) {
                 LOG.severe("Empty string, won't try to parse or cache it.");

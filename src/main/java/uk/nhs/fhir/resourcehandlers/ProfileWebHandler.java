@@ -21,6 +21,7 @@ import uk.nhs.fhir.util.PropertyReader;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -28,13 +29,25 @@ import java.util.logging.Logger;
  * @author Tim Coates
  */
 public class ProfileWebHandler {
-    private static final Logger LOG = Logger.getLogger(ProfileWebHandler.class.getName());
+    private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
+    private static String logLevel = PropertyReader.getProperty("logLevel");
     
     private static String startOfBaseResourceBox = null;
     private static String endOfBaseResourceBox = null;
     Datasource myDataSource = null;
 
     public ProfileWebHandler(Datasource dataSource) {
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
         myDataSource = dataSource;
         startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
         endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");

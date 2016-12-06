@@ -22,8 +22,11 @@ import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
 /**
@@ -31,6 +34,8 @@ import uk.nhs.fhir.validator.ValidateAny;
  * @author Tim Coates
  */
 public class BundleProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
+    private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
     FhirContext ctx = null;
@@ -42,6 +47,17 @@ public class BundleProvider implements IResourceProvider {
      * @param dataSource
      */
     public BundleProvider(Datasource dataSource) {
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
     }

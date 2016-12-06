@@ -29,10 +29,12 @@ import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
 /**
@@ -40,7 +42,8 @@ import uk.nhs.fhir.validator.ValidateAny;
  * @author Tim Coates
  */
 public class StrutureDefinitionProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
+    private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDatasource = null;
     FhirContext ctx = null;
@@ -52,6 +55,17 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      * @param dataSource
      */
     public StrutureDefinitionProvider(Datasource dataSource) {
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
         myDatasource = dataSource;
         ctx = FhirContext.forDstu2();
     }
