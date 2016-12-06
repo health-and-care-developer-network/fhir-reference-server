@@ -45,6 +45,8 @@ public class OperationDefinitionProvider implements IResourceProvider  {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        LOG.fine("Created OperationDefinitionProvider handler to respond to requests for OperationDefinition resource types.");
+
     }
     
     

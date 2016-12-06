@@ -68,6 +68,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
         }
         myDatasource = dataSource;
         ctx = FhirContext.forDstu2();
+        LOG.fine("Created StrutureDefinitionProvider handler to respond to requests for StrutureDefinition resource types.");
     }
 
     /**

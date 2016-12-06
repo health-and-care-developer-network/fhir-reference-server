@@ -60,6 +60,8 @@ public class BundleProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        
+        LOG.fine("Created BundleProvider handler to respond to requests for Bundle resource types.");
     }
     
     

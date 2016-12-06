@@ -60,6 +60,7 @@ public class PractitionerProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        LOG.fine("Created PractitionerProvider handler to respond to requests for Practitioner resource types.");
     }
 
     /**

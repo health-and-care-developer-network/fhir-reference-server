@@ -61,6 +61,7 @@ public class OrganizationProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        LOG.fine("Created OrganizationProvider handler to respond to requests for Organization resource types.");
     }
 
     /**

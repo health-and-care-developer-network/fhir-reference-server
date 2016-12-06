@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -33,56 +34,69 @@ import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.resourcehandlers.*;
 
 import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
- * 
- * We create a datastore in initialize method, which we pass to each ResourceProvider
- * so that all resources can be persisted to/from the same datastore.
- * 
+ *
+ * We create a datastore in initialize method, which we pass to each ResourceProvider so that all resources can be persisted to/from the same datastore.
+ *
  * @author Tim Coates
  */
 @WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
-    private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
+
+    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
+    private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     Datasource dataSource = null;
-    
-	private static String css = FileLoader.loadFileOnClasspath("/style.css");
-	
+
+    private static String css = FileLoader.loadFileOnClasspath("/style.css");
+
     @Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-    	LOG.info("Requested URI: " + request.getRequestURI());
-    	
-    	if (request.getRequestURI().equals("/style.css")) {
-    		// Special case processing for the stylesheet as we are grabbing all URLs
-    		response.setStatus(200);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        LOG.info("Requested URI: " + request.getRequestURI());
+
+        if(request.getRequestURI().equals("/style.css")) {
+            // Special case processing for the stylesheet as we are grabbing all URLs
+            response.setStatus(200);
             response.setContentType("text/css");
-    		PrintWriter outputStream = response.getWriter();
-    		outputStream.append(css);
-    	} else {    	
-    		super.doGet(request, response);
-    	}
-	}
+            PrintWriter outputStream = response.getWriter();
+            outputStream.append(css);
+        } else {
+            super.doGet(request, response);
+        }
+    }
 
-
-	/**
-    * This is where we start, called when our servlet is first initialised.
-    * For simplicity, we do the datastore setup once here.
-    * 
-    * 
-    * @throws ServletException 
-    */
+    /**
+     * This is where we start, called when our servlet is first initialised. For simplicity, we do the datastore setup once here.
+     *
+     *
+     * @throws ServletException
+     */
     @Override
     protected void initialize() throws ServletException {
+
+        // We set our logging level based on the config file property.
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
         
         // We create an instance of our persistent layer (either MongoDB or
-    	// Filesystem), which we'll pass to each resource type handler as we create them
+        // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-                        
+
         ProfileWebHandler webber = new ProfileWebHandler(dataSource);
-        
+
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
         resourceProviders.add(new PatientProvider(dataSource));
@@ -92,7 +106,7 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new BundleProvider(dataSource));
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
-        
+
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");

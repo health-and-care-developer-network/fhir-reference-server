@@ -51,6 +51,7 @@ public class ProfileWebHandler {
         myDataSource = dataSource;
         startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
         endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
+        LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
     public String getAllNames(String resourceType) {

@@ -61,6 +61,7 @@ public class ValueSetProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        LOG.fine("Created ValueSetProvider handler to respond to requests for ValueSet resource types.");
     }
 
     /**

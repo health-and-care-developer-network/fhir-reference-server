@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +42,26 @@ public class FilesystemIF implements Datasource {
     private String profilePath = PropertyReader.getProperty("profilePath");
     private String examplesPath = PropertyReader.getProperty("examplesPath");
     private String fileExtension = PropertyReader.getProperty("fileExtension");
-    
+    private static String logLevel = PropertyReader.getProperty("logLevel");
+
+    /**
+     * Constructor, we simply set the logging level, and () Log that we've been instantiated.
+     * 
+     */
+    public FilesystemIF() {
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("INFO")) {
+           LOG.setLevel(Level.INFO);
+        }
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
+        LOG.info("FilesystemIF instantiated, using filesystem datasource.");
+    }
 
     /**
      * Gets a specific one

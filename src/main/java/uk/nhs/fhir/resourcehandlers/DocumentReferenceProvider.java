@@ -61,6 +61,8 @@ public class DocumentReferenceProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
+        
+        LOG.fine("Created DocumentReferenceProvider handler to respond to requests for DocumentReference resource types.");
     }
 
     /**
