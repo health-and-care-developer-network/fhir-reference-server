@@ -109,8 +109,10 @@ public class XMLParserUtils {
                 if(thisType.equals("Reference")) {
                     // If it's a Reference, get the profile for it and add to our list of Profiles
                     Element profileElement = (Element) node.getElementsByTagName("profile").item(0);
-                    String prof = profileElement.getAttribute("value");
-                    profiles.add(prof);
+                    if(profileElement != null) {
+                        String prof = profileElement.getAttribute("value");
+                        profiles.add(prof);
+                    }
                     aReference = true;
                 }
             }
