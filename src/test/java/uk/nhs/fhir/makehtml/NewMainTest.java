@@ -235,9 +235,9 @@ public class NewMainTest {
     @Test
     public void testDecorateResourceName() {
         System.out.println("decorateResourceName");
-        String type = "AnythingHere";
+        String type = "Address";
         NewMain instance = new NewMain();
-        String expResult = "<a href='https://www.hl7.org/fhir/anythinghere.html'>AnythingHere</a>";
+        String expResult = "<a href='https://www.hl7.org/fhir/address.html'>Address</a>";
         String result = instance.decorateResourceName(type);
         assertEquals(expResult, result);
     }
