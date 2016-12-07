@@ -138,11 +138,15 @@ public class XMLParserUtils {
             	typeName = type;
             }
             if(type.equals("Reference")) {
-                typeName = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a> ( ";
-                for(int i = 0; i < profiles.size()-1; i++) {
-                    typeName = typeName + decorateProfileName(profiles.get(i)) + " | ";
+                if(profiles.size() > 0) {
+                    typeName = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a> ( ";
+                    for(int i = 0; i < profiles.size() - 1; i++) {
+                        typeName = typeName + decorateProfileName(profiles.get(i)) + " | ";
+                    }
+                    typeName = typeName + decorateProfileName(profiles.get(profiles.size() - 1)) + " ) ";
+                } else {
+                    typeName = "<a href='https://www.hl7.org/fhir/references.html'>Reference</a>";
                 }
-                typeName = typeName + decorateProfileName(profiles.get(profiles.size()-1)) + " ) ";
             }
         }   
         return typeName;
