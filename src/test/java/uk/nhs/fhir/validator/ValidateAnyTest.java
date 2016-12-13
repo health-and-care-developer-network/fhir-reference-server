@@ -27,8 +27,14 @@ import static org.junit.Assert.*;
 public class ValidateAnyTest {
     
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL patient">
-    String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><id value=\"pat1\"/></Patient>";
+    String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"https://www.hl7.org/fhir/patient.profile.xml\" /></meta><id value=\"pat1\"/></Patient>";
 //</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL BAD patient">
+    String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"https://www.hl7.org/fhir/patient.profile.xml\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"female\" /><gender value=\"male\" /></Patient>";
+//</editor-fold>
+    
+
     
 //<editor-fold defaultstate="collapsed" desc="Set up a HL7 patient">
     String HL7_PATIENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Patient xmlns=\"http://hl7.org/fhir\">\n" +
@@ -199,11 +205,9 @@ public class ValidateAnyTest {
     @Test
     public void testValidateStructureDefinition() {
         System.out.println("validateStructureDefinition");
-        
         int errorCount = 0;
-        
         FhirContext ctx = FhirContext.forDstu2();
-        Patient pat = ctx.newXmlParser().parseResource(Patient.class, HL7_PATIENT);
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_BAD_PATIENT);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
@@ -212,10 +216,10 @@ public class ValidateAnyTest {
             String sev = thisIssue.getSeverity().toLowerCase();
             if(!sev.equals("information")) {
                 errorCount++;
-                System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+                //System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
             }
+            System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
         }        
-        assertEquals(1, issueList.size());
         assertEquals(0, errorCount);
     }
     

@@ -24,6 +24,7 @@ import ca.uhn.fhir.validation.SchemaBaseValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.validation.schematron.SchematronBaseValidator;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.DefaultProfileValidationSupport;
@@ -64,7 +65,7 @@ public class ValidateAny {
         validator.registerValidatorModule(module2);
 
         // Pass a resource in to be validated.
-        ValidationResult result = validator.validateWithResult(resourceToTest);
+        ValidationResult result = validator.validateWithResult((Patient) resourceToTest);
 
         OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();
         for (int i = 0; i < result.getMessages().size(); i++) {
