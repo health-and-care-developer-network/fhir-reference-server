@@ -14,4 +14,21 @@ To deploy this into the root context in tomcat, you will need to edit the contex
 <Context docBase="fhir" path="/" reloadable="true" source="org.eclipse.jst.jee.server:fhir"/>
 ```
 
+Deploying in Docker
+-------------------
+
+If you have Docker installed, you can easily build and deploy this in Docker.
+
+First, build the WAR file:
+
+```bash
+mvn install
+```
+
+Then create and start the Docker image:
+
+```bash
+./build.sh
+./deploy.sh
+```
 
