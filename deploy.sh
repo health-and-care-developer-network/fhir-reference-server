@@ -9,8 +9,6 @@ TARGET_HOST=$2
 IMAGE_NAME=fhir-server
 CONTAINER_NAME=fhir-server
 
-REGISTRY_URL=$REGISTRY_HOST:5000
-
 if [ -z $TARGET_HOST ]
 then
   TARGET_PREFIX=""
@@ -21,15 +19,21 @@ fi
 if [ -z $REGISTRY_HOST ]
 then
   REGISTRY_PREFIX=""
+  SOURCE=$IMAGE_NAME
 else
   REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
+  SOURCE=$REGISTRY_HOST:5000/$IMAGE_NAME
 fi
 
 MEMORYFLAG=1g
 CPUFLAG=768
 
 echo "Pull and run FHIR server"
-docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
+if [ ! -z $REGISTRY_HOST ]
+then
+  docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
+fi
+
 docker $TARGET_PREFIX stop $CONTAINER_NAME
 docker $TARGET_PREFIX rm $CONTAINER_NAME
 docker $TARGET_PREFIX run -p 8080:8080 --name $CONTAINER_NAME \
@@ -38,6 +42,6 @@ docker $TARGET_PREFIX run -p 8080:8080 --name $CONTAINER_NAME \
 	-c $CPUFLAG \
 	-v /docker-data/fhir-profiles:/opt/fhir \
 	-v /docker-data/fhir-server-temp:/tmp/jetty \
-	-d $REGISTRY_URL/$IMAGE_NAME
+	-d $SOURCE
 
 

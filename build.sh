@@ -18,7 +18,10 @@ fi
 # Build the publisher image
 set -e # Stop on error
 docker $REGISTRY_PREFIX build -t $IMAGE_NAME .
-docker $REGISTRY_PREFIX tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME
-docker $REGISTRY_PREFIX push $REGISTRY_URL/$IMAGE_NAME
-docker $REGISTRY_PREFIX rmi $IMAGE_NAME
 
+if [ ! -z $REGISTRY_HOST ]
+then
+  docker $REGISTRY_PREFIX tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME
+  docker $REGISTRY_PREFIX push $REGISTRY_URL/$IMAGE_NAME
+  docker $REGISTRY_PREFIX rmi $IMAGE_NAME
+fi
