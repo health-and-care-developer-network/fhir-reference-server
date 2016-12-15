@@ -40,10 +40,35 @@ public class ValidateAnyTest {
     String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/></Patient>";
 //</editor-fold>
 
+//<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL patient with a text block">
+    String MINIMAL_PATIENT_TEXT = "<Patient xmlns=\"http://hl7.org/fhir\">" +
+                        "<meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta>" +
+                        "<id value=\"pat1\"/>" +
+                        "  <text>\n" +
+                        "    <status value=\"generated\"/>\n" +
+                        "    <div xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                        "      <table>\n" +
+                        "        <tbody>\n" +
+                        "          <tr>\n" +
+                        "            <td>Name</td>\n" +
+                        "            <td>John Smith</td>\n" +
+                        "          </tr>\n" +
+                        "          <tr>\n" +
+                        "            <td>Address</td>\n" +
+                        "            <td>534 Erewhon, Pleasantville, Vic, 3999</td>\n" +
+                        "          </tr>\n" +
+                        "        </tbody>\n" +
+                        "      </table>    \n" +
+                        "    </div>\n" +
+                        "  </text>\n" +
+                        "</Patient>";
+//</editor-fold>
+
+
+    
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL patient which HAS NO CONTENT">
     String MINIMAL_PATIENT_NO_CONTENTS = "<Patient xmlns=\"http://hl7.org/fhir\" />";
 //</editor-fold>
-
 
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL BAD patient">
     String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"nothinglikeacode\" /></Patient>";
@@ -192,12 +217,14 @@ public class ValidateAnyTest {
                         "    <birthDate value=\"1947-06-09\" />\n" +
                         "</Patient>";
 //</editor-fold>
+    static FhirContext ctx;
     
     public ValidateAnyTest() {
     }
     
     @BeforeClass
     public static void setUpClass() {
+        ctx = FhirContext.forDstu2();
     }
     
     @AfterClass
@@ -219,7 +246,7 @@ public class ValidateAnyTest {
     public void testValidateStructureDefinition_MINIMAL() {
         System.out.println("testValidateStructureDefinition_MINIMAL");
         int errorCount = 0;
-        FhirContext ctx = FhirContext.forDstu2();
+        
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_PATIENT);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
@@ -235,6 +262,30 @@ public class ValidateAnyTest {
         assertEquals(0, errorCount);
     }
 
+    /**
+     * Test of validateStructureDefinition method, of class ValidateAny.
+     */
+    @Test
+    public void testValidateStructureDefinition_MINIMAL_TEXT() {
+        System.out.println("testValidateStructureDefinition_MINIMAL_TEXT");
+        int errorCount = 0;
+        
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_PATIENT_TEXT);
+        IBaseResource resourceToTest = pat;
+        MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
+        List<Issue> issueList = opOutcome.getIssue();
+        for(Issue thisIssue : issueList) {
+            String sev = thisIssue.getSeverity().toLowerCase();
+            if(!sev.equals("information")) {
+                errorCount++;
+            }
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+        }        
+        assertEquals(0, errorCount);
+    }
+
+    
 
     /**
      * Test of validateStructureDefinition method, of class ValidateAny.
@@ -243,7 +294,7 @@ public class ValidateAnyTest {
     public void testValidateStructureDefinition_MINIMAL_PATIENT_NO_CONTENTS() {
         System.out.println("testValidateStructureDefinition_MINIMAL_PATIENT_NO_CONTENTS");
         int errorCount = 0;
-        FhirContext ctx = FhirContext.forDstu2();
+        
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_PATIENT_NO_CONTENTS);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
@@ -268,7 +319,7 @@ public class ValidateAnyTest {
     public void testValidateStructureDefinition_MINIMAL_BAD() {
         System.out.println("testValidateStructureDefinition_MINIMAL_BAD");
         int errorCount = 0;
-        FhirContext ctx = FhirContext.forDstu2();
+        
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_BAD_PATIENT);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
@@ -292,7 +343,7 @@ public class ValidateAnyTest {
     public void testValidateStructureDefinition_HL7() {
         System.out.println("testValidateStructureDefinition_HL7");
         int errorCount = 0;
-        FhirContext ctx = FhirContext.forDstu2();
+        
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, HL7_PATIENT);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
@@ -319,7 +370,7 @@ public class ValidateAnyTest {
     public void testValidateStructureDefinition_GP_CONNECT() {
         System.out.println("testValidateStructureDefinition_GP_CONNECT");
         int errorCount = 0;
-        FhirContext ctx = FhirContext.forDstu2();
+        
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, GPCONNECT_PATIENT);
         IBaseResource resourceToTest = pat;
         MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
