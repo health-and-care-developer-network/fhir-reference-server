@@ -43,7 +43,7 @@ public class ValidatorFactory {
     
     // Get whether we're expecting to validate against local profile.
     private static final String localValidation = PropertyReader.getProperty("localValidation");
-    private static boolean localValidationFlag;
+    private static boolean localValidationFlag = true;
     
     // We store a validator which we'll instantiate on first use,
     // and return for future uses.
@@ -103,7 +103,7 @@ public class ValidatorFactory {
             FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
             
             if(localValidationFlag) {
-                LOG.info("New validator will validate against custom (local) profiles");
+                LOG.info("New validator _WILL_ validate against custom (local) profiles");
                 // NB we also do instance validation...
                 // ... with our own profile loader implementation
                 IValidationSupport ourProfileLoader = new ProfileLoader(); // This is our custom profile loader
@@ -111,7 +111,7 @@ public class ValidatorFactory {
                 instanceValidator.setValidationSupport(supportChain);
                 validator.registerValidatorModule(instanceValidator);
             } else {
-                LOG.info("New validator will _NOT_ validate against custom (local) profiles");
+                LOG.info("New validator _WILL_NOT_ validate against custom (local) profiles");
                 // NB we will do instance validation
                 validator.registerValidatorModule(instanceValidator);
             }

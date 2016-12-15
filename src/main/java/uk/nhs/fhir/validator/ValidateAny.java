@@ -53,31 +53,37 @@ public class ValidateAny {
     public static MethodOutcome validateStructureDefinition(FhirContext ctx, @ResourceParam IBaseResource resourceToTest) {
         MethodOutcome retval = new MethodOutcome();
 
-        FhirValidator validator = ValidatorFactory.getValidator(ctx);
-        if(validator == null) {
-            LOG.warning("WARNING: getValidator returned null!!");
-        } else {
-            LOG.fine("Validator created for Context: " + ctx.getVersion());
-        }
-
-        // Pass a resource in to be validated.
-        ValidationResult result = null;
+        FhirValidator validator;
         try {
-            result = validator.validateWithResult(resourceToTest);
-        } catch (Exception e) {
-            LOG.info(e.getMessage());
-        }
-        OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();
-        for (int i = 0; i < result.getMessages().size(); i++) {
-            LOG.warning(result.getMessages().get(i).toString());
-        }
-        
-        retval.setOperationOutcome(oo);
+            validator = ValidatorFactory.getValidator(ctx);
+            
+            if(validator == null) {
+                LOG.warning("WARNING: getValidator returned null!!");
+            } else {
+                LOG.fine("Validator created for Context: " + ctx.getVersion());
+            }
 
-        if (result.isSuccessful()) {
-            LOG.info("Validation passed");
-        } else {
-            LOG.warning("Validation failed");
+            // Pass a resource in to be validated.
+            ValidationResult result = null;
+            try {
+                result = validator.validateWithResult(resourceToTest);
+            } catch (Exception e) {
+                LOG.info(e.getMessage());
+            }
+            OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();
+            for (int i = 0; i < result.getMessages().size(); i++) {
+                LOG.warning(result.getMessages().get(i).toString());
+            }
+
+            retval.setOperationOutcome(oo);
+
+            if (result.isSuccessful()) {
+                LOG.info("Validation passed");
+            } else {
+                LOG.warning("Validation failed");
+            }            
+        } catch (Exception except) {
+            LOG.warning("Exception caught when getting a validator: " + except.getMessage());
         }
         return retval;
     }

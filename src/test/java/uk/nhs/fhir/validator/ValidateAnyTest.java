@@ -40,8 +40,13 @@ public class ValidateAnyTest {
     String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/></Patient>";
 //</editor-fold>
 
+//<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL patient which HAS NO CONTENT">
+    String MINIMAL_PATIENT_NO_CONTENTS = "<Patient xmlns=\"http://hl7.org/fhir\" />";
+//</editor-fold>
+
+
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL BAD patient">
-    String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"female\" /><gender value=\"male\" /></Patient>";
+    String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"nothinglikeacode\" /></Patient>";
 //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="Set up a HL7 patient">
@@ -148,30 +153,30 @@ public class ValidateAnyTest {
                         "</Patient>";
 //</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="Set up a Patient resource">
+//<editor-fold defaultstate="collapsed" desc="Set up a GP Connect Patient resource">
     String GPCONNECT_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\">\n" +
                         "    <id value=\"07e2071f-509f-4ac1-82e5-2f74a8915379\" />\n" +
                         "    <meta>\n" +
-                        "        <profile value=\"http://{{Base}}/StructureDefinition/GPConnect-Register-Patient-1.xml\" />\n" +
+                        "        <profile value=\"http://fhir.nhs.uk/fhir/StructureDefinition/GPConnect-Register-Patient-1.xml\" />\n" +
                         "    </meta>\n" +
-                        "    <extension url=\"http://{{Base}}/Extension/Extension-Registration-Period-1.xml\">\n" +
+                        "    <extension url=\"http://fhir.nhs.uk/fhir/Extension/Extension-Registration-Period-1.xml\">\n" +
                         "        <valuePeriod>\n" +
                         "            <start value=\"1991-01-01\" />\n" +
                         "        </valuePeriod>\n" +
                         "    </extension>\n" +
-                        "    <extension url=\"http://{{Base}}/Extension/Extension-Registration-Status-1.xml\">\n" +
+                        "    <extension url=\"http://fhir.nhs.uk/fhir/Extension/Extension-Registration-Status-1.xml\">\n" +
                         "        <valueCodeableConcept>\n" +
                         "            <coding>\n" +
-                        "                <system value=\"http://{{Base}}/registration-status-code-1\" />\n" +
+                        "                <system value=\"http://fhir.nhs.uk/fhir/registration-status-code-1\" />\n" +
                         "                <code value=\"A\" />\n" +
                         "                <display value=\"Active\" />\n" +
                         "            </coding>\n" +
                         "        </valueCodeableConcept>\n" +
                         "    </extension>\n" +
-                        "    <extension url=\"http://{{Base}}/Extension/Extension-Registration-Type-1.xml\">\n" +
+                        "    <extension url=\"http://fhir.nhs.uk/fhir/Extension/Extension-Registration-Type-1.xml\">\n" +
                         "        <valueCodeableConcept>\n" +
                         "            <coding>\n" +
-                        "                <system value=\"http://{{Base}}/ValueSet/registration-type-1.xml\" />\n" +
+                        "                <system value=\"http://fhir.nhs.uk/fhir/ValueSet/registration-type-1.xml\" />\n" +
                         "                <code value=\"R\" />\n" +
                         "                <display value=\"Fully Registered\" />\n" +
                         "            </coding>\n" +
@@ -229,7 +234,36 @@ public class ValidateAnyTest {
         }        
         assertEquals(0, errorCount);
     }
+
+
+    /**
+     * Test of validateStructureDefinition method, of class ValidateAny.
+     */
+    @Test
+    public void testValidateStructureDefinition_MINIMAL_PATIENT_NO_CONTENTS() {
+        System.out.println("testValidateStructureDefinition_MINIMAL_PATIENT_NO_CONTENTS");
+        int errorCount = 0;
+        FhirContext ctx = FhirContext.forDstu2();
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_PATIENT_NO_CONTENTS);
+        IBaseResource resourceToTest = pat;
+        MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
+        List<Issue> issueList = opOutcome.getIssue();
+        for(Issue thisIssue : issueList) {
+            String sev = thisIssue.getSeverity().toLowerCase();
+            if(!sev.equals("information")) {
+                errorCount++;
+            }
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+        }        
+        assertEquals(2, errorCount);
+    }
     
+    /**
+     * Tests how we react when (in this example) we have a patient with a gender value which isn't in
+     * the known list of genders.
+     * 
+     */
     @Test
     public void testValidateStructureDefinition_MINIMAL_BAD() {
         System.out.println("testValidateStructureDefinition_MINIMAL_BAD");
@@ -247,9 +281,13 @@ public class ValidateAnyTest {
             }
             System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
         }        
-        assertEquals(0, errorCount);
+        assertEquals(2, errorCount);
     }
     
+    /**
+     * Tests the validation of a HL7 base Patient resource.
+     * 
+     */
     @Test
     public void testValidateStructureDefinition_HL7() {
         System.out.println("testValidateStructureDefinition_HL7");
@@ -270,6 +308,13 @@ public class ValidateAnyTest {
         assertEquals(0, errorCount);
     }
     
+    /**
+     * Tests the validation of a GP Connect defined locally profiled Patient resource.
+     * The resource claims it conforms to the profile:
+     * 
+     * http://fhir.nhs.uk/fhir/StructureDefinition/GPConnect-Register-Patient-1.xml
+     * 
+     */
     @Test
     public void testValidateStructureDefinition_GP_CONNECT() {
         System.out.println("testValidateStructureDefinition_GP_CONNECT");
