@@ -37,11 +37,11 @@ import static org.junit.Assert.*;
 public class ValidateAnyTest {
 
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL patient">
-    String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"https://www.hl7.org/fhir/patient.profile.xml\" /></meta><id value=\"pat1\"/></Patient>";
+    String MINIMAL_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/></Patient>";
 //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="Set up a MINIMAL BAD patient">
-    String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://www.hl7.org/fhir/patient.profile.xml\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"female\" /><gender value=\"male\" /></Patient>";
+    String MINIMAL_BAD_PATIENT = "<Patient xmlns=\"http://hl7.org/fhir\"><meta><profile value=\"http://hl7.org/fhir/StructureDefinition/Patient\" /></meta><id value=\"pat1\"/><active value=\"true\"/><active value=\"false\"/><gender value=\"female\" /><gender value=\"male\" /></Patient>";
 //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="Set up a HL7 patient">
@@ -211,8 +211,28 @@ public class ValidateAnyTest {
      * Test of validateStructureDefinition method, of class ValidateAny.
      */
     @Test
-    public void testValidateStructureDefinition() {
-        System.out.println("validateStructureDefinition");
+    public void testValidateStructureDefinition_MINIMAL() {
+        System.out.println("testValidateStructureDefinition_MINIMAL");
+        int errorCount = 0;
+        FhirContext ctx = FhirContext.forDstu2();
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_PATIENT);
+        IBaseResource resourceToTest = pat;
+        MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
+        List<Issue> issueList = opOutcome.getIssue();
+        for(Issue thisIssue : issueList) {
+            String sev = thisIssue.getSeverity().toLowerCase();
+            if(!sev.equals("information")) {
+                errorCount++;
+            }
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+        }        
+        assertEquals(0, errorCount);
+    }
+    
+    @Test
+    public void testValidateStructureDefinition_MINIMAL_BAD() {
+        System.out.println("testValidateStructureDefinition_MINIMAL_BAD");
         int errorCount = 0;
         FhirContext ctx = FhirContext.forDstu2();
         Patient pat = ctx.newXmlParser().parseResource(Patient.class, MINIMAL_BAD_PATIENT);
@@ -224,7 +244,46 @@ public class ValidateAnyTest {
             String sev = thisIssue.getSeverity().toLowerCase();
             if(!sev.equals("information")) {
                 errorCount++;
-                //System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+            }
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+        }        
+        assertEquals(0, errorCount);
+    }
+    
+    @Test
+    public void testValidateStructureDefinition_HL7() {
+        System.out.println("testValidateStructureDefinition_HL7");
+        int errorCount = 0;
+        FhirContext ctx = FhirContext.forDstu2();
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, HL7_PATIENT);
+        IBaseResource resourceToTest = pat;
+        MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
+        List<Issue> issueList = opOutcome.getIssue();
+        for(Issue thisIssue : issueList) {
+            String sev = thisIssue.getSeverity().toLowerCase();
+            if(!sev.equals("information")) {
+                errorCount++;
+            }
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+        }        
+        assertEquals(0, errorCount);
+    }
+    
+    @Test
+    public void testValidateStructureDefinition_GP_CONNECT() {
+        System.out.println("testValidateStructureDefinition_GP_CONNECT");
+        int errorCount = 0;
+        FhirContext ctx = FhirContext.forDstu2();
+        Patient pat = ctx.newXmlParser().parseResource(Patient.class, GPCONNECT_PATIENT);
+        IBaseResource resourceToTest = pat;
+        MethodOutcome methodOutcome = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
+        OperationOutcome opOutcome = (OperationOutcome) methodOutcome.getOperationOutcome();
+        List<Issue> issueList = opOutcome.getIssue();
+        for(Issue thisIssue : issueList) {
+            String sev = thisIssue.getSeverity().toLowerCase();
+            if(!sev.equals("information")) {
+                errorCount++;
             }
             System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
         }        

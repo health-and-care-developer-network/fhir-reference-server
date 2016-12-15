@@ -21,9 +21,10 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  * This class can in theory be used to validate any resource. It is called from
@@ -32,6 +33,20 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
  * @author Tim Coates
  */
 public class ValidateAny {
+    private static String logLevel = PropertyReader.getProperty("logLevel");
+
+    public ValidateAny() {
+        LOG.setLevel(Level.INFO);
+
+        if(logLevel.equals("FINE")) {
+            LOG.setLevel(Level.FINE);
+        }
+        if(logLevel.equals("OFF")) {
+            LOG.setLevel(Level.OFF);
+        }
+    }
+
+    
 
     private static final Logger LOG = Logger.getLogger(ValidateAny.class.getName());
     
@@ -39,6 +54,11 @@ public class ValidateAny {
         MethodOutcome retval = new MethodOutcome();
 
         FhirValidator validator = ValidatorFactory.getValidator(ctx);
+        if(validator == null) {
+            LOG.warning("WARNING: getValidator returned null!!");
+        } else {
+            LOG.fine("Validator created for Context: " + ctx.getVersion());
+        }
 
         // Pass a resource in to be validated.
         ValidationResult result = null;

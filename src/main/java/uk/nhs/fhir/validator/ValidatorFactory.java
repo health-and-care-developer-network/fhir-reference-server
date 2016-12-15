@@ -97,16 +97,14 @@ public class ValidatorFactory {
         
         // Now we check whether we've already created a validator, in which case ignore all this.
         if(validator == null) {
-            LOG.info("Creating new validator");
+            LOG.info("Creating a new validator");
             // We didn't have one in stock, so we need to create one.
             validator = ctx.newValidator();
-            
-            // NB we also do instance validation
             FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
-
+            
             if(localValidationFlag) {
                 LOG.info("New validator will validate against custom (local) profiles");
-
+                // NB we also do instance validation...
                 // ... with our own profile loader implementation
                 IValidationSupport ourProfileLoader = new ProfileLoader(); // This is our custom profile loader
                 ValidationSupportChain supportChain = new ValidationSupportChain(new DefaultProfileValidationSupport(), ourProfileLoader);
@@ -114,19 +112,22 @@ public class ValidatorFactory {
                 validator.registerValidatorModule(instanceValidator);
             } else {
                 LOG.info("New validator will _NOT_ validate against custom (local) profiles");
+                // NB we will do instance validation
                 validator.registerValidatorModule(instanceValidator);
             }
             // Create some validation modules and register them
             IValidatorModule schemaBaseValidator = new SchemaBaseValidator(ctx);
+            IValidatorModule schematronBaseValidator = new SchematronBaseValidator(ctx);
+
             validator.registerValidatorModule(schemaBaseValidator);
+            validator.registerValidatorModule(schematronBaseValidator);
 
             // We also validate against schematrons ?
             validator.setValidateAgainstStandardSchematron(true);
-            IValidatorModule schematronBaseValidator = new SchematronBaseValidator(ctx);
-            validator.registerValidatorModule(schematronBaseValidator);
+            
             version = ctx.getVersion();
         } else {
-            LOG.info("We will reuse existing validator :-)");
+            LOG.info("We will reuse the existing validator :-)");
         }
         return validator;
     }
