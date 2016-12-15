@@ -30,18 +30,19 @@ import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
- * Factory class, which is never instantiated, but gives us either a new
- * validator, or instantiates a new one.
+ * Factory class, which is never instantiated, but instantiates a new
+ * validator, or gives us an existing.
  * 
  * @author Tim Coates
  */
 public class ValidatorFactory {
     private static final Logger LOG = Logger.getLogger(ValidatorFactory.class.getName());
-    
-    private static String logLevel = PropertyReader.getProperty("logLevel");
+
+    // Get the log level we want to logging done at...
+    private static final String logLevel = PropertyReader.getProperty("logLevel");
     
     // Get whether we're expecting to validate against local profile.
-    private static String localValidation = PropertyReader.getProperty("localValidation");
+    private static final String localValidation = PropertyReader.getProperty("localValidation");
     private static boolean localValidationFlag;
     
     // We store a validator which we'll instantiate on first use,
@@ -99,23 +100,20 @@ public class ValidatorFactory {
             LOG.info("Creating new validator");
             // We didn't have one in stock, so we need to create one.
             validator = ctx.newValidator();
+            
+            // NB we also do instance validation
+            FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
 
             if(localValidationFlag) {
                 LOG.info("New validator will validate against custom (local) profiles");
 
-                // NB we also do instance validation...
-                FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
-                
                 // ... with our own profile loader implementation
                 IValidationSupport ourProfileLoader = new ProfileLoader(); // This is our custom profile loader
-                ValidationSupportChain support = new ValidationSupportChain(new DefaultProfileValidationSupport(), ourProfileLoader);
-                instanceValidator.setValidationSupport(support);
+                ValidationSupportChain supportChain = new ValidationSupportChain(new DefaultProfileValidationSupport(), ourProfileLoader);
+                instanceValidator.setValidationSupport(supportChain);
                 validator.registerValidatorModule(instanceValidator);
             } else {
                 LOG.info("New validator will _NOT_ validate against custom (local) profiles");
-
-                // NB we also do instance validation
-                FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
                 validator.registerValidatorModule(instanceValidator);
             }
             // Create some validation modules and register them
