@@ -19,17 +19,10 @@ import ca.uhn.fhir.model.dstu2.resource.OperationOutcome;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.IValidatorModule;
-import ca.uhn.fhir.validation.SchemaBaseValidator;
 import ca.uhn.fhir.validation.ValidationResult;
-import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
-import ca.uhn.fhir.validation.schematron.SchematronBaseValidator;
 import java.util.logging.Logger;
-import org.hl7.fhir.instance.hapi.validation.DefaultProfileValidationSupport;
-import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
-import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
@@ -44,29 +37,16 @@ public class ValidateAny {
     
     public static MethodOutcome validateStructureDefinition(FhirContext ctx, @ResourceParam IBaseResource resourceToTest) {
         MethodOutcome retval = new MethodOutcome();
-        FhirValidator validator = ctx.newValidator();
 
-        // Create some validation modules and register them
-        IValidatorModule module1 = new SchemaBaseValidator(ctx);
-        validator.registerValidatorModule(module1);
-
-        // NB we also do instance validation...
-        FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
-
-        // ... with our own profile loader implementation
-        IValidationSupport valSupport = new ProfileLoader(); // This is our custom profile loader
-        ValidationSupportChain support = new ValidationSupportChain(new DefaultProfileValidationSupport(), valSupport);
-        instanceValidator.setValidationSupport(support);
-        validator.registerValidatorModule(instanceValidator);
-
-        // We also validate against schematrons ?
-        validator.setValidateAgainstStandardSchematron(true);
-        IValidatorModule module2 = new SchematronBaseValidator(ctx);
-        validator.registerValidatorModule(module2);
+        FhirValidator validator = ValidatorFactory.getValidator(ctx);
 
         // Pass a resource in to be validated.
-        ValidationResult result = validator.validateWithResult((Patient) resourceToTest);
-
+        ValidationResult result = null;
+        try {
+            result = validator.validateWithResult(resourceToTest);
+        } catch (Exception e) {
+            LOG.info(e.getMessage());
+        }
         OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();
         for (int i = 0; i < result.getMessages().size(); i++) {
             LOG.warning(result.getMessages().get(i).toString());

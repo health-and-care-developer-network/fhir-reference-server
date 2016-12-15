@@ -218,7 +218,7 @@ public class ValidateAnyTest {
                 errorCount++;
                 //System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
             }
-            System.out.println("Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
+            System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
         }        
         assertEquals(0, errorCount);
     }
