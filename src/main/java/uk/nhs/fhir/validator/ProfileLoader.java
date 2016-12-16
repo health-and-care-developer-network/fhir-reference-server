@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
@@ -73,7 +72,7 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext fc, ValueSet.ConceptSetComponent csc) {
-        LOG.severe("Request to ProfileLoader.expandValueSet() for: " + csc.getSystem().toString() + "\nTHIS IS NOT YET IMPLEMENTED\n\n");
+        LOG.warning("Request to ProfileLoader.expandValueSet() for: " + csc.getSystem().toString() + "\nTHIS IS NOT YET IMPLEMENTED\n\n");
         return null;
     }
 
@@ -151,6 +150,11 @@ public class ProfileLoader implements IValidationSupport {
         // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
         // just http fetch it even if we're fetching it from this server.
         DomainResource theResource = null;
+        
+        if(string.equals("http://hl7.org/fhir/StructureDefinition/xhtml")) {
+            LOG.severe("Asked to retrieve resource: http://hl7.org/fhir/StructureDefinition/xhtml  -- Returning null");
+            return (T) theResource;
+        }
 
         theResource = ResourceCache.getResource(string);
 
@@ -221,6 +225,7 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
+        LOG.fine("isCodeSystemSupported() called for: " + theSystem);
         if(theSystem.startsWith("http://fhir.nhs.uk/")) {
             return true;
         } else {
@@ -241,6 +246,9 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public CodeValidationResult validateCode(FhirContext theContext, String theCodeSystem, String theCode, String theDisplay) {
+        
+        LOG.fine("validateCode() called for code: " + theCode);
+        
         CodeValidationResult result;
         ValueSet vs = fetchResource(theContext, ValueSet.class, theCodeSystem);
         // Here see if we can find the code in the ValueSet...
@@ -251,10 +259,12 @@ public class ProfileLoader implements IValidationSupport {
             if (concept.getCode().equals(theCode)) {
                 if (concept.getDisplay().equals(theDisplay)) {
                     result = new CodeValidationResult(definition);
+                    LOG.fine("Code validated as: " + result.getDisplay());
                     return result;
                 }
             }
         }
+        LOG.fine("Code _NOT_ validated: " + theCode);
         return new CodeValidationResult(IssueSeverity.ERROR, "Code or display not matched: " + theCodeSystem + " / " + theCode + " / " + theDisplay);
     }
 }
