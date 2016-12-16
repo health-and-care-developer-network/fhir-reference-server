@@ -5,6 +5,7 @@
 
 REGISTRY_HOST=$1
 TARGET_HOST=$2
+PORT=${PORT:-8080}
 
 IMAGE_NAME=fhir-server
 CONTAINER_NAME=fhir-server
@@ -36,7 +37,7 @@ fi
 
 docker $TARGET_PREFIX stop $CONTAINER_NAME
 docker $TARGET_PREFIX rm $CONTAINER_NAME
-docker $TARGET_PREFIX run -p 8080:8080 --name $CONTAINER_NAME \
+docker $TARGET_PREFIX run -p $PORT:8080 --name $CONTAINER_NAME \
 	--restart=on-failure:5 \
         -m $MEMORYFLAG \
 	-c $CPUFLAG \
