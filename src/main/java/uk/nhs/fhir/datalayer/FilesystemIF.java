@@ -15,15 +15,12 @@
  */
 package uk.nhs.fhir.datalayer;
 
-import ca.uhn.fhir.context.ConfigurationException;
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.parser.DataFormatException;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,20 +37,18 @@ public class FilesystemIF implements Datasource {
     private static final Logger LOG = Logger.getLogger(FilesystemIF.class.getName());
 
     private String profilePath = PropertyReader.getProperty("profilePath");
+    private String valueSetPath = PropertyReader.getProperty("valusetPath");
     private String examplesPath = PropertyReader.getProperty("examplesPath");
     private String fileExtension = PropertyReader.getProperty("fileExtension");
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     /**
-     * Constructor, we simply set the logging level, and () Log that we've been instantiated.
+     * Constructor, we simply set the logging level, and log that we've been instantiated.
      * 
      */
     public FilesystemIF() {
         LOG.setLevel(Level.INFO);
 
-        if(logLevel.equals("INFO")) {
-           LOG.setLevel(Level.INFO);
-        }
         if(logLevel.equals("FINE")) {
             LOG.setLevel(Level.FINE);
         }
@@ -73,11 +68,10 @@ public class FilesystemIF implements Datasource {
     	
     	filename = filename + fileExtension;
     	
-    	LOG.info("Getting StructureDefinitions with name=" + name +
-        			" looking for file: " + profilePath + "/" + filename);
+    	LOG.info("Getting StructureDefinitions with name=" + name + " looking for file: " + profilePath + "/" + filename);
         
-    	StructureDefinition foundDocRef = FHIRUtils.loadProfileFromFile(filename);
-        return foundDocRef;
+    	StructureDefinition foundProfile = FHIRUtils.loadProfileFromFile(filename);
+        return foundProfile;
     }
 
     /**
@@ -87,16 +81,14 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return 
      */
-    public List<StructureDefinition> getMatchByName(String theNamePart) {
+    public List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
-        
-        List<String> matchingNames = getAllNames(theNamePart);
-        
-        for (String name : matchingNames) {
-        	list.add(getSingleStructureDefinitionByName(name));
+        List<String> matchingNames = getAllStructureDefinitionNames(theNamePart);
+
+        for(String name : matchingNames) {
+            list.add(getSingleStructureDefinitionByName(name));
         }
-        
         return list;
     }
 
@@ -106,7 +98,7 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<StructureDefinition> getAll() {
+    public List<StructureDefinition> getAllStructureDefinitions() {
         LOG.info("Getting all StructureDefinitions");
         return FileCache.getProfiles();
     }
@@ -116,9 +108,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<String> getAllNames() {
+    public List<String> getAllStructureDefinitionNames() {
         LOG.info("Getting all StructureDefinition Names");
-        return FileCache.getNameList();
+        return FileCache.getStructureDefinitionNameList();
     }
     
     /**
@@ -127,11 +119,10 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public HashMap<String, List<String>> getAllNamesByBaseResource() {
+    public HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource() {
         LOG.info("Getting all StructureDefinition Names by base resource");
         return FileCache.getGroupedNameList();
     }
-
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -139,11 +130,11 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return 
      */
-    public List<String> getAllNames(String theNamePart) {
+    public List<String> getAllStructureDefinitionNames(String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of profiles first");
-        List<String> profileList = FileCache.getNameList();
+        List<String> profileList = FileCache.getStructureDefinitionNameList();
         
         LOG.info("Now filtering the list to those matching our criteria");
         ArrayList<String> matches = new ArrayList<String>();
@@ -163,4 +154,72 @@ public class FilesystemIF implements Datasource {
         LOG.info("Returning matches");
         return matches;
     }
+
+    /**
+     * Gets a specific ValueSet specified by name.
+     * 
+     * @param name
+     * @return 
+     */
+    public ValueSet getSingleValueSetByName(String name) {
+    	String filename = FileLoader.cleanFilename(name);
+    	
+    	filename = filename + fileExtension;
+    	
+    	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + valueSetPath + "/" + filename);
+        
+    	ValueSet foundValSet = FHIRUtils.loadValueSetFromFile(filename);
+        return foundValSet;
+    }
+
+    /**
+     * This is the method to do a search based on name, ie to find where
+     * name:contains=[parameter]
+     * 
+     * @param theNamePart
+     * @return a List of matched ValueSet objects
+     */
+    public List<ValueSet> getValueSetMatchByName(String theNamePart) {
+        LOG.info("Getting ValueSets with name=" + theNamePart);
+        List<ValueSet> list = new ArrayList<ValueSet>();
+        List<String> matchingNames = getAllValueSetNames(theNamePart);
+
+        for(String name : matchingNames) {
+            list.add(getSingleValueSetByName(name));
+        }
+        return list;
+    }
+
+    /**
+     * This is the method to search by name, e.g. name:contains=Patient
+     * 
+     * @param theNamePart
+     * @return 
+     */
+    public List<String> getAllValueSetNames(String theNamePart) {
+        LOG.info("Getting all ValueSet Names containing: " + theNamePart + " in their name");
+        
+        LOG.info("Getting full list of ValueSets first");
+        List<String> valSetList = FileCache.getValueSetNameList();
+        
+        LOG.info("Now filtering the list to those matching our criteria");
+        ArrayList<String> matches = new ArrayList<String>();
+        
+        String pattern = "(.*)" + theNamePart + "(.*)";
+        
+        for (String valSetName : valSetList) {
+        	// Create a Pattern object
+            Pattern r = Pattern.compile(pattern);
+
+            // Now create matcher object.
+            Matcher m = r.matcher(valSetName);
+            if (m.find()) {
+               matches.add(valSetName);
+            }
+        }
+        LOG.info("Returning matches");
+        return matches;
+    }
+    
+
 }

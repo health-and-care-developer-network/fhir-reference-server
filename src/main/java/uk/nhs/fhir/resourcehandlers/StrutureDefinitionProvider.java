@@ -57,9 +57,6 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     public StrutureDefinitionProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
-        if(logLevel.equals("INFO")) {
-           LOG.setLevel(Level.INFO);
-        }
         if(logLevel.equals("FINE")) {
             LOG.setLevel(Level.FINE);
         }
@@ -128,7 +125,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Search
     public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-        List<StructureDefinition> foundList = myDatasource.getMatchByName(theNamePart.getValue());
+        List<StructureDefinition> foundList = myDatasource.getStructureDefinitionMatchByName(theNamePart.getValue());
         return foundList;
     }
 
@@ -140,7 +137,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<StructureDefinition> getAllStructureDefinitions() {
         LOG.info("Request for ALL StructureDefinition objects");
-        List<StructureDefinition> foundList = myDatasource.getAll();
+        List<StructureDefinition> foundList = myDatasource.getAllStructureDefinitions();
         return foundList;
     }
 //</editor-fold>

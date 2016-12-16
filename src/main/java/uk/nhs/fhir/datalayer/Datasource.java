@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 
 public interface Datasource {
 
@@ -36,21 +37,21 @@ public interface Datasource {
 	 * @param theNamePart
 	 * @return 
 	 */
-	List<StructureDefinition> getMatchByName(String theNamePart);
+	List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart);
 
 	/**
 	 * Gets a full list of StructureDefinition objects
 	 * 
 	 * @return 
 	 */
-	List<StructureDefinition> getAll();
+	List<StructureDefinition> getAllStructureDefinitions();
 
 	/**
 	 * Gets a full list of names for the web view of /StructureDefinition requests.
 	 * 
 	 * @return 
 	 */
-	List<String> getAllNames();
+	List<String> getAllStructureDefinitionNames();
 	
 	/**
 	 * Gets a full list of names, grouped by base resource for the web view
@@ -58,7 +59,7 @@ public interface Datasource {
 	 * 
 	 * @return
 	 */
-	HashMap<String, List<String>> getAllNamesByBaseResource();
+	HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource();
 
 	/**
 	 * This is the method to search by name, e.g. name:contains=Patient
@@ -66,6 +67,13 @@ public interface Datasource {
 	 * @param theNamePart
 	 * @return 
 	 */
-	List<String> getAllNames(String theNamePart);
+	List<String> getAllStructureDefinitionNames(String theNamePart);
 
+        /**
+         * This is the method to get a specific ValueSet by name.
+         * 
+         * @param name
+         * @return 
+         */
+        ValueSet getSingleValueSetByName(String name);
 }

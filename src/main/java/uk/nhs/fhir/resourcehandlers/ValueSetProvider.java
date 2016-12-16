@@ -18,15 +18,24 @@ package uk.nhs.fhir.resourcehandlers;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.rest.annotation.IdParam;
+import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.ValueSetCodesCache;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -43,7 +52,7 @@ public class ValueSetProvider implements IResourceProvider {
     
 //<editor-fold defaultstate="collapsed" desc="Housekeeping code">
     /**
-     * Constructor, which tell us which mongo data source we're working with.
+     * Constructor, which tell us which data source we're working with.
      *
      * @param dataSource
      */
@@ -95,6 +104,68 @@ public class ValueSetProvider implements IResourceProvider {
         
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
+    }
+//</editor-fold>
+    
+//<editor-fold defaultstate="collapsed" desc="RESTFul request handlers">
+    /**
+     * The "@Read" annotation indicates that this method supports the
+     * read operation. Read operations should return a single resource
+     * instance.
+     *
+     * @param theId
+     *    The read operation takes one parameter, which must be of type
+     *    IdDt and must be annotated with the "@Read.IdParam" annotation.
+     * @return
+     *    Returns a resource matching this identifier, or null if none exists.
+     */
+    @Read()
+    public ValueSet getValueSetById(@IdParam IdDt theId) {
+        String name = theId.getIdPart().toString();
+        ValueSet foundItem = myDataSource.getSingleValueSetByName(name);
+        return foundItem;
+    }
+    
+    /**
+     * The "@Search" annotation indicates that this method supports the
+     * search operation.
+     *
+     * @param theName
+     *    This operation takes one parameter which is the search criteria. It is
+     *    annotated with the "@Required" annotation. This annotation takes one argument,
+     *    a string containing the name of the search criteria. The datatype here
+     *    is StringParam, but there are other possible parameter types depending on the
+     *    specific search criteria.
+     * @return
+     *    This method returns a list of ValueSets where the name matches the supplied parameter.
+     */
+    @Search()
+    public List<ValueSet> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
+        List<ValueSet> results = new ArrayList<ValueSet>();
+        return results;
+    }
+    
+    /**
+     * The "@Search" annotation indicates that this method supports the
+     * search operation.
+     *
+     * @param theCode
+     *    This operation takes one parameter which is the search criteria. It is
+     *    annotated with the "@Required" annotation. This annotation takes one argument,
+     *    a string containing the code of the search criteria.
+     * @return
+     *    This method returns a list of ValueSets which contain the supplied code.
+     */
+    @Search()
+    public List<ValueSet> getValueSetsByCode(@RequiredParam(name = ValueSet.SP_CODE) StringParam theCode) {
+        List<ValueSet> results = new ArrayList<ValueSet>();
+        ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
+        
+        List<String> names = codeCache.findCode(theCode.getValue());
+        for(String theName : names) {
+            results.add(myDataSource.getSingleValueSetByName(theName));
+        }
+        return results;
     }
 //</editor-fold>
 }

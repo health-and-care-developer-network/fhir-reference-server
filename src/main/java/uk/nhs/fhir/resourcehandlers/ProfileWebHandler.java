@@ -56,7 +56,7 @@ public class ProfileWebHandler {
     
     public String getAllNames(String resourceType) {
         LOG.info("Called: ProfileWebHandler.getAllNames()");
-        List<String> myNames = myDataSource.getAllNames();
+        List<String> myNames = myDataSource.getAllStructureDefinitionNames();
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -68,7 +68,7 @@ public class ProfileWebHandler {
     
     public String getAllGroupedNames(String resourceType) {
         LOG.info("Called: ProfileWebHandler.getAlGroupedNames()");
-        HashMap<String, List<String>> myNames = myDataSource.getAllNamesByBaseResource();
+        HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
         StringBuilder sb = new StringBuilder();
         
         sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
@@ -90,7 +90,7 @@ public class ProfileWebHandler {
 
     public String getAllNames(String resourceType, String namePart) {
         LOG.info("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myNames = myDataSource.getAllNames(namePart);
+        List<String> myNames = myDataSource.getAllStructureDefinitionNames(namePart);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {

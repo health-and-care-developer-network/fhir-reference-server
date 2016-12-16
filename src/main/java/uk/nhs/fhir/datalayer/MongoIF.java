@@ -30,6 +30,7 @@ import com.mongodb.MongoClient;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -83,7 +84,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getMatchByName(java.lang.String)
 	 */
     @Override
-	public List<StructureDefinition> getMatchByName(String theNamePart) {
+	public List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
         
@@ -111,7 +112,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAll()
 	 */
     @Override
-	public List<StructureDefinition> getAll() {
+	public List<StructureDefinition> getAllStructureDefinitions() {
         LOG.info("Getting all StructureDefinitions");
         
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
@@ -135,7 +136,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames()
 	 */
     @Override
-	public List<String> getAllNames() {
+	public List<String> getAllStructureDefinitionNames() {
         LOG.info("Getting all StructureDefinition Names");
         
         List<String> list = new ArrayList<String>();
@@ -160,7 +161,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames(java.lang.String)
 	 */
     @Override
-	public List<String> getAllNames(String theNamePart) {
+	public List<String> getAllStructureDefinitionNames(String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         List<String> list = new ArrayList<String>();
@@ -185,8 +186,13 @@ public class MongoIF implements Datasource {
         return list;
     }
     
-    public HashMap<String, List<String>> getAllNamesByBaseResource() {
+    public HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource() {
     	//TODO: Implement this for Mongo
     	return null;
+    }
+
+    @Override
+    public ValueSet getSingleValueSetByName(String name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
