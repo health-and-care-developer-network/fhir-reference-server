@@ -72,7 +72,7 @@ public class ProfileLoader implements IValidationSupport {
      */
     @Override
     public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext fc, ValueSet.ConceptSetComponent csc) {
-        LOG.fine("Request to ProfileLoader.expandValueSet() for: " + csc.getSystem().toString() + "\nTHIS IS NOT YET IMPLEMENTED\n\n");
+        LOG.warning("Request to ProfileLoader.expandValueSet() for: " + csc.getSystem().toString() + "\nTHIS IS NOT YET IMPLEMENTED\n\n");
         return null;
     }
 
@@ -150,6 +150,11 @@ public class ProfileLoader implements IValidationSupport {
         // NB: We need to decide here whether we should inspect the url, and fetch the file locally, or
         // just http fetch it even if we're fetching it from this server.
         DomainResource theResource = null;
+        
+        if(string.equals("http://hl7.org/fhir/StructureDefinition/xhtml")) {
+            LOG.severe("Asked to retrieve resource: http://hl7.org/fhir/StructureDefinition/xhtml  -- Returning null");
+            return (T) theResource;
+        }
 
         theResource = ResourceCache.getResource(string);
 

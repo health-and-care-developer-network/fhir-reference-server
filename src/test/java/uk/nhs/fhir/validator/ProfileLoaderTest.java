@@ -35,6 +35,7 @@ public class ProfileLoaderTest {
     FhirContext fc;
     ValueSet vs;
     String vsURL = "https://raw.githubusercontent.com/nhsconnect/gpconnect-fhir/develop/ValueSets/gpconnect-error-or-warning-code-1.xml";
+    String xhtmlURL = "http://hl7.org/fhir/StructureDefinition/xhtml";
     String VALUESET = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ValueSet xmlns=\"http://hl7.org/fhir\">\n" +
         "  <id value=\"example-inline\"/>\n" +
         "  <meta>\n" +
@@ -160,7 +161,24 @@ public class ProfileLoaderTest {
         ValueSet result = (ValueSet) instance.fetchResource(fc, ValueSet.class, vsURL);
         assertEquals(expResult, result.getName());
     }
+    
+    /**
+     * Test of fetchResource method, of class ProfileLoader.
+     * This test tries to fetch from URL found in the narrative block like this:
+     * <div xmlns="http://www.w3.org/1999/xhtml"> 
+     * 
+     * We should just return a null object!
+     */
+    @Test
+    public void testFetchBadResource() {
+        System.out.println("fetchResource");
+        ProfileLoader instance = new ProfileLoader();
+        ValueSet result = (ValueSet) instance.fetchResource(fc, ValueSet.class, xhtmlURL);
+        assertNull(result);
+    }
 
+
+    
     /**
      * Test of isCodeSystemSupported method, of class ProfileLoader.
      */
