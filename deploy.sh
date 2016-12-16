@@ -32,7 +32,7 @@ CPUFLAG=768
 echo "Pull and run FHIR server"
 if [ ! -z $REGISTRY_HOST ]
 then
-  docker $TARGET_PREFIX pull $REGISTRY_URL/$IMAGE_NAME
+  docker $TARGET_PREFIX pull $SOURCE
 fi
 
 docker $TARGET_PREFIX stop $CONTAINER_NAME
