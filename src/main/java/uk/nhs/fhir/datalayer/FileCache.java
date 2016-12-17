@@ -145,59 +145,79 @@ public class FileCache {
         if(updateRequired()) {
             lastUpdated = System.currentTimeMillis();
             LOG.fine("Updating cache from fliesystem");
-            ArrayList<String> newFileList = new ArrayList<String>();
-            ArrayList<StructureDefinition> newProfileList = new ArrayList<StructureDefinition>();
-            File folder = new File(profilePath);
-            File[] files = folder.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(fileExtension);
-                }
-            });
             
-            for(int i = 0; i < files.length; i++) {
-                if(files[i].isFile()) {
-                    LOG.fine("Reading profile file into cache: " + files[i].getName());
-                    
-                    // Add it to the name list
-                    String name = files[i].getName();
-                    newFileList.add(FileLoader.removeFileExtension(name));
-                    
-                    // Add the profile itself
-                    StructureDefinition profile = FHIRUtils.loadProfileFromFile(files[i]);
-                    newProfileList.add(profile);
-                }
-            }
+            profileList = cacheProfileFiles();
+            profileFileList = cacheFileNames(profilePath);
             
-            profileList = newProfileList;
-            profileFileList = newFileList;
             
-            newFileList = new ArrayList<String>();
-            ArrayList<ValueSet> newValueSetList = new ArrayList<ValueSet>();
-            folder = new File(valueSetPath);
-            files = folder.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(fileExtension);
-                }
-            });
-            
-            for(int i = 0; i < files.length; i++) {
-                if(files[i].isFile()) {
-                    LOG.fine("Reading ValueSet file into cache: " + files[i].getName());
-                    
-                    // Add it to the name list
-                    String name = files[i].getName();
-                    newFileList.add(FileLoader.removeFileExtension(name));
-                    
-                    // Add the profile itself
-                    ValueSet valSet = FHIRUtils.loadValueSetFromFile(files[i]);
-                    newValueSetList.add(valSet);
-                }
-            }
-            
-            ValueSetList = newValueSetList;
-            ValueSetFileList = newFileList;
+            ValueSetList = cacheValueSetFiles();
+            ValueSetFileList = cacheFileNames(valueSetPath);
         }
     }
+    
+    
+    private static ArrayList<String> cacheFileNames(String path){
+        ArrayList<String> newFileList = new ArrayList<String>();
+        File folder = new File(path);
+            File[] fileList = folder.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(fileExtension);
+                }
+            });
+            
+        for (File thisFile : fileList) {
+            if (thisFile.isFile()) {
+                LOG.fine("Reading profile filename into cache: " + thisFile.getName());
+                // Add it to the name list
+                String name = thisFile.getName();
+                newFileList.add(FileLoader.removeFileExtension(name));
+            }
+        }
+        return newFileList;
+    }
+    
+    private static ArrayList<StructureDefinition> cacheProfileFiles() {
+        ArrayList<StructureDefinition> newProfileList = new ArrayList<StructureDefinition>();
+        File folder = new File(profilePath);
+        File[] files = folder.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(fileExtension);
+            }
+        });
+
+        for(int i = 0; i < files.length; i++) {
+            if(files[i].isFile()) {
+                LOG.fine("Reading profile file into cache: " + files[i].getName());
+
+                // Add the profile itself
+                StructureDefinition profile = FHIRUtils.loadProfileFromFile(files[i]);
+                newProfileList.add(profile);
+            }
+        }
+        return newProfileList;
+    }
+
+    private static ArrayList<ValueSet> cacheValueSetFiles() {
+        ArrayList<ValueSet> newProfileList = new ArrayList<ValueSet>();
+        File folder = new File(valueSetPath);
+        File[] files = folder.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(fileExtension);
+            }
+        });
+
+        for(int i = 0; i < files.length; i++) {
+            if(files[i].isFile()) {
+                LOG.fine("Reading profile file into cache: " + files[i].getName());
+
+                // Add the profile itself
+                ValueSet profile = FHIRUtils.loadValueSetFromFile(files[i]);
+                newProfileList.add(profile);
+            }
+        }
+        return newProfileList;
+    }
+
 //</editor-fold>
     
 
