@@ -15,7 +15,9 @@
  */
 package uk.nhs.fhir;
 
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
@@ -104,34 +107,69 @@ public class PlainContent extends InterceptorAdapter {
     }
     
     private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
-    	
-        //content = theResponse.getWriter();
-        //content.append("<html><body>");
-    		StructureDefinition sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
-        	content.append("<div class='fhirServerGeneratedContent'>");
-        	content.append(fhirServerWarning);
-        	content.append(fhirServerNotice);
-            content.append("<h2 class='resourceType'>" + sd.getName() + " (" + resourceType + ")</h2>");
-            
-            content.append("<div class='resourceSummary'>");
-            content.append("<ul>");
-            content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
-            content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
-            content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
-            content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
-            content.append("<li>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
-            content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
-            content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
-            content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
-            content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
-            content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
-            content.append("</div>");
-            
-            content.append("<div class='treeView'>");
-            content.append(sd.getText().getDivAsString());
-            content.append("</div>");
-            
-            content.append("</div>");
+
+        content.append("<div class='fhirServerGeneratedContent'>");
+        content.append(fhirServerWarning);
+        content.append(fhirServerNotice);
+
+        if(resourceType.equals("StructureDefinition")) {
+            content.append(DescribeStructureDefinition(theRequestDetails, resourceType));
+        }
+        if(resourceType.equals("ValueSet")) {
+            content.append(DescribeValueSet(theRequestDetails, resourceType));
+        }
+        
+        
+        
+        content.append("</div>");
+    }
+
+    private String DescribeStructureDefinition(RequestDetails theRequestDetails, String resourceType) {
+        StringBuilder content = new StringBuilder();
+        StructureDefinition sd;
+        sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
+        content.append("<h2 class='resourceType'>" + sd.getName() + " (" + resourceType + ")</h2>");
+        content.append("<div class='resourceSummary'>");
+        content.append("<ul>");
+        content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
+        content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
+        content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
+        content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
+        content.append("<li>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
+        content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
+        content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
+        content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
+        content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
+        content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
+        content.append("</div>");
+        content.append("<div class='treeView'>");
+        content.append(sd.getText().getDivAsString());
+        content.append("</div>");
+        return content.toString();
+    }
+    
+    private String DescribeValueSet(RequestDetails theRequestDetails, String resourceType) {
+        StringBuilder content = new StringBuilder();
+        ValueSet valSet;
+        valSet = myWebber.getVSByName(theRequestDetails.getId().getIdPart());
+        content.append("<h2 class='resourceType'>" + valSet.getName() + " (" + resourceType + ")</h2>");
+        content.append("<div class='resourceSummary'>");
+        content.append("<ul>");
+        content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
+        content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
+        content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
+        content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
+        content.append("<li>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
+        content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
+        content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
+        content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
+        content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
+        //content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getFhirVersion()) + "</li>");
+        content.append("</div>");
+        content.append("<div class='treeView'>");
+        content.append(valSet.getText().getDivAsString());
+        content.append("</div>");
+        return content.toString();
     }
     
     private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {

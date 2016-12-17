@@ -16,6 +16,7 @@
 package uk.nhs.fhir.resourcehandlers;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -104,5 +105,11 @@ public class ProfileWebHandler {
         LOG.info("Called: ProfileWebHandler.getSDByName(String name)");
         StructureDefinition sd = myDataSource.getSingleStructureDefinitionByName(name);
         return sd;
+    }
+
+    public ValueSet getVSByName(String name) {
+        LOG.info("Called: ProfileWebHandler.getVSByName(String name)");
+        ValueSet valSet = myDataSource.getSingleValueSetByName(name);
+        return valSet;
     }
 }

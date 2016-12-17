@@ -134,7 +134,7 @@ public class FileCache {
     private static boolean updateRequired() {
         long currentTime = System.currentTimeMillis();
         if(profileList == null || (currentTime > (lastUpdated + updateInterval))) {
-            LOG.info("Cache needs updating");
+            LOG.fine("Cache needs updating");
             return true;
         }
         LOG.info("Using Cache");
@@ -144,7 +144,7 @@ public class FileCache {
     private synchronized static void updateCache() {
         if(updateRequired()) {
             lastUpdated = System.currentTimeMillis();
-            LOG.info("Updating cache from fliesystem");
+            LOG.fine("Updating cache from fliesystem");
             ArrayList<String> newFileList = new ArrayList<String>();
             ArrayList<StructureDefinition> newProfileList = new ArrayList<StructureDefinition>();
             File folder = new File(profilePath);
@@ -156,7 +156,7 @@ public class FileCache {
             
             for(int i = 0; i < files.length; i++) {
                 if(files[i].isFile()) {
-                    LOG.info("Reading profile file into cache: " + files[i].getName());
+                    LOG.fine("Reading profile file into cache: " + files[i].getName());
                     
                     // Add it to the name list
                     String name = files[i].getName();
@@ -182,7 +182,7 @@ public class FileCache {
             
             for(int i = 0; i < files.length; i++) {
                 if(files[i].isFile()) {
-                    LOG.info("Reading ValueSet file into cache: " + files[i].getName());
+                    LOG.fine("Reading ValueSet file into cache: " + files[i].getName());
                     
                     // Add it to the name list
                     String name = files[i].getName();

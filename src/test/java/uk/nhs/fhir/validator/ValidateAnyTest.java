@@ -383,6 +383,6 @@ public class ValidateAnyTest {
             }
             System.out.println("+++Severity: [" + sev + "] Diagnostic message: [" + thisIssue.getDiagnosticsElement().toString() + "]");
         }        
-        assertEquals(0, errorCount);
+        assertEquals(1, errorCount);
     }
 }
