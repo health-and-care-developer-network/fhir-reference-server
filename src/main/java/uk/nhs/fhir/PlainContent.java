@@ -111,24 +111,30 @@ public class PlainContent extends InterceptorAdapter {
         content.append("<div class='fhirServerGeneratedContent'>");
         content.append(fhirServerWarning);
         content.append(fhirServerNotice);
+        
+        String resourceName = theRequestDetails.getId().getIdPart();
 
         if(resourceType.equals("StructureDefinition")) {
-            content.append(DescribeStructureDefinition(theRequestDetails, resourceType));
+            content.append(DescribeStructureDefinition(resourceName));
         }
         if(resourceType.equals("ValueSet")) {
-            content.append(DescribeValueSet(theRequestDetails, resourceType));
+            content.append(DescribeValueSet(resourceName));
         }
-        
-        
         
         content.append("</div>");
     }
 
-    private String DescribeStructureDefinition(RequestDetails theRequestDetails, String resourceType) {
+    /**
+     * Code in here to create the HTML response to a request for a StructureDefinition we hold.
+     * 
+     * @param resourceName Name of the SD we need to describe.
+     * @return 
+     */
+    private String DescribeStructureDefinition(String resourceName) {
         StringBuilder content = new StringBuilder();
         StructureDefinition sd;
-        sd = myWebber.getSDByName(theRequestDetails.getId().getIdPart());
-        content.append("<h2 class='resourceType'>" + sd.getName() + " (" + resourceType + ")</h2>");
+        sd = myWebber.getSDByName(resourceName);
+        content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
         content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
@@ -148,11 +154,19 @@ public class PlainContent extends InterceptorAdapter {
         return content.toString();
     }
     
-    private String DescribeValueSet(RequestDetails theRequestDetails, String resourceType) {
+
+    /**
+     * Code to generate a HTML view of the named ValueSet
+     * 
+     * @param resourceName Named resource we need to describe.
+     * 
+     * @return 
+     */
+    private String DescribeValueSet(String resourceName) {
         StringBuilder content = new StringBuilder();
         ValueSet valSet;
-        valSet = myWebber.getVSByName(theRequestDetails.getId().getIdPart());
-        content.append("<h2 class='resourceType'>" + valSet.getName() + " (" + resourceType + ")</h2>");
+        valSet = myWebber.getVSByName(resourceName);
+        content.append("<h2 class='resourceType'>" + valSet.getName() + " (ValueSet)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
         content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
@@ -173,6 +187,7 @@ public class PlainContent extends InterceptorAdapter {
     }
     
     private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+        
     	Map<String, String[]> params = theRequestDetails.getParameters();
         
         content.append("<div class='fhirServerGeneratedContent'>");
