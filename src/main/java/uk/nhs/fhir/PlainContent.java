@@ -15,15 +15,21 @@
  */
 package uk.nhs.fhir;
 
+import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.api.TagList;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.NotImplementedException;
@@ -256,4 +262,39 @@ public class PlainContent extends InterceptorAdapter {
     private static Object printIfNotNull(Object input) {
         return (input == null) ? "" : input;
     }
+    
+    @Override
+	public boolean outgoingResponse(RequestDetails theRequestDetails, Bundle theResponseObject,
+			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
+			throws AuthenticationException {
+    	addResponseHeaders(theServletResponse);
+		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
+	}
+
+	@Override
+	public boolean outgoingResponse(RequestDetails theRequestDetails, HttpServletRequest theServletRequest,
+			HttpServletResponse theServletResponse) throws AuthenticationException {
+		addResponseHeaders(theServletResponse);
+		return super.outgoingResponse(theRequestDetails, theServletRequest, theServletResponse);
+	}
+
+	@Override
+	public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject,
+			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
+			throws AuthenticationException {
+		addResponseHeaders(theServletResponse);
+		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
+	}
+
+	@Override
+	public boolean outgoingResponse(RequestDetails theRequestDetails, TagList theResponseObject,
+			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
+			throws AuthenticationException {
+		addResponseHeaders(theServletResponse);
+		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
+	}
+	
+	protected void addResponseHeaders(HttpServletResponse resp) {
+		resp.addHeader("Access-Control-Allow-Origin", "*");
+	}
 }
