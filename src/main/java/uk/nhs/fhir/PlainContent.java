@@ -15,7 +15,6 @@
  */
 package uk.nhs.fhir;
 
-import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
@@ -23,117 +22,121 @@ import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import uk.nhs.fhir.resourcehandlers.ProfileWebHandler;
+import org.apache.commons.lang3.NotImplementedException;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
- *
+ * Class used to generate html content when a request comes from a browser.
+ * 
  * @author Tim Coates
  */
 public class PlainContent extends InterceptorAdapter {
+
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
-    ProfileWebHandler myWebber = null;
+    ResourceWebHandler myWebHandler = null;
     private String template = null;
-    private String fhirServerNotice = null;
-    private String fhirServerWarning = null;
-    
-    public PlainContent(ProfileWebHandler webber) {
-        myWebber = webber;
+
+    public PlainContent(ResourceWebHandler webber) {
+        myWebHandler = webber;
         template = FileLoader.loadFileOnClasspath("/template/profiles.html");
-        fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
-        fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
     }
-    
-    
-    
+
     @Override
     public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) {
         PrintWriter outputStream = null;
 
         String mimes = theRequest.getHeader("accept");
-        
+
         if (mimes == null) {
-        	LOG.info("No accept header set, assume a non-browser client.");
+            LOG.info("No accept header set, assume a non-browser client.");
             return true;
         } else {
             if (mimes.contains("html") == false) {
-            	LOG.info("Accept header set, but without html, so assume a non-browser client.");
-            	return true;
+                LOG.info("Accept header set, but without html, so assume a non-browser client.");
+                return true;
             }
         }
-        
+
         if (theRequestDetails.getOperation() != null) {
-	        if (theRequestDetails.getOperation().equals("metadata")) {
-	        	// We don't have any rendered version of the conformance profile as yet, so just return it in raw form
-	        	return true;
-	        }
+            if (theRequestDetails.getOperation().equals("metadata")) {
+                // We don't have any rendered version of the conformance profile as yet, so just return it in raw form
+                return true;
+            }
         }
 
         LOG.info("This appears to be a browser, generate some HTML to return.");
-        
+
         StringBuffer content = new StringBuffer();
         String resourceType = theRequestDetails.getResourceName();
-        
+
         try {
-        	if(theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ){
-        		renderSingleResource(theRequestDetails, content, resourceType);
+            if (theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ) {
+                renderSingleResource(theRequestDetails, content, resourceType);
             } else {
                 renderListOfResources(theRequestDetails, content, resourceType);
             }
-            
+
             // Initialise the output
             theResponse.setStatus(200);
-    	    theResponse.setContentType("text/html");
-    		outputStream = theResponse.getWriter();
-    		
-    		// Put the content into our template
-    	    String outputString = template;
+            theResponse.setContentType("text/html");
+            outputStream = theResponse.getWriter();
+
+            // Put the content into our template
+            String outputString = template;
             outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
-            
+
             // Send it to the output
             outputStream.append(outputString);
-            
+
         } catch (IOException ex) {
             LOG.severe("Error sending response: " + ex.getMessage());
         }
         return false;
     }
-    
+
+    /**
+     * Code used to display a single resource as HTML when requested by a
+     * browser.
+     *
+     * @param theRequestDetails
+     * @param content
+     * @param resourceType
+     */
     private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
 
-        content.append("<div class='fhirServerGeneratedContent'>");
-        content.append(fhirServerWarning);
-        content.append(fhirServerNotice);
-        
+        content.append(GenerateIntroSection());
+
         String resourceName = theRequestDetails.getId().getIdPart();
 
-        if(resourceType.equals("StructureDefinition")) {
+        if (resourceType.equals("StructureDefinition")) {
             content.append(DescribeStructureDefinition(resourceName));
         }
-        if(resourceType.equals("ValueSet")) {
+        if (resourceType.equals("ValueSet")) {
             content.append(DescribeValueSet(resourceName));
         }
-        
+        if (resourceType.equals("OperationDefinition")) {
+            throw new NotImplementedException("Code not yet written for OperationDefinition resources...");
+        }
         content.append("</div>");
     }
 
     /**
-     * Code in here to create the HTML response to a request for a StructureDefinition we hold.
-     * 
+     * Code in here to create the HTML response to a request for a
+     * StructureDefinition we hold.
+     *
      * @param resourceName Name of the SD we need to describe.
-     * @return 
+     * @return
      */
     private String DescribeStructureDefinition(String resourceName) {
         StringBuilder content = new StringBuilder();
         StructureDefinition sd;
-        sd = myWebber.getSDByName(resourceName);
+        sd = myWebHandler.getSDByName(resourceName);
         content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
@@ -153,19 +156,18 @@ public class PlainContent extends InterceptorAdapter {
         content.append("</div>");
         return content.toString();
     }
-    
 
     /**
      * Code to generate a HTML view of the named ValueSet
-     * 
+     *
      * @param resourceName Named resource we need to describe.
-     * 
-     * @return 
+     *
+     * @return
      */
     private String DescribeValueSet(String resourceName) {
         StringBuilder content = new StringBuilder();
         ValueSet valSet;
-        valSet = myWebber.getVSByName(resourceName);
+        valSet = myWebHandler.getVSByName(resourceName);
         content.append("<h2 class='resourceType'>" + valSet.getName() + " (ValueSet)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
@@ -185,32 +187,64 @@ public class PlainContent extends InterceptorAdapter {
         content.append("</div>");
         return content.toString();
     }
-    
+
+    /**
+     * Code called to render a list of resources. for example in response to a
+     * url like http://host/fhir/StructureDefinition
+     *
+     *
+     * @param theRequestDetails
+     * @param content
+     * @param resourceType
+     */
     private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+
+        Map<String, String[]> params = theRequestDetails.getParameters();
+
+        content.append(GenerateIntroSection());
         
-    	Map<String, String[]> params = theRequestDetails.getParameters();
-        
-        content.append("<div class='fhirServerGeneratedContent'>");
-        content.append(fhirServerWarning);
-        content.append(fhirServerNotice);
-        content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2><ul>");
-        
-        if(params.containsKey("name") || params.containsKey("name:contains")) {
-            if(params.containsKey("name")) {
-                content.append(myWebber.getAllNames(resourceType, params.get("name")[0]));
+        content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2>");
+
+        content.append("<ul>");
+        if (params.containsKey("name") || params.containsKey("name:contains")) {
+            if (params.containsKey("name")) {
+                content.append(myWebHandler.getAllNames(resourceType, params.get("name")[0]));
             }
-            if(params.containsKey("name:contains")) {
-                content.append(myWebber.getAllNames(resourceType, params.get("name:contains")[0]));
+            if (params.containsKey("name:contains")) {
+                content.append(myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]));
             }
         } else {
-            //content.append(myWebber.getAllNames(resourceType));
-            content.append(myWebber.getAllGroupedNames(resourceType));
+            content.append(myWebHandler.getAllGroupedNames(resourceType));
         }
         content.append("</ul>");
         content.append("</div>");
     }
-    
+
+    /**
+     * Simply encapsulates multiple repeated lines used to build the start of
+     * the html section
+     * 
+     * @return 
+     */
+    private String GenerateIntroSection() {
+        StringBuilder buffer = new StringBuilder();
+
+        String fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
+        String fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
+        
+        buffer.append("<div class='fhirServerGeneratedContent'>");
+        buffer.append(fhirServerWarning);
+        buffer.append(fhirServerNotice);
+        return buffer.toString();
+    }
+
+    /**
+     * Simple helper class to avoid errors caused by null values.
+     *
+     * @param input
+     * @return
+     */
     private static Object printIfNotNull(Object input) {
-    	return (input == null)?"":input;
+        return (input == null) ? "" : input;
     }
 }

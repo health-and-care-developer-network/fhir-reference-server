@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Tim Coates
  */
-public class ProfileWebHandler {
+public class ResourceWebHandler {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     
@@ -37,7 +37,7 @@ public class ProfileWebHandler {
     private static String endOfBaseResourceBox = null;
     Datasource myDataSource = null;
 
-    public ProfileWebHandler(Datasource dataSource) {
+    public ResourceWebHandler(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -56,7 +56,7 @@ public class ProfileWebHandler {
     }
     
     public String getAllNames(String resourceType) {
-        LOG.info("Called: ProfileWebHandler.getAllNames()");
+        LOG.fine("Called: ProfileWebHandler.getAllNames()");
         List<String> myNames = myDataSource.getAllStructureDefinitionNames();
         StringBuilder sb = new StringBuilder();
         
@@ -68,7 +68,7 @@ public class ProfileWebHandler {
     }
     
     public String getAllGroupedNames(String resourceType) {
-        LOG.info("Called: ProfileWebHandler.getAlGroupedNames()");
+        LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
         HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
         StringBuilder sb = new StringBuilder();
         
@@ -90,7 +90,7 @@ public class ProfileWebHandler {
     }
 
     public String getAllNames(String resourceType, String namePart) {
-        LOG.info("Called: ProfileWebHandler.getAllNames(String namePart)");
+        LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
         List<String> myNames = myDataSource.getAllStructureDefinitionNames(namePart);
         StringBuilder sb = new StringBuilder();
         
@@ -102,13 +102,13 @@ public class ProfileWebHandler {
     }
         
     public StructureDefinition getSDByName(String name) {
-        LOG.info("Called: ProfileWebHandler.getSDByName(String name)");
+        LOG.fine("Called: ProfileWebHandler.getSDByName(String name)");
         StructureDefinition sd = myDataSource.getSingleStructureDefinitionByName(name);
         return sd;
     }
 
     public ValueSet getVSByName(String name) {
-        LOG.info("Called: ProfileWebHandler.getVSByName(String name)");
+        LOG.fine("Called: ProfileWebHandler.getVSByName(String name)");
         ValueSet valSet = myDataSource.getSingleValueSetByName(name);
         return valSet;
     }

@@ -95,7 +95,7 @@ public class RestfulServlet extends RestfulServer {
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
 
-        ProfileWebHandler webber = new ProfileWebHandler(dataSource);
+        ResourceWebHandler webber = new ResourceWebHandler(dataSource);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
