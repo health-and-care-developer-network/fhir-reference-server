@@ -104,18 +104,16 @@ public class ValidatorFactory {
             
             if(localValidationFlag) {
                 LOG.info("New validator _WILL_ validate against custom (local) profiles");
-                // NB we also do instance validation...
                 // ... with our own profile loader implementation
                 IValidationSupport ourProfileLoader = new ProfileLoader(); // This is our custom profile loader
                 ValidationSupportChain supportChain = new ValidationSupportChain(new DefaultProfileValidationSupport(), ourProfileLoader);
                 instanceValidator.setValidationSupport(supportChain);
-                validator.registerValidatorModule(instanceValidator);
             } else {
                 LOG.info("New validator _WILL_NOT_ validate against custom (local) profiles");
-                // NB we will do instance validation
-                validator.registerValidatorModule(instanceValidator);
             }
-            // Create some validation modules and register them
+            validator.registerValidatorModule(instanceValidator);
+
+                // Create some validation modules and register them
             IValidatorModule schemaBaseValidator = new SchemaBaseValidator(ctx);
             IValidatorModule schematronBaseValidator = new SchematronBaseValidator(ctx);
 
@@ -124,7 +122,7 @@ public class ValidatorFactory {
 
             // We also validate against schematrons ?
             validator.setValidateAgainstStandardSchematron(true);
-            
+            validator.setValidateAgainstStandardSchema(true);
             version = ctx.getVersion();
         } else {
             LOG.info("We will reuse the existing validator :-)");
