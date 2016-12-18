@@ -182,7 +182,7 @@ public class FilesystemIF implements Datasource {
     public List<ValueSet> getValueSetMatchByName(String theNamePart) {
         LOG.info("Getting ValueSets with name=" + theNamePart);
         List<ValueSet> list = new ArrayList<ValueSet>();
-        List<String> matchingNames = getAllValueSetNames(theNamePart);
+        List<String> matchingNames = getAllMatchedValueSetNames(theNamePart);
 
         for(String name : matchingNames) {
             list.add(getSingleValueSetByName(name));
@@ -196,7 +196,7 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return 
      */
-    public List<String> getAllValueSetNames(String theNamePart) {
+    public List<String> getAllMatchedValueSetNames(String theNamePart) {
         LOG.info("Getting all ValueSet Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of ValueSets first");
@@ -219,6 +219,18 @@ public class FilesystemIF implements Datasource {
         }
         LOG.info("Returning matches");
         return matches;
+    }
+
+    public List<String> getAllValueSetNames() {
+        LOG.info("Getting all ValueSet Names");
+        List<String> valSetList = FileCache.getValueSetNameList();
+        
+        return valSetList;
+    }
+
+    @Override
+    public List<ValueSet> getAllValueSets() {
+        return FileCache.getValueSets();
     }
     
 

@@ -27,7 +27,7 @@ import java.util.List;
  * @author tim.coates@hscic.gov.uk
  */
 public class ValueSetCodesCache {
-    List<cacheObject> _cache;
+    private static List<cacheObject> _cache;
     private static ValueSetCodesCache _instance = null;
 
     /**
@@ -82,9 +82,10 @@ public class ValueSetCodesCache {
      *              <code value="R"/>
      *              <display value="Fully Registered"/>
      *          </concept>
+     * 
      * @return A List of ValueSet names, where this code was found.
      */
-    public List<String> findCode(String code) {
+    public static List<String> findCode(String code) {
         List<String> matches = new ArrayList<String>();
         
         for(cacheObject cacheItem : _cache) {

@@ -167,5 +167,11 @@ public class ValueSetProvider implements IResourceProvider {
         }
         return results;
     }
+    
+    @Search
+    public List<ValueSet> getAllValueSets() {
+        List<ValueSet> results = myDataSource.getAllValueSets();
+        return results;
+    }
 //</editor-fold>
 }

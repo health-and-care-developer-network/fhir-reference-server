@@ -55,7 +55,7 @@ public class ResourceWebHandler {
         LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    public String getAllNames(String resourceType) {
+    public String getAllStructureDefinitionNames(String resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAllNames()");
         List<String> myNames = myDataSource.getAllStructureDefinitionNames();
         StringBuilder sb = new StringBuilder();
@@ -67,25 +67,35 @@ public class ResourceWebHandler {
         return sb.toString();
     }
     
-    public String getAllGroupedNames(String resourceType) {
+    public String getAllGroupedStructureDefinitionNames(String resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
-        HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
         StringBuilder sb = new StringBuilder();
-        
         sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
         
-        for(String base : myNames.keySet()) {
-        	sb.append(startOfBaseResourceBox);
-        	sb.append(base);
-        	sb.append(endOfBaseResourceBox);
-        	for(String name : myNames.get(base)) {
-                sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
+        if(resourceType.equals("StructureDefinition")) {
+            HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
+            for(String base : myNames.keySet()) {
+                    sb.append(startOfBaseResourceBox);
+                    sb.append(base);
+                    sb.append(endOfBaseResourceBox);
+                    for(String name : myNames.get(base)) {
+                    sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
+                }
+                sb.append("</ul></section></div></div>");
             }
-        	sb.append("</ul></section></div></div>");
         }
         
-        sb.append("</div>");
+        if(resourceType.equals("ValueSet")) {
+            List<String> myNames = myDataSource.getAllValueSetNames();
+            
+            for(String name : myNames) {
+                sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
+            }
+            sb.append("</ul></section></div></div>");
+        }
         
+        
+        sb.append("</div>");        
         return sb.toString();
     }
 

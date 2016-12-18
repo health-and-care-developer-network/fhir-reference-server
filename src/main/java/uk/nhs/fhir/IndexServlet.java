@@ -60,7 +60,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
     	
     	content.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
     	outputFancyBox(content, "StructureDefinition", "StructureDefinition", "List all StructureDefinitions");
-    	outputFancyBox(content, "ValueSet", "#", "[Coming Soon] List all ValueSets");
+    	outputFancyBox(content, "ValueSet", "ValueSet", "List all ValueSets");
     	outputFancyBox(content, "OperationDefinition", "#", "[Coming Soon] List all OperationDefinition resources");
     	outputFancyBox(content, "Conformance", "#", "[Coming Soon] List all Conformance resources");
     	content.append("</div>");

@@ -33,18 +33,20 @@ import uk.nhs.fhir.util.PropertyReader;
 
 /**
  * Class used to generate html content when a request comes from a browser.
- * 
+ *
  * @author Tim Coates
  */
 public class PlainContent extends InterceptorAdapter {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ResourceWebHandler myWebHandler = null;
-    private String template = null;
+    private String SDtemplate = null;
+    private String VStemplate = null;
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
-        template = FileLoader.loadFileOnClasspath("/template/profiles.html");
+        SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
+        VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
     }
 
     @Override
@@ -88,7 +90,14 @@ public class PlainContent extends InterceptorAdapter {
             outputStream = theResponse.getWriter();
 
             // Put the content into our template
-            String outputString = template;
+            String outputString = null;
+            if (resourceType.equals("StructureDefinition")) {
+                outputString = SDtemplate;
+            }
+            if (resourceType.equals("ValueSet")) {
+                outputString = VStemplate;
+            }
+
             outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
 
             // Send it to the output
@@ -202,7 +211,7 @@ public class PlainContent extends InterceptorAdapter {
         Map<String, String[]> params = theRequestDetails.getParameters();
 
         content.append(GenerateIntroSection());
-        
+
         content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2>");
 
         content.append("<ul>");
@@ -214,7 +223,7 @@ public class PlainContent extends InterceptorAdapter {
                 content.append(myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]));
             }
         } else {
-            content.append(myWebHandler.getAllGroupedNames(resourceType));
+            content.append(myWebHandler.getAllGroupedStructureDefinitionNames(resourceType));
         }
         content.append("</ul>");
         content.append("</div>");
@@ -223,15 +232,15 @@ public class PlainContent extends InterceptorAdapter {
     /**
      * Simply encapsulates multiple repeated lines used to build the start of
      * the html section
-     * 
-     * @return 
+     *
+     * @return
      */
     private String GenerateIntroSection() {
         StringBuilder buffer = new StringBuilder();
 
         String fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
         String fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
-        
+
         buffer.append("<div class='fhirServerGeneratedContent'>");
         buffer.append(fhirServerWarning);
         buffer.append(fhirServerNotice);
