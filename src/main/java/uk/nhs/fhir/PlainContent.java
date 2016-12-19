@@ -23,13 +23,18 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
@@ -59,6 +64,37 @@ public class PlainContent extends InterceptorAdapter {
         PrintWriter outputStream = null;
 
         String mimes = theRequest.getHeader("accept");
+
+
+        if(theRequestDetails.getOperation() != null) {
+            if(theRequestDetails.getOperation().equals("$validate")) {
+                try {
+                    StringBuffer jb = new StringBuffer();
+                    String line = null;
+                    BufferedReader reader = theRequest.getReader();
+                    while((line = reader.readLine()) != null) {
+                        jb.append(line);
+                    }
+                    line = jb.toString();
+                    System.out.println(line);
+                    
+                    // Here we need to:
+                    // 1) Extract the parameters into a NodeList.
+                    // 2) Get the Node which holds the resource we're validating into a String:
+                    // eg: <parameter><name value="resource"/><resource><Patient xmlns="http://hl7.org/fhir">
+                    // 3) Call: ValidateAny.validateStructureDefinition(FhirContext. theString);
+                    // 4) put the MethodOutcome we get back in the response
+                    // 5 return false to stop any further processing by HAPI
+                    
+                } catch (IOException ex) {
+                    Logger.getLogger(PlainContent.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return true;
+            }
+        }
+
+
+
 
         if (mimes == null) {
             LOG.info("No accept header set, assume a non-browser client.");
@@ -261,7 +297,7 @@ public class PlainContent extends InterceptorAdapter {
     private static Object printIfNotNull(Object input) {
         return (input == null) ? "" : input;
     }
-    
+
     @Override
 	public boolean outgoingResponse(RequestDetails theRequestDetails, Bundle theResponseObject,
 			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
@@ -292,7 +328,7 @@ public class PlainContent extends InterceptorAdapter {
 		addResponseHeaders(theServletResponse);
 		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
 	}
-	
+
 	protected void addResponseHeaders(HttpServletResponse resp) {
 		resp.addHeader("Access-Control-Allow-Origin", "*");
 	}
