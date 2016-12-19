@@ -3,13 +3,28 @@
 # Usage:
 # build.sh registryhostname
 
-TAGNAME="nhsd/fhir-make-html"
-BUILDFOLDER="."
-
-source $(dirname $0)/lib/build.sh
-
 # Copy jars
 cp -R ../target .
 
-build_image
+REGISTRY_HOST=$1
+IMAGE_NAME="nhsd/fhir-make-html"
 
+REGISTRY_URL=$REGISTRY_HOST:5000
+
+if [ -z $REGISTRY_HOST ]
+then
+  REGISTRY_PREFIX=""
+else
+  REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
+fi
+
+# Build the publisher image
+set -e # Stop on error
+docker $REGISTRY_PREFIX build -t $IMAGE_NAME .
+
+if [ ! -z $REGISTRY_HOST ]
+then
+  docker $REGISTRY_PREFIX tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME
+  docker $REGISTRY_PREFIX push $REGISTRY_URL/$IMAGE_NAME
+  docker $REGISTRY_PREFIX rmi $IMAGE_NAME
+fi

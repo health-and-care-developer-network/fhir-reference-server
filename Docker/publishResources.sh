@@ -17,10 +17,10 @@ IMAGE_NAME="nhsd/fhir-make-html"
 if [ -z $REGISTRY_HOST ]
 then
   REGISTRY_PREFIX=""
-  REGISTRY_URL=""
+  SOURCE=$IMAGE_NAME
 else
   REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
-  REGISTRY_URL=$REGISTRY_HOST:5000/
+  SOURCE=$REGISTRY_HOST:5000/$IMAGE_NAME
 fi
 
 if [ -z $TARGET_HOST ]
@@ -33,11 +33,11 @@ fi
 # Run the publisher to generate the FHIR content
 if [ -z $REGISTRY_HOST ]
 then
-	docker $TARGET_PREFIX pull $REGISTRY_URL$IMAGE_NAME
+	docker $TARGET_PREFIX pull $SOURCE
 fi
 docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
-	$REGISTRY_URL$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH
+	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH
 
