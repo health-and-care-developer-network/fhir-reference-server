@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname
+# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path
 
 GITHUB_URL=$1
 BRANCH=$2
@@ -10,6 +10,7 @@ OLD_URL=$4
 NEW_URL=$5
 REGISTRY_HOST=$6
 TARGET_HOST=$7
+OUT_PATH=$8
 
 IMAGE_NAME="nhsd/fhir-make-html"
 
@@ -38,5 +39,5 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
-	$REGISTRY_URL$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL
+	$REGISTRY_URL$IMAGE_NAME $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH
 
