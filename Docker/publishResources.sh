@@ -31,7 +31,7 @@ else
 fi
 
 # Run the publisher to generate the FHIR content
-if [ -z $REGISTRY_HOST ]
+if [ ! -z $REGISTRY_HOST ]
 then
 	docker $TARGET_PREFIX pull $SOURCE
 fi
