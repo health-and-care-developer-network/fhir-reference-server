@@ -15,10 +15,13 @@
  */
 package uk.nhs.fhir;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.TagList;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -137,7 +140,32 @@ public class PlainContent extends InterceptorAdapter {
         if (resourceType.equals("OperationDefinition")) {
             throw new NotImplementedException("Code not yet written for OperationDefinition resources...");
         }
+        
+        content.append(GetXMLContent(resourceName));
+        
         content.append("</div>");
+        
+    }
+    
+    private String GetXMLContent(String resourceName) {
+        StructureDefinition sd = myWebHandler.getSDByName(resourceName);
+        // Clear out the generated text
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv("");
+        sd.setText(textElement);
+        // Serialise it to XML
+        FhirContext ctx = FhirContext.forDstu2();
+        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(sd);
+        // Encode it for HTML output
+        String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
+        // Wrap it in a div and pre tag
+        StringBuffer out = new StringBuffer();
+        out.append("<div class='rawXML'><pre lang='xml'>");
+        out.append(xml);
+        out.append("</pre></div>");
+        
+        return out.toString();
     }
 
     /**

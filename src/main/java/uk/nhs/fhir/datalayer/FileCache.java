@@ -84,6 +84,8 @@ public class FileCache {
         HashMap<String, List<String>> result = new HashMap<String, List<String>>();
         try {
             for(StructureDefinition sd : profileList) {
+                boolean isExtension = (sd.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+                //TODO: Show extensions differently?
                 String base = sd.getConstrainedType();
                 String name = sd.getName();
                 if(result.containsKey(base)) {
