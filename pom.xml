@@ -75,12 +75,12 @@
             <version>3.3.0</version>
             <type>jar</type>
         </dependency>
-        <!-- <dependency>
+        <dependency>
             <groupId>org.hl7.fhir</groupId>
             <artifactId>validator</artifactId>
             <version>1.0</version>
             <type>jar</type>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
