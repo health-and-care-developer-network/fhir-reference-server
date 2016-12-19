@@ -75,8 +75,8 @@ public class PlainContent extends InterceptorAdapter {
                     while((line = reader.readLine()) != null) {
                         jb.append(line);
                     }
-                    line = jb.toString();
-                    System.out.println(line);
+                    ResourceSeparator rs = new ResourceSeparator();
+                    String resourceString = ResourceSeparator.getResource(jb);
                     
                     // Here we need to:
                     // 1) Extract the parameters into a NodeList.
@@ -89,7 +89,7 @@ public class PlainContent extends InterceptorAdapter {
                 } catch (IOException ex) {
                     Logger.getLogger(PlainContent.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                return true;
+                return false;
             }
         }
 
