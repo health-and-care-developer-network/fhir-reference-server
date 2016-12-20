@@ -14,6 +14,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,8 +75,8 @@ public class ResourceSeparator {
                                 NodeList resourceContents = param.getElementsByTagName("resource");
                                 if(resourceContents.getLength() != 0) {
                                     Node resource = resourceContents.item(0);
-                                    Node resourceContentElement = resource.getFirstChild();
-                                    String peekaboo = nodeToString(resource);                   // Added to see what's in the parent element during debugging, not used.
+                                    Node resourceContentElement = (Node) resource.getChildNodes().item(1);
+                                    //String peekaboo = nodeToString(resource);                   // Added to see what's in the parent element during debugging, not used.
                                     result = nodeToString(resourceContentElement);    // Get the entire contents of the specified Element.
                                 }
                             }
@@ -94,13 +98,41 @@ public class ResourceSeparator {
         }
         return result;
     }
+    
+    public static String getPassedResource(StringBuffer inputtext) {
+        String result = null;
+        try {
+            String input = inputtext.toString();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(input));
+            Document document = docBuilder.parse(is);
+            
+            XPathFactory xPathfactory = XPathFactory.newInstance();
+            XPath xpath = xPathfactory.newXPath();
+            XPathExpression expr = xpath.compile("/Parameters/parameter/resource/element()/node()");
+            result = expr.evaluate(document);
+                    
+                    
+        } catch (XPathExpressionException ex) {
+            LOG.severe("XPathExpressionException: " + ex.getMessage());
+            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            LOG.severe("ParserConfigurationException: " + ex.getMessage());
+        } catch (SAXException ex) {
+            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
 
     private static String nodeToString(Node node) {
         StringWriter buf = new StringWriter();
         try {
             Transformer xform = TransformerFactory.newInstance().newTransformer();
             xform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            xform.setOutputProperty(OutputKeys.INDENT, "no");
+            //xform.setOutputProperty(OutputKeys.INDENT, "no");
             xform.transform(new DOMSource(node), new StreamResult(buf));
         } catch (TransformerException ex) {
             LOG.severe("TransformerException: " + ex.getMessage());
