@@ -2,13 +2,21 @@ package uk.nhs.fhir;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,17 +64,16 @@ public class ResourceSeparator {
                             
                             Element nameValue = (Element) nameParts.item(0);
                             String nameVal = nameValue.getAttribute("value"); // We get the value of that name element
+
                             if(nameVal.equals("resource")) {
-                                // Here we've isolated the resource parameter within the Parameters section...
-                                
+                                // Here we've isolated the resource parameter within the Parameters section...    
                                 // That element has an inner element called resource, which has the actual Resource as it's inner text
                                 NodeList resourceContents = param.getElementsByTagName("resource");
                                 if(resourceContents.getLength() != 0) {
-                                    Element resource = (Element) resourceContents.item(0);
-                                    
-                                    //We just need the innerText of that element.
-                                    // See: http://stackoverflow.com/questions/8979851/java-how-to-extract-a-complete-xml-block
-                                    result = resource.getTextContent();
+                                    Node resource = resourceContents.item(0);
+                                    Node resourceContentElement = resource.getFirstChild();
+                                    String peekaboo = nodeToString(resource);                   // Added to see what's in the parent element during debugging, not used.
+                                    result = nodeToString(resourceContentElement);    // Get the entire contents of the specified Element.
                                 }
                             }
                         }
@@ -87,5 +94,18 @@ public class ResourceSeparator {
         }
         return result;
     }
-    
+
+    private static String nodeToString(Node node) {
+        StringWriter buf = new StringWriter();
+        try {
+            Transformer xform = TransformerFactory.newInstance().newTransformer();
+            xform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            xform.setOutputProperty(OutputKeys.INDENT, "no");
+            xform.transform(new DOMSource(node), new StreamResult(buf));
+        } catch (TransformerException ex) {
+            LOG.severe("TransformerException: " + ex.getMessage());
+        }
+        return (buf.toString());
+    }
+
 }

@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.XmlParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -97,8 +98,9 @@ public class ValidateAny {
      * 
      * @return A MethodOutcome describing what happened.
      */
-    public static MethodOutcome validateStructureDefinition(FhirContext ctx, String serialisedResource) {
-        MethodOutcome retval = new MethodOutcome();
+    public static String validateStructureDefinition(String serialisedResource) {
+        FhirContext ctx = FhirContext.forDstu2();
+        String retValue = null;
 
         FhirValidator validator;
         try {
@@ -121,8 +123,9 @@ public class ValidateAny {
             for (int i = 0; i < result.getMessages().size(); i++) {
                 LOG.warning(result.getMessages().get(i).toString());
             }
-
-            retval.setOperationOutcome(oo);
+            
+            retValue = ctx.newXmlParser().encodeResourceToString(oo);
+            
 
             if (result.isSuccessful()) {
                 LOG.info("Validation passed");
@@ -130,8 +133,8 @@ public class ValidateAny {
                 LOG.warning("Validation failed");
             }            
         } catch (Exception except) {
-            LOG.warning("Exception caught when getting a validator: " + except.getMessage());
+            LOG.warning("Exception caught when getting and using a validator: " + except.getMessage());
         }
-        return retval;
+        return retValue;
     }
 }

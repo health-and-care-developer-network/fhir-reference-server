@@ -19,6 +19,7 @@ import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.TagList;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -40,6 +41,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  * Class used to generate html content when a request comes from a browser.
@@ -76,16 +78,22 @@ public class PlainContent extends InterceptorAdapter {
                         jb.append(line);
                     }
                     ResourceSeparator rs = new ResourceSeparator();
-                    String resourceString = ResourceSeparator.getResource(jb);
                     
                     // Here we need to:
                     // 1) Extract the parameters into a NodeList.
                     // 2) Get the Node which holds the resource we're validating into a String:
                     // eg: <parameter><name value="resource"/><resource><Patient xmlns="http://hl7.org/fhir">
+                    String resourceString = ResourceSeparator.getResource(jb);
                     // 3) Call: ValidateAny.validateStructureDefinition(FhirContext. theString);
+                    String outcome = ValidateAny.validateStructureDefinition(resourceString);
                     // 4) put the MethodOutcome we get back in the response
                     // 5 return false to stop any further processing by HAPI
+                                // Initialise the output
+                    theResponse.setStatus(200);
+                    theResponse.setContentType("text/html");
+                    outputStream = theResponse.getWriter();
                     
+                    outputStream.append(outcome);
                 } catch (IOException ex) {
                     Logger.getLogger(PlainContent.class.getName()).log(Level.SEVERE, null, ex);
                 }
