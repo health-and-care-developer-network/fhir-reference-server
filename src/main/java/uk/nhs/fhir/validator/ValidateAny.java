@@ -23,6 +23,7 @@ import ca.uhn.fhir.validation.ValidationResult;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue;
 import ca.uhn.fhir.parser.XmlParser;
+import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -115,14 +116,17 @@ public class ValidateAny {
 
             // Pass a resource in to be validated.
             ValidationResult result = null;
-            OperationOutcome oo;
+            OperationOutcome oo = null;
             try {
-                result = validator.validateWithResult(serialisedResource);
-                oo = (OperationOutcome) result.toOperationOutcome();
-            } catch (Exception e) {
-                LOG.warning(e.getMessage());
+                if(validator != null) {
+                    result = validator.validateWithResult(serialisedResource);
+                    oo = (OperationOutcome) result.toOperationOutcome();
+                }
+            } catch (InternalErrorException e) {
+                String errorMsg = e.getMessage();
+                LOG.warning(errorMsg);
                 Issue theIssue = new Issue();
-                theIssue.setDiagnostics(e.getMessage());
+                theIssue.setDiagnostics(errorMsg);
                 oo = new OperationOutcome();
                 oo.addIssue(theIssue);
             }
@@ -138,8 +142,9 @@ public class ValidateAny {
                 } else {
                     LOG.warning("Validation failed");
                 }
+            } else {
+                LOG.warning("Validation failed");
             }
-
         } catch (Exception except) {
             LOG.warning("Exception caught when getting and using a validator: " + except.getMessage());
         }
