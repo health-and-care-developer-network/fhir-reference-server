@@ -3,7 +3,6 @@ package uk.nhs.fhir;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,10 +13,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import org.apache.commons.lang3.NotImplementedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,10 +70,9 @@ public class ResourceSeparator {
                                 // That element has an inner element called resource, which has the actual Resource as it's inner text
                                 NodeList resourceContents = param.getElementsByTagName("resource");
                                 if(resourceContents.getLength() != 0) {
-                                    Node resource = resourceContents.item(0);
-                                    Node resourceContentElement = (Node) resource.getChildNodes().item(1);
-                                    //String peekaboo = nodeToString(resource);                   // Added to see what's in the parent element during debugging, not used.
-                                    result = nodeToString(resourceContentElement);    // Get the entire contents of the specified Element.
+                                    Element resource = (Element) resourceContents.item(0);
+                                    NodeList resourceContentElements = resource.getElementsByTagName("*");  // Get the first Element the within the <resource> element
+                                    result = nodeToString(resourceContentElements.item(0));    // Get the entire contents of the specified Element.
                                 }
                             }
                         }
@@ -93,40 +88,13 @@ public class ResourceSeparator {
             }
         } else {
             if(input.startsWith("{") || input.startsWith("[")) {
-                // Here can we assume we've got JSON, is this check sstrong enough??
+                // Here can we assume we've got JSON, is this check strong enough??
+                throw new NotImplementedException("Not yet ready to validate JSON resources");
             }
         }
         return result;
     }
     
-    public static String getPassedResource(StringBuffer inputtext) {
-        String result = null;
-        try {
-            String input = inputtext.toString();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            InputSource is = new InputSource(new StringReader(input));
-            Document document = docBuilder.parse(is);
-            
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            XPathExpression expr = xpath.compile("/Parameters/parameter/resource/element()/node()");
-            result = expr.evaluate(document);
-                    
-                    
-        } catch (XPathExpressionException ex) {
-            LOG.severe("XPathExpressionException: " + ex.getMessage());
-            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            LOG.severe("ParserConfigurationException: " + ex.getMessage());
-        } catch (SAXException ex) {
-            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ResourceSeparator.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
-    }
-
     private static String nodeToString(Node node) {
         StringWriter buf = new StringWriter();
         try {

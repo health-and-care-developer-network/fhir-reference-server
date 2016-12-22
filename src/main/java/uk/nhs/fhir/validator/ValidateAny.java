@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.resource.OperationOutcome.Issue;
 import ca.uhn.fhir.parser.XmlParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,24 +115,31 @@ public class ValidateAny {
 
             // Pass a resource in to be validated.
             ValidationResult result = null;
+            OperationOutcome oo;
             try {
                 result = validator.validateWithResult(serialisedResource);
+                oo = (OperationOutcome) result.toOperationOutcome();
             } catch (Exception e) {
-                LOG.info(e.getMessage());
+                LOG.warning(e.getMessage());
+                Issue theIssue = new Issue();
+                theIssue.setDiagnostics(e.getMessage());
+                oo = new OperationOutcome();
+                oo.addIssue(theIssue);
             }
-            OperationOutcome oo = (OperationOutcome) result.toOperationOutcome();
-            for (int i = 0; i < result.getMessages().size(); i++) {
-                LOG.warning(result.getMessages().get(i).toString());
-            }
-            
             retValue = ctx.newXmlParser().encodeResourceToString(oo);
             
+            if(result != null) {
+                for (int i = 0; i < result.getMessages().size(); i++) {
+                    LOG.warning(result.getMessages().get(i).toString());
+                }
+            
+                if (result.isSuccessful()) {
+                    LOG.info("Validation passed");
+                } else {
+                    LOG.warning("Validation failed");
+                }
+            }
 
-            if (result.isSuccessful()) {
-                LOG.info("Validation passed");
-            } else {
-                LOG.warning("Validation failed");
-            }            
         } catch (Exception except) {
             LOG.warning("Exception caught when getting and using a validator: " + except.getMessage());
         }
