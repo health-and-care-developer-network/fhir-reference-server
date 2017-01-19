@@ -125,8 +125,10 @@ public class XMLParserUtils {
             types.add(thisType);
             if(thisType.equals("Reference")) {
                 Element profileNode = (Element) typeNode.getElementsByTagName("profile").item(0);
-                String profileName = profileNode.getAttribute("value");
-                profiles.add(profileName);
+                if (profileNode != null) {
+                	String profileName = profileNode.getAttribute("value");
+                	profiles.add(profileName);
+                }
             }
         }
 
