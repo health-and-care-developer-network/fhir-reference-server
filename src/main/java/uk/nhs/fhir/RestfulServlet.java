@@ -106,9 +106,11 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new BundleProvider(dataSource));
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
-
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");
+        
+        setServerConformanceProvider(new CustomServerConformanceProvider());
+        LOG.info("Custom Conformance provider added");
     }
 }

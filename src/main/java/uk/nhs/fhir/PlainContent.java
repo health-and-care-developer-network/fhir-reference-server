@@ -19,6 +19,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.TagList;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
@@ -26,6 +27,8 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
+import ca.uhn.fhir.rest.server.provider.dstu2.ServerConformanceProvider;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -50,71 +53,138 @@ public class PlainContent extends InterceptorAdapter {
     ResourceWebHandler myWebHandler = null;
     private String SDtemplate = null;
     private String VStemplate = null;
+    private String ServerConformanceTemplate = null;
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
         VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
+        ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
     }
 
-    @Override
-    public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) {
-        PrintWriter outputStream = null;
-
-        String mimes = theRequest.getHeader("accept");
-
+    protected boolean isBrowser(HttpServletRequest theRequest) {
+    	String mimes = theRequest.getHeader("accept");
+    	// Check if this has come from a browser
         if (mimes == null) {
             LOG.info("No accept header set, assume a non-browser client.");
-            return true;
+            return false;
         } else {
             if (mimes.contains("html") == false) {
                 LOG.info("Accept header set, but without html, so assume a non-browser client.");
-                return true;
+                return false;
             }
         }
+        return true;
+    }
+    
+    @Override
+    public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest,
+    													HttpServletResponse theResponse) {
+        
 
-        if (theRequestDetails.getOperation() != null) {
-            if (theRequestDetails.getOperation().equals("metadata")) {
-                // We don't have any rendered version of the conformance profile as yet, so just return it in raw form
-                return true;
-            }
+        String format = theRequest.getParameter("_format");
+        
+        if (!isBrowser(theRequest)) {
+            return true;
         }
 
         LOG.info("This appears to be a browser, generate some HTML to return.");
+        
+        // We don't have any rendered version of the conformance profile as yet, so just return it in XML
+        if (theRequestDetails.getOperation() != null) {
+            if (theRequestDetails.getOperation().equals("metadata")) {
+            	//format = "xml";
+            	return true;
+            }
+        }
+        
+        // See if they have asked for an XML version, or the HTML rendered version
+        if (format == null) {
+        	format = "html";
+        }
 
         StringBuffer content = new StringBuffer();
         String resourceType = theRequestDetails.getResourceName();
 
-        try {
-            if (theRequestDetails.getRestOperationType() == RestOperationTypeEnum.READ) {
-                renderSingleResource(theRequestDetails, content, resourceType);
+        RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
+        LOG.info("FHIR Operation:" + operation);
+        LOG.info("Format to return to browser:" + format);
+        
+            if (operation == RestOperationTypeEnum.READ) {
+            	if (format.equals("html")) {
+            		renderSingleResource(theRequestDetails, content, resourceType);
+            	} else if (format.equals("xml")) {
+            		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType);
+            	}
             } else {
                 renderListOfResources(theRequestDetails, content, resourceType);
             }
 
-            // Initialise the output
-            theResponse.setStatus(200);
-            theResponse.setContentType("text/html");
-            outputStream = theResponse.getWriter();
+            streamHTMLresponse(theResponse, resourceType, content);
 
-            // Put the content into our template
-            String outputString = null;
-            if (resourceType.equals("StructureDefinition")) {
-                outputString = SDtemplate;
-            }
-            if (resourceType.equals("ValueSet")) {
-                outputString = VStemplate;
-            }
-
-            outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
-
-            // Send it to the output
-            outputStream.append(outputString);
-
-        } catch (IOException ex) {
-            LOG.severe("Error sending response: " + ex.getMessage());
-        }
+        
         return false;
+    }
+    
+    protected void streamHTMLresponse(HttpServletResponse theResponse, String resourceType, StringBuffer content) {
+    	try {
+	    	// Initialise the output
+	    	PrintWriter outputStream = null;
+	        theResponse.setStatus(200);
+	        theResponse.setContentType("text/html");
+			outputStream = theResponse.getWriter();
+	
+	        // Put the content into our template
+	        String outputString = null;
+	        if (resourceType == null) {
+	        	outputString = SDtemplate;
+	        } else {
+	            if (resourceType.equals("StructureDefinition")) {
+	                outputString = SDtemplate;
+	            } else if (resourceType.equals("ValueSet")) {
+	                outputString = VStemplate;
+	            } else if (resourceType.equals("Conformance")) {
+	                outputString = ServerConformanceTemplate;
+	            }
+	        }
+	
+	        outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
+	
+	        // Send it to the output
+	        outputStream.append(outputString);
+    	} catch (IOException e) {
+    		LOG.severe(e.getMessage());
+		}
+    }
+    
+    @Override
+    public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) {
+    	
+    	if (!isBrowser(theServletRequest)) {
+    		addResponseHeaders(theServletResponse);
+    		return true;
+    	} else {
+    		// Check if this is a request for the conformance resource from a browser - if so, wrap it and return it
+    		StringBuffer content = new StringBuffer();
+    		renderConformance(theRequestDetails, theServletRequest, content, theResponseObject);
+    		LOG.info(content.toString());
+    		streamHTMLresponse(theServletResponse, "Conformance", content);
+    		return false;
+    	}
+	}
+    
+    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+        content.append(GenerateIntroSection());
+        String resourceName = theRequestDetails.getId().getIdPart();
+        content.append(getResourceContent(resourceName));
+        content.append("</div>");
+    }
+    
+    private void renderConformance(RequestDetails theRequestDetails, HttpServletRequest theRequest, StringBuffer content, IBaseResource conformance) {
+    	LOG.info("Attempting to render conformance statement");
+    	content.append(GenerateIntroSection());
+    	content.append(getResourceAsXML(conformance, null));
+        content.append("</div>");
     }
 
     /**
@@ -141,30 +211,36 @@ public class PlainContent extends InterceptorAdapter {
             throw new NotImplementedException("Code not yet written for OperationDefinition resources...");
         }
         
-        content.append(GetXMLContent(resourceName));
+        //content.append(GetXMLContent(resourceName));
         
         content.append("</div>");
         
     }
     
-    private String GetXMLContent(String resourceName) {
+    private String getResourceContent(String resourceName) {
         StructureDefinition sd = myWebHandler.getSDByName(resourceName);
         // Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv("");
         sd.setText(textElement);
+        return getResourceAsXML(sd, sd.getName());
+    }
+    
+    private String getResourceAsXML(IBaseResource resource, String url) {
         // Serialise it to XML
         FhirContext ctx = FhirContext.forDstu2();
-        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(sd);
+        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
         // Encode it for HTML output
         String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
         // Wrap it in a div and pre tag
         StringBuffer out = new StringBuffer();
+        if (url != null) {
+        	out.append("<p><a href='./" + url + "'>Back to rendered profile</a></p>");
+        }
         out.append("<div class='rawXML'><pre lang='xml'>");
         out.append(xml);
         out.append("</pre></div>");
-        
         return out.toString();
     }
 
@@ -192,6 +268,7 @@ public class PlainContent extends InterceptorAdapter {
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
+        content.append("<li>Show Raw Profile: <a href='./" + sd.getName() + "?_format=xml'>XML</a></li>");
         content.append("</div>");
         content.append("<div class='treeView'>");
         content.append(sd.getText().getDivAsString());
@@ -303,14 +380,6 @@ public class PlainContent extends InterceptorAdapter {
 			HttpServletResponse theServletResponse) throws AuthenticationException {
 		addResponseHeaders(theServletResponse);
 		return super.outgoingResponse(theRequestDetails, theServletRequest, theServletResponse);
-	}
-
-	@Override
-	public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject,
-			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
-			throws AuthenticationException {
-		addResponseHeaders(theServletResponse);
-		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
 	}
 
 	@Override
