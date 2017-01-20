@@ -144,7 +144,7 @@ public class PlainContent extends CORSInterceptor {
     private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
         String resourceName = theRequestDetails.getId().getIdPart();
-        content.append(getResourceContent(resourceName, mimeType));
+        content.append(getResourceContent(resourceName, mimeType, resourceType));
         content.append("</div>");
     }
     
@@ -189,17 +189,29 @@ public class PlainContent extends CORSInterceptor {
         
     }
     
-    private String getResourceContent(String resourceName, MimeType mimeType) {
-        StructureDefinition sd = myWebHandler.getSDByName(resourceName);
-        // Clear out the generated text
+    private String getResourceContent(String resourceName, MimeType mimeType, String resourceType) {
+    	
+    	IBaseResource resource = null;
+    	
+    	// Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv("");
-        sd.setText(textElement);
+    	
+    	if (resourceType.equals("StructureDefinition")) {
+    		StructureDefinition sd = myWebHandler.getSDByName(resourceName);
+    		sd.setText(textElement);
+    		resource = sd;
+    	} else if (resourceType.equals("ValueSet")) {
+    		ValueSet vs = myWebHandler.getVSByName(resourceName);
+    		vs.setText(textElement);
+    		resource = vs;
+    	}
+        
         if (mimeType == JSON) {
-        	return getResourceAsJSON(sd, sd.getName());
+        	return getResourceAsJSON(resource, resourceName);
         } else {
-        	return getResourceAsXML(sd, sd.getName());
+        	return getResourceAsXML(resource, resourceName);
         }
     }
     
@@ -212,7 +224,7 @@ public class PlainContent extends CORSInterceptor {
         // Wrap it in a div and pre tag
         StringBuffer out = new StringBuffer();
         if (url != null) {
-        	out.append("<p><a href='./" + url + "'>Back to rendered profile</a></p>");
+        	out.append("<p><a href='./" + url + "'>Back to rendered view</a></p>");
         }
         out.append("<div class='rawXML'><pre lang='xml'>");
         out.append(xml);
@@ -229,7 +241,7 @@ public class PlainContent extends CORSInterceptor {
         // Wrap it in a div and pre tag
         StringBuffer out = new StringBuffer();
         if (url != null) {
-        	out.append("<p><a href='./" + url + "'>Back to rendered profile</a></p>");
+        	out.append("<p><a href='./" + url + "'>Back to rendered view</a></p>");
         }
         out.append("<div class='rawXML'><pre lang='json'>");
         out.append(serialised);
@@ -261,8 +273,8 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + sd.getName() + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + sd.getName() + "?_format=json'>JSON</a></li>");
+        content.append("<li>Show Raw Profile: <a href='./" + resourceName + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         content.append("<div class='treeView'>");
         content.append(sd.getText().getDivAsString());
@@ -294,6 +306,8 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
         //content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getFhirVersion()) + "</li>");
+        content.append("<li>Show Raw ValueSet: <a href='./" + resourceName + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         content.append("<div class='renderedValueSet'>");
         content.append(valSet.getText().getDivAsString());
