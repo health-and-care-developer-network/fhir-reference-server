@@ -42,3 +42,7 @@ h2.resourceType {
     margin-top: 5px;
     line-height: 1.2em;
 }
+
+.treeView tr {
+    line-height: 0.8em;
+}
