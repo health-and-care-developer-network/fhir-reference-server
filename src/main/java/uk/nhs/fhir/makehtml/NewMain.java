@@ -692,6 +692,10 @@ public class NewMain implements Constants {
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
 
         // Here we need to get the name element
+        
+        /*
+         * AH: The FHIR server shows this meta-data anyway, so don't think we need it here?
+         
         sb.append("<table>");
         sb.append("<tr><td>Name:</td><td>" + getValueSetName(thisDoc) + "</td></tr>\n");
         sb.append("<tr><td>Version:</td><td>" + getValueSetVersion(thisDoc) + "</td></tr>\n");
@@ -700,7 +704,8 @@ public class NewMain implements Constants {
         sb.append("<tr><td>URL:</td><td>" + getValueSetURL(thisDoc) + "</td></tr>\n");
         sb.append("<tr><td>Status:</td><td>" + getValueSetStatus(thisDoc) + "</td></tr>\n");
         sb.append("</table>");
-
+		*/
+        
         //<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
         NodeList composeSet = thisDoc.getElementsByTagName("compose");
         if(composeSet.getLength() > 0) {
