@@ -729,16 +729,33 @@ public class NewMain implements Constants {
             for(int i = 0; i < composeIncludes.getLength(); i++) {
                 Element includeRef = (Element) composeIncludes.item(i);
 
-                sb.append("<p><table><tr><td><b>Include:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
+                sb.append("<p><table><tr><td><b>Code System:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
 
                 NodeList filterList = includeRef.getElementsByTagName("filter");
+                if (filterList.getLength()>0) {
+                	sb.append("<tr><td colspan='2'><b>Filters:</b></td></tr>");
+                }
                 for(int j = 0; j < filterList.getLength(); j++) {
                     Element theFilter = (Element) filterList.item(j);
-
                     sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
                     sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
                     sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
                 }
+                
+                NodeList includeList = includeRef.getElementsByTagName("concept");
+                if (includeList.getLength()>0) {
+                	sb.append("<tr><td colspan='2'><b>Includes:</b></td></tr>");
+                }
+                for(int j = 0; j < includeList.getLength(); j++) {
+                    Element theInclude = (Element) includeList.item(j);
+                    sb.append("<tr><td colspan='2'><li>");
+                    sb.append("<b>code:</b> " + getFirstNamedChildValue(theInclude, "code"));
+                    sb.append(": ");
+                    sb.append("<b>display:</b> " + getFirstNamedChildValue(theInclude, "display"));
+                    sb.append("</li></td></tr>");
+                    
+                }
+                
                 sb.append("</table></p>");
             }
 
