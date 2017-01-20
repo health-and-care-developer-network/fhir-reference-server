@@ -15,175 +15,147 @@
  */
 package uk.nhs.fhir;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.TagList;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.Conformance;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
-import ca.uhn.fhir.rest.method.RequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
-import ca.uhn.fhir.rest.server.provider.dstu2.ServerConformanceProvider;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.READ;
+import static uk.nhs.fhir.util.ClientType.BROWSER;
+import static uk.nhs.fhir.util.ClientType.NON_BROWSER;
+import static uk.nhs.fhir.util.MimeType.JSON;
+import static uk.nhs.fhir.util.MimeType.XML;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
+import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.ClientType;
+import uk.nhs.fhir.util.MimeType;
+import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
  * Class used to generate html content when a request comes from a browser.
  *
- * @author Tim Coates
+ * @author Tim Coates, Adam Hatherly
  */
-public class PlainContent extends InterceptorAdapter {
+public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ResourceWebHandler myWebHandler = null;
-    private String SDtemplate = null;
-    private String VStemplate = null;
-    private String ServerConformanceTemplate = null;
+    PageTemplateHelper templateHelper = null;
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
-        SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
-        VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
-        ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
-    }
-
-    protected boolean isBrowser(HttpServletRequest theRequest) {
-    	String mimes = theRequest.getHeader("accept");
-    	// Check if this has come from a browser
-        if (mimes == null) {
-            LOG.info("No accept header set, assume a non-browser client.");
-            return false;
-        } else {
-            if (mimes.contains("html") == false) {
-                LOG.info("Accept header set, but without html, so assume a non-browser client.");
-                return false;
-            }
-        }
-        return true;
+        templateHelper = new PageTemplateHelper();
     }
     
     @Override
     public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest,
     													HttpServletResponse theResponse) {
         
-
-        String format = theRequest.getParameter("_format");
+    	// First detect if this is a browser, and the mime type and operation requested
+    	MimeType mimeType = MimeType.getTypeFromHeader(theRequest.getParameter("_format"));
+        ClientType clientType = ClientType.getTypeFromHeaders(theRequest);
+        RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
         
-        if (!isBrowser(theRequest)) {
+        LOG.info("Request received - operation: " + operation.toString());
+        
+        // If it is not a browser, let HAPI handle returning the resource
+        if (clientType == NON_BROWSER) {
             return true;
         }
 
         LOG.info("This appears to be a browser, generate some HTML to return.");
         
-        // We don't have any rendered version of the conformance profile as yet, so just return it in XML
-        if (theRequestDetails.getOperation() != null) {
-            if (theRequestDetails.getOperation().equals("metadata")) {
-            	//format = "xml";
+        // If they have asked for the conformance profile then let this one through - it
+        // will be caught and handled by the outgoingResponse handler instead
+        if (operation != null) {
+            if (operation == METADATA) {
             	return true;
             }
-        }
-        
-        // See if they have asked for an XML version, or the HTML rendered version
-        if (format == null) {
-        	format = "html";
         }
 
         StringBuffer content = new StringBuffer();
         String resourceType = theRequestDetails.getResourceName();
 
-        RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
-        LOG.info("FHIR Operation:" + operation);
-        LOG.info("Format to return to browser:" + format);
+        LOG.info("FHIR Operation: " + operation);
+        LOG.info("Format to return to browser: " + mimeType.toString());
         
-            if (operation == RestOperationTypeEnum.READ) {
-            	if (format.equals("html")) {
-            		renderSingleResource(theRequestDetails, content, resourceType);
-            	} else if (format.equals("xml")) {
-            		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType);
-            	}
-            } else {
-                renderListOfResources(theRequestDetails, content, resourceType);
-            }
+        boolean showList = true;
+        
+        if (operation != null) {
+        	if (operation == READ) {
+	        	if (mimeType == XML || mimeType == JSON) {
+	        		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
+	        		showList = false;
+	        	} else {
+	        		renderSingleResource(theRequestDetails, content, resourceType);
+	        		showList = false;
+	        	}
+	        }
+        }
+        
+        // We either don't have an operation, or we don't understand the operation, so
+        // return a list of resources instead
+        if (showList) {
+        	renderListOfResources(theRequestDetails, content, resourceType);
+        }
 
-            streamHTMLresponse(theResponse, resourceType, content);
-
+        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
         
         return false;
-    }
-    
-    protected void streamHTMLresponse(HttpServletResponse theResponse, String resourceType, StringBuffer content) {
-    	try {
-	    	// Initialise the output
-	    	PrintWriter outputStream = null;
-	        theResponse.setStatus(200);
-	        theResponse.setContentType("text/html");
-			outputStream = theResponse.getWriter();
-	
-	        // Put the content into our template
-	        String outputString = null;
-	        if (resourceType == null) {
-	        	outputString = SDtemplate;
-	        } else {
-	            if (resourceType.equals("StructureDefinition")) {
-	                outputString = SDtemplate;
-	            } else if (resourceType.equals("ValueSet")) {
-	                outputString = VStemplate;
-	            } else if (resourceType.equals("Conformance")) {
-	                outputString = ServerConformanceTemplate;
-	            }
-	        }
-	
-	        outputString = outputString.replaceFirst("\\{\\{PAGE-CONTENT\\}\\}", content.toString());
-	
-	        // Send it to the output
-	        outputStream.append(outputString);
-    	} catch (IOException e) {
-    		LOG.severe(e.getMessage());
-		}
     }
     
     @Override
     public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) {
     	
-    	if (!isBrowser(theServletRequest)) {
-    		addResponseHeaders(theServletResponse);
-    		return true;
-    	} else {
-    		// Check if this is a request for the conformance resource from a browser - if so, wrap it and return it
-    		StringBuffer content = new StringBuffer();
-    		renderConformance(theRequestDetails, theServletRequest, content, theResponseObject);
-    		LOG.info(content.toString());
-    		streamHTMLresponse(theServletResponse, "Conformance", content);
-    		return false;
-    	}
+    	// First detect if this is a browser, and the mime type and operation requested
+    	MimeType mimeType = MimeType.getTypeFromHeader(theServletRequest.getParameter("_format"));
+        ClientType clientType = ClientType.getTypeFromHeaders(theServletRequest);
+        RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
+        
+        // If this is a request from a browser for the conformance resource, render and wrap it in HTML
+        if (operation != null) {
+        	if (operation == METADATA && clientType == BROWSER) {
+	    		StringBuffer content = new StringBuffer();
+	    		renderConformance(content, theResponseObject, mimeType);
+	    		LOG.info(content.toString());
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, "Conformance", content);
+	    		return false;
+    		}
+        }
+        
+		// Add the CORS header, and let HAPI handle the request
+		addCORSResponseHeaders(theServletResponse);
+		return true;
 	}
     
-    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
         String resourceName = theRequestDetails.getId().getIdPart();
-        content.append(getResourceContent(resourceName));
+        content.append(getResourceContent(resourceName, mimeType));
         content.append("</div>");
     }
     
-    private void renderConformance(RequestDetails theRequestDetails, HttpServletRequest theRequest, StringBuffer content, IBaseResource conformance) {
+    private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
     	LOG.info("Attempting to render conformance statement");
     	content.append(GenerateIntroSection());
-    	content.append(getResourceAsXML(conformance, null));
+    	if (mimeType == JSON) {
+    		content.append(getResourceAsJSON(conformance, null));
+    	} else {
+    		content.append(getResourceAsXML(conformance, null));
+    	}
         content.append("</div>");
     }
 
@@ -217,14 +189,18 @@ public class PlainContent extends InterceptorAdapter {
         
     }
     
-    private String getResourceContent(String resourceName) {
+    private String getResourceContent(String resourceName, MimeType mimeType) {
         StructureDefinition sd = myWebHandler.getSDByName(resourceName);
         // Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv("");
         sd.setText(textElement);
-        return getResourceAsXML(sd, sd.getName());
+        if (mimeType == JSON) {
+        	return getResourceAsJSON(sd, sd.getName());
+        } else {
+        	return getResourceAsXML(sd, sd.getName());
+        }
     }
     
     private String getResourceAsXML(IBaseResource resource, String url) {
@@ -240,6 +216,23 @@ public class PlainContent extends InterceptorAdapter {
         }
         out.append("<div class='rawXML'><pre lang='xml'>");
         out.append(xml);
+        out.append("</pre></div>");
+        return out.toString();
+    }
+    
+    private String getResourceAsJSON(IBaseResource resource, String url) {
+        // Serialise it to JSON
+        FhirContext ctx = FhirContext.forDstu2();
+        String serialised = ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
+        // Encode it for HTML output
+        //String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
+        // Wrap it in a div and pre tag
+        StringBuffer out = new StringBuffer();
+        if (url != null) {
+        	out.append("<p><a href='./" + url + "'>Back to rendered profile</a></p>");
+        }
+        out.append("<div class='rawXML'><pre lang='json'>");
+        out.append(serialised);
         out.append("</pre></div>");
         return out.toString();
     }
@@ -268,7 +261,8 @@ public class PlainContent extends InterceptorAdapter {
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + sd.getName() + "?_format=xml'>XML</a></li>");
+        content.append("<li>Show Raw Profile: <a href='./" + sd.getName() + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + sd.getName() + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         content.append("<div class='treeView'>");
         content.append(sd.getText().getDivAsString());
@@ -301,7 +295,7 @@ public class PlainContent extends InterceptorAdapter {
         content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
         //content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getFhirVersion()) + "</li>");
         content.append("</div>");
-        content.append("<div class='treeView'>");
+        content.append("<div class='renderedValueSet'>");
         content.append(valSet.getText().getDivAsString());
         content.append("</div>");
         return content.toString();
@@ -333,7 +327,7 @@ public class PlainContent extends InterceptorAdapter {
                 content.append(myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]));
             }
         } else {
-            content.append(myWebHandler.getAllGroupedStructureDefinitionNames(resourceType));
+            content.append(myWebHandler.getAGroupedListOfResources(resourceType));
         }
         content.append("</ul>");
         content.append("</div>");
@@ -366,31 +360,4 @@ public class PlainContent extends InterceptorAdapter {
     private static Object printIfNotNull(Object input) {
         return (input == null) ? "" : input;
     }
-    
-    @Override
-	public boolean outgoingResponse(RequestDetails theRequestDetails, Bundle theResponseObject,
-			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
-			throws AuthenticationException {
-    	addResponseHeaders(theServletResponse);
-		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
-	}
-
-	@Override
-	public boolean outgoingResponse(RequestDetails theRequestDetails, HttpServletRequest theServletRequest,
-			HttpServletResponse theServletResponse) throws AuthenticationException {
-		addResponseHeaders(theServletResponse);
-		return super.outgoingResponse(theRequestDetails, theServletRequest, theServletResponse);
-	}
-
-	@Override
-	public boolean outgoingResponse(RequestDetails theRequestDetails, TagList theResponseObject,
-			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
-			throws AuthenticationException {
-		addResponseHeaders(theServletResponse);
-		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
-	}
-	
-	protected void addResponseHeaders(HttpServletResponse resp) {
-		resp.addHeader("Access-Control-Allow-Origin", "*");
-	}
 }

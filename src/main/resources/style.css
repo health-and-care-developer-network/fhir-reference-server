@@ -34,6 +34,12 @@ h2.resourceType {
     margin-top: 5px;
 }
 
+.renderedValueSet {
+    border: thin solid #d4d2d2;
+    padding: 5px;
+    margin-top: 5px;
+}
+
 .rawXML {
     overflow-x: scroll;
     border: thin solid #d4d2d2;
@@ -45,4 +51,8 @@ h2.resourceType {
 
 .treeView tr {
     line-height: 0.8em;
+}
+
+.renderedValueSet td {
+    padding: 5px;
 }

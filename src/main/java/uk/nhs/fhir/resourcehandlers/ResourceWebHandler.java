@@ -67,12 +67,13 @@ public class ResourceWebHandler {
         return sb.toString();
     }
     
-    public String getAllGroupedStructureDefinitionNames(String resourceType) {
+    public String getAGroupedListOfResources(String resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
         StringBuilder sb = new StringBuilder();
-        sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
         
         if(resourceType.equals("StructureDefinition")) {
+        	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
+        	
             HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
             for(String base : myNames.keySet()) {
                     sb.append(startOfBaseResourceBox);
