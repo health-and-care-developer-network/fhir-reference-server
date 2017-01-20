@@ -794,6 +794,7 @@ public class NewMain implements Constants {
                         // Get the target reference for it...
                         Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
                         NodeList mapItems = thisMap.getElementsByTagName("element");
+                        sb.append("<ul>");
                         for(int k = 0; k< mapItems.getLength(); k++) {
                             Element mapItem = (Element) mapItems.item(k);
                             String mapItemCode = getFirstNamedChildValue(mapItem, "code");
@@ -805,17 +806,22 @@ public class NewMain implements Constants {
                                 for(int l = 0; l < targetList.getLength(); l++) {
                                     Element target = (Element) targetList.item(l);
 
+                                    sb.append("<li>");
+                                    
                                     // Add the target code it maps to...
-                                    sb.append("<br />&nbsp;&nbsp; <b>maps to:</b> " + getFirstNamedChildValue(target, "code"));
+                                    sb.append("<b>maps to:</b> " + getFirstNamedChildValue(target, "code"));
 
                                     // Now add how it is mapped
                                     sb.append(" (" + getFirstNamedChildValue(target, "equivalence") + ") ");
 
                                     // Now add in which mapping
-                                    sb.append(" in " + mapName + " (referenced as: " + getFirstNamedChildValue(targetReferenceElement, "reference") + ")<br /><br />");
+                                    sb.append(" in <a href='" + getFirstNamedChildValue(targetReferenceElement, "reference") + "'>" + mapName + "</a>");
+                                    
+                                    sb.append("</li>");
                                 }
                             }
                         }
+                        sb.append("</ul>");
                     }
                     sb.append("</li>");
                 }
