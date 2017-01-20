@@ -15,7 +15,7 @@ git clone $GITHUB_URL /source/files
 cd /source/files
 git checkout $BRANCH
 
-sed -i -- "s|$OLD_URL|$NEW_URL|g" /source/files/StructureDefinitions/*
+sed -i -- "s|$OLD_URL|$NEW_URL|g" /source/files/$REPO_PATH/*
 
 mkdir -p /generated/$OUT_PATH
 
