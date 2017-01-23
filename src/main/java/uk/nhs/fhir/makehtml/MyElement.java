@@ -16,8 +16,7 @@
 package uk.nhs.fhir.makehtml;
 
 import org.apache.commons.lang3.StringUtils;
-import static uk.nhs.fhir.makehtml.Constants.END_TABLE_CELL;
-import static uk.nhs.fhir.makehtml.Constants.START_TABLE_CELL;
+import static uk.nhs.fhir.makehtml.Constants.*;
 
 /**
  *
@@ -150,8 +149,13 @@ public class MyElement {
         return myFlags;
     }
     
-    public String getHTMLWrappedFlags() {
-        String result = START_TABLE_CELL;
+    public String getHTMLWrappedFlags(boolean fieldHasBeenRemovedInProfile) {
+    	String result = null;
+        if (fieldHasBeenRemovedInProfile)
+        	result = START_TABLE_CELL_REMOVED_FIELD;
+        else
+        	result = START_TABLE_CELL;
+    	
         result= result + this.myFlags;
         result= result + END_TABLE_CELL;
         return result;
@@ -161,8 +165,13 @@ public class MyElement {
         return myCardinality;
     }
     
-    public String getHTMLWrappedCardinality() {
-        String result = START_TABLE_CELL;
+    public String getHTMLWrappedCardinality(boolean fieldHasBeenRemovedInProfile) {
+    	String result = null;
+        if (fieldHasBeenRemovedInProfile)
+        	result = START_TABLE_CELL_REMOVED_FIELD;
+        else
+        	result = START_TABLE_CELL;
+        
         result= result + this.myCardinality;
         result= result + END_TABLE_CELL;
         return result;
@@ -172,16 +181,24 @@ public class MyElement {
         return display;
     }
     
-    public String getNiceTitle() {
-        return "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"" + cleanHoverText(myHover) + "\">" + localName + "</span>";
+    public String getNiceTitle(boolean fieldHasBeenRemovedInProfile) {
+        if (fieldHasBeenRemovedInProfile)
+        	return "<span style=\"text-decoration: line-through; color: gray;\" xmlns=\"http://www.w3.org/1999/xhtml\" title=\"" + cleanHoverText(myHover) + "\">" + localName + "</span>";
+        else
+        	return "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"" + cleanHoverText(myHover) + "\">" + localName + "</span>";
     }
     
     public String getDescription() {
         return this.myDescription;                
     }
     
-    public String getHTMLWrappedDescription(){
-        String result = START_TABLE_CELL;
+    public String getHTMLWrappedDescription(boolean fieldHasBeenRemovedInProfile) {
+    	String result = null;
+        if (fieldHasBeenRemovedInProfile)
+        	result = START_TABLE_CELL_REMOVED_FIELD;
+        else
+        	result = START_TABLE_CELL;
+        
         result= result + this.myDescription;
         result= result + END_TABLE_CELL;
         return result;

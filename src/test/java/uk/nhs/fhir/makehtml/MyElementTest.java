@@ -254,7 +254,7 @@ public class MyElementTest {
         System.out.println("getNiceTitle");
         MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
         String expResult = "<span xmlns=\"http://www.w3.org/1999/xhtml\" title=\"Hover text\">Name</span>";
-        String result = instance.getNiceTitle();
+        String result = instance.getNiceTitle(false);
         assertEquals(expResult, result);
     }
 
@@ -278,7 +278,7 @@ public class MyElementTest {
         System.out.println("getHTMLWrappedFlags");
         MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
         String expResult = START_TABLE_CELL + "FlagsHere" + END_TABLE_CELL;
-        String result = instance.getHTMLWrappedFlags();
+        String result = instance.getHTMLWrappedFlags(false);
         assertEquals(expResult, result);
     }
 
@@ -290,7 +290,7 @@ public class MyElementTest {
         System.out.println("getHTMLWrappedCardinality");
         MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
         String expResult = START_TABLE_CELL + "1..1" + END_TABLE_CELL;
-        String result = instance.getHTMLWrappedCardinality();
+        String result = instance.getHTMLWrappedCardinality(false);
         assertEquals(expResult, result);
     }
 
@@ -302,7 +302,7 @@ public class MyElementTest {
         System.out.println("getHTMLWrappedDescription");
         MyElement instance = new MyElement("A.New.Name", "1..1", "newType", "New type name", "FlagsHere", "The description", "Hover text", true);
         String expResult = START_TABLE_CELL + "The description" + END_TABLE_CELL;
-        String result = instance.getHTMLWrappedDescription();
+        String result = instance.getHTMLWrappedDescription(false);
         assertEquals(expResult, result);
     }
     

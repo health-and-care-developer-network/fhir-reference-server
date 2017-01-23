@@ -112,7 +112,7 @@ public class NewMain implements Constants {
                 String flags = getFlags(element);
                 String description = getTitle(element);
                 String hoverText = getDescription(element);
-
+                
                 boolean hasChanged = changedNodes.contains(elementName);
 
                 if(typeName == null) {
@@ -165,12 +165,43 @@ public class NewMain implements Constants {
             }
         }
         elementList.get(elementList.size() - 1).setIsLast(true);
+        
+        boolean fieldHasBeenRemovedInProfile = false;
+        int levelWhereFieldWasRemoved = 1;
+        
+        // Build HTML table
         for(int i = 0; i < elementList.size(); i++) {
             MyElement item = (MyElement) elementList.get(i);
+            
+            int level = item.getLevel();
+            
+            // If this field has a cardinality of 0..0 it has been removed in this
+            // profile, make a note of this so we can also remove any child fields
+            if (fieldHasBeenRemovedInProfile == true) {
+            	if (level > levelWhereFieldWasRemoved) {
+            		// Do nothing - we are in a child of a removed field, so keep this field removed too
+            	} else {
+            		// We are back up to a level where we need to check again if the field is removed
+            		fieldHasBeenRemovedInProfile = "0..0".equals(item.getCardinality());
+            		if (fieldHasBeenRemovedInProfile) {
+            			levelWhereFieldWasRemoved = level;
+            		}
+            	}
+            } else {
+            	// Check if the field is removed
+        		fieldHasBeenRemovedInProfile = "0..0".equals(item.getCardinality());
+        		if (fieldHasBeenRemovedInProfile) {
+        			levelWhereFieldWasRemoved = level;
+        		}
+            }
 
             if(item.isDisplay()) {
 
-                sb.append(START_TABLE_ROW);
+                //if (fieldHasBeenRemovedInProfile) {
+//                	sb.append(START_TABLE_ROW_REMOVED_FIELD);
+                //} else {
+                	sb.append(START_TABLE_ROW);
+//                }
 
                 // Make a cell for the tree images and the name
                 sb.append(START_TABLE_CELL);
@@ -482,23 +513,28 @@ public class NewMain implements Constants {
                     sb.append(BUNDLE);
                 }
 
-                if(item.isChanged()) {
+                if(item.isChanged() && !fieldHasBeenRemovedInProfile) {
                     sb.append("<b>");
-                    sb.append(item.getNiceTitle());
+                    sb.append(item.getNiceTitle(fieldHasBeenRemovedInProfile));
                     sb.append("</b>");
                 } else {
-                    sb.append(item.getNiceTitle());
+                    sb.append(item.getNiceTitle(fieldHasBeenRemovedInProfile));
                 }
                 sb.append(END_TABLE_CELL);
 
                 // Now the flags column
-                sb.append(item.getHTMLWrappedFlags());
+                sb.append(item.getHTMLWrappedFlags(fieldHasBeenRemovedInProfile));
 
                 // Now the Cardinality column
-                sb.append(item.getHTMLWrappedCardinality());
+                sb.append(item.getHTMLWrappedCardinality(fieldHasBeenRemovedInProfile));
 
                 // Now the type column
-                sb.append(START_TABLE_CELL);
+                if (fieldHasBeenRemovedInProfile)
+                	sb.append(START_TABLE_CELL_REMOVED_FIELD);
+                else
+                	sb.append(START_TABLE_CELL);
+                
+                
                 if(item.getTypeName().equals("Multiple_Type_Choice") == false) {
                     if(thisType == DataTypes.Resource) {
                         sb.append(decorateResourceName(item.getTypeName()));
@@ -513,7 +549,7 @@ public class NewMain implements Constants {
                 sb.append(END_TABLE_CELL);
 
                 // And now the description
-                sb.append(item.getHTMLWrappedDescription());
+                sb.append(item.getHTMLWrappedDescription(fieldHasBeenRemovedInProfile));
 
                 sb.append(END_TABLE_ROW);
             }

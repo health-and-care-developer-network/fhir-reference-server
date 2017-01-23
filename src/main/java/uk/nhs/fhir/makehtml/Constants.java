@@ -31,9 +31,13 @@ public interface Constants {
         public static final String CHOICETYPE = "<img xmlns=\"http://www.w3.org/1999/xhtml\" title=\"Choice of Types\" style=\"background-color: white; background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,R0lGODlhEAAQAMQfAGm6/idTd4yTmF+v8Xa37KvW+lyh3KHJ62aq41ee2bXZ98nm/2mt5W2Ck5XN/C1chEZieho8WXXA/2Gn4P39/W+y6V+l3qjP8Njt/lx2izxPYGyv51Oa1EJWZ////////yH5BAEAAB8ALAAAAAAQABAAAAWH4Cd+Xml6Y0pCQts0EKp6GbYshaM/skhjhCChUmFIeL4OsHIxXRAISQTl6SgIG8+FgfBMoh2qtbLZQr0TQJhk3TC4pYPBApiyFVDEwSOf18UFXxMWBoUJBn9sDgmDewcJCRyJJBoEkRyYmAABPZQEAAOhA5seFDMaDw8BAQ9TpiokJyWwtLUhADs=\" />";
 	
 	public static final String START_TABLE_CELL = "    <td style=\"font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">";
+	
+	public static final String START_TABLE_CELL_REMOVED_FIELD = "    <td style=\"text-decoration: line-through; color: gray; font-size: small; padding-top: 0px; padding-right: 4px; padding-bottom: 0px; padding-left: 4px;\">";
+	
 	public static final String END_TABLE_CELL   = "</td>\n";
 	
-	public static final String START_TABLE_ROW = "  <tr>\n";
+	public static final String START_TABLE_ROW = "  <tr style=\"line-height: 0.8em;\">\n";
+	//public static final String START_TABLE_ROW_REMOVED_FIELD = "  <tr style=\"line-height: 0.8em; text-decoration: line-through; color: gray;\">\n";
 	public static final String END_TABLE_ROW   = "   </tr>\n";
         
         // Set the set of base types which we'll use a simple icon to annotate in the html tree
