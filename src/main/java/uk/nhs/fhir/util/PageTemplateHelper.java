@@ -6,6 +6,10 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
+import uk.nhs.fhir.enums.ResourceType;
+
+import static uk.nhs.fhir.enums.ResourceType.*;
+
 public class PageTemplateHelper {
 	
 	private static final Logger LOG = Logger.getLogger(PageTemplateHelper.class.getName());
@@ -19,16 +23,16 @@ public class PageTemplateHelper {
         ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
     }
     
-    public String wrapContentInTemplate(String resourceType, StringBuffer content) {
+    public String wrapContentInTemplate(ResourceType resourceType, StringBuffer content) {
         String outputString = null;
         if (resourceType == null) {
         	outputString = SDtemplate;
         } else {
-            if (resourceType.equals("StructureDefinition")) {
+            if (resourceType == STRUCTUREDEFINITION) {
                 outputString = SDtemplate;
-            } else if (resourceType.equals("ValueSet")) {
+            } else if (resourceType == VALUESET) {
                 outputString = VStemplate;
-            } else if (resourceType.equals("Conformance")) {
+            } else if (resourceType == CONFORMANCE) {
                 outputString = ServerConformanceTemplate;
             }
         }
@@ -36,7 +40,7 @@ public class PageTemplateHelper {
         return outputString;
     }
     
-    public void streamTemplatedHTMLresponse(HttpServletResponse theResponse, String resourceType, StringBuffer content) {
+    public void streamTemplatedHTMLresponse(HttpServletResponse theResponse, ResourceType resourceType, StringBuffer content) {
     	try {
 	    	// Initialise the output
 	    	PrintWriter outputStream = null;

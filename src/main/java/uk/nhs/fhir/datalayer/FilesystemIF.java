@@ -123,6 +123,17 @@ public class FilesystemIF implements Datasource {
         LOG.info("Getting all StructureDefinition Names by base resource");
         return FileCache.getGroupedNameList();
     }
+    
+    /**
+     * Gets a full list of valueset names grouped by the broad category of the valueset
+     * for the web view of /ValueSet requests.
+     */
+    @Override
+	public HashMap<String, List<String>> getAllValueSetNamesByCategory() {
+    	LOG.info("Getting all ValueSet Names by category");
+        return FileCache.getGroupedValueSetNameList();
+	}
+    
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -232,6 +243,5 @@ public class FilesystemIF implements Datasource {
     public List<ValueSet> getAllValueSets() {
         return FileCache.getValueSets();
     }
-    
 
 }

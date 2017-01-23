@@ -24,9 +24,13 @@ import java.util.logging.Logger;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
+import static uk.nhs.fhir.enums.ResourceType.*;
 
 /**
  * Holds an in-memory cache of the profiles from the filesystem, as well as the list of profile names.
@@ -37,16 +41,18 @@ public class FileCache {
     private static final Logger LOG = Logger.getLogger(FileCache.class.getName());
 
     // Singleton object to act as a cache of the files in the profiles and valueset directories
-    private static List<String> profileFileList = null;
-    private static List<String> ValueSetFileList = null;
-    private static List<StructureDefinition> profileList = null;
-    private static List<ValueSet> ValueSetList = null;
+    private static List<ResourceEntity> profileFileList = null;
+    private static List<ResourceEntity> ValueSetFileList = null;
+    //private static List<StructureDefinition> profileList = null;
+    //private static List<ValueSet> ValueSetList = null;
 
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
     private static String profilePath = PropertyReader.getProperty("profilePath");
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
     private static String fileExtension = PropertyReader.getProperty("fileExtension");
+    
+    private static String snomedCTcodeSystem = PropertyReader.getProperty("snomedCTcodeSystem");
 
     
 //<editor-fold defaultstate="collapsed" desc="Methods to get cached StructureDefinitions and their names">
@@ -68,7 +74,7 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List<String> getStructureDefinitionNameList() {
+    public static List<ResourceEntity> getStructureDefinitionNameList() {
         if(updateRequired()) {
             updateCache();
         }
@@ -96,6 +102,51 @@ public class FileCache {
                     entry.add(name);
                     result.put(base, entry);
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.severe("ERROR: " + e.getMessage());
+        }
+        LOG.info("Generated HashMap: " + result.toString());
+        return result;
+    }
+    
+    public static HashMap<String, List<String>> getGroupedValueSetNameList() {
+        if(updateRequired()) {
+            updateCache();
+        }
+        
+        LOG.info("Creating HashMap");
+        HashMap<String, List<String>> result = new HashMap<String, List<String>>();
+        try {
+            for(ValueSet vs : ValueSetList) {
+                
+            	String category = "Code List";
+            	
+            	if (vs.getCompose() != null) {
+            		if (vs.getCompose().getInclude() != null) {
+            			List<ComposeInclude> includeList = vs.getCompose().getInclude();
+        				for (ComposeInclude includeEntry : includeList) {
+        					if (includeEntry.getSystem() != null) {
+        						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+        							category = "SNOMED CT Code List";
+        						}
+        					}
+        				}
+            		}
+            	}
+            	
+            	String name = vs.getName();
+                
+            	if(result.containsKey(category)) {
+                    List<String> entry = result.get(category);
+                    entry.add(name);
+                } else {
+                    List<String> entry = new ArrayList<String>();
+                    entry.add(name);
+                    result.put(category, entry);
+                }
+                
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,18 +199,17 @@ public class FileCache {
             lastUpdated = System.currentTimeMillis();
             LOG.fine("Updating cache from fliesystem");
             
-            profileList = cacheProfileFiles();
-            profileFileList = cacheFileNames(profilePath);
+            //profileList = cacheProfileFiles();
+            profileFileList = cacheFileNames(profilePath, STRUCTUREDEFINITION);
             
-            
-            ValueSetList = cacheValueSetFiles();
-            ValueSetFileList = cacheFileNames(valueSetPath);
+            //ValueSetList = cacheValueSetFiles();
+            ValueSetFileList = cacheFileNames(valueSetPath, VALUESET);
         }
     }
     
     
-    private static ArrayList<String> cacheFileNames(String path){
-        ArrayList<String> newFileList = new ArrayList<String>();
+    private static ArrayList<ResourceEntity> cacheFileNames(String path, ResourceType resourceType){
+        ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -169,15 +219,24 @@ public class FileCache {
             
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
-                LOG.fine("Reading profile filename into cache: " + thisFile.getName());
-                // Add it to the name list
-                String name = thisFile.getName();
-                newFileList.add(FileLoader.removeFileExtension(name));
+                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
+                
+                String name = null;
+                
+                if (resourceType == STRUCTUREDEFINITION) {
+                	StructureDefinition profile = FHIRUtils.loadProfileFromFile(thisFile);
+                	name = profile.getName();
+                } else if (resourceType == VALUESET) {
+                	ValueSet profile = FHIRUtils.loadValueSetFromFile(thisFile);
+                	name = profile.getName();
+                }
+                newFileList.add(new ResourceEntity(name, thisFile, resourceType));
             }
         }
         return newFileList;
     }
     
+    /*
     private static ArrayList<StructureDefinition> cacheProfileFiles() {
         ArrayList<StructureDefinition> newProfileList = new ArrayList<StructureDefinition>();
         File folder = new File(profilePath);
@@ -197,8 +256,9 @@ public class FileCache {
             }
         }
         return newProfileList;
-    }
+    }*/
 
+    /*
     private static ArrayList<ValueSet> cacheValueSetFiles() {
         ArrayList<ValueSet> newProfileList = new ArrayList<ValueSet>();
         File folder = new File(valueSetPath);
@@ -219,6 +279,7 @@ public class FileCache {
         }
         return newProfileList;
     }
+    */
 
 //</editor-fold>
     

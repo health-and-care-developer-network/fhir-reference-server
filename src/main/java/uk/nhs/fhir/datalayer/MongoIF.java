@@ -205,4 +205,9 @@ public class MongoIF implements Datasource {
     public List<String> getAllValueSetNames() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+	@Override
+	public HashMap<String, List<String>> getAllValueSetNamesByCategory() {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
 }

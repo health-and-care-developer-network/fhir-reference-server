@@ -87,4 +87,6 @@ public interface Datasource {
     List<ValueSet> getAllValueSets();
     
     List<String> getAllValueSetNames();
+    
+    HashMap<String, List<String>> getAllValueSetNamesByCategory();
 }
