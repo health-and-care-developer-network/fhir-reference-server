@@ -26,7 +26,7 @@ else
   SOURCE=$REGISTRY_HOST:5000/$IMAGE_NAME
 fi
 
-MEMORYFLAG=1g
+MEMORYFLAG=2g
 CPUFLAG=768
 
 echo "Pull and run FHIR server"
