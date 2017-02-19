@@ -229,8 +229,10 @@ public class FileCache {
         }
     }
     
-
     public static ResourceEntity getSingleResourceByName(String name) {
+        if(updateRequired()) {
+            updateCache();
+        }
     	for (ResourceEntity entry : resourceList) {
     		if (entry.getResourceName().equals(name) || entry.getActualResourceName().equals(name)) {
     			return entry;
