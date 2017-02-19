@@ -1062,7 +1062,6 @@ public class NewMain implements Constants {
         if(value != null) {
             sb.append("<tr><td><span title='What type this parameter has'>Type</span></td><td>" + decorateTypeName(value) + "</td></tr>");
         }
-        sb.append("<tr><td>&nbsp;</td><td></td></tr>");
         return sb.toString();
     }
 }
