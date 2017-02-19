@@ -331,7 +331,7 @@ public class FileCache {
     */
     public static ResourceEntity getSingleValueSetByName(String name) {
     	for (ResourceEntity vs : ValueSetFileList) {
-    		if (vs.getResourceName().equals(name)) {
+    		if (vs.getResourceName().equals(name) || vs.getActualResourceName().equals(name)) {
     			return vs;
     		}
     	}
@@ -340,7 +340,7 @@ public class FileCache {
 
     public static ResourceEntity getSingleProfileByName(String name) {
     	for (ResourceEntity entry : profileFileList) {
-    		if (entry.getResourceName().equals(name)) {
+    		if (entry.getResourceName().equals(name) || entry.getActualResourceName().equals(name)) {
     			return entry;
     		}
     	}
