@@ -1,4 +1,4 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.enums;
 
 import java.util.logging.Logger;
 

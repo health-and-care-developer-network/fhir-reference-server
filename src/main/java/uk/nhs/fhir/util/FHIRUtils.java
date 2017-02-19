@@ -22,7 +22,10 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.parser.DataFormatException;
+
+import java.util.List;
 import java.util.logging.Level;
 
 public class FHIRUtils {
@@ -50,6 +53,8 @@ public class FHIRUtils {
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static String examplesPath = PropertyReader.getProperty("examplesPath");
+    
+    private static String snomedCTcodeSystem = PropertyReader.getProperty("snomedCTcodeSystem");
 
     /**
      * Method to load a StructureDefinition object from a specified filename.
@@ -115,6 +120,22 @@ public class FHIRUtils {
         }
         LOG.info("ValueSet loaded - size: " + resource.length());
         return vSet;
+    }
+    
+    public static boolean isValueSetSNOMED(ValueSet vs) {
+    	if (vs.getCompose() != null) {
+    		if (vs.getCompose().getInclude() != null) {
+    			List<ComposeInclude> includeList = vs.getCompose().getInclude();
+				for (ComposeInclude includeEntry : includeList) {
+					if (includeEntry.getSystem() != null) {
+						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+							return true;
+						}
+					}
+				}
+    		}
+    	}
+    	return false;
     }
 
 }

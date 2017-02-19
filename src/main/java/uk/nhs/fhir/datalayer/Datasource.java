@@ -20,6 +20,7 @@ import java.util.List;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 
 public interface Datasource {
 
@@ -61,7 +62,7 @@ public interface Datasource {
      *
      * @return
      */
-    HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource();
+    HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource();
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -87,4 +88,6 @@ public interface Datasource {
     List<ValueSet> getAllValueSets();
     
     List<String> getAllValueSetNames();
+    
+    HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory();
 }

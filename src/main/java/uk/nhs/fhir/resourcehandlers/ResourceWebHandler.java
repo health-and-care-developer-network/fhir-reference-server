@@ -18,8 +18,15 @@ package uk.nhs.fhir.resourcehandlers;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
+import static uk.nhs.fhir.enums.ResourceType.*;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -67,46 +74,61 @@ public class ResourceWebHandler {
         return sb.toString();
     }
     
-    public String getAGroupedListOfResources(String resourceType) {
+    public String getAGroupedListOfResources(ResourceType resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
         StringBuilder sb = new StringBuilder();
         
-        if(resourceType.equals("StructureDefinition")) {
+        if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET) {
         	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
         	
-            HashMap<String, List<String>> myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
+            HashMap<String, List<ResourceEntity>> myNames = null;
+            
+            if(resourceType == STRUCTUREDEFINITION) {
+            	myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
+            } else if (resourceType == VALUESET) {
+            	myNames = myDataSource.getAllValueSetNamesByCategory();
+            }
+            
             for(String base : myNames.keySet()) {
                     sb.append(startOfBaseResourceBox);
                     sb.append(base);
                     sb.append(endOfBaseResourceBox);
-                    for(String name : myNames.get(base)) {
-                    sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
-                }
+                    for(ResourceEntity resource : myNames.get(base)) {
+                    	String name_for_url = resource.getActualResourceName();
+						try {
+							name_for_url = URLEncoder.encode(resource.getActualResourceName(), Charset.defaultCharset().name());
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    	sb.append("<li><a href=").append(resourceType.getHAPIName()).append('/').append(name_for_url).append('>').append(resource.getResourceName()).append("</a></li>");
+	                }
                 sb.append("</ul></section></div></div>");
             }
         }
         
-        if(resourceType.equals("ValueSet")) {
+        /*
+        if(resourceType == VALUESET) {
             List<String> myNames = myDataSource.getAllValueSetNames();
             
             for(String name : myNames) {
                 sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
             }
-            sb.append("</ul></section></div></div>");
-        }
+            sb.append("</ul></section></div></div>");        	
+        }*/
         
         
         sb.append("</div>");        
         return sb.toString();
     }
 
-    public String getAllNames(String resourceType, String namePart) {
+    public String getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
         List<String> myNames = myDataSource.getAllStructureDefinitionNames(namePart);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
-            sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
+            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(name).append('>').append(name).append("</a>");
             sb.append("<br />");
         }
         return sb.toString();

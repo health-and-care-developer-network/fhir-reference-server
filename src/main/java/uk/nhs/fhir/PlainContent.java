@@ -15,12 +15,10 @@
  */
 package uk.nhs.fhir;
 
-import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
-import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.READ;
-import static uk.nhs.fhir.util.ClientType.BROWSER;
-import static uk.nhs.fhir.util.ClientType.NON_BROWSER;
-import static uk.nhs.fhir.util.MimeType.JSON;
-import static uk.nhs.fhir.util.MimeType.XML;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.*;
+import static uk.nhs.fhir.enums.ClientType.*;
+import static uk.nhs.fhir.enums.MimeType.*;
+import static uk.nhs.fhir.enums.ResourceType.*;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,9 +36,10 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.enums.ClientType;
+import uk.nhs.fhir.enums.MimeType;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.ClientType;
-import uk.nhs.fhir.util.MimeType;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -68,8 +67,10 @@ public class PlainContent extends CORSInterceptor {
     	MimeType mimeType = MimeType.getTypeFromHeader(theRequest.getParameter("_format"));
         ClientType clientType = ClientType.getTypeFromHeaders(theRequest);
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
+        ResourceType resourceType = ResourceType.getTypeFromRequest(theRequestDetails);
         
         LOG.info("Request received - operation: " + operation.toString());
+        LOG.info("Resource type: " + resourceType.toString());
         
         // If it is not a browser, let HAPI handle returning the resource
         if (clientType == NON_BROWSER) {
@@ -87,7 +88,7 @@ public class PlainContent extends CORSInterceptor {
         }
 
         StringBuffer content = new StringBuffer();
-        String resourceType = theRequestDetails.getResourceName();
+        
 
         LOG.info("FHIR Operation: " + operation);
         LOG.info("Format to return to browser: " + mimeType.toString());
@@ -131,7 +132,7 @@ public class PlainContent extends CORSInterceptor {
 	    		StringBuffer content = new StringBuffer();
 	    		renderConformance(content, theResponseObject, mimeType);
 	    		LOG.info(content.toString());
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, "Conformance", content);
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, content);
 	    		return false;
     		}
         }
@@ -141,7 +142,7 @@ public class PlainContent extends CORSInterceptor {
 		return true;
 	}
     
-    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType, MimeType mimeType) {
+    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
         String resourceName = theRequestDetails.getId().getIdPart();
         content.append(getResourceContent(resourceName, mimeType, resourceType));
@@ -167,19 +168,19 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+    private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
         content.append(GenerateIntroSection());
 
         String resourceName = theRequestDetails.getId().getIdPart();
 
-        if (resourceType.equals("StructureDefinition")) {
+        if (resourceType == STRUCTUREDEFINITION) {
             content.append(DescribeStructureDefinition(resourceName));
         }
-        if (resourceType.equals("ValueSet")) {
+        if (resourceType == VALUESET) {
             content.append(DescribeValueSet(resourceName));
         }
-        if (resourceType.equals("OperationDefinition")) {
+        if (resourceType == OPERATIONDEFINITION) {
             throw new NotImplementedException("Code not yet written for OperationDefinition resources...");
         }
         
@@ -189,7 +190,7 @@ public class PlainContent extends CORSInterceptor {
         
     }
     
-    private String getResourceContent(String resourceName, MimeType mimeType, String resourceType) {
+    private String getResourceContent(String resourceName, MimeType mimeType, ResourceType resourceType) {
     	
     	IBaseResource resource = null;
     	
@@ -198,11 +199,11 @@ public class PlainContent extends CORSInterceptor {
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv("");
     	
-    	if (resourceType.equals("StructureDefinition")) {
+    	if (resourceType == STRUCTUREDEFINITION) {
     		StructureDefinition sd = myWebHandler.getSDByName(resourceName);
     		sd.setText(textElement);
     		resource = sd;
-    	} else if (resourceType.equals("ValueSet")) {
+    	} else if (resourceType == VALUESET) {
     		ValueSet vs = myWebHandler.getVSByName(resourceName);
     		vs.setText(textElement);
     		resource = vs;
@@ -324,7 +325,7 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, String resourceType) {
+    private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
         Map<String, String[]> params = theRequestDetails.getParameters();
 
