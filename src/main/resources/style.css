@@ -28,7 +28,7 @@ h2.resourceType {
     padding: 5px;
     font-size: 0.8em;
 }
-.treeView {
+.treeView, .operationTable {
     border: thin solid #d4d2d2;
     padding: 5px;
     margin-top: 5px;
@@ -55,4 +55,13 @@ h2.resourceType {
 
 .renderedValueSet td {
     padding: 5px;
+}
+
+.operationTable th {
+    background: #f0f0f0;
+    min-width: 153px;
+}
+
+.operationTable td {
+    min-width: 153px;
 }

@@ -321,7 +321,7 @@ public class PlainContent extends CORSInterceptor {
         content.append("</div>");
         String textSection = od.getText().getDivAsString();
         if (textSection != null) {
-	        content.append("<div class='treeView'>");
+	        content.append("<div class='operationTable'>");
 	        content.append(textSection);
 	        content.append("</div>");
         }
