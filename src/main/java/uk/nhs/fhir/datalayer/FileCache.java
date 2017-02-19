@@ -18,6 +18,7 @@ package uk.nhs.fhir.datalayer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,16 +44,12 @@ public class FileCache {
     // Singleton object to act as a cache of the files in the profiles and valueset directories
     private static List<ResourceEntity> profileFileList = null;
     private static List<ResourceEntity> ValueSetFileList = null;
-    //private static List<StructureDefinition> profileList = null;
-    //private static List<ValueSet> ValueSetList = null;
 
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
     private static String profilePath = PropertyReader.getProperty("profilePath");
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
     private static String fileExtension = PropertyReader.getProperty("fileExtension");
-    
-    private static String snomedCTcodeSystem = PropertyReader.getProperty("snomedCTcodeSystem");
 
     
 //<editor-fold defaultstate="collapsed" desc="Methods to get cached StructureDefinitions and their names">
@@ -62,45 +59,65 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List<StructureDefinition> getProfiles() {
+    /*public static List<StructureDefinition> getProfiles() {
         if(updateRequired()) {
             updateCache();
         }
         return profileList;
-    }
+    }*/
     
     /**
      * Method to get the cached set of StructureDefinition names
      * 
      * @return 
      */
-    public static List<ResourceEntity> getStructureDefinitionNameList() {
+    public static List<String> getStructureDefinitionNameList() {
         if(updateRequired()) {
             updateCache();
         }
-        return profileFileList;
+        ArrayList<String> names = new ArrayList<String>();
+        for(ResourceEntity sd : profileFileList) {
+        	names.add(sd.getResourceName());
+        }
+        return names;
+    }
+
+    /**
+     * Method to get the cached set of StructureDefinition names
+     * 
+     * @return 
+     */
+    public static List<String> getValueSetNameList() {
+        if(updateRequired()) {
+            updateCache();
+        }
+        ArrayList<String> names = new ArrayList<String>();
+        for(ResourceEntity vs : ValueSetFileList) {
+        	names.add(vs.getResourceName());
+        }
+        return names;
     }
     
-    public static HashMap<String, List<String>> getGroupedNameList() {
+    public static HashMap<String, List<ResourceEntity>> getGroupedNameList() {
         if(updateRequired()) {
             updateCache();
         }
         
         LOG.info("Creating HashMap");
-        HashMap<String, List<String>> result = new HashMap<String, List<String>>();
+        HashMap<String, List<ResourceEntity>> result = new HashMap<String, List<ResourceEntity>>();
         try {
-            for(StructureDefinition sd : profileList) {
-                boolean isExtension = (sd.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+            for(ResourceEntity sd : profileFileList) {
+                boolean isExtension = sd.isExtension();
                 //TODO: Show extensions differently?
-                String base = sd.getConstrainedType();
-                String name = sd.getName();
-                if(result.containsKey(base)) {
-                    List<String> entry = result.get(base);
-                    entry.add(name);
+                String group = sd.getDisplayGroup();
+                String name = sd.getResourceName();
+                if(result.containsKey(group)) {
+                    List<ResourceEntity> entry = result.get(group);
+                    entry.add(sd);
                 } else {
-                    List<String> entry = new ArrayList<String>();
-                    entry.add(name);
-                    result.put(base, entry);
+                    List<ResourceEntity> entry = new ArrayList<ResourceEntity>();
+                    entry.add(sd);
+                    result.put(group, entry);
                 }
             }
         } catch (Exception e) {
@@ -111,42 +128,26 @@ public class FileCache {
         return result;
     }
     
-    public static HashMap<String, List<String>> getGroupedValueSetNameList() {
+    public static HashMap<String, List<ResourceEntity>> getGroupedValueSetNameList() {
         if(updateRequired()) {
             updateCache();
         }
         
         LOG.info("Creating HashMap");
-        HashMap<String, List<String>> result = new HashMap<String, List<String>>();
+        HashMap<String, List<ResourceEntity>> result = new HashMap<String, List<ResourceEntity>>();
         try {
-            for(ValueSet vs : ValueSetList) {
-                
-            	String category = "Code List";
+            for(ResourceEntity vs : ValueSetFileList) {
+            	String category = vs.getDisplayGroup();
+            	String name = vs.getResourceName();
             	
-            	if (vs.getCompose() != null) {
-            		if (vs.getCompose().getInclude() != null) {
-            			List<ComposeInclude> includeList = vs.getCompose().getInclude();
-        				for (ComposeInclude includeEntry : includeList) {
-        					if (includeEntry.getSystem() != null) {
-        						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
-        							category = "SNOMED CT Code List";
-        						}
-        					}
-        				}
-            		}
-            	}
-            	
-            	String name = vs.getName();
-                
             	if(result.containsKey(category)) {
-                    List<String> entry = result.get(category);
-                    entry.add(name);
+                    List<ResourceEntity> entry = result.get(category);
+                    entry.add(vs);
                 } else {
-                    List<String> entry = new ArrayList<String>();
-                    entry.add(name);
+                    List<ResourceEntity> entry = new ArrayList<ResourceEntity>();
+                    entry.add(vs);
                     result.put(category, entry);
                 }
-                
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -160,7 +161,7 @@ public class FileCache {
 //<editor-fold defaultstate="collapsed" desc="Methods to get cached ValueSets and their names">
     
     /**
-     * Method to get all of the cached ValueSets
+     * Method to get all of the ValueSets
      * 
      * @return 
      */
@@ -168,25 +169,38 @@ public class FileCache {
         if(updateRequired()) {
             updateCache();
         }
-        return ValueSetList;
+        // Load each resource file and put them in a list to return
+        ArrayList<ValueSet> allFiles = new ArrayList<ValueSet>();
+        for (ResourceEntity entry : ValueSetFileList) {
+        	ValueSet vs = FHIRUtils.loadValueSetFromFile(entry.getResourceFile());
+        	allFiles.add(vs);
+        }
+        return allFiles;
     }
     
     /**
-     * Method to gte the cached list of ValueSet names
+     * Method to get all of the StructureDefinitions
      * 
      * @return 
      */
-    static List<String> getValueSetNameList() {
+    public static List<StructureDefinition> getProfiles() {
         if(updateRequired()) {
             updateCache();
         }
-        return ValueSetFileList;
+        // Load each resource file and put them in a list to return
+        ArrayList<StructureDefinition> allFiles = new ArrayList<StructureDefinition>();
+        for (ResourceEntity entry : profileFileList) {
+        	StructureDefinition sd = FHIRUtils.loadProfileFromFile(entry.getResourceFile());
+        	allFiles.add(sd);
+        }
+        return allFiles;
     }
+    
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="Updating section is in here">
     private static boolean updateRequired() {
         long currentTime = System.currentTimeMillis();
-        if(profileList == null || (currentTime > (lastUpdated + updateInterval))) {
+        if(profileFileList == null || (currentTime > (lastUpdated + updateInterval))) {
             LOG.fine("Cache needs updating");
             return true;
         }
@@ -197,18 +211,18 @@ public class FileCache {
     private synchronized static void updateCache() {
         if(updateRequired()) {
             lastUpdated = System.currentTimeMillis();
-            LOG.fine("Updating cache from fliesystem");
+            LOG.fine("Updating cache from filesystem");
             
             //profileList = cacheProfileFiles();
-            profileFileList = cacheFileNames(profilePath, STRUCTUREDEFINITION);
+            profileFileList = cacheFHIRResources(profilePath, STRUCTUREDEFINITION);
             
             //ValueSetList = cacheValueSetFiles();
-            ValueSetFileList = cacheFileNames(valueSetPath, VALUESET);
+            ValueSetFileList = cacheFHIRResources(valueSetPath, VALUESET);
         }
     }
     
     
-    private static ArrayList<ResourceEntity> cacheFileNames(String path, ResourceType resourceType){
+    private static ArrayList<ResourceEntity> cacheFHIRResources(String path, ResourceType resourceType){
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
@@ -222,19 +236,54 @@ public class FileCache {
                 LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
                 
                 String name = null;
+                String actualName = null;
+                boolean extension = false;
+                String baseType = "Other";
+                String displayGroup = null;
+                boolean example = false;
                 
-                if (resourceType == STRUCTUREDEFINITION) {
-                	StructureDefinition profile = FHIRUtils.loadProfileFromFile(thisFile);
-                	name = profile.getName();
-                } else if (resourceType == VALUESET) {
-                	ValueSet profile = FHIRUtils.loadValueSetFromFile(thisFile);
-                	name = profile.getName();
+                try {
+	                if (resourceType == STRUCTUREDEFINITION) {
+	                	StructureDefinition profile = FHIRUtils.loadProfileFromFile(thisFile);
+	                	name = profile.getName();
+	                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+	                    baseType = profile.getConstrainedType();
+	                    actualName = getActualNameFromURL(profile.getUrl(), name);
+	                    displayGroup = baseType;
+	                } else if (resourceType == VALUESET) {
+	                	displayGroup = "Code List";
+	                	ValueSet profile = FHIRUtils.loadValueSetFromFile(thisFile);
+	                	name = profile.getName();
+	                	actualName = getActualNameFromURL(profile.getUrl(), name);
+	                	if (FHIRUtils.isValueSetSNOMED(profile)) {
+	                		displayGroup = "SNOMED CT Code List";
+	                	}
+	                }
+	                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
+	                										displayGroup, example, actualName));
+                } catch (Exception ex) {
+                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
                 }
-                newFileList.add(new ResourceEntity(name, thisFile, resourceType));
             }
         }
+        
+        // Sort our collection into alpha order by resource name
+        Collections.sort(newFileList);
+        
         return newFileList;
     }
+    
+    private static String getActualNameFromURL(String url, String def) {
+    	// Find the actual name of the resource from the URL
+        int idx = url.lastIndexOf('/');
+        if (idx > -1) {
+        	return url.substring(idx+1);
+        } else {
+        	// Can't find a real name in the URL!
+        	return def;
+        }
+    }
+    
     
     /*
     private static ArrayList<StructureDefinition> cacheProfileFiles() {
@@ -280,7 +329,25 @@ public class FileCache {
         return newProfileList;
     }
     */
+    public static ResourceEntity getSingleValueSetByName(String name) {
+    	for (ResourceEntity vs : ValueSetFileList) {
+    		if (vs.getResourceName().equals(name)) {
+    			return vs;
+    		}
+    	}
+    	return null;
+    }
 
+    public static ResourceEntity getSingleProfileByName(String name) {
+    	for (ResourceEntity entry : profileFileList) {
+    		if (entry.getResourceName().equals(name)) {
+    			return entry;
+    		}
+    	}
+    	return null;
+    }
+
+    
 //</editor-fold>
     
 

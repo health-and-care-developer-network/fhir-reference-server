@@ -18,11 +18,15 @@ package uk.nhs.fhir.resourcehandlers;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
 import static uk.nhs.fhir.enums.ResourceType.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -77,7 +81,7 @@ public class ResourceWebHandler {
         if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET) {
         	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
         	
-            HashMap<String, List<String>> myNames = null;
+            HashMap<String, List<ResourceEntity>> myNames = null;
             
             if(resourceType == STRUCTUREDEFINITION) {
             	myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
@@ -89,9 +93,16 @@ public class ResourceWebHandler {
                     sb.append(startOfBaseResourceBox);
                     sb.append(base);
                     sb.append(endOfBaseResourceBox);
-                    for(String name : myNames.get(base)) {
-                    sb.append("<li><a href=").append(resourceType.getHAPIName()).append('/').append(name).append('>').append(name).append("</a></li>");
-                }
+                    for(ResourceEntity resource : myNames.get(base)) {
+                    	String name_for_url = resource.getActualResourceName();
+						try {
+							name_for_url = URLEncoder.encode(resource.getActualResourceName(), Charset.defaultCharset().name());
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    	sb.append("<li><a href=").append(resourceType.getHAPIName()).append('/').append(name_for_url).append('>').append(resource.getResourceName()).append("</a></li>");
+	                }
                 sb.append("</ul></section></div></div>");
             }
         }

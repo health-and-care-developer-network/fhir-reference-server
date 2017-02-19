@@ -17,10 +17,12 @@ package uk.nhs.fhir.datalayer;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,13 +66,11 @@ public class FilesystemIF implements Datasource {
      * @return 
      */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
-    	String filename = FileLoader.cleanFilename(name);
-    	
-    	filename = filename + fileExtension;
-    	
-    	LOG.info("Getting StructureDefinitions with name=" + name + " looking for file: " + profilePath + "/" + filename);
+    	ResourceEntity entry = FileCache.getSingleProfileByName(name);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting StructureDefinition with name=" + name + " looking for file: " + path.getAbsolutePath());
         
-    	StructureDefinition foundProfile = FHIRUtils.loadProfileFromFile(filename);
+    	StructureDefinition foundProfile = FHIRUtils.loadProfileFromFile(path);
         return foundProfile;
     }
 
@@ -93,8 +93,7 @@ public class FilesystemIF implements Datasource {
     }
 
     /**
-     * Gets a full list of StructureDefinition objects. Not especially performant, and
-     * could certainly be cached in memory to improve performance and reduce disk io.
+     * Gets a full list of StructureDefinition objects. Not especially performant.
      * 
      * @return 
      */
@@ -119,7 +118,7 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource() {
+    public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
         LOG.info("Getting all StructureDefinition Names by base resource");
         return FileCache.getGroupedNameList();
     }
@@ -129,7 +128,7 @@ public class FilesystemIF implements Datasource {
      * for the web view of /ValueSet requests.
      */
     @Override
-	public HashMap<String, List<String>> getAllValueSetNamesByCategory() {
+	public HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory() {
     	LOG.info("Getting all ValueSet Names by category");
         return FileCache.getGroupedValueSetNameList();
 	}
@@ -173,13 +172,11 @@ public class FilesystemIF implements Datasource {
      * @return 
      */
     public ValueSet getSingleValueSetByName(String name) {
-    	String filename = FileLoader.cleanFilename(name);
-    	
-    	filename = filename + fileExtension;
-    	
-    	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + valueSetPath + "/" + filename);
+    	ResourceEntity entry = FileCache.getSingleValueSetByName(name);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + path.getAbsolutePath());
         
-    	ValueSet foundValSet = FHIRUtils.loadValueSetFromFile(filename);
+    	ValueSet foundValSet = FHIRUtils.loadValueSetFromFile(path);
         return foundValSet;
     }
 

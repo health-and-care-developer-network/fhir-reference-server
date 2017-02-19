@@ -31,6 +31,7 @@ import com.mongodb.MongoClient;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -186,7 +187,7 @@ public class MongoIF implements Datasource {
         return list;
     }
     
-    public HashMap<String, List<String>> getAllStructureDefinitionNamesByBaseResource() {
+    public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
     	//TODO: Implement this for Mongo
     	return null;
     }
@@ -207,7 +208,7 @@ public class MongoIF implements Datasource {
     }
 
 	@Override
-	public HashMap<String, List<String>> getAllValueSetNamesByCategory() {
+	public HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory() {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 }
