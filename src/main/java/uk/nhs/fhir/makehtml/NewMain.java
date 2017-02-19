@@ -835,7 +835,7 @@ public class NewMain implements Constants {
                     sb.append("<li>");
                     Element code = (Element) concept.getElementsByTagName("code").item(0);
                     sb.append("<b>code:</b> " + code.getAttribute("value"));
-                    sb.append(": ");
+                    sb.append(" ");
                     sb.append("<b>display:</b> " + getFirstNamedChildValue(concept, "display"));
 
                     for(int j = 0; j < conceptMaps.getLength(); j++) {
