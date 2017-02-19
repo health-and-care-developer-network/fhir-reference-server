@@ -922,13 +922,14 @@ public class NewMain implements Constants {
 
         sb.append("<table style='font-family: sans-serif;'><tr><th>Name</th><th>Value</th></tr>");
 
-        sb.append(makeOpDefRow(root, "url", "URL", "Logical URL to reference this operation definition"));
+        /*sb.append(makeOpDefRow(root, "url", "URL", "Logical URL to reference this operation definition"));
         sb.append(makeOpDefRow(root, "version", "Version", "Logical id for this version of the operation definition"));
         sb.append(makeOpDefRow(root, "name", "Name", "Informal name for this operation"));
         sb.append(makeOpDefRow(root, "status", "Status", "draft | active | retired"));
         sb.append(makeOpDefRow(root, "kind", "Kind", "operation | query"));
         sb.append(makeOpDefRow(root, "experimental", "Experimental", "If for testing purposes, not real usage"));
         sb.append(makeOpDefRow(root, "publisher", "Publisher", "Name of the publisher (Organization or individual)"));
+        */
         NodeList contacts = root.getElementsByTagName("contact");
         if(contacts.getLength() > 0) {
             sb.append("<tr><td colspan='2' style='border-bottom: 1px solid #ddd;'></td></tr>");
