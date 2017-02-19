@@ -15,11 +15,13 @@ public class PageTemplateHelper {
 	private static final Logger LOG = Logger.getLogger(PageTemplateHelper.class.getName());
 	private String SDtemplate = null;
     private String VStemplate = null;
+    private String ODtemplate = null;
     private String ServerConformanceTemplate = null;
     
     public PageTemplateHelper() {
         SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
         VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
+        ODtemplate = FileLoader.loadFileOnClasspath("/template/operations.html");
         ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
     }
     
@@ -32,6 +34,8 @@ public class PageTemplateHelper {
                 outputString = SDtemplate;
             } else if (resourceType == VALUESET) {
                 outputString = VStemplate;
+            } else if (resourceType == OPERATIONDEFINITION) {
+                outputString = ODtemplate;
             } else if (resourceType == CONFORMANCE) {
                 outputString = ServerConformanceTemplate;
             }

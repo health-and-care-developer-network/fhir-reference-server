@@ -31,6 +31,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
@@ -181,7 +182,7 @@ public class PlainContent extends CORSInterceptor {
             content.append(DescribeValueSet(resourceName));
         }
         if (resourceType == OPERATIONDEFINITION) {
-            throw new NotImplementedException("Code not yet written for OperationDefinition resources...");
+        	content.append(DescribeOperationDefinition(resourceName));
         }
         
         //content.append(GetXMLContent(resourceName));
@@ -207,7 +208,11 @@ public class PlainContent extends CORSInterceptor {
     		ValueSet vs = myWebHandler.getVSByName(resourceName);
     		vs.setText(textElement);
     		resource = vs;
-    	}
+    	} else if (resourceType == OPERATIONDEFINITION) {
+     		OperationDefinition od = myWebHandler.getOperationByName(resourceName);
+     		od.setText(textElement);
+     		resource = od;
+     	}
         
         if (mimeType == JSON) {
         	return getResourceAsJSON(resource, resourceName);
@@ -273,16 +278,56 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(sd.getFhirVersion()) + "</li>");
+        content.append("<li>FHIRVersion: " + printIfNotNull(sd.getStructureFhirVersionEnum()) + "</li>");
         content.append("<li>Show Raw Profile: <a href='./" + resourceName + "?_format=xml'>XML</a>"
         		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
         content.append("</div>");
-        content.append("<div class='treeView'>");
-        content.append(sd.getText().getDivAsString());
-        content.append("</div>");
+        String textSection = sd.getText().getDivAsString();
+        if (textSection != null) {
+	        content.append("<div class='treeView'>");
+	        content.append(textSection);
+	        content.append("</div>");
+        }
         return content.toString();
     }
 
+
+    /**
+     * Code in here to create the HTML response to a request for a
+     * StructureDefinition we hold.
+     *
+     * @param resourceName Name of the SD we need to describe.
+     * @return
+     */
+    private String DescribeOperationDefinition(String resourceName) {
+        StringBuilder content = new StringBuilder();
+        OperationDefinition od;
+        od = myWebHandler.getOperationByName(resourceName);
+        content.append("<h2 class='resourceType'>" + od.getName() + " (OperationDefinition)</h2>");
+        content.append("<div class='resourceSummary'>");
+        content.append("<ul>");
+        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
+        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
+        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
+        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
+        content.append("<li>Description: " + printIfNotNull(od.getDescription()) + "</li>");
+        content.append("<li>Requirements: " + printIfNotNull(od.getRequirements()) + "</li>");
+        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
+        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
+        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
+        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
+        content.append("<li>Show Raw Profile: <a href='./" + resourceName + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("</div>");
+        String textSection = od.getText().getDivAsString();
+        if (textSection != null) {
+	        content.append("<div class='treeView'>");
+	        content.append(textSection);
+	        content.append("</div>");
+        }
+        return content.toString();
+    }
+    
     /**
      * Code to generate a HTML view of the named ValueSet
      *
@@ -306,13 +351,16 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
-        //content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getFhirVersion()) + "</li>");
+        content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getStructureFhirVersionEnum()) + "</li>");
         content.append("<li>Show Raw ValueSet: <a href='./" + resourceName + "?_format=xml'>XML</a>"
         		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
         content.append("</div>");
-        content.append("<div class='renderedValueSet'>");
-        content.append(valSet.getText().getDivAsString());
-        content.append("</div>");
+        String textSection = valSet.getText().getDivAsString();
+        if (textSection != null) {
+	        content.append("<div class='treeView'>");
+	        content.append(textSection);
+	        content.append("</div>");
+        }
         return content.toString();
     }
 

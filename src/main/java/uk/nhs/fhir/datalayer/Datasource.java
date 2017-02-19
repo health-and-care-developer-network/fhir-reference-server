@@ -18,6 +18,7 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
@@ -31,7 +32,7 @@ public interface Datasource {
      * @return
      */
     StructureDefinition getSingleStructureDefinitionByName(String name);
-
+    
     /**
      * This is the method to do a search based on name, ie to find where
      * name:contains=[parameter]
@@ -80,14 +81,25 @@ public interface Datasource {
      */
     ValueSet getSingleValueSetByName(String name);
 
-    /**
-     * This is the method to get all ValueSets.
-     * 
-     * @return 
-     */
     List<ValueSet> getAllValueSets();
     
     List<String> getAllValueSetNames();
     
     HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory();
+    
+
+    /**
+     * Gets a specific one
+     *
+     * @param name
+     * @return
+     */
+    OperationDefinition getSingleOperationDefinitionByName(String name);
+
+    List<OperationDefinition> getAllOperations();
+    
+    List<String> getAllOperationNames();
+    
+    HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory();
+
 }

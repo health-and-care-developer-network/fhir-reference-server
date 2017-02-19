@@ -8,11 +8,18 @@ package uk.nhs.fhir.resourcehandlers;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.rest.annotation.IdParam;
+import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -77,4 +84,30 @@ public class OperationDefinitionProvider implements IResourceProvider  {
         return retval;
     }
 //</editor-fold>
+
+    /**
+     * Instance level GET of a resource... 
+     *
+     * @return An OperationDefinition resource
+     */
+    @Read
+    public OperationDefinition getResourceById(@IdParam IdDt theId) {
+        String name = theId.getIdPart().toString();
+        OperationDefinition foundItem = myDataSource.getSingleOperationDefinitionByName(name);
+        return foundItem;
+    }
+    
+    /**
+     * Overall search, will return ALL Operation Definitions so responds to: /OperationDefinition
+     *
+     * @return
+     */
+    @Search
+    public List<OperationDefinition> getAllStructureDefinitions() {
+        LOG.info("Request for ALL OperationDefinition objects");
+        List<OperationDefinition> foundList = myDataSource.getAllOperations();
+        return foundList;
+    }
+
+
 }

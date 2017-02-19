@@ -15,9 +15,11 @@
  */
 package uk.nhs.fhir.datalayer;
 
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
@@ -38,10 +40,6 @@ import java.util.regex.Pattern;
 public class FilesystemIF implements Datasource {
     private static final Logger LOG = Logger.getLogger(FilesystemIF.class.getName());
 
-    private String profilePath = PropertyReader.getProperty("profilePath");
-    private String valueSetPath = PropertyReader.getProperty("valusetPath");
-    private String examplesPath = PropertyReader.getProperty("examplesPath");
-    private String fileExtension = PropertyReader.getProperty("fileExtension");
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     /**
@@ -66,11 +64,11 @@ public class FilesystemIF implements Datasource {
      * @return 
      */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleProfileByName(name);
+    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
     	File path = entry.getResourceFile();
     	LOG.info("Getting StructureDefinition with name=" + name + " looking for file: " + path.getAbsolutePath());
         
-    	StructureDefinition foundProfile = FHIRUtils.loadProfileFromFile(path);
+    	StructureDefinition foundProfile = (StructureDefinition)FHIRUtils.loadResourceFromFile(path);
         return foundProfile;
     }
 
@@ -99,7 +97,7 @@ public class FilesystemIF implements Datasource {
      */
     public List<StructureDefinition> getAllStructureDefinitions() {
         LOG.info("Getting all StructureDefinitions");
-        return FileCache.getProfiles();
+        return FileCache.getResources(ResourceType.STRUCTUREDEFINITION);
     }
     
     /**
@@ -109,7 +107,7 @@ public class FilesystemIF implements Datasource {
      */
     public List<String> getAllStructureDefinitionNames() {
         LOG.info("Getting all StructureDefinition Names");
-        return FileCache.getStructureDefinitionNameList();
+        return FileCache.getResourceNameList(ResourceType.STRUCTUREDEFINITION);
     }
     
     /**
@@ -120,7 +118,7 @@ public class FilesystemIF implements Datasource {
      */
     public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
         LOG.info("Getting all StructureDefinition Names by base resource");
-        return FileCache.getGroupedNameList();
+        return FileCache.getGroupedNameList(ResourceType.STRUCTUREDEFINITION);
     }
     
     /**
@@ -130,7 +128,7 @@ public class FilesystemIF implements Datasource {
     @Override
 	public HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory() {
     	LOG.info("Getting all ValueSet Names by category");
-        return FileCache.getGroupedValueSetNameList();
+        return FileCache.getGroupedNameList(ResourceType.VALUESET);
 	}
     
 
@@ -144,7 +142,7 @@ public class FilesystemIF implements Datasource {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of profiles first");
-        List<String> profileList = FileCache.getStructureDefinitionNameList();
+        List<String> profileList = FileCache.getResourceNameList(ResourceType.STRUCTUREDEFINITION);
         
         LOG.info("Now filtering the list to those matching our criteria");
         ArrayList<String> matches = new ArrayList<String>();
@@ -172,11 +170,11 @@ public class FilesystemIF implements Datasource {
      * @return 
      */
     public ValueSet getSingleValueSetByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleValueSetByName(name);
+    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
     	File path = entry.getResourceFile();
     	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + path.getAbsolutePath());
         
-    	ValueSet foundValSet = FHIRUtils.loadValueSetFromFile(path);
+    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
         return foundValSet;
     }
 
@@ -208,7 +206,7 @@ public class FilesystemIF implements Datasource {
         LOG.info("Getting all ValueSet Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of ValueSets first");
-        List<String> valSetList = FileCache.getValueSetNameList();
+        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
         
         LOG.info("Now filtering the list to those matching our criteria");
         ArrayList<String> matches = new ArrayList<String>();
@@ -231,14 +229,45 @@ public class FilesystemIF implements Datasource {
 
     public List<String> getAllValueSetNames() {
         LOG.info("Getting all ValueSet Names");
-        List<String> valSetList = FileCache.getValueSetNameList();
+        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
         
         return valSetList;
     }
 
     @Override
     public List<ValueSet> getAllValueSets() {
-        return FileCache.getValueSets();
+    	return FileCache.getResources(ResourceType.VALUESET);
     }
+
+    
+    
+    
+	@Override
+	public OperationDefinition getSingleOperationDefinitionByName(String name) {
+    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting Operation with name=" + name + " looking for file: " + path.getAbsolutePath());
+        
+    	OperationDefinition foundOperation = (OperationDefinition)FHIRUtils.loadResourceFromFile(path);
+        return foundOperation;
+	}
+
+	@Override
+	public List<OperationDefinition> getAllOperations() {
+		return FileCache.getResources(ResourceType.OPERATIONDEFINITION);
+	}
+
+	@Override
+	public List<String> getAllOperationNames() {
+        LOG.info("Getting all Operation Names");
+        List<String> operationList = FileCache.getResourceNameList(ResourceType.OPERATIONDEFINITION);
+        return operationList;
+	}
+
+	@Override
+	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
+    	LOG.info("Getting all Operation Names by category");
+        return FileCache.getGroupedNameList(ResourceType.OPERATIONDEFINITION);
+	}
 
 }
