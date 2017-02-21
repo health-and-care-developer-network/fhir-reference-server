@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -116,4 +117,28 @@ public class ResourceBuilder {
         serialised = serialised.replace("Σ", "&#931;");
         return serialised;
     }
+    
+    static String addTextSectionToImplementationGuide(String originalResource, String textSection, String newBaseURL) {
+        String serialised = null;
+        FhirContext ctx = FhirContext.forDstu2();
+        ImplementationGuide impGuideResource = null;
+        impGuideResource = (ImplementationGuide) ctx.newXmlParser().parseResource(originalResource);
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv(textSection);
+        impGuideResource.setText(textElement);
+        
+        if (newBaseURL != null) {
+        	String resourceName = impGuideResource.getName();
+        	if (newBaseURL.endsWith("/")) {
+        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
+        	}
+        	impGuideResource.setUrl(newBaseURL+"/ImplementationGuide/"+resourceName);
+        }
+        
+        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(impGuideResource);
+        serialised = serialised.replace("Σ", "&#931;");
+        return serialised;
+    }
+    
 }

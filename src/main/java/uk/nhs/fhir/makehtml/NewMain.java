@@ -52,6 +52,7 @@ import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetStatus;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetURL;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getValueSetVersion;
 
+import uk.nhs.fhir.makehtml.resources.ImplementationGuide;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 
@@ -641,6 +642,20 @@ public class NewMain implements Constants {
                     String originalResource = FileLoader.loadFile(inFile);
 
                     String augmentedResource = ResourceBuilder.addTextSectionTooperationDefinition(originalResource, result, newBaseURL);
+                    try {
+                        FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex) {
+                        LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+                    }
+                }
+                
+                int isImplementationGuide = thisDoc.getElementsByTagName("ImplementationGuide").getLength();
+                if(isImplementationGuide > 0) {
+                    LOG.info("It's an ImplementationGuide");
+                    result = ImplementationGuide.makeHTMLForImplementationGuide(thisDoc, folder);
+                    String originalResource = FileLoader.loadFile(inFile);
+
+                    String augmentedResource = ResourceBuilder.addTextSectionToImplementationGuide(originalResource, result, newBaseURL);
                     try {
                         FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
                     } catch (UnsupportedEncodingException ex) {

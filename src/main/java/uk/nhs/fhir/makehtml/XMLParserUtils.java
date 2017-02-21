@@ -404,7 +404,7 @@ public class XMLParserUtils {
      * @param name
      * @return 
      */
-    protected static String getFirstNamedChildValue(Node thisOne, String name) {
+    public static String getFirstNamedChildValue(Node thisOne, String name) {
         String theValue = null;
         if(thisOne != null) {
             Element thisElement = (Element) thisOne;
