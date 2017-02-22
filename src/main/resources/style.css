@@ -66,15 +66,17 @@ h2.resourceType {
     min-width: 153px;
 }
 
+.guideContent {
+	font-size: 0.8em;
+}
+
 .guideContent h1 {
+	padding-top: 5px;
 	font-size: 1.6em;
 }
 .guideContent h2 {
-	font-size: 1.2em;
-}
-
-.guideContent table {
-	margin-top: 25px;
+	padding-top: 5px;
+	font-size: 1.4em;
 }
 
 .guideContent td, .guideContent th {
@@ -84,4 +86,8 @@ h2.resourceType {
 
 .guideContent th {
 	font-weight: bold;
+}
+
+.guideContent .nameCol {
+	width: 300px;
 }
