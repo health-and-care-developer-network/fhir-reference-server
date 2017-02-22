@@ -73,6 +73,8 @@ public class ImplementationGuide {
         NodeList packageSet = thisDoc.getElementsByTagName("package");
         if(packageSet.getLength() > 0) {
         	
+        	sb.append("<h1>Constrained FHIR Models</h1>");
+        	
         	sb.append("<table style='font-family: sans-serif;' width='100%'>");
         	
         	for(int i = 0; i < packageSet.getLength(); i++) {
@@ -81,7 +83,8 @@ public class ImplementationGuide {
         		
             	sb.append("<tr><th colspan='3' bgcolor='#f0f0f0'>")
             					.append(packageName).append("</th></tr>");
-            	sb.append("<tr><th>Name</th><th>Type</th><th>Description and Constraints</th></tr>");
+            	sb.append("<tr><th class='nameCol'>Name</th><th class='typeCol'>Type</th>");
+            	sb.append("<th class='descCol'>Description and Constraints</th></tr>");
             	
             	NodeList resourceSet = packageElement.getElementsByTagName("resource");
             	ArrayList<ResourceRow> resourceList = new ArrayList<ResourceRow>(); 
@@ -90,7 +93,7 @@ public class ImplementationGuide {
                 	for(int j = 0; j < resourceSet.getLength(); j++) {
                 		Element resourceElement = (Element) resourceSet.item(j);
                 		String resourceName = getFirstNamedChildValue(resourceElement, "name");
-                		String resourceDescription = reformatResourceDescriptions(
+                		String resourceDescription = reformatResourceDescriptionsForListing(
                 					getFirstNamedChildValue(resourceElement, "description"));
                 		String resourcePurpose = getFirstNamedChildValue(resourceElement, "purpose");
                 		String resourceUri = getFirstNamedChildValue(resourceElement, "sourceUri");
@@ -150,6 +153,38 @@ public class ImplementationGuide {
     	}
     }
     
+    /**
+     * In the listing in the DMS, the description is truncated from the first newline, excluding any at the very start.
+     * @param val
+     * @return
+     */
+    private static String reformatResourceDescriptionsForListing(String val) {
+    	if (val == null) {
+    		return "";
+    	}
+    	StringBuilder sb = new StringBuilder();
+    	int idx = 0;
+    	boolean foundFirstValidCharacter = false;
+    	while (idx < val.length()) {
+    		char c = val.charAt(idx);
+    		if (c == 10 || c == 13) {
+    			if (foundFirstValidCharacter) {
+    				return sb.toString();
+    			}
+    		} else {
+    			foundFirstValidCharacter = true;
+    			sb.append(c);
+    		}
+    		idx++;
+    	}
+    	return sb.toString();
+    }
+    
+    /**
+     * Replace carriage return and line feed with a html line break
+     * @param val
+     * @return
+     */
     private static String reformatResourceDescriptions(String val) {
     	if (val == null) {
     		return "";
