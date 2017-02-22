@@ -27,6 +27,12 @@
 		    <artifactId>graphviz-builder</artifactId>
 		    <version>1.0.4</version>
 		</dependency>
+		<!-- Markdown library -->
+		<dependency>
+		    <groupId>com.vladsch.flexmark</groupId>
+		    <artifactId>flexmark</artifactId>
+		    <version>0.15.1</version>
+		</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

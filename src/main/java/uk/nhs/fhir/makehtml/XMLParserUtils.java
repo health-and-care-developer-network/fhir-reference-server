@@ -25,6 +25,8 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -404,7 +406,7 @@ public class XMLParserUtils {
      * @param name
      * @return 
      */
-    protected static String getFirstNamedChildValue(Node thisOne, String name) {
+    public static String getFirstNamedChildValue(Node thisOne, String name) {
         String theValue = null;
         if(thisOne != null) {
             Element thisElement = (Element) thisOne;
@@ -412,5 +414,27 @@ public class XMLParserUtils {
             theValue = getElementValue(theElement);
         }        
         return theValue;
+    }
+    
+    /**
+     * Loops through any extensions it finds, looking for one with the specified URL, then
+     * returns the value of the specified element in that extension
+     * @param node Parent node containing extensions
+     * @param url URL of the extension to look for
+     * @param valueElement Value element to take from the matched extension
+     * @return Value of the specified element in the specified extension, or null if not found
+     */
+    public static String getExtensionValue(Element node, String url, String valueElement) {
+    	NodeList extensionSet = node.getElementsByTagName("extension");
+		if(extensionSet.getLength() > 0) {
+        	for(int i = 0; i < extensionSet.getLength(); i++) {
+        		Element extensionElement = (Element) extensionSet.item(i);
+        		String extensionUrl = extensionElement.getAttribute("url");
+        		if (extensionUrl.equals(url)) {
+        			return getFirstNamedChildValue(extensionElement, valueElement);
+        		}
+        	}
+		}
+		return null;
     }
 }
