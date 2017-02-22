@@ -28,7 +28,7 @@ h2.resourceType {
     padding: 5px;
     font-size: 0.8em;
 }
-.treeView, .operationTable {
+.treeView, .operationTable, .guideContent {
     border: thin solid #d4d2d2;
     padding: 5px;
     margin-top: 5px;
@@ -64,4 +64,24 @@ h2.resourceType {
 
 .operationTable td {
     min-width: 153px;
+}
+
+.guideContent h1 {
+	font-size: 1.6em;
+}
+.guideContent h2 {
+	font-size: 1.2em;
+}
+
+.guideContent table {
+	margin-top: 25px;
+}
+
+.guideContent td, .guideContent th {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.guideContent th {
+	font-weight: bold;
 }

@@ -16,12 +16,14 @@ public class PageTemplateHelper {
 	private String SDtemplate = null;
     private String VStemplate = null;
     private String ODtemplate = null;
+    private String IGtemplate = null;
     private String ServerConformanceTemplate = null;
     
     public PageTemplateHelper() {
         SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
         VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
         ODtemplate = FileLoader.loadFileOnClasspath("/template/operations.html");
+        IGtemplate = FileLoader.loadFileOnClasspath("/template/guides.html");
         ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
     }
     
@@ -36,6 +38,8 @@ public class PageTemplateHelper {
                 outputString = VStemplate;
             } else if (resourceType == OPERATIONDEFINITION) {
                 outputString = ODtemplate;
+            } else if (resourceType == IMPLEMENTATIONGUIDE) {
+                outputString = IGtemplate;
             } else if (resourceType == CONFORMANCE) {
                 outputString = ServerConformanceTemplate;
             }
