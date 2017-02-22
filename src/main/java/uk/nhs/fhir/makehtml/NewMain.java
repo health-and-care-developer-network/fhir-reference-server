@@ -652,7 +652,7 @@ public class NewMain implements Constants {
                 int isImplementationGuide = thisDoc.getElementsByTagName("ImplementationGuide").getLength();
                 if(isImplementationGuide > 0) {
                     LOG.info("It's an ImplementationGuide");
-                    result = ImplementationGuide.makeHTMLForImplementationGuide(thisDoc, folder);
+                    result = ImplementationGuide.makeHTMLForImplementationGuide(thisDoc, folder, outPath);
                     String originalResource = FileLoader.loadFile(inFile);
 
                     String augmentedResource = ResourceBuilder.addTextSectionToImplementationGuide(originalResource, result, newBaseURL);

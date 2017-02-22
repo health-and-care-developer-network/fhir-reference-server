@@ -11,7 +11,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import uk.nhs.fhir.makehtml.XMLParserUtils;
 import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.MarkdownProcessor;
 
 public class ImplementationGuide {
@@ -26,7 +28,7 @@ public class ImplementationGuide {
      * @return          Valid xhtml fully describing the ImplementationGuide
      */
     @SuppressWarnings("unchecked")
-	public static String makeHTMLForImplementationGuide(Document thisDoc, File folder) {
+	public static String makeHTMLForImplementationGuide(Document thisDoc, File folder, String outPath) {
     	
     	StringBuilder sb = new StringBuilder();
 
@@ -34,7 +36,6 @@ public class ImplementationGuide {
 
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
 
-        
         // Load in the relevant markdown file and inject it here.
         // TODO: Add support for other mime types and child pages - is this required?
         
@@ -52,6 +53,8 @@ public class ImplementationGuide {
         		// Go and retrieve the content from the source URL - assume it is a file in the same directory!
         		File srcUrl = new File(folder.getAbsolutePath() + "/" + source);
         		content_to_inject = FileLoader.loadFile(srcUrl);
+        		// Also, copy the file to the output path
+        		FileWriter.writeFile(outPath + "/" + source, content_to_inject.getBytes());
         	}
         	
         	if (format.equalsIgnoreCase("text/markdown")) {
@@ -86,28 +89,28 @@ public class ImplementationGuide {
             	if(resourceSet.getLength() > 0) {
                 	for(int j = 0; j < resourceSet.getLength(); j++) {
                 		Element resourceElement = (Element) resourceSet.item(j);
-                		String resourceName = cleanPackageName(getFirstNamedChildValue(resourceElement, "name"));
-                		String resourceDescription = cleanPackageName(getFirstNamedChildValue(resourceElement, "description"));
-                		String resourcePurpose = cleanPackageName(getFirstNamedChildValue(resourceElement, "purpose"));
-                		String resourceUri = cleanPackageName(getFirstNamedChildValue(resourceElement, "sourceUri"));
+                		String resourceName = getFirstNamedChildValue(resourceElement, "name");
+                		String resourceDescription = reformatResourceDescriptions(
+                					getFirstNamedChildValue(resourceElement, "description"));
+                		String resourcePurpose = getFirstNamedChildValue(resourceElement, "purpose");
+                		String resourceUri = getFirstNamedChildValue(resourceElement, "sourceUri");
                 		
                 		// Look through the extensions
                 		int publishOrder = 1000;
-                		NodeList extensionSet = thisDoc.getElementsByTagName("extension");
-                		if(extensionSet.getLength() > 0) {
-                        	for(int k = 0; k < extensionSet.getLength(); k++) {
-                        		Element extensionElement = (Element) extensionSet.item(k);
-                        		String extensionUrl = extensionElement.getAttribute("url");
-                        		if (extensionUrl.equals("urn:hscic:publishOrder")) {
-                        			publishOrder = Integer.parseInt(getFirstNamedChildValue(extensionElement, "valueInteger"));
-                        		}
-                        	}
+                		String publishOrderStr = XMLParserUtils.getExtensionValue(
+                											resourceElement, "urn:hscic:publishOrder", "valueInteger");
+                		String resourceType = XMLParserUtils.getExtensionValue(
+								resourceElement, "urn:hscic:resourceType", "valueString");
+                		
+                		if (publishOrderStr != null) {
+                			publishOrder = Integer.parseInt(publishOrderStr);
                 		}
+                		
                 		
                 		if (resourcePurpose.equals("example")) {
                 			// Ignore examples for now!
                 		} else {
-                			resourceList.add(new ResourceRow(resourceName, resourceDescription, resourceUri, resourcePurpose, publishOrder));
+                			resourceList.add(new ResourceRow(resourceName, resourceDescription, resourceUri, resourceType, publishOrder));
                 		}
                 	}
                 }
@@ -124,81 +127,6 @@ public class ImplementationGuide {
         	
         }
         
-        // TODO: Update the below for ImplementationGuide!
-        
-        
-        /*
-        sb.append("<table style='font-family: sans-serif;'><tr><th>Name</th><th>Value</th></tr>");
-        
-        NodeList composeSet = thisDoc.getElementsByTagName("compose");
-        if(composeSet.getLength() > 0) {
-            sb.append("<h4>Composed from</h4>");
-
-            Element composeElement = (Element) composeSet.item(0);
-
-            // The compose can be one or more of Import, Inlude and Exclude sections
-            NodeList composeImports = composeElement.getElementsByTagName("import");
-            NodeList composeIncludes = composeElement.getElementsByTagName("include");
-            NodeList composeExcludes = composeElement.getElementsByTagName("exclude");
-
-            // Imports is dead easy...
-            for(int i = 0; i < composeImports.getLength(); i++) {
-                Element importRef = (Element) composeImports.item(i);
-                sb.append("<p><b>Import:</b> " + importRef.getAttribute("value") + "<br /></p>");
-            }
-
-            // Includes is more tricky...
-            for(int i = 0; i < composeIncludes.getLength(); i++) {
-                Element includeRef = (Element) composeIncludes.item(i);
-
-                sb.append("<p><table><tr><td><b>Code System:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
-
-                NodeList filterList = includeRef.getElementsByTagName("filter");
-                if (filterList.getLength()>0) {
-                	sb.append("<tr><td colspan='2'><b>Filters:</b></td></tr>");
-                }
-                for(int j = 0; j < filterList.getLength(); j++) {
-                    Element theFilter = (Element) filterList.item(j);
-                    sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
-                    sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
-                    sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
-                }
-                
-                NodeList includeList = includeRef.getElementsByTagName("concept");
-                if (includeList.getLength()>0) {
-                	sb.append("<tr><td colspan='2'><b>Includes:</b></td></tr>");
-                }
-                for(int j = 0; j < includeList.getLength(); j++) {
-                    Element theInclude = (Element) includeList.item(j);
-                    sb.append("<tr><td colspan='2'><li>");
-                    sb.append("<b>code:</b> " + getFirstNamedChildValue(theInclude, "code"));
-                    sb.append(": ");
-                    sb.append("<b>display:</b> " + getFirstNamedChildValue(theInclude, "display"));
-                    sb.append("</li></td></tr>");
-                    
-                }
-                
-                sb.append("</table></p>");
-            }
-
-            // Excludes is identical to Includes...
-            for(int i = 0; i < composeExcludes.getLength(); i++) {
-                Element excludeRef = (Element) composeExcludes.item(i);
-
-                sb.append("<p><table><tr><td><b>Exclude:</b></td><td>" + getFirstNamedChildValue(excludeRef, "system") + "</td></tr>");
-
-                NodeList filterList = excludeRef.getElementsByTagName("filter");
-                for(int j = 0; j < filterList.getLength(); j++) {
-                    Element theFilter = (Element) filterList.item(j);
-
-                    sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
-                    sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
-                    sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
-                }
-                sb.append("</table></p>");
-            }
-
-        }*/
         
         LOG.info("\n=========================================\nhtml generated\n=========================================");
         sb.append("</div>\n");
@@ -220,6 +148,16 @@ public class ImplementationGuide {
     	} else {
     		return val;
     	}
+    }
+    
+    private static String reformatResourceDescriptions(String val) {
+    	if (val == null) {
+    		return "";
+    	}
+    	System.out.println("Before: " + val);
+    	String result = val.replaceAll("\\r\\n|\\r|\\n", "<br/>");
+    	System.out.println("After : " + result);
+    	return result;
     }
 
 }

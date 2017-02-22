@@ -17,9 +17,9 @@ public class ResourceRow implements Comparable {
     }
 	
 	public void writeResource(StringBuilder sb) {
-		sb.append("<tr><td><a href='").append(url).append("'>").append(name).append(" ORDER=").append(publishOrder).append("</a></td>");
-    	sb.append("<td>").append(type).append("</td>");
-    	sb.append("<td>").append(description).append("</td>");
+		sb.append("<tr><td style='border-bottom: 1px solid #ddd;'><a href='").append(url).append("'>").append(name).append("</a></td>");
+    	sb.append("<td style='border-bottom: 1px solid #ddd;'>").append(type).append("</td>");
+    	sb.append("<td style='border-bottom: 1px solid #ddd;'>").append(description).append("</td>");
 		sb.append("</tr>");
 	}
 	
