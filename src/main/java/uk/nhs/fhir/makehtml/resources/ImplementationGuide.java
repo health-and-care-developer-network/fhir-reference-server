@@ -3,12 +3,21 @@ package uk.nhs.fhir.makehtml.resources;
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.MarkdownProcessor;
+
 public class ImplementationGuide {
+	
+	private static final Logger LOG = Logger.getLogger(ImplementationGuide.class.getName());
+	
     /**
      * Make the html narrative section for the ImplementationGuide described in this XML
      *
@@ -16,20 +25,109 @@ public class ImplementationGuide {
      *
      * @return          Valid xhtml fully describing the ImplementationGuide
      */
-    public static String makeHTMLForImplementationGuide(Document thisDoc, File folder) {
-
-        StringBuilder sb = new StringBuilder();
+    @SuppressWarnings("unchecked")
+	public static String makeHTMLForImplementationGuide(Document thisDoc, File folder) {
+    	
+    	StringBuilder sb = new StringBuilder();
 
         Element root = (Element) thisDoc.getFirstChild();
 
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
 
         
-        // TODO: Load in the relevant markdown file and inject it here
+        // Load in the relevant markdown file and inject it here.
+        // TODO: Add support for other mime types and child pages - is this required?
         
+        NodeList pageSet = thisDoc.getElementsByTagName("page");
+        if(pageSet.getLength() > 0) {
+        	// Only one page at the top level
+        	Element pageElement = (Element) pageSet.item(0);
+        	String source = getFirstNamedChildValue(pageElement, "source");
+        	String name = getFirstNamedChildValue(pageElement, "name");
+        	String kind = getFirstNamedChildValue(pageElement, "kind");
+        	String format = getFirstNamedChildValue(pageElement, "format");
+        	
+        	String content_to_inject = null;
+        	if (source != null) {
+        		// Go and retrieve the content from the source URL - assume it is a file in the same directory!
+        		File srcUrl = new File(folder.getAbsolutePath() + "/" + source);
+        		content_to_inject = FileLoader.loadFile(srcUrl);
+        	}
+        	
+        	if (format.equalsIgnoreCase("text/markdown")) {
+        		// Compile and Inject markdown content
+        		String html = MarkdownProcessor.renderMarkdown(content_to_inject);
+        		sb.append("<div class='markdown_page'>").append(html).append("</div>");
+        	} else if (format.startsWith("text")) {
+        		// Inject the text straignt in
+        		sb.append("<pre>").append(content_to_inject).append("</pre>");
+        	} else {
+        		LOG.info("Unrecognised page format: " + format);
+        	}
+        }
+        
+        
+        NodeList packageSet = thisDoc.getElementsByTagName("package");
+        if(packageSet.getLength() > 0) {
+        	
+        	sb.append("<table style='font-family: sans-serif;' width='100%'>");
+        	
+        	for(int i = 0; i < packageSet.getLength(); i++) {
+        		Element packageElement = (Element) packageSet.item(i);
+        		String packageName = cleanPackageName(getFirstNamedChildValue(packageElement, "name"));
+        		
+            	sb.append("<tr><th colspan='3' bgcolor='#f0f0f0'>")
+            					.append(packageName).append("</th></tr>");
+            	sb.append("<tr><th>Name</th><th>Type</th><th>Description and Constraints</th></tr>");
+            	
+            	NodeList resourceSet = packageElement.getElementsByTagName("resource");
+            	ArrayList<ResourceRow> resourceList = new ArrayList<ResourceRow>(); 
+            	
+            	if(resourceSet.getLength() > 0) {
+                	for(int j = 0; j < resourceSet.getLength(); j++) {
+                		Element resourceElement = (Element) resourceSet.item(j);
+                		String resourceName = cleanPackageName(getFirstNamedChildValue(resourceElement, "name"));
+                		String resourceDescription = cleanPackageName(getFirstNamedChildValue(resourceElement, "description"));
+                		String resourcePurpose = cleanPackageName(getFirstNamedChildValue(resourceElement, "purpose"));
+                		String resourceUri = cleanPackageName(getFirstNamedChildValue(resourceElement, "sourceUri"));
+                		
+                		// Look through the extensions
+                		int publishOrder = 1000;
+                		NodeList extensionSet = thisDoc.getElementsByTagName("extension");
+                		if(extensionSet.getLength() > 0) {
+                        	for(int k = 0; k < extensionSet.getLength(); k++) {
+                        		Element extensionElement = (Element) extensionSet.item(k);
+                        		String extensionUrl = extensionElement.getAttribute("url");
+                        		if (extensionUrl.equals("urn:hscic:publishOrder")) {
+                        			publishOrder = Integer.parseInt(getFirstNamedChildValue(extensionElement, "valueInteger"));
+                        		}
+                        	}
+                		}
+                		
+                		if (resourcePurpose.equals("example")) {
+                			// Ignore examples for now!
+                		} else {
+                			resourceList.add(new ResourceRow(resourceName, resourceDescription, resourceUri, resourcePurpose, publishOrder));
+                		}
+                	}
+                }
+            	
+            	// Output the sorted list of resources
+            	Collections.sort(resourceList);
+            	for (ResourceRow row : resourceList) {
+            		row.writeResource(sb);
+            	}
+        		
+        	}
+        	
+        	sb.append("</table>");
+        	
+        }
         
         // TODO: Update the below for ImplementationGuide!
         
+        
+        /*
         sb.append("<table style='font-family: sans-serif;'><tr><th>Name</th><th>Value</th></tr>");
         
         NodeList composeSet = thisDoc.getElementsByTagName("compose");
@@ -100,93 +198,28 @@ public class ImplementationGuide {
                 sb.append("</table></p>");
             }
 
-        }
-
-        NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
-
-        NodeList conceptMaps = thisDoc.getElementsByTagName("ConceptMap");
-
-        if(codeSystemSet.getLength() > 0) {
-            // We have a codeSystem in play
-            Element codeSystem = (Element) codeSystemSet.item(0);
-            NodeList concepts = codeSystem.getElementsByTagName("concept");
-
-            sb.append("<p><b>CodeSystem:</b> " + getFirstNamedChildValue(codeSystem, "system") + "<br />");
-
-            if(concepts.getLength() > 0) {
-                sb.append("<ul>");
-
-                for(int i = 0; i < concepts.getLength(); i++) {
-                    Element concept = (Element) concepts.item(i);
-                    sb.append("<li>");
-                    Element code = (Element) concept.getElementsByTagName("code").item(0);
-                    sb.append("<b>code:</b> " + code.getAttribute("value"));
-                    sb.append(" ");
-                    sb.append("<b>display:</b> " + getFirstNamedChildValue(concept, "display"));
-
-                    for(int j = 0; j < conceptMaps.getLength(); j++) {
-                        Element thisMap = (Element) conceptMaps.item(j);
-
-                        // Get the name for this mapping...
-                        String mapName = getFirstNamedChildValue(thisMap, "name");
-
-                        // Get the target reference for it...
-                        Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
-                        NodeList mapItems = thisMap.getElementsByTagName("element");
-                        sb.append("<ul>");
-                        for(int k = 0; k< mapItems.getLength(); k++) {
-                            Element mapItem = (Element) mapItems.item(k);
-                            String mapItemCode = getFirstNamedChildValue(mapItem, "code");
-
-                            // Finally!!!
-                            if(mapItemCode.equals(code.getAttribute("value"))) {
-                                // We have a mapped value
-                                NodeList targetList = mapItem.getElementsByTagName("target");
-                                for(int l = 0; l < targetList.getLength(); l++) {
-                                    Element target = (Element) targetList.item(l);
-
-                                    sb.append("<li>");
-                                    
-                                    // Add the target code it maps to...
-                                    sb.append("<b>maps to:</b> " + getFirstNamedChildValue(target, "code"));
-
-                                    // Now add how it is mapped
-                                    sb.append(" (" + getFirstNamedChildValue(target, "equivalence") + ") ");
-
-                                    // Now add in which mapping
-                                    sb.append(" in <a href='" + getFirstNamedChildValue(targetReferenceElement, "reference") + "'>" + mapName + "</a>");
-                                    
-                                    sb.append("</li>");
-                                }
-                            }
-                        }
-                        sb.append("</ul>");
-                    }
-                    sb.append("</li>");
-                }
-                sb.append("</ul>");
-            }
-            sb.append("</p>");
-        }
-
-        NodeList expansionList = thisDoc.getElementsByTagName("expansion");
-        if(expansionList.getLength() == 1) {
-            Element expansion = (Element) expansionList.item(0);
-            sb.append("<p><h4>Expansion</h4>");
-            sb.append("<b>NB: Expansions are not fully catered for in generating the narrative section</b></ br>");
-            sb.append("identifier: " + getFirstNamedChildValue(expansion, "identifier"));
-            sb.append("timestamp: " + getFirstNamedChildValue(expansion, "timestamp"));
-
-            NodeList totalList = expansion.getElementsByTagName("total");
-            if(totalList.getLength() == 1) {
-                Element totalEle = (Element) totalList.item(0);
-                sb.append("<b>total: </b>" + totalEle.getAttribute("value") + "<br />");
-            }
-            sb.append("</p>");
-        }
-
+        }*/
+        
+        LOG.info("\n=========================================\nhtml generated\n=========================================");
         sb.append("</div>\n");
         return sb.toString();
+    }
+    
+    /**
+     * The package names in the ImplementationGuide seem to be in the form Profile.GetRecordQueryRequest
+     * but we want to publish them without the prefix, so remove it if there is one.
+     * @param val
+     * @return
+     */
+    private static String cleanPackageName(String val) {
+    	if (val == null)
+    		return "";
+    	int idx = val.indexOf('.');
+    	if (idx > -1) {
+    		return val.substring(idx+1);
+    	} else {
+    		return val;
+    	}
     }
 
 }
