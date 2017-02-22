@@ -15,9 +15,10 @@
  */
 package uk.nhs.fhir.datalayer;
 
+import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
+import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -27,8 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.logging.Log;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -53,6 +56,7 @@ public class FileCache {
     private static String profilePath = PropertyReader.getProperty("profilePath");
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
     private static String operationsPath = PropertyReader.getProperty("operationsPath");
+    private static String guidesPath = PropertyReader.getProperty("guidesPath");
     private static String fileExtension = PropertyReader.getProperty("fileExtension");
 
 
@@ -154,9 +158,14 @@ public class FileCache {
             
             // Add operations
             newList.addAll(cacheFHIRResources(operationsPath, OPERATIONDEFINITION));
+
+            // Add ImplementationGuides
+            newList.addAll(cacheFHIRResources(guidesPath, IMPLEMENTATIONGUIDE));
             
             // Swap out for our new list
             resourceList = newList;
+            
+            //printCacheContent();
         }
     }
     
@@ -199,10 +208,13 @@ public class FileCache {
 	                } else if (resourceType == OPERATIONDEFINITION) {
 	                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
 	                	name = operation.getName();
-	                	//extension = (operation.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-	                    //baseType = operation.getType();
 	                    actualName = getActualNameFromURL(operation.getUrl(), name);
 	                    displayGroup = "Operations";
+	                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+	                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
+	                	name = guide.getName();
+	                    actualName = getActualNameFromURL(guide.getUrl(), name);
+	                    displayGroup = "Implementation Guides";
 	                }
 	                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
 	                										displayGroup, example, actualName));
@@ -240,5 +252,13 @@ public class FileCache {
     	}
     	return null;
     }
+    
+    /*
+    private static void printCacheContent() {
+    	LOG.info("Cache loaded - entries:");
+    	for (ResourceEntity entry : resourceList) {
+    		LOG.info("  -> " + entry.getResourceName() + " : " + entry.getResourceType().name());
+    	}
+    }*/
 
 }

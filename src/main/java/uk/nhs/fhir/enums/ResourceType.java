@@ -16,6 +16,7 @@ public enum ResourceType {
 	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition"),
 	VALUESET("ValueSet", "ValueSet"),
 	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition"),
+	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide"),
 	CONFORMANCE("Conformance", "Conformance"), 
 	OTHER("Other", "Other");
 	
@@ -51,6 +52,8 @@ public enum ResourceType {
     		return VALUESET;
     	} else if (typeInRequest.equals(OPERATIONDEFINITION.hapiName)) {
     		return OPERATIONDEFINITION;
+    	} else if (typeInRequest.equals(IMPLEMENTATIONGUIDE.hapiName)) {
+    		return IMPLEMENTATIONGUIDE;
     	} else if (typeInRequest.equals(CONFORMANCE.hapiName)) {
     		return CONFORMANCE;
     	}

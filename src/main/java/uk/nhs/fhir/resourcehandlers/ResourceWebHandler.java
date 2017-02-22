@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -79,7 +80,8 @@ public class ResourceWebHandler {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
         StringBuilder sb = new StringBuilder();
         
-        if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET || resourceType == OPERATIONDEFINITION) {
+        if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
+        		|| resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
         	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
         	
             HashMap<String, List<ResourceEntity>> myNames = null;
@@ -90,6 +92,8 @@ public class ResourceWebHandler {
             	myNames = myDataSource.getAllValueSetNamesByCategory();
             } else if (resourceType == OPERATIONDEFINITION) {
             	myNames = myDataSource.getAllOperationNamesByCategory();
+            } else if (resourceType == IMPLEMENTATIONGUIDE) {
+            	myNames = myDataSource.getAllImplementationGuideNamesByCategory();
             }
             
             for(String base : myNames.keySet()) {
@@ -147,6 +151,12 @@ public class ResourceWebHandler {
         LOG.fine("Called: ProfileWebHandler.getOperationByName(String name)");
         OperationDefinition od = myDataSource.getSingleOperationDefinitionByName(name);
         return od;
+    }
+
+    public ImplementationGuide getImplementationGuideByName(String name) {
+        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByName(String name)");
+        ImplementationGuide ig = myDataSource.getSingleImplementationGuideByName(name);
+        return ig;
     }
     
     public ValueSet getVSByName(String name) {

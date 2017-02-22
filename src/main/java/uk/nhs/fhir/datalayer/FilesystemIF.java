@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir.datalayer;
 
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -240,8 +241,6 @@ public class FilesystemIF implements Datasource {
     }
 
     
-    
-    
 	@Override
 	public OperationDefinition getSingleOperationDefinitionByName(String name) {
     	ResourceEntity entry = FileCache.getSingleResourceByName(name);
@@ -268,6 +267,35 @@ public class FilesystemIF implements Datasource {
 	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
     	LOG.info("Getting all Operation Names by category");
         return FileCache.getGroupedNameList(ResourceType.OPERATIONDEFINITION);
+	}
+
+	
+	@Override
+	public ImplementationGuide getSingleImplementationGuideByName(String name) {
+    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting ImplementationGuide with name=" + name + " looking for file: " + path.getAbsolutePath());
+        
+    	ImplementationGuide foundGuide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(path);
+        return foundGuide;
+	}
+
+	@Override
+	public List<ImplementationGuide> getAllImplementationGuides() {
+		return FileCache.getResources(ResourceType.IMPLEMENTATIONGUIDE);
+	}
+
+	@Override
+	public List<String> getAllImplementationGuideNames() {
+        LOG.info("Getting all ImplementationGuide Names");
+        List<String> guideList = FileCache.getResourceNameList(ResourceType.IMPLEMENTATIONGUIDE);
+        return guideList;
+	}
+
+	@Override
+	public HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory() {
+    	LOG.info("Getting all ImplementationGuide Names by category");
+        return FileCache.getGroupedNameList(ResourceType.IMPLEMENTATIONGUIDE);
 	}
 
 }

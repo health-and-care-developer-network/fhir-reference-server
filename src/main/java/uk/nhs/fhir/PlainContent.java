@@ -20,6 +20,8 @@ import static uk.nhs.fhir.enums.ClientType.*;
 import static uk.nhs.fhir.enums.MimeType.*;
 import static uk.nhs.fhir.enums.ResourceType.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -41,6 +44,7 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -54,6 +58,7 @@ public class PlainContent extends CORSInterceptor {
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ResourceWebHandler myWebHandler = null;
     PageTemplateHelper templateHelper = null;
+    private static String guidesPath = PropertyReader.getProperty("guidesPath");
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
@@ -72,6 +77,15 @@ public class PlainContent extends CORSInterceptor {
         
         LOG.info("Request received - operation: " + operation.toString());
         LOG.info("Resource type: " + resourceType.toString());
+        
+        // First, check if this is a request for a markdown or text file from the ImplementationGuide directory..
+        if (operation == READ && resourceType == IMPLEMENTATIONGUIDE) {
+        	String resourceName = theRequestDetails.getId().getIdPart();
+        	if (resourceName.endsWith(".md") || resourceName.endsWith(".txt")) {
+        		streamFileDirectly(theResponse, resourceName);
+        		return false;
+        	}
+        }
         
         // If it is not a browser, let HAPI handle returning the resource
         if (clientType == NON_BROWSER) {
@@ -117,6 +131,28 @@ public class PlainContent extends CORSInterceptor {
         templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
         
         return false;
+    }
+    
+    /**
+     * Method to stream a file directly from the guide directory to the client (for files referenced
+     * in ImplementationGuide resources)
+     * @param theResponse
+     * @param filename
+     */
+    private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
+    	LOG.info("Request for a file from the ImplementationGuide path: " + filename);
+		try {
+	    	// Initialise the output
+	    	PrintWriter outputStream = null;
+	        theResponse.setStatus(200);
+	        theResponse.setContentType("text/plain");
+			outputStream = theResponse.getWriter();
+	        // Send the file directly to the output
+	        String content = FileLoader.loadFile(guidesPath + "/" + filename);
+			outputStream.append(content);
+    	} catch (IOException e) {
+    		LOG.severe(e.getMessage());
+		}
     }
     
     @Override
@@ -184,6 +220,9 @@ public class PlainContent extends CORSInterceptor {
         if (resourceType == OPERATIONDEFINITION) {
         	content.append(DescribeOperationDefinition(resourceName));
         }
+        if (resourceType == IMPLEMENTATIONGUIDE) {
+        	content.append(DescribeImplementationGuide(resourceName));
+        }
         
         //content.append(GetXMLContent(resourceName));
         
@@ -212,6 +251,10 @@ public class PlainContent extends CORSInterceptor {
      		OperationDefinition od = myWebHandler.getOperationByName(resourceName);
      		od.setText(textElement);
      		resource = od;
+    	} else if (resourceType == IMPLEMENTATIONGUIDE) {
+     		ImplementationGuide ig = myWebHandler.getImplementationGuideByName(resourceName);
+     		ig.setText(textElement);
+     		resource = ig;
      	}
         
         if (mimeType == JSON) {
@@ -327,6 +370,42 @@ public class PlainContent extends CORSInterceptor {
         }
         return content.toString();
     }
+    
+    /**
+     * Code in here to create the HTML response to a request for a
+     * StructureDefinition we hold.
+     *
+     * @param resourceName Name of the SD we need to describe.
+     * @return
+     */
+    private String DescribeImplementationGuide(String resourceName) {
+        StringBuilder content = new StringBuilder();
+        ImplementationGuide od;
+        od = myWebHandler.getImplementationGuideByName(resourceName);
+        content.append("<h2 class='resourceType'>" + od.getName() + " (ImplementationGuide)</h2>");
+        content.append("<div class='resourceSummary'>");
+        content.append("<ul>");
+        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
+        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
+        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
+        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
+        content.append("<li>Description: " + printIfNotNull(od.getDescription()) + "</li>");
+        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
+        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
+        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
+        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
+        content.append("<li>Show Raw ImplementationGuide: <a href='./" + resourceName + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("</div>");
+        String textSection = od.getText().getDivAsString();
+        if (textSection != null) {
+	        content.append("<div class='guideContent'>");
+	        content.append(textSection);
+	        content.append("</div>");
+        }
+        return content.toString();
+    }
+    
     
     /**
      * Code to generate a HTML view of the named ValueSet

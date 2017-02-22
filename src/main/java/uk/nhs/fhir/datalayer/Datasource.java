@@ -18,6 +18,7 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -101,5 +102,15 @@ public interface Datasource {
     List<String> getAllOperationNames();
     
     HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory();
+    
+    
+    // ImplementationGuides
+    ImplementationGuide getSingleImplementationGuideByName(String name);
+
+    List<ImplementationGuide> getAllImplementationGuides();
+    
+    List<String> getAllImplementationGuideNames();
+    
+    HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory();
 
 }
