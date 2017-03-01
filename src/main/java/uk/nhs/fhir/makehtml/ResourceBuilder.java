@@ -15,8 +15,6 @@
  */
 package uk.nhs.fhir.makehtml;
 
-import java.util.logging.Logger;
-
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
@@ -24,9 +22,6 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.logging.Level;
 
 public class ResourceBuilder {
 
@@ -140,5 +135,4 @@ public class ResourceBuilder {
         serialised = serialised.replace("Σ", "&#931;");
         return serialised;
     }
-    
 }

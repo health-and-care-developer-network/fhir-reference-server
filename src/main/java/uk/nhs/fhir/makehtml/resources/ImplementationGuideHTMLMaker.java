@@ -11,14 +11,23 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import uk.nhs.fhir.makehtml.HTMLMaker;
 import uk.nhs.fhir.makehtml.XMLParserUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.MarkdownProcessor;
 
-public class ImplementationGuide {
+public class ImplementationGuideHTMLMaker extends HTMLMaker {
 	
-	private static final Logger LOG = Logger.getLogger(ImplementationGuide.class.getName());
+	private static final Logger LOG = Logger.getLogger(ImplementationGuideHTMLMaker.class.getName());
+	
+	private final File folder;
+	private final String outPath;
+	
+	public ImplementationGuideHTMLMaker(File folder, String outPath) {
+		this.folder = folder;
+		this.outPath = outPath;
+	}
 	
     /**
      * Make the html narrative section for the ImplementationGuide described in this XML
@@ -27,8 +36,8 @@ public class ImplementationGuide {
      *
      * @return          Valid xhtml fully describing the ImplementationGuide
      */
-    @SuppressWarnings("unchecked")
-	public static String makeHTMLForImplementationGuide(Document thisDoc, File folder, String outPath) {
+    @Override
+	public String makeHTML(Document thisDoc) {
     	
     	StringBuilder sb = new StringBuilder();
 
