@@ -15,8 +15,13 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
+import com.google.common.base.Preconditions;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
@@ -24,115 +29,71 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 
 public class ResourceBuilder {
+	private final ResourcePreparer<StructureDefinition> structureDefinitionPreparer;
+	private final ResourcePreparer<ValueSet> valueSetPreparer;
+	private final ResourcePreparer<OperationDefinition> operationDefinitionPreparer;
+	private final ResourcePreparer<ImplementationGuide> implementationGuidePreparer;
 
-    protected static String addTextSectionToResource(String resourceXML, String textSection, String newBaseURL) {
-        String serialised = null;
-        FhirContext ctx = FhirContext.forDstu2();
-        StructureDefinition structureDefinitionResource = null;
-        structureDefinitionResource = (StructureDefinition) ctx.newXmlParser().parseResource(resourceXML);
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv(textSection);
-        structureDefinitionResource.setText(textElement);
+	public ResourceBuilder(
+		ResourcePreparer<StructureDefinition> structureDefinitionPreparer,
+		ResourcePreparer<ValueSet> valueSetPreparer,
+		ResourcePreparer<OperationDefinition> operationDefinitionPreparer,
+		ResourcePreparer<ImplementationGuide> implementationGuideSanitizer) {
 
-        // Here (while we have the resource in as a StructureDefinition) we resolve any invalid (c) character in the Copyright section too!
-        String copyRight = structureDefinitionResource.getCopyrightElement().getValue();
-        if(copyRight != null) {
-            copyRight = copyRight.replace("©", "&copy;");
-            copyRight = copyRight.replace("\\u00a9", "&copy;");
-            structureDefinitionResource.setCopyright(copyRight);
-        }
-        
-        if (newBaseURL != null) {
-        	String resourceName = structureDefinitionResource.getName();
-        	if (newBaseURL.endsWith("/")) {
-        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
-        	}
-        	//structureDefinitionResource.setBase(newBaseURL);
-        	structureDefinitionResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
-        }
-        
-        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(structureDefinitionResource);
+		Preconditions.checkNotNull(structureDefinitionPreparer);
+		Preconditions.checkNotNull(valueSetPreparer);
+		Preconditions.checkNotNull(operationDefinitionPreparer);
+		Preconditions.checkNotNull(implementationGuideSanitizer);
+		
+		this.structureDefinitionPreparer = structureDefinitionPreparer;
+		this.valueSetPreparer = valueSetPreparer;
+		this.operationDefinitionPreparer = operationDefinitionPreparer;
+		this.implementationGuidePreparer = implementationGuideSanitizer;
+	}
+	
+	protected String addTextSection(String resourceXML, String textSection, String newBaseURL) throws Exception {
+		FhirContext ctx = FhirContext.forDstu2();
+		BaseResource resource = parseResource(ctx, resourceXML);
+		addHumanReadableText(resource, textSection);
+        prepareResource(resource, newBaseURL);
+		
+		String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
         serialised = serialised.replace("Σ", "&#931;");
         return serialised;
-    }
+	}
 
-    protected static String addTextSectionToValueSet(String vsXML, String textSection, String newBaseURL) {
-        String serialised = null;
-        FhirContext ctx = FhirContext.forDstu2();
-        ValueSet vsResource = null;
-        vsResource = (ValueSet) ctx.newXmlParser().parseResource(vsXML);
-        NarrativeDt textElement = new NarrativeDt();
+	private void addHumanReadableText(BaseResource resource, String textSection) {
+		NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv(textSection);
-        vsResource.setText(textElement);
+        resource.setText(textElement);
+	}
 
-        // Here (while we have the resource in as a StructureDefinition) we resolve any invalid (c) character in the Copyright section too!
-        String copyRight = vsResource.getCopyrightElement().getValue();
-        if(copyRight != null) {
-            copyRight = copyRight.replace("©", "&copy;");
-            copyRight = copyRight.replace("\\u00a9", "&copy;");
-            vsResource.setCopyright(copyRight);
-        }
-        
-        if (newBaseURL != null) {
-        	String resourceName = vsResource.getName();
-        	if (newBaseURL.endsWith("/")) {
-        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
-        	}
-        	//structureDefinitionResource.setBase(newBaseURL);
-        	vsResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
-        }
-        
-        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(vsResource);
-        serialised = serialised.replace("Σ", "&#931;");
-        return serialised;
-    }
-
-    static String addTextSectionTooperationDefinition(String originalResource, String textSection, String newBaseURL) {
-        String serialised = null;
-        FhirContext ctx = FhirContext.forDstu2();
-        OperationDefinition opDefResource = null;
-        opDefResource = (OperationDefinition) ctx.newXmlParser().parseResource(originalResource);
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv(textSection);
-        opDefResource.setText(textElement);
-        
-        if (newBaseURL != null) {
-        	String resourceName = opDefResource.getName();
-        	if (newBaseURL.endsWith("/")) {
-        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
-        	}
-        	//structureDefinitionResource.setBase(newBaseURL);
-        	opDefResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
-        }
-        
-        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(opDefResource);
-        serialised = serialised.replace("Σ", "&#931;");
-        return serialised;
-    }
-    
-    static String addTextSectionToImplementationGuide(String originalResource, String textSection, String newBaseURL) {
-        String serialised = null;
-        FhirContext ctx = FhirContext.forDstu2();
-        ImplementationGuide impGuideResource = null;
-        impGuideResource = (ImplementationGuide) ctx.newXmlParser().parseResource(originalResource);
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv(textSection);
-        impGuideResource.setText(textElement);
-        
-        if (newBaseURL != null) {
-        	String resourceName = impGuideResource.getName();
-        	if (newBaseURL.endsWith("/")) {
-        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
-        	}
-        	impGuideResource.setUrl(newBaseURL+"/ImplementationGuide/"+resourceName);
-        }
-        
-        serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(impGuideResource);
-        serialised = serialised.replace("Σ", "&#931;");
-        return serialised;
-    }
+	private static BaseResource parseResource(FhirContext ctx, String resourceXML) throws Exception {
+		IBaseResource iResource = ctx.newXmlParser().parseResource(resourceXML);
+		
+		if (iResource instanceof BaseResource) {
+			return (BaseResource)iResource;
+		} else {
+			throw new Exception("Parsed object wasn't an instance of BaseResource");
+		}
+	}
+	
+	private void prepareResource(BaseResource resource, String newBaseURL) throws Exception {
+		if (resource instanceof StructureDefinition) {
+			StructureDefinition structureDefinition = (StructureDefinition)resource;
+			structureDefinitionPreparer.prepare(structureDefinition, newBaseURL);
+		} else if (resource instanceof ValueSet) {
+			ValueSet valueSet = (ValueSet)resource;
+			valueSetPreparer.prepare(valueSet, newBaseURL);
+		} else if (resource instanceof OperationDefinition) {
+			OperationDefinition operationDefinition = (OperationDefinition)resource;
+			operationDefinitionPreparer.prepare(operationDefinition, newBaseURL);
+		} else if (resource instanceof ImplementationGuide) {
+			ImplementationGuide implementationGuide = (ImplementationGuide)resource;
+			implementationGuidePreparer.prepare(implementationGuide, newBaseURL);
+		} else {
+			throw new Exception("Deserialised file was not any recognised type");
+		}
+	}
 }

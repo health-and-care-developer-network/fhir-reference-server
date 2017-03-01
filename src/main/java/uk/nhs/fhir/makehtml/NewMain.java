@@ -58,12 +58,20 @@ public class NewMain {
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
             
+            ResourceBuilder resourceBuilder =
+            	new ResourceBuilder(
+            		new StructureDefinitionPreparer(),
+            		new ValueSetPreparer(),
+            		new OperationDefinitionPreparer(),
+            		new ImplementationGuidePreparer());	
+            
             FileProcessor fileProcessor =
-        	    	new FileProcessor(
-        	    		new StructureDefinitionHTMLMaker(),
-        	    		new ValueSetHTMLMaker(),
-        	    		new OperationDefinitionHTMLMaker(),
-        	    		new ImplementationGuideHTMLMaker(new File(inputDir), newBaseURL));
+    	    	new FileProcessor(
+    	    		new StructureDefinitionHTMLMaker(),
+    	    		new ValueSetHTMLMaker(),
+    	    		new OperationDefinitionHTMLMaker(),
+    	    		new ImplementationGuideHTMLMaker(new File(inputDir), newBaseURL),
+    	    		resourceBuilder);
             
             instance.process(fileProcessor);
         }
@@ -82,11 +90,12 @@ public class NewMain {
             }
         });
 
-        for (File thisFile : allProfiles) {
-        	boolean success = fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
-        	if (!success) {
-        		break;
-        	}
+        try {
+	        for (File thisFile : allProfiles) {
+	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
+	        }
+        } catch (Exception e) {
+        	e.printStackTrace();
         }
     }
 }
