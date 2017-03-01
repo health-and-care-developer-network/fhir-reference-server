@@ -20,8 +20,6 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.resources.ImplementationGuideHTMLMaker;
-
 /**
  *
  * @author tim.coates@hscic.gov.uk

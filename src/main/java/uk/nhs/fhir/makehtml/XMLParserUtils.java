@@ -15,20 +15,21 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Utility methods for parsing XML content

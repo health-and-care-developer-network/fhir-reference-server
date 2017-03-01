@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.resources;
+package uk.nhs.fhir.makehtml;
 
 import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
 
@@ -11,8 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import uk.nhs.fhir.makehtml.HTMLMaker;
-import uk.nhs.fhir.makehtml.XMLParserUtils;
+import uk.nhs.fhir.makehtml.resources.ResourceRow;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.MarkdownProcessor;
