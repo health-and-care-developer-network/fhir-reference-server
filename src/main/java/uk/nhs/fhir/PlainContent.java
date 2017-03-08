@@ -316,7 +316,7 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
         content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
         content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
-        content.append("<li>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
+        content.append("<li id='description'>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
         content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
         content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
@@ -353,7 +353,7 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
         content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
         content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li>Description: " + printIfNotNull(od.getDescription()) + "</li>");
+        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
         content.append("<li>Requirements: " + printIfNotNull(od.getRequirements()) + "</li>");
         content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
@@ -389,7 +389,7 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
         content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
         content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li>Description: " + printIfNotNull(od.getDescription()) + "</li>");
+        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
         content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
@@ -425,7 +425,7 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
         content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
         content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
-        content.append("<li>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
+        content.append("<li id='description'>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
         content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
         content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
         content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
