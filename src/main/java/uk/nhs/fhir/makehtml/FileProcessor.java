@@ -3,39 +3,45 @@ package uk.nhs.fhir.makehtml;
 import static java.io.File.separatorChar;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.jdom2.Document;
 
 import com.google.common.base.Preconditions;
 
+import ca.uhn.fhir.context.FhirContext;
+import uk.nhs.fhir.makehtml.old.HTMLMakerOLD;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
+import uk.nhs.fhir.util.HTMLUtil;
+import uk.nhs.fhir.util.SectionedHTMLDoc;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
 	
-    private final HTMLMaker structureDefinitionHTMLMaker;
-    private final HTMLMaker valueSetHTMLMaker;
-    private final HTMLMaker operationDefinitionHTMLMaker;
-    private final HTMLMaker implementationGuideHTMLMaker;
+    private final FhirContext fhirContext;
+    
+    private final HTMLMakerOLD structureDefinitionHTMLMaker;
+    private final HTMLMakerOLD valueSetHTMLMaker;
+    private final HTMLMakerOLD operationDefinitionHTMLMaker;
+    private final HTMLMakerOLD implementationGuideHTMLMaker;
     
     private final ResourceBuilder resourceBuilder;
     
     public FileProcessor(
-    	HTMLMaker structureDefinitionHTMLMaker,
-    	HTMLMaker valueSetHTMLMaker,
-    	HTMLMaker operationDefinitionHTMLMaker,
-    	HTMLMaker implementationGuideHTMLMaker,
+    	HTMLMakerOLD structureDefinitionHTMLMaker,
+    	HTMLMakerOLD valueSetHTMLMaker,
+    	HTMLMakerOLD operationDefinitionHTMLMaker,
+    	HTMLMakerOLD implementationGuideHTMLMaker,
     	ResourceBuilder resourceBuilder) {
+    	
+    	this.fhirContext = FhirContext.forDstu2();
     	
     	Preconditions.checkNotNull(structureDefinitionHTMLMaker);
     	Preconditions.checkNotNull(valueSetHTMLMaker);
@@ -58,7 +64,16 @@ public class FileProcessor {
 		    String inFile = thisFile.getPath();
 		    String outFilename = outPath + separatorChar + thisFile.getName();
 		    LOG.info("\n\n=========================================\nProcessing file: " + inFile + "\n=========================================");
-		    Document thisDoc = ReadFile(inFile);
+		    
+		    Document output = null;
+		    try (FileReader fr = new FileReader(thisFile)) {
+		    	IBaseResource resource = fhirContext.newXmlParser().parseResource(fr);
+		    	output = processResource(resource);
+		    }
+
+		    LOG.fine(HTMLUtil.docToString(output, true, false));
+
+		    Document thisDoc = HTMLUtil.readFile(inFile);
 
 		    Optional<String> html = buildHTML(inFile, thisDoc);
 		    if (html.isPresent()) {
@@ -72,22 +87,29 @@ public class FileProcessor {
 		}
 	}
 
-	Optional<String> buildHTML(String inFile, Document thisDoc) throws Exception {
+	private <T extends IBaseResource> Document processResource(T resource) throws ParserConfigurationException {
+		ResourceFormatter<T> formatter = ResourceFormatter.factoryForResource(resource);
+		SectionedHTMLDoc doc = new SectionedHTMLDoc();
+		doc.addSection(formatter.makeSectionHTML(resource));
+		return doc.getHTML();
+	}
+
+	Optional<String> buildHTML(String inFile, Document document) throws Exception {
 		String html = null;
 		try {
-		    String rootTagName = thisDoc.getDocumentElement().getTagName();
+		    String rootTagName = document.getRootElement().getName();
 			switch (rootTagName) {
 		    	case "StructureDefinition":
-		    		html = structureDefinitionHTMLMaker.makeHTML(thisDoc);
+		    		html = structureDefinitionHTMLMaker.makeHTML(document);
 		    		break;
 		    	case "ValueSet":
-		    		html = valueSetHTMLMaker.makeHTML(thisDoc);
+		    		html = valueSetHTMLMaker.makeHTML(document);
 		    		break;
 		    	case "OperationDefinition":
-		    		html = operationDefinitionHTMLMaker.makeHTML(thisDoc);
+		    		html = operationDefinitionHTMLMaker.makeHTML(document);
 		    		break;
 		    	case "ImplementationGuide":
-		    		html = implementationGuideHTMLMaker.makeHTML(thisDoc);
+		    		html = implementationGuideHTMLMaker.makeHTML(document);
 		    		break;
 				default:
 					LOG.info("Skipping file " + inFile + " - root element tag was " + rootTagName);
@@ -99,27 +121,4 @@ public class FileProcessor {
 		
 		return Optional.of(html);
 	}
-
-    /**
-     * Routine to read in an XML file to an org.w3c.dom.Document.
-     *
-     * @param filename
-     * @return a Document containing the specified file.
-     */
-    private Document ReadFile(String filename) {
-        Document document = null;
-        try {
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            document = docBuilder.parse(filename);
-            return document;
-        } catch (ParserConfigurationException ex) {
-            LOG.severe("ParserConfigurationException: " + ex.getMessage());
-        } catch (SAXException ex) {
-            LOG.severe("SAXException: " + ex.getMessage());
-        } catch (IOException ex) {
-            LOG.severe("IOException: " + ex.getMessage());
-        }
-        return document;
-    }
 }

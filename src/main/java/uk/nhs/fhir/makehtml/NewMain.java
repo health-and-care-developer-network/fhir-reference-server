@@ -20,6 +20,15 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.nhs.fhir.makehtml.old.ImplementationGuideHTMLMakerOLD;
+import uk.nhs.fhir.makehtml.old.OperationDefinitionHTMLMakerOLD;
+import uk.nhs.fhir.makehtml.old.StructureDefinitionHTMLMakerOLD;
+import uk.nhs.fhir.makehtml.old.ValueSetHTMLMakerOLD;
+import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
+import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
+import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
+import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
+
 /**
  *
  * @author tim.coates@hscic.gov.uk
@@ -65,10 +74,10 @@ public class NewMain {
             
             FileProcessor fileProcessor =
     	    	new FileProcessor(
-    	    		new StructureDefinitionHTMLMaker(),
-    	    		new ValueSetHTMLMaker(),
-    	    		new OperationDefinitionHTMLMaker(),
-    	    		new ImplementationGuideHTMLMaker(new File(inputDir), newBaseURL),
+    	    		new StructureDefinitionHTMLMakerOLD(),
+    	    		new ValueSetHTMLMakerOLD(),
+    	    		new OperationDefinitionHTMLMakerOLD(),
+    	    		new ImplementationGuideHTMLMakerOLD(new File(inputDir), newBaseURL),
     	    		resourceBuilder);
             
             instance.process(fileProcessor);

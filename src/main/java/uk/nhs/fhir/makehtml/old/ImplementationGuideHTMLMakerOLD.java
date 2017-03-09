@@ -1,29 +1,30 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getFirstNamedChildValue;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.util.IteratorIterable;
 
 import uk.nhs.fhir.makehtml.resources.ResourceRow;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.MarkdownProcessor;
 
-public class ImplementationGuideHTMLMaker extends HTMLMaker {
+public class ImplementationGuideHTMLMakerOLD extends HTMLMakerOLD {
 	
-	private static final Logger LOG = Logger.getLogger(ImplementationGuideHTMLMaker.class.getName());
+	private static final Logger LOG = Logger.getLogger(ImplementationGuideHTMLMakerOLD.class.getName());
 	
 	private final File folder;
 	private final String outPath;
 	
-	public ImplementationGuideHTMLMaker(File folder, String outPath) {
+	public ImplementationGuideHTMLMakerOLD(File folder, String outPath) {
 		this.folder = folder;
 		this.outPath = outPath;
 	}
@@ -40,20 +41,20 @@ public class ImplementationGuideHTMLMaker extends HTMLMaker {
     	
     	StringBuilder sb = new StringBuilder();
 
-        Element root = (Element) thisDoc.getFirstChild();
+        //Element root = (Element) thisDoc.getFirstChild();
 
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
 
         // Load in the relevant markdown file and inject it here.
         // TODO: Add support for other mime types and child pages - is this required?
         
-        NodeList pageSet = thisDoc.getElementsByTagName("page");
-        if(pageSet.getLength() > 0) {
+        IteratorIterable<Element> pageSet = thisDoc.getDescendants(new ElementFilter("page"));
+        if(pageSet.hasNext()) {
         	// Only one page at the top level
-        	Element pageElement = (Element) pageSet.item(0);
+        	Element pageElement = pageSet.next();
         	String source = getFirstNamedChildValue(pageElement, "source");
-        	String name = getFirstNamedChildValue(pageElement, "name");
-        	String kind = getFirstNamedChildValue(pageElement, "kind");
+        	//String name = getFirstNamedChildValue(pageElement, "name");
+        	//String kind = getFirstNamedChildValue(pageElement, "kind");
         	String format = getFirstNamedChildValue(pageElement, "format");
         	
         	String content_to_inject = null;
@@ -78,52 +79,45 @@ public class ImplementationGuideHTMLMaker extends HTMLMaker {
         }
         
         
-        NodeList packageSet = thisDoc.getElementsByTagName("package");
-        if(packageSet.getLength() > 0) {
-        	
+        IteratorIterable<Element> packageSet = thisDoc.getDescendants(new ElementFilter("package"));
+        if (packageSet.hasNext()) {
         	sb.append("<h1>Constrained FHIR Models</h1>");
         	
         	sb.append("<table style='font-family: sans-serif;' width='100%'>");
         	
-        	for(int i = 0; i < packageSet.getLength(); i++) {
-        		Element packageElement = (Element) packageSet.item(i);
+        	for(Element packageElement : packageSet) {
         		String packageName = cleanPackageName(getFirstNamedChildValue(packageElement, "name"));
         		
             	sb.append("<tr><th colspan='3' bgcolor='#f0f0f0'>")
             					.append(packageName).append("</th></tr>");
             	sb.append("<tr><th class='nameCol'>Name</th><th class='typeCol'>Type</th>");
             	sb.append("<th class='descCol'>Description and Constraints</th></tr>");
-            	
-            	NodeList resourceSet = packageElement.getElementsByTagName("resource");
-            	ArrayList<ResourceRow> resourceList = new ArrayList<ResourceRow>(); 
-            	
-            	if(resourceSet.getLength() > 0) {
-                	for(int j = 0; j < resourceSet.getLength(); j++) {
-                		Element resourceElement = (Element) resourceSet.item(j);
-                		String resourceName = getFirstNamedChildValue(resourceElement, "name");
-                		String resourceDescription = reformatResourceDescriptionsForListing(
-                					getFirstNamedChildValue(resourceElement, "description"));
-                		String resourcePurpose = getFirstNamedChildValue(resourceElement, "purpose");
-                		String resourceUri = getFirstNamedChildValue(resourceElement, "sourceUri");
-                		
-                		// Look through the extensions
-                		int publishOrder = 1000;
-                		String publishOrderStr = XMLParserUtils.getExtensionValue(
-                											resourceElement, "urn:hscic:publishOrder", "valueInteger");
-                		String resourceType = XMLParserUtils.getExtensionValue(
-								resourceElement, "urn:hscic:resourceType", "valueString");
-                		
-                		if (publishOrderStr != null) {
-                			publishOrder = Integer.parseInt(publishOrderStr);
-                		}
-                		
-                		
-                		if (resourcePurpose.equals("example")) {
-                			// Ignore examples for now!
-                		} else {
-                			resourceList.add(new ResourceRow(resourceName, resourceDescription, resourceUri, resourceType, publishOrder));
-                		}
-                	}
+
+            	ArrayList<ResourceRow> resourceList = new ArrayList<ResourceRow>();
+            	for (Element resourceElement : packageElement.getDescendants(new ElementFilter("resource"))) {
+        			String resourceName = getFirstNamedChildValue(resourceElement, "name");
+            		String resourceDescription = reformatResourceDescriptionsForListing(
+            					getFirstNamedChildValue(resourceElement, "description"));
+            		String resourcePurpose = getFirstNamedChildValue(resourceElement, "purpose");
+            		String resourceUri = getFirstNamedChildValue(resourceElement, "sourceUri");
+            		
+            		// Look through the extensions
+            		int publishOrder = 1000;
+            		String publishOrderStr = XMLParserUtils.getExtensionValue(
+            											resourceElement, "urn:hscic:publishOrder", "valueInteger");
+            		String resourceType = XMLParserUtils.getExtensionValue(
+							resourceElement, "urn:hscic:resourceType", "valueString");
+            		
+            		if (publishOrderStr != null) {
+            			publishOrder = Integer.parseInt(publishOrderStr);
+            		}
+            		
+            		
+            		if (resourcePurpose.equals("example")) {
+            			// Ignore examples for now!
+            		} else {
+            			resourceList.add(new ResourceRow(resourceName, resourceDescription, resourceUri, resourceType, publishOrder));
+            		}
                 }
             	
             	// Output the sorted list of resources
@@ -193,7 +187,7 @@ public class ImplementationGuideHTMLMaker extends HTMLMaker {
      * @param val
      * @return
      */
-    private static String reformatResourceDescriptions(String val) {
+    /*private static String reformatResourceDescriptions(String val) {
     	if (val == null) {
     		return "";
     	}
@@ -201,6 +195,6 @@ public class ImplementationGuideHTMLMaker extends HTMLMaker {
     	String result = val.replaceAll("\\r\\n|\\r|\\n", "<br/>");
     	System.out.println("After : " + result);
     	return result;
-    }
+    }*/
 
 }

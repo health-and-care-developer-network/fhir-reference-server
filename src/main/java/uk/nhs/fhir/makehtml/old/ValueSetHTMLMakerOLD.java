@@ -1,12 +1,14 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getFirstNamedChildValue;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import java.util.List;
 
-public class ValueSetHTMLMaker extends HTMLMaker {
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+
+public class ValueSetHTMLMakerOLD extends HTMLMakerOLD {
 
 	/**
      * Make the html narrative section for the ValueSet described in this XML
@@ -38,47 +40,42 @@ public class ValueSetHTMLMaker extends HTMLMaker {
 		*/
         
         //<editor-fold defaultstate="collapsed" desc="Here we go through any compose sections where we point to other valuesets">
-        NodeList composeSet = thisDoc.getElementsByTagName("compose");
-        if(composeSet.getLength() > 0) {
+        List<Element> composeSet = XMLParserUtils.descendantsList(thisDoc, "compose");
+        
+        if(composeSet.size() > 0) {
             sb.append("<h4>Composed from</h4>");
 
-            Element composeElement = (Element) composeSet.item(0);
+            Element composeElement = (Element) composeSet.get(0);
 
 
             // The compose can be one or more of Import, Inlude and Exclude sections
-            NodeList composeImports = composeElement.getElementsByTagName("import");
-            NodeList composeIncludes = composeElement.getElementsByTagName("include");
-            NodeList composeExcludes = composeElement.getElementsByTagName("exclude");
-
             // Imports is dead easy...
-            for(int i = 0; i < composeImports.getLength(); i++) {
-                Element importRef = (Element) composeImports.item(i);
+            for (Element importRef : composeElement.getDescendants(new ElementFilter("import"))) {
                 sb.append("<p><b>Import:</b> " + importRef.getAttribute("value") + "<br /></p>");
             }
 
             // Includes is more tricky...
-            for(int i = 0; i < composeIncludes.getLength(); i++) {
-                Element includeRef = (Element) composeIncludes.item(i);
+            for (Element includeRef : composeElement.getDescendants(new ElementFilter("include"))) {
 
                 sb.append("<p><table><tr><td><b>Code System:</b></td><td>" + getFirstNamedChildValue(includeRef, "system") + "</td></tr>");
 
-                NodeList filterList = includeRef.getElementsByTagName("filter");
-                if (filterList.getLength()>0) {
+                List<Element> filterList = XMLParserUtils.descendantsList(includeRef, "filter");
+                if (filterList.size()>0) {
                 	sb.append("<tr><td colspan='2'><b>Filters:</b></td></tr>");
                 }
-                for(int j = 0; j < filterList.getLength(); j++) {
-                    Element theFilter = (Element) filterList.item(j);
+                for(int j = 0; j < filterList.size(); j++) {
+                    Element theFilter = filterList.get(j);
                     sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
                     sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
                     sb.append("<tr><td>Value:</td><td>" + getFirstNamedChildValue(theFilter, "value") + "</td></tr>");
                 }
                 
-                NodeList includeList = includeRef.getElementsByTagName("concept");
-                if (includeList.getLength()>0) {
+                List<Element> includeList = XMLParserUtils.descendantsList(includeRef, "concept");
+                if (includeList.size()>0) {
                 	sb.append("<tr><td colspan='2'><b>Includes:</b></td></tr>");
                 }
-                for(int j = 0; j < includeList.getLength(); j++) {
-                    Element theInclude = (Element) includeList.item(j);
+                for(int j = 0; j < includeList.size(); j++) {
+                    Element theInclude = includeList.get(j);
                     sb.append("<tr><td colspan='2'><li>");
                     sb.append("<b>code:</b> " + getFirstNamedChildValue(theInclude, "code"));
                     sb.append(": ");
@@ -91,14 +88,13 @@ public class ValueSetHTMLMaker extends HTMLMaker {
             }
 
             // Excludes is identical to Includes...
-            for(int i = 0; i < composeExcludes.getLength(); i++) {
-                Element excludeRef = (Element) composeExcludes.item(i);
+            for (Element excludeRef : composeElement.getDescendants(new ElementFilter("exclude"))) {
 
                 sb.append("<p><table><tr><td><b>Exclude:</b></td><td>" + getFirstNamedChildValue(excludeRef, "system") + "</td></tr>");
 
-                NodeList filterList = excludeRef.getElementsByTagName("filter");
-                for(int j = 0; j < filterList.getLength(); j++) {
-                    Element theFilter = (Element) filterList.item(j);
+                List<Element> filterList = XMLParserUtils.descendantsList(excludeRef, "filter");
+                for(int j = 0; j < filterList.size(); j++) {
+                    Element theFilter = filterList.get(j);
 
                     sb.append("<tr><td>Property:</td><td>" + getFirstNamedChildValue(theFilter, "property") + "</td></tr>");
                     sb.append("<tr><td>Operation:</td><td>" + getFirstNamedChildValue(theFilter, "op") + "</td></tr>");
@@ -111,48 +107,48 @@ public class ValueSetHTMLMaker extends HTMLMaker {
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="Here we go through any codeSystem items">
-        NodeList codeSystemSet = thisDoc.getElementsByTagName("codeSystem");
+        List<Element> codeSystemSet = XMLParserUtils.descendantsList(thisDoc, "codeSystem");
 
-        NodeList conceptMaps = thisDoc.getElementsByTagName("ConceptMap");
+        List<Element> conceptMaps = XMLParserUtils.descendantsList(thisDoc, "ConceptMap");
 
-        if(codeSystemSet.getLength() > 0) {
+        if(codeSystemSet.size() > 0) {
             // We have a codeSystem in play
-            Element codeSystem = (Element) codeSystemSet.item(0);
-            NodeList concepts = codeSystem.getElementsByTagName("concept");
+            Element codeSystem = (Element) codeSystemSet.get(0);
+            List<Element> concepts = XMLParserUtils.descendantsList(codeSystem, "concept");
 
             sb.append("<p><b>CodeSystem:</b> " + getFirstNamedChildValue(codeSystem, "system") + "<br />");
 
-            if(concepts.getLength() > 0) {
+            if(concepts.size() > 0) {
                 sb.append("<ul>");
 
-                for(int i = 0; i < concepts.getLength(); i++) {
-                    Element concept = (Element) concepts.item(i);
+                for(int i = 0; i < concepts.size(); i++) {
+                    Element concept = concepts.get(i);
                     sb.append("<li>");
-                    Element code = (Element) concept.getElementsByTagName("code").item(0);
+                    Element code = XMLParserUtils.descendantsList(concept, "code").get(0);
                     sb.append("<b>code:</b> " + code.getAttribute("value"));
                     sb.append(" ");
                     sb.append("<b>display:</b> " + getFirstNamedChildValue(concept, "display"));
 
-                    for(int j = 0; j < conceptMaps.getLength(); j++) {
-                        Element thisMap = (Element) conceptMaps.item(j);
+                    for(int j = 0; j < conceptMaps.size(); j++) {
+                        Element thisMap = conceptMaps.get(j);
 
                         // Get the name for this mapping...
                         String mapName = getFirstNamedChildValue(thisMap, "name");
 
                         // Get the target reference for it...
-                        Element targetReferenceElement = (Element) thisMap.getElementsByTagName("targetReference").item(0);
-                        NodeList mapItems = thisMap.getElementsByTagName("element");
+                        Element targetReferenceElement = XMLParserUtils.descendantsList(thisMap, "targetReference").get(0);
+                        List<Element> mapItems = XMLParserUtils.descendantsList(thisMap, "element");
                         sb.append("<ul>");
-                        for(int k = 0; k< mapItems.getLength(); k++) {
-                            Element mapItem = (Element) mapItems.item(k);
+                        for(int k = 0; k< mapItems.size(); k++) {
+                            Element mapItem = mapItems.get(k);
                             String mapItemCode = getFirstNamedChildValue(mapItem, "code");
 
                             // Finally!!!
                             if(mapItemCode.equals(code.getAttribute("value"))) {
                                 // We have a mapped value
-                                NodeList targetList = mapItem.getElementsByTagName("target");
-                                for(int l = 0; l < targetList.getLength(); l++) {
-                                    Element target = (Element) targetList.item(l);
+                                List<Element> targetList = XMLParserUtils.descendantsList(mapItem, "target");
+                                for(int l = 0; l < targetList.size(); l++) {
+                                    Element target = targetList.get(l);
 
                                     sb.append("<li>");
                                     
@@ -180,17 +176,17 @@ public class ValueSetHTMLMaker extends HTMLMaker {
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="Here we handle an expansion section">
-        NodeList expansionList = thisDoc.getElementsByTagName("expansion");
-        if(expansionList.getLength() == 1) {
-            Element expansion = (Element) expansionList.item(0);
+        List<Element> expansionList = XMLParserUtils.descendantsList(thisDoc, "expansion");
+        if(expansionList.size() == 1) {
+            Element expansion = expansionList.get(0);
             sb.append("<p><h4>Expansion</h4>");
             sb.append("<b>NB: Expansions are not fully catered for in generating the narrative section</b></ br>");
             sb.append("identifier: " + getFirstNamedChildValue(expansion, "identifier"));
             sb.append("timestamp: " + getFirstNamedChildValue(expansion, "timestamp"));
 
-            NodeList totalList = expansion.getElementsByTagName("total");
-            if(totalList.getLength() == 1) {
-                Element totalEle = (Element) totalList.item(0);
+            List<Element> totalList = XMLParserUtils.descendantsList(expansion, "total");
+            if(totalList.size() == 1) {
+                Element totalEle = totalList.get(0);
                 sb.append("<b>total: </b>" + totalEle.getAttribute("value") + "<br />");
             }
             sb.append("</p>");

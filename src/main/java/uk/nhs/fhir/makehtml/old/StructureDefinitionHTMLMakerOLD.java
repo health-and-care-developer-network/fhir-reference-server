@@ -1,25 +1,31 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getDescription;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementCardinality;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementName;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeList;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getElementTypeName;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getFlags;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getQuantityType;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getReferenceTypes;
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getTitle;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getDescription;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getElementCardinality;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getElementName;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getElementTypeList;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getElementTypeName;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getFlags;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getQuantityType;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getReferenceTypes;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getTitle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
 
-public class StructureDefinitionHTMLMaker extends HTMLMaker {
-    private static final Logger LOG = Logger.getLogger(StructureDefinitionHTMLMaker.class.getName());
+import com.google.common.collect.Lists;
+
+import uk.nhs.fhir.makehtml.DataTypes;
+import uk.nhs.fhir.makehtml.MyElement;
+
+public class StructureDefinitionHTMLMakerOLD extends HTMLMakerOLD {
+    private static final Logger LOG = Logger.getLogger(StructureDefinitionHTMLMakerOLD.class.getName());
 
    /**
     * Process a specific file.
@@ -32,11 +38,14 @@ public class StructureDefinitionHTMLMaker extends HTMLMaker {
        StringBuilder sb = new StringBuilder();
        sb.append(TABLESTART);
 
-       ArrayList<MyElement> elementList = new ArrayList<MyElement>();
-       Element snapshotNode = (Element) document.getElementsByTagName("snapshot").item(0);
+       List<MyElement> elementList = Lists.newArrayList();
+       Element snapshotNode = document.getDescendants(new ElementFilter("snapshot")).next();
 
-       NodeList elements = snapshotNode.getElementsByTagName("element");
-       int snapshotElementCount = elements.getLength();
+       List<Element> elements = Lists.newArrayList();
+       for (Element e : snapshotNode.getDescendants(new ElementFilter("element"))){
+    	   elements.add(e);
+       }
+       int snapshotElementCount = elements.size();
 
        // Now get a list of the names of elements which show as having been changed by this profile...
        ArrayList<String> changedNodes = GetChangedNodes(document);
@@ -44,7 +53,7 @@ public class StructureDefinitionHTMLMaker extends HTMLMaker {
 
        // First we process all the elements...
        for(int i = 0; i < snapshotElementCount; i++) {
-           Element element = (Element) elements.item(i);
+           Element element = (Element) elements.get(i);
            if(element != null) {
                String elementName = getElementName(element);
                String cardinality = getElementCardinality(element);
@@ -60,8 +69,27 @@ public class StructureDefinitionHTMLMaker extends HTMLMaker {
                    typeName = "see link";
                }
 
-               // Catch vrious elements which can be of multiple types or other oddities...
-               if(typeName.equals("Multiple_Type_Choice")) {
+               switch (typeName) {
+                   case "Multiple_Type_Choice":
+                	   List<String> types = getElementTypeList(element);
+                       elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                       for(String type : types) {
+                           elementList.add(new MyElement(elementName + "." + type, "", type, type, flags, "", "", hasChanged));
+                       }
+                       break;
+                   case "Reference":
+                	   String referenceTypeName = getReferenceTypes(element);
+                       elementList.add(new MyElement(elementName, cardinality, typeName, referenceTypeName, flags, description, hoverText, hasChanged));
+                       break;
+                   case "Quantity":
+                	   String quantityTypeName = getQuantityType(element);
+                       elementList.add(new MyElement(elementName, cardinality, typeName, quantityTypeName, flags, description, hoverText, hasChanged));
+                       break;
+                   default:
+                	   elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
+                	   break;
+               }
+               /*if(typeName.equals("Multiple_Type_Choice")) {
                    ArrayList<String> types = getElementTypeList(element);
                    elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                    for(String type : types) {
@@ -80,7 +108,7 @@ public class StructureDefinitionHTMLMaker extends HTMLMaker {
                            elementList.add(new MyElement(elementName, cardinality, typeName, typeName, flags, description, hoverText, hasChanged));
                        }
                    }
-               }
+               }*/
            }
        }
 

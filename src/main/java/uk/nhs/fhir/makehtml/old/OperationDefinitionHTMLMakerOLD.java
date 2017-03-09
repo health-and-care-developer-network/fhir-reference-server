@@ -1,26 +1,29 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import static uk.nhs.fhir.makehtml.XMLParserUtils.getFirstNamedChildValue;
+import static uk.nhs.fhir.makehtml.old.XMLParserUtils.getFirstNamedChildValue;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.xml.parsers.ParserConfigurationException;
 
-public class OperationDefinitionHTMLMaker extends HTMLMaker {
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.util.IteratorIterable;
+
+public class OperationDefinitionHTMLMakerOLD extends HTMLMakerOLD {
 
 	/**
      * Method to generate the narrative section describing an OperationDefinition
      *
      * @param thisDoc   The XML Document as an org.w3c.dom.Document
      * @return          String holding an xhtml div
+	 * @throws ParserConfigurationException 
      */
 	@Override
-	public String makeHTML(Document thisDoc) {
+	public String makeHTML(Document thisDoc) throws ParserConfigurationException {
         StringBuilder sb = new StringBuilder();
 
-        Element root = (Element) thisDoc.getFirstChild();
-
+        Element root = thisDoc.getRootElement();
+        
         sb.append("<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n");
         // Here's where we need to do the magic...
 
@@ -34,17 +37,14 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         sb.append(makeOpDefRow(root, "experimental", "Experimental", "If for testing purposes, not real usage"));
         sb.append(makeOpDefRow(root, "publisher", "Publisher", "Name of the publisher (Organization or individual)"));
         */
-        NodeList contacts = root.getElementsByTagName("contact");
-        if(contacts.getLength() > 0) {
+        IteratorIterable<Element> contacts = root.getDescendants(new ElementFilter("contact"));
+        if(contacts.hasNext()) {
             sb.append("<tr><td colspan='2' style='border-bottom: 1px solid #ddd;'></td></tr>");
             sb.append("<tr><td colspan='2'><b>Contacts</b></td></tr>");
 
-            for(int i=0; i<contacts.getLength(); i++) {
-                sb.append(makeOpDefRow(contacts.item(i), "name", "Name", "Name of a individual to contact"));
-                Element contact = (Element) contacts.item(i);
-                NodeList telecoms = contact.getElementsByTagName("telecom");
-                for(int j = 0; j < telecoms.getLength(); j++) {
-                    Element telecom = (Element) telecoms.item(j);
+            for(Element contact : contacts) {
+				sb.append(makeOpDefRow(contact, "name", "Name", "Name of a individual to contact"));
+				for (Element telecom : contact.getDescendants(new ElementFilter("telecom"))) {
                     sb.append(makeOpDefRow(telecom, "system", "Type", "phone | fax | email | pager | other"));
                     sb.append(makeOpDefRow(telecom, "value", "Value", "The actual contact point details"));
                     sb.append(makeOpDefRow(telecom, "use", "Use type", "home | work | temp | old | mobile - purpose of this contact point"));
@@ -63,12 +63,11 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         sb.append(makeOpDefRow(root, "system", "System", "Invoke at the system level?"));
         
         // Here we need to show multiple reference types.
-        NodeList types = root.getElementsByTagName("type");
-        if(types.getLength() > 0) {
+        IteratorIterable<Element> types = root.getDescendants(new ElementFilter("type"));
+        if (types.hasNext()) {
             sb.append("<tr><td valign='top'><span title='Invoke at resource level for these type'>Type</span></td><td>");
-            for(int i = 0; i < types.getLength(); i++) {
-                Element type = (Element) types.item(i);
-                sb.append(decorateTypeName(type.getAttribute("value")) + "<br />");
+            for (Element type : types) {
+            	sb.append(decorateTypeName(type.getAttributeValue("value")) + "<br />");
             }
             sb.append("</td></tr>");
         }
@@ -81,13 +80,11 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         sb.append("</table>");
 
         // Now we iterate through the Parameters
-        NodeList parameters = root.getElementsByTagName("parameter");
+        IteratorIterable<Element> parameters = root.getDescendants(new ElementFilter("parameter"));
         
-        if(parameters.getLength() > 0){
+        if (parameters.hasNext()){
             sb.append("<table style='font-family: sans-serif;'><tr><th colspan='2'>Parameters</th></tr>");
-            
-            for(int i = 0; i < parameters.getLength(); i++) {
-                Node parameter = parameters.item(i);
+            for (Element parameter : parameters) {
                 sb.append(makeParameterItem(parameter));
             }
             sb.append("</table>");
@@ -97,7 +94,7 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         return sb.toString();
     }
 
-    protected String makeOpDefRow(Node parentNode,String nodeName) {
+    protected String makeOpDefRow(Element parentNode,String nodeName) {
         String resultString = "";
         String value = getFirstNamedChildValue(parentNode, nodeName);
         if(value != null) {
@@ -106,7 +103,7 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         return resultString;
     }
     
-    protected String makeOpDefRow(Node parentNode,String nodeName, String title) {
+    protected String makeOpDefRow(Element parentNode,String nodeName, String title) {
         String resultString = "";
         String value = getFirstNamedChildValue(parentNode, nodeName);
         if(value != null) {
@@ -115,7 +112,7 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
         return resultString;
     }
 
-    protected String makeOpDefRow(Node parentNode,String nodeName, String title, String hover) {
+    protected String makeOpDefRow(Element parentNode,String nodeName, String title, String hover) {
         String resultString = "";
         String value = getFirstNamedChildValue(parentNode, nodeName);
         if(value != null) {
@@ -149,7 +146,7 @@ public class OperationDefinitionHTMLMaker extends HTMLMaker {
      * @param parameter
      * @return
      */
-    protected String makeParameterItem(Node parameter) {
+    protected String makeParameterItem(Element parameter) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<tr><td colspan='2' bgcolor='#f0f0f0'><span title='Name in Parameters.parameter.name or in URL'>");

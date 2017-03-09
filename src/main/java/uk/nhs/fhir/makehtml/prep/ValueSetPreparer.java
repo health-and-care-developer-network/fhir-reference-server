@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.prep;
 
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 

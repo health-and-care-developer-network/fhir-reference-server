@@ -1,25 +1,22 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import uk.nhs.fhir.util.HTMLUtil;
 
 public class TestChangedNodes {
 
@@ -27,7 +24,7 @@ public class TestChangedNodes {
     Element element;
     Element elementReference;
     Element elementQuantity;
-    NodeList difflist;
+    List<Element> difflist;
     
     @Before
     public void setUp() {
@@ -165,22 +162,17 @@ public class TestChangedNodes {
                 "    </element>\n" +
                 "  </differential>\n" +
                 "</StructureDefinition>";
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            document = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+
+            document = HTMLUtil.parseString(xml);
+        } catch (IOException | JDOMException ex) {
             Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        difflist = document.getElementsByTagName("differential");
-        Element snapshotNode = (Element) difflist.item(0);
-        NodeList elements = snapshotNode.getElementsByTagName("element");
-        element = (Element) elements.item(0);
-        elementReference = (Element) elements.item(2);
-        elementQuantity =  (Element) elements.item(3);
+        difflist = XMLParserUtils.descendantsList(document, "snapshot");
+        Element snapshotNode = difflist.get(0);
+        List<Element> elements = XMLParserUtils.descendantsList(snapshotNode, "element");
+        element = elements.get(0);
+        elementReference = elements.get(2);
+        elementQuantity = elements.get(3);
     }
 	
     /**
@@ -189,7 +181,7 @@ public class TestChangedNodes {
     @Test
     public void testGetChangedNodes() {
         System.out.println("GetChangedNodes");
-        HTMLMaker instance = new DummyHTMLMaker();
+        HTMLMakerOLD instance = new DummyHTMLMakerOLD();
 
         ArrayList<String> result = instance.GetChangedNodes(document);
         assertEquals(2, result.size());

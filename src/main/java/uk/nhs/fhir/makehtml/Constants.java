@@ -15,8 +15,11 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface Constants {
-        public static final String TABLESTART = "<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n<table border='0' cellpadding='0' cellspacing='0'>\n  <tr>\n    <th style='font-size: small;' width='250px'>Name</th>\n    <th style='font-size: small;'>Flags</th>\n    <th style='font-size: small;'>Card.</th>\n    <th style='font-size: small;' width='250px'>Type</th>\n    <th style='font-size: small;'>Description &amp; Constraints</th>\n  </tr>\n";
+    public static final String TABLESTART = "<div style='font-family: sans-serif;' xmlns='http://www.w3.org/1999/xhtml'>\n<table border='0' cellpadding='0' cellspacing='0'>\n  <tr>\n    <th style='font-size: small;' width='250px'>Name</th>\n    <th style='font-size: small;'>Flags</th>\n    <th style='font-size: small;'>Card.</th>\n    <th style='font-size: small;' width='250px'>Type</th>\n    <th style='font-size: small;'>Description &amp; Constraints</th>\n  </tr>\n";
     
 	public static final String SPACER    = "<img xmlns=\"http://www.w3.org/1999/xhtml\" style=\"background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzIZgEiYEgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAIElEQVQ4y2P8//8/AyWAiYFCMGrAqAGjBowaMGoAAgAALL0DKYQ0DPIAAAAASUVORK5CYII=\" />";
 	public static final String CORNER    = "<img xmlns=\"http://www.w3.org/1999/xhtml\" style=\"background-color: inherit\" alt=\".\" class=\"hierarchy\" src=\"data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAWCAYAAADJqhx8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYeFzME+lXFigAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y+3OsRUAIAjEUOL+O8cJABttJM11/x1qZAGqRBEVcNIqdWj1efDqQbb3HwwwwEfABmQUHSPM9dtDAAAAAElFTkSuQmCC\" />";
@@ -42,6 +45,8 @@ public interface Constants {
         
         // Set the set of base types which we'll use a simple icon to annotate in the html tree
         public static final String[] BASERESOURCETYPES = new String[] {"boolean", "code", "date", "dateTime", "instant", "unsignedInt", "string", "decimal", "base64Binary", "uri", "integer", "Period", "Identifier", "CodeableConcept"};
+        public static final List<String> BASE_RESOURCE_TYPES = Arrays.asList(BASERESOURCETYPES);
+        
         // Set the Resource types for which we use a 'cube' icon in the html tree
         public static final String[] RESOURCETYPES = new String[] {"ContactPoint", "Address", "Attachment", "Resource", "Signature", "BackboneElement", "HumanName", "Money", "Coding", "Annotation", "Patient", "Bundle"};
 }
