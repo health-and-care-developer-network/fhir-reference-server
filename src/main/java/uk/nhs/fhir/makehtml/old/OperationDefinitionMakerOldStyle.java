@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.valueset.ResourceTypeEnum;
 import ca.uhn.fhir.model.primitive.BoundCodeDt;
-import uk.nhs.fhir.makehtml.old.FormattedTableHTML;
+import uk.nhs.fhir.makehtml.Constants;
 import uk.nhs.fhir.util.LinkData;
 
 public class OperationDefinitionMakerOldStyle extends HTMLMaker<OperationDefinition> {

@@ -22,7 +22,8 @@ public class HTMLUtil {
 		Format format = prettyPrint ? Format.getPrettyFormat() : Format.getCompactFormat();
 		format.setOmitDeclaration(!xmlDeclaration);
 		format.setIndent("  ");
-		format.setLineSeparator("\n");
+		
+		format.setLineSeparator(prettyPrint ? "\n" : "");
 		
 		XMLOutputter outputter = new XMLOutputter(format);
         outputter.output(document, writer);

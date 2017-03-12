@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.fmt.CSSRule;
+
 public class CSSStyleBlock {
 	private final List<String> selectors;
 	private final List<CSSRule> rules;
@@ -19,6 +21,14 @@ public class CSSStyleBlock {
 		this.rules = rules;
 	}
 	
+	public void addSelector(String selector) {
+		selectors.add(selector);
+	}
+	
+	public void addRule(CSSRule rule) {
+		rules.add(rule);
+	}
+	
 	public String toFormattedString() {
 		
 		List<String> ruleTexts = Lists.newArrayList();
@@ -31,24 +41,6 @@ public class CSSStyleBlock {
 			.append(" {\n\t")
 			.append(String.join(";\n\t", ruleTexts))
 			.append("\n}")
-			.toString();
-	}
-}
-
-class CSSRule {
-	private final String styleName;
-	private final String arguments;
-	
-	public CSSRule(String styleName, String string) {
-		this.styleName = styleName;
-		this.arguments = string;
-	}
-	
-	public String toFormattedString() {
-		return new StringBuilder()
-			.append(styleName)
-			.append(": ")
-			.append(arguments)
 			.toString();
 	}
 }

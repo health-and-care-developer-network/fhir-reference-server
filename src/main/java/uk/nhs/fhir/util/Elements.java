@@ -1,5 +1,6 @@
 package uk.nhs.fhir.util;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -34,6 +35,10 @@ public class Elements {
     public static Element withChild(String name, Content child) {
     	return withChildren(name, Lists.newArrayList(child));
     }
+    
+    public static Element withChildren(String name, Content... children) {
+    	return withChildren(name, Arrays.asList(children));
+    }
 
 	public static Element withChildren(String name, List<? extends Content> children) {
         return withAttributesAndChildren(name, Lists.newArrayList(), children);
@@ -64,5 +69,13 @@ public class Elements {
         attributes.forEach(e::setAttribute);
         children.forEach(e::addContent);
         return e;
+    }
+    
+    public static Element setClasses(Element element, List<String> classes) {
+    	if (!classes.isEmpty()) {
+    		element.setAttribute("class", String.join(" ", classes));
+    	}
+    	
+    	return element;
     }
 }

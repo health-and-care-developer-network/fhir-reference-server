@@ -18,6 +18,8 @@ import ca.uhn.fhir.model.dstu2.valueset.ContactPointSystemEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ContactPointUseEnum;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.makehtml.old.OperationDefinitionMakerOldStyle;
+import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.SectionedHTMLDoc;
 

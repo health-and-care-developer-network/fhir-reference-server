@@ -15,6 +15,10 @@ public class FhirDocLinkFactory {
 		this.fhirContext = fhirContext;
 	}
 	
+	public FhirDocLinkFactory() {
+		this.fhirContext = FhirContext.forDstu2();
+	}
+	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
 		String typeURL;

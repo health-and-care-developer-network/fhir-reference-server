@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
 import javax.xml.parsers.ParserConfigurationException;
 
