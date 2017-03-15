@@ -1,14 +1,20 @@
 #!/bin/bash
 
 # Usage:
-# build.sh registryhostname targethostname
+# build.sh registryhostname targethostname tagname
 
 REGISTRY_HOST=$1
 TARGET_HOST=$2
 PORT=${PORT:-8080}
+TAG_NAME=$3
 
 IMAGE_NAME=fhir-server
 CONTAINER_NAME=fhir-server
+
+if [ ! -z $TAG_NAME ]
+then
+  IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
+fi
 
 if [ -z $TARGET_HOST ]
 then
