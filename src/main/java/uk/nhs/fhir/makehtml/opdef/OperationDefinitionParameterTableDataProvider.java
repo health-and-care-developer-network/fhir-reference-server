@@ -1,5 +1,7 @@
 package uk.nhs.fhir.makehtml.opdef;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -14,7 +16,8 @@ import ca.uhn.fhir.model.dstu2.valueset.BindingStrengthEnum;
 import ca.uhn.fhir.model.primitive.BoundCodeDt;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.ResourceFlag;
+import uk.nhs.fhir.makehtml.data.ResourceInfo;
+import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.LinkData;
 import uk.nhs.fhir.util.TableTitle;
@@ -47,7 +50,7 @@ public class OperationDefinitionParameterTableDataProvider {
 			CodeDt typeElement = parameter.getTypeElement();
 			LinkData typeLink = fhirDocLinkFactory.forDataType(typeElement);
 			String documentation = parameter.getDocumentation();
-			List<ResourceFlag> flags = getParameterFlags(parameter);
+			List<ResourceInfo> flags = getParameterFlags(parameter);
 
 			data.add(new OperationDefinitionParameterTableData(rowTitle, cardinality, typeLink, documentation, flags));
 		}
@@ -55,38 +58,44 @@ public class OperationDefinitionParameterTableDataProvider {
 		return data;
 	}
 	
-	private List<ResourceFlag> getParameterFlags(Parameter parameter) {
-		List<ResourceFlag> resourceFlags = Lists.newArrayList();
+	private List<ResourceInfo> getParameterFlags(Parameter parameter) {
 		
-		ParameterBinding binding = parameter.getBinding();
-		if (!binding.isEmpty()) {
-			ResourceFlag bindingFlag = null;
-			IDatatype choice = binding.getValueSet();
-			if (choice instanceof UriDt) {
-				UriDt uri = (UriDt)choice;
-				bindingFlag = new ResourceFlag("Binding", uri.getValueAsString(), true);
-			} else if (choice instanceof ResourceReferenceDt) {
-				//TODO need to test this
-				ResourceReferenceDt ref = (ResourceReferenceDt)choice;
-				bindingFlag = new ResourceFlag("Binding", ref.getReferenceElement().getValue(), true);
+		try {
+		
+			List<ResourceInfo> resourceFlags = Lists.newArrayList();
+			
+			ParameterBinding binding = parameter.getBinding();
+			if (!binding.isEmpty()) {
+				ResourceInfo bindingFlag = null;
+				IDatatype choice = binding.getValueSet();
+				if (choice instanceof UriDt) {
+					UriDt uri = (UriDt)choice;
+					bindingFlag = new ResourceInfo("Binding", new URL(uri.getValueAsString()), ResourceInfoType.BINDING);
+				} else if (choice instanceof ResourceReferenceDt) {
+					//TODO need to test this
+					ResourceReferenceDt ref = (ResourceReferenceDt)choice;
+					bindingFlag = new ResourceInfo("Binding", new URL(ref.getReferenceElement().getValue()), ResourceInfoType.BINDING);
+				}
+				
+				BoundCodeDt<BindingStrengthEnum> strengthElement = binding.getStrengthElement();
+				bindingFlag.addExtraTag("Strength: " + strengthElement.getValueAsEnum().getCode());
+				resourceFlags.add(bindingFlag);
 			}
 			
-			BoundCodeDt<BindingStrengthEnum> strengthElement = binding.getStrengthElement();
-			bindingFlag.addExtraTag("Strength: " + strengthElement.getValueAsEnum().getCode());
-			resourceFlags.add(bindingFlag);
+			ResourceReferenceDt profile = parameter.getProfile();
+			if (!profile.isEmpty()) {
+				resourceFlags.add(new ResourceInfo("Profile", new URL(profile.getReferenceElement().getValue()),  ResourceInfoType.BINDING));
+			}
+			
+			//TODO tuple parameters
+			List<Parameter> parts = parameter.getPart();
+			if (!parts.isEmpty()) {
+				throw new NotImplementedException("Tuple parameter");
+			}
+			
+			return resourceFlags;
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
 		}
-		
-		ResourceReferenceDt profile = parameter.getProfile();
-		if (!profile.isEmpty()) {
-			resourceFlags.add(new ResourceFlag("Profile", profile.getReferenceElement().getValue(), true));
-		}
-		
-		//TODO tuple parameters
-		List<Parameter> parts = parameter.getPart();
-		if (!parts.isEmpty()) {
-			throw new NotImplementedException("Tuple parameter");
-		}
-		
-		return resourceFlags;
 	}
 }

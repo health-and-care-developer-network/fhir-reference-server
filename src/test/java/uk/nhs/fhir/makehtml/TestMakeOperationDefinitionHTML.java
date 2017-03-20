@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerException;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.ConfigurationException;
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Contact;
@@ -22,11 +21,12 @@ import uk.nhs.fhir.makehtml.old.OperationDefinitionMakerOldStyle;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.SectionedHTMLDoc;
+import uk.nhs.fhir.util.SharedFhirContext;
 
 public class TestMakeOperationDefinitionHTML {
 	@Test
 	public void testMakeUsingHapi() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException, TransformerException {
-		IParser parser = FhirContext.forDstu2().newXmlParser();
+		IParser parser = SharedFhirContext.get().newXmlParser();
 		try (
 			FileReader reader = new FileReader(getClass().getClassLoader().getResource("example_operation_definition.xml").getFile());
 		) {

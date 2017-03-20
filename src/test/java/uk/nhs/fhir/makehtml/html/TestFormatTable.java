@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.fmt;
+package uk.nhs.fhir.makehtml.html;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,6 +11,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.makehtml.html.LinkCell;
+import uk.nhs.fhir.makehtml.html.SimpleTextCell;
+import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.makehtml.html.TableRow;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.LinkData;
 import uk.nhs.fhir.util.TableTitle;

@@ -1,8 +1,9 @@
-package uk.nhs.fhir.makehtml.fmt;
+package uk.nhs.fhir.makehtml.html;
 
 import java.util.List;
 import java.util.Set;
 
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
@@ -37,10 +38,18 @@ public class Table {
 		List<Element> rowElements = Lists.newArrayList();
 		rows.forEach((TableRow row) -> rowElements.add(row.makeRow()));
 		
-		return Elements.withChildren("table",
-			Elements.withChild("thead",
-				Elements.withChildren("tr", titleElements)),
-			Elements.withChildren("tbody",
-				rowElements));
+		return Elements.withAttributeAndChildren("table",
+			new Attribute("class", "fhir-table"),
+			Lists.newArrayList(
+				Elements.withChild("thead",
+					Elements.withAttributeAndChildren("tr", 
+						new Attribute("class", "fhir-table-header-row"), 
+						titleElements)),
+				Elements.withChildren("tbody",
+					rowElements)));
+	}
+	
+	public List<TableRow> getRows() {
+		return rows;
 	}
 }

@@ -1,23 +1,11 @@
 package uk.nhs.fhir.util;
 
-import ca.uhn.fhir.context.BaseRuntimeElementDefinition;
-import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
-import ca.uhn.fhir.parser.DataFormatException;
 
 public class FhirDocLinkFactory {
-	private final FhirContext fhirContext;
-	
-	public FhirDocLinkFactory(FhirContext fhirContext) {
-		this.fhirContext = fhirContext;
-	}
-	
-	public FhirDocLinkFactory() {
-		this.fhirContext = FhirContext.forDstu2();
-	}
 	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
@@ -34,30 +22,36 @@ public class FhirDocLinkFactory {
 
 	private LinkData forCodedType(CodeDt codedType) {
 		String dataTypeName = codedType.getValue();
-
+		
+		return forDataTypeName(dataTypeName);
+	}
+	
+	public LinkData forDataTypeName(String dataTypeName) {
 		String typeURL;
-		if (isResourceType(dataTypeName)) {
+		switch (FhirDataTypes.forType(dataTypeName)) {
+		case RESOURCE:
 			typeURL = urlForComplexDataType(dataTypeName);
-		} else if (isElementType(dataTypeName)) {
-			typeURL = urlForElement(dataTypeName);
-		} else {
+			break;
+		case SIMPLE_ELEMENT:
+			typeURL = urlForSimpleDataType(dataTypeName);
+			break;
+		case PRIMITIVE:
+			typeURL = urlForSimpleDataType(dataTypeName);
+			break;
+		case COMPLEX_ELEMENT:
+			typeURL = urlForComplexDataType(dataTypeName);
+			break;
+		case UNKNOWN:
 			// The code doesn't represent an element or a resource. 
 			// Don't try to unpack - just treat it as a 'Code' type.
 			dataTypeName = "Code";
 			typeURL = urlForSimpleDataType(dataTypeName);
+			break;
+		default:
+			throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}
 		
 		return new LinkData(typeURL, StringUtil.capitaliseLowerCase(dataTypeName));
-	}
-	
-	private String urlForElement(String dataTypeName) {
-		BaseRuntimeElementDefinition<?> elementDefinition = fhirContext.getElementDefinition(dataTypeName);
-
-		if (IDatatype.class.isAssignableFrom(elementDefinition.getImplementingClass())) {
-			return urlForSimpleDataType(dataTypeName);
-		} else {
-			return urlForComplexDataType(dataTypeName);
-		}
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
@@ -66,19 +60,5 @@ public class FhirDocLinkFactory {
 	
 	private String urlForSimpleDataType(String dataTypeName) {
 		return "https://www.hl7.org/fhir/datatypes.html#" + dataTypeName.toLowerCase();
-	}
-	
-	private boolean isResourceType(String typeName) {
-		try {
-			fhirContext.getResourceDefinition(typeName);
-			return true;
-		} catch (DataFormatException e) {
-			return false;
-		}
-	}
-	
-	private boolean isElementType(String typeName) {
-		BaseRuntimeElementDefinition<?> elementDefinition = fhirContext.getElementDefinition(typeName);
-		return elementDefinition != null;
 	}
 }

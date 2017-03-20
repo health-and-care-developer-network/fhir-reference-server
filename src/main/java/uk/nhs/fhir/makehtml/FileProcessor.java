@@ -21,6 +21,7 @@ import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.SectionedHTMLDoc;
+import uk.nhs.fhir.util.SharedFhirContext;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
@@ -41,7 +42,7 @@ public class FileProcessor {
     	HTMLMakerOLD implementationGuideHTMLMaker,
     	ResourceBuilder resourceBuilder) {
     	
-    	this.fhirContext = FhirContext.forDstu2();
+    	this.fhirContext = SharedFhirContext.get();
     	
     	Preconditions.checkNotNull(structureDefinitionHTMLMaker);
     	Preconditions.checkNotNull(valueSetHTMLMaker);

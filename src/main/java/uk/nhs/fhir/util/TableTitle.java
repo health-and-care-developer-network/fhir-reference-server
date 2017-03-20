@@ -30,7 +30,8 @@ public class TableTitle {
 		return Elements.withAttributesAndText("th",
 				Lists.newArrayList(
 					new Attribute("title", hoverText),
-					new Attribute("style", "width: " + cssWidth)), 
+					new Attribute("style", "width: " + cssWidth),
+					new Attribute("class", "fhir-table-title")), 
 				title);
 	}
 }

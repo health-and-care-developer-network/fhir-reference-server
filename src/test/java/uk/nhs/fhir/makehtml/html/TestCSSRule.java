@@ -1,8 +1,9 @@
-package uk.nhs.fhir.makehtml.fmt;
+package uk.nhs.fhir.makehtml.html;
 
 import org.junit.Test;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.makehtml.html.CSSRule;
 
 public class TestCSSRule {
 	@Test

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.fmt.CSSRule;
+import uk.nhs.fhir.makehtml.html.CSSRule;
 
 public class CSSStyleBlock {
 	private final List<String> selectors;

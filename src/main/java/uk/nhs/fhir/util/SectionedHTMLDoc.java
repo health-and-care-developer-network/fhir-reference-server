@@ -27,7 +27,7 @@ public class SectionedHTMLDoc extends HTMLDocSection {
 		List<String> formattedStyleBlocks = Lists.newArrayList();
 		styles.forEach((CSSStyleBlock block) -> formattedStyleBlocks.add(block.toFormattedString()));
 		
-		headElements.add(Elements.withText("style", String.join("\n", formattedStyleBlocks)));
+		headElements.add(Elements.withText("style", "\n" + String.join("\n", formattedStyleBlocks) + "\n"));
 		
 		return new Document(Elements.withChildren("html",
 			Lists.newArrayList(

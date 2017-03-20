@@ -2,9 +2,9 @@ package uk.nhs.fhir.makehtml.opdef;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.fmt.LinkCell;
-import uk.nhs.fhir.makehtml.fmt.SimpleTextCell;
-import uk.nhs.fhir.makehtml.fmt.TableRow;
+import uk.nhs.fhir.makehtml.html.LinkCell;
+import uk.nhs.fhir.makehtml.html.SimpleTextCell;
+import uk.nhs.fhir.makehtml.html.TableRow;
 
 public class OperationDefinitionMetaDataRowFormatter {
 	public TableRow formatRow(OperationDefinitionMetaDataRowData source) {

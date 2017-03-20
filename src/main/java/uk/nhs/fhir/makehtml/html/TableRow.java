@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.fmt;
+package uk.nhs.fhir.makehtml.html;
 
 import java.util.Arrays;
 import java.util.List;

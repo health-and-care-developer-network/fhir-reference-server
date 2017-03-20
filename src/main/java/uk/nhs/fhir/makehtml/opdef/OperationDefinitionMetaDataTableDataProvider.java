@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
@@ -20,7 +19,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 	private final FhirDocLinkFactory fhirDocLinkFactory;
 
 	public OperationDefinitionMetaDataTableDataProvider(OperationDefinition source) {
-		this(source, new FhirDocLinkFactory(FhirContext.forDstu2()));
+		this(source, new FhirDocLinkFactory());
 	}
 	
 	public OperationDefinitionMetaDataTableDataProvider(OperationDefinition source, FhirDocLinkFactory linkDataFactory) {

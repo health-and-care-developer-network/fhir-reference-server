@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.fmt;
+package uk.nhs.fhir.makehtml.html;
 
 import java.io.IOException;
 
@@ -8,6 +8,7 @@ import org.jdom2.Element;
 import org.junit.Test;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.HTMLUtil;
 
