@@ -16,7 +16,6 @@ import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.SharedCSS;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.TableRow;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
@@ -84,8 +83,8 @@ public class OperationDefinitionFormatter extends ResourceFormatter<OperationDef
 	}
 
 	private void addStyles(HTMLDocSection section) {
-		SharedCSS.getTableStyles().forEach(section::addStyle);
-		SharedCSS.getPanelStyles().forEach(section::addStyle);
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
 		ValueWithInfoCell.getStyles().forEach(section::addStyle);
 		LinkCell.getStyles().forEach(section::addStyle);
 	}

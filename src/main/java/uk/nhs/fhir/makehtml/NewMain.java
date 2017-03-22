@@ -36,6 +36,7 @@ import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+	public static final boolean STRICT = false;
 
     private final File inputDirectory;
     private final String outPath;

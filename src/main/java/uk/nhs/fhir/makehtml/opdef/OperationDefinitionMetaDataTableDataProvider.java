@@ -8,8 +8,8 @@ import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
 import ca.uhn.fhir.model.primitive.CodeDt;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
-import uk.nhs.fhir.util.LinkData;
 import uk.nhs.fhir.util.StringUtil;
 import uk.nhs.fhir.util.TableTitle;
 

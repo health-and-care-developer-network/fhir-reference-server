@@ -30,6 +30,10 @@ public class TableRow {
 		tableCells.addAll(cells);
 	}
 	
+	public List<TableCell> getCells() {
+		return tableCells;
+	}
+	
 	public Element makeRow() {
 		List<Element> cells = Lists.newArrayList();
 		tableCells.forEach((TableCell cell) -> cells.add(cell.makeCell()));

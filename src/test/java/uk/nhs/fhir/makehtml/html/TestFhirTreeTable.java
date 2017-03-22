@@ -12,20 +12,21 @@ import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeNodeId;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.LinkData;
 
 public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId("test", null, FhirIcon.ELEMENT), 
+			new FhirTreeNodeId("test", null, FhirIcon.ELEMENT),
 			new ResourceFlags(),
 			new FhirCardinality("0", "1"),
 			new LinkData("#", "testlink"),
 			"root info",
-			Lists.newArrayList());
+			Lists.newArrayList(),
+			"path.to.resource");
 		FhirTreeData data = new FhirTreeData(node);
 		Table table = new FhirTreeTable(data).asTable(false);
 		

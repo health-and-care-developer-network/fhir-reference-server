@@ -11,89 +11,123 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
+import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueWithInfoCell implements TableCell {
 
 	private final String value;
-	private final List<ResourceInfo> constraints;
+	private final List<ResourceInfo> resourceInfos;
 	
 	public ValueWithInfoCell(String value, List<ResourceInfo> constraints) {
 		this.value = value;
-		this.constraints = constraints;
+		this.resourceInfos = constraints;
 	}
 
 	@Override
 	public Element makeCell() {
 		List<Content> valueDataNodes = Lists.newArrayList();
-		valueDataNodes.add(new Text(StringUtil.capitaliseLowerCase(value)));
-		for (ResourceInfo flag : constraints) {
-			valueDataNodes.add(new Element("br"));
-			valueDataNodes.addAll(nodesForResourceFlag(flag));
+		if (!value.isEmpty()) {
+			valueDataNodes.add(new Text(StringUtil.capitaliseLowerCase(value)));
+		}
+		for (ResourceInfo resourceInfo : resourceInfos) {
+			if (!valueDataNodes.isEmpty()) {
+				valueDataNodes.add(new Element("br"));
+			}
+			valueDataNodes.addAll(nodesForResourceFlag(resourceInfo));
 		}
 		
-		return Elements.withChildren("td", valueDataNodes);
+		return Elements.withAttributeAndChildren("td", new Attribute("class", "fhir-resource-info-cell"), valueDataNodes);
 	}
 	
-	private List<Content> nodesForResourceFlag(ResourceInfo constraint) {
+	private List<Content> nodesForResourceFlag(ResourceInfo resourceInfo) {
 		List<Content> constraintInfoNodes = Lists.newArrayList();
 		
+		ResourceInfoType type = resourceInfo.getType();
+		boolean useTidyStyle = useTidyStyle(type);
+		String nameClass = useTidyStyle ?
+			"fhir-info-name-bold" :
+			"fhir-info-name-block";
+		
+		// The tidy style doesn't have a box around the title, so needs a colon to separate it from the content
+		String name = resourceInfo.getName();
+		if (useTidyStyle) {
+			name += ": ";
+		}
 		constraintInfoNodes.add(
 			Elements.withAttributeAndText("span", 
-				new Attribute("class", "fhir-info-name"),
-				constraint.getName()));
+				new Attribute("class", nameClass),
+				name));
 		
-		boolean hasText = constraint.getDescription().isPresent();
-		boolean hasLink = constraint.getDescriptionLink().isPresent();
+		List<Content> constraintInfoText = getConstraintInfoContents(resourceInfo);
 		
-		if (hasText && hasLink) {
-			String constraintDescription = constraint.getDescription().get();
-			String constraintLink = constraint.getDescriptionLink().get().toString();
-			
-			// To produce: some info (<a href="http://my_url" class="fhir-link">http://my_url</a>)
-			
-			constraintInfoNodes.add(new Text(constraintDescription + " ("));
-			
+		if (useTidyStyle) {
 			constraintInfoNodes.add(
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("href", constraintLink),
-						new Attribute("class", "fhir-link")),
-					constraintLink));
-			
-			constraintInfoNodes.add(new Text(")"));
-			
-		} else if (hasText) {
-			String constraintDescription = constraint.getDescription().get();
-			
-			constraintInfoNodes.add(new Text(StringUtil.capitaliseLowerCase(constraintDescription)));
-			
-		} else if (hasLink) {
-			String constraintLink = constraint.getDescriptionLink().get().toString();
-			
-			constraintInfoNodes.add(
-				Elements.withAttributesAndText("a", 
-						Lists.newArrayList(
-							new Attribute("href", constraintLink),
-							new Attribute("class", "fhir-link")),
-						constraintLink));
-			
+				Elements.withAttributeAndChildren("span",
+					new Attribute("class", "fhir-text-italic"),
+					constraintInfoText));
 		} else {
-			throw new IllegalStateException("Constraint without text or link");
+			constraintInfoNodes.addAll(constraintInfoText);
 		}
 		
-		for (String tag: constraint.getExtraTags()) {
+		for (String tag: resourceInfo.getExtraTags()) {
 			constraintInfoNodes.add(getFormattedTag(tag));
 		}
 		
 		return constraintInfoNodes;
 	}
+
+	List<Content> getConstraintInfoContents(ResourceInfo resourceInfo) {
+		boolean hasText = resourceInfo.getDescription().isPresent();
+		boolean hasLink = resourceInfo.getDescriptionLink().isPresent();
+		boolean bracketLink = hasText && hasLink;
+		
+		if (!hasText && !hasLink) {
+			throw new IllegalStateException("Resource info without text or link");
+		}
+		
+		String description = hasText ? resourceInfo.getDescription().get() : "";
+		String link = hasLink ? resourceInfo.getDescriptionLink().get().toString() : "";
+		
+		List<Content> constraintInfoText = Lists.newArrayList();
+		if (hasText) {
+			constraintInfoText.add(new Text(StringUtil.capitaliseLowerCase(description)));
+		}
+		
+		if (bracketLink) {
+			constraintInfoText.add(new Text(" ("));
+		}
+		
+		if (hasLink) {	
+			constraintInfoText.add(
+				Elements.withAttributesAndText("a", 
+					Lists.newArrayList(
+						new Attribute("href", link),
+						new Attribute("class", "fhir-link")),
+					link));
+		}
+			
+		if (bracketLink) {
+			constraintInfoText.add(new Text(")"));
+		}
+		
+		return constraintInfoText;
+	}
 	
+	private boolean useTidyStyle(ResourceInfoType type) {
+		switch (type) {
+		case SLICING:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	private Content getFormattedTag(String tag) {
 		return 
 			Elements.withAttributeAndText("span", 
-				new Attribute("class", "fhir-info-tag"),
+				new Attribute("class", "fhir-info-tag-block"),
 				tag);
 	}
 	
@@ -102,7 +136,7 @@ public class ValueWithInfoCell implements TableCell {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name, .fhir-info-tag"),
+			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name-block, .fhir-info-tag-block"),
 				Lists.newArrayList(
 					new CSSRule("display", "inline"),
 					new CSSRule("background-color", "#cccccc"),
@@ -117,13 +151,30 @@ public class ValueWithInfoCell implements TableCell {
 					new CSSRule("border-radius", ".25em"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name"),
+			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name-block"),
 				Lists.newArrayList(new CSSRule("background-color", "#cccccc"))));
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-info-tag"),
+				Lists.newArrayList(".fhir-info-tag-block"),
 				Lists.newArrayList(new CSSRule("background-color", "#ffbb55"))));
+		
+		styles.add(
+			new CSSStyleBlock(
+				Lists.newArrayList(".fhir-info-name-bold"),
+				Lists.newArrayList(new CSSRule("font-weight", "bold"))));
+		
+		styles.add(
+			new CSSStyleBlock(
+				Lists.newArrayList(".fhir-text-italic"),
+				Lists.newArrayList(new CSSRule("font-style", "italic"))));
+		
+		styles.add(
+			new CSSStyleBlock(
+				Lists.newArrayList(".fhir-resource-info-cell"),
+				Lists.newArrayList(
+					new CSSRule("padding", "5px 4px"),
+					new CSSRule("border-bottom", "1px solid #F0F0F0"))));
 		
 		return styles;
 	}

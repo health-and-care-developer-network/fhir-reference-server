@@ -3,23 +3,22 @@ package uk.nhs.fhir.makehtml.opdef;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.ParameterBinding;
-import ca.uhn.fhir.model.dstu2.valueset.BindingStrengthEnum;
-import ca.uhn.fhir.model.primitive.BoundCodeDt;
 import ca.uhn.fhir.model.primitive.CodeDt;
-import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
-import uk.nhs.fhir.util.LinkData;
+import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.TableTitle;
 
 public class OperationDefinitionParameterTableDataProvider {
@@ -66,25 +65,13 @@ public class OperationDefinitionParameterTableDataProvider {
 			
 			ParameterBinding binding = parameter.getBinding();
 			if (!binding.isEmpty()) {
-				ResourceInfo bindingFlag = null;
-				IDatatype choice = binding.getValueSet();
-				if (choice instanceof UriDt) {
-					UriDt uri = (UriDt)choice;
-					bindingFlag = new ResourceInfo("Binding", new URL(uri.getValueAsString()), ResourceInfoType.BINDING);
-				} else if (choice instanceof ResourceReferenceDt) {
-					//TODO need to test this
-					ResourceReferenceDt ref = (ResourceReferenceDt)choice;
-					bindingFlag = new ResourceInfo("Binding", new URL(ref.getReferenceElement().getValue()), ResourceInfoType.BINDING);
-				}
-				
-				BoundCodeDt<BindingStrengthEnum> strengthElement = binding.getStrengthElement();
-				bindingFlag.addExtraTag("Strength: " + strengthElement.getValueAsEnum().getCode());
+				ResourceInfo bindingFlag = buildBindingResourceInfo(binding);
 				resourceFlags.add(bindingFlag);
 			}
 			
 			ResourceReferenceDt profile = parameter.getProfile();
 			if (!profile.isEmpty()) {
-				resourceFlags.add(new ResourceInfo("Profile", new URL(profile.getReferenceElement().getValue()),  ResourceInfoType.BINDING));
+				resourceFlags.add(new ResourceInfo("Profile", new URL(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
 			}
 			
 			//TODO tuple parameters
@@ -94,6 +81,17 @@ public class OperationDefinitionParameterTableDataProvider {
 			}
 			
 			return resourceFlags;
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
+		String choice = HAPIUtils.resolveDatatypeValue(binding.getValueSet());
+		String strength = binding.getStrength();
+		
+		try {
+			return new BindingResourceInfo(Optional.empty(), Optional.of(new URL(choice)), strength);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}

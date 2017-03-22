@@ -1,4 +1,4 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.makehtml.data;
 
 /**
  * Data class holding information for a link to be displayed on a screen

@@ -2,6 +2,7 @@ package uk.nhs.fhir.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -10,6 +11,7 @@ import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class Elements {
 
@@ -71,9 +73,18 @@ public class Elements {
         return e;
     }
     
-    public static Element setClasses(Element element, List<String> classes) {
-    	if (!classes.isEmpty()) {
-    		element.setAttribute("class", String.join(" ", classes));
+    public static Element addClasses(Element element, List<String> classes) {
+    	Set<String> uniqueClasses = Sets.newHashSet(classes); 
+    	
+    	Attribute attribute = element.getAttribute("class");
+		if (attribute != null) {
+			String existingClasses = attribute.getValue();
+			List<String> existingClassesList = Arrays.asList(existingClasses.split(" "));
+			uniqueClasses.addAll(existingClassesList);
+		}
+    	
+    	if (!uniqueClasses.isEmpty()) {
+    		element.setAttribute("class", String.join(" ", uniqueClasses));
     	}
     	
     	return element;

@@ -8,5 +8,10 @@ package uk.nhs.fhir.makehtml.data;
 public enum ResourceInfoType {
 	CONSTRAINT,
 	BINDING,
-	EXAMPLE_VALUE;
+	EXAMPLE_VALUE,
+	SLICING,
+	SLICING_DISCRIMINATOR,
+	FIXED_VALUE,
+	DEFAULT_VALUE,
+	PROFILE;
 }

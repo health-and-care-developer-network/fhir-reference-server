@@ -13,8 +13,8 @@ import org.jdom2.Text;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.util.Elements;
-import uk.nhs.fhir.util.LinkData;
 
 public class FormattedTableHTML {
 	

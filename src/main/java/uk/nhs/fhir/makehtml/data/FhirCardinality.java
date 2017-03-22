@@ -2,6 +2,8 @@ package uk.nhs.fhir.makehtml.data;
 
 import com.google.common.base.Preconditions;
 
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+
 public class FhirCardinality {
 	private final FhirElementCount min;
 	private final FhirElementCount max;
@@ -20,6 +22,10 @@ public class FhirCardinality {
 		Preconditions.checkArgument(FhirElementCount.validMinMaxPair(min, max), "Invalid min and max pair [" + minRaw + ".." + maxRaw + "]");
 	}
 	
+	public FhirCardinality(ElementDefinitionDt elementDefinition) {
+		this(elementDefinition.getMin(), elementDefinition.getMax());
+	}
+
 	public FhirElementCount getMax() {
 		return max;
 	}

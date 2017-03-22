@@ -9,8 +9,8 @@ import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.ICompositeDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -56,13 +56,7 @@ public enum FhirIcon {
 		return "url('data:image/" + extension + ";base64," + base64 + "')";
 	}
 
-	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
-		
-		Slicing slicing = definition.getSlicing();
-		if (!slicing.isEmpty()) {
-			return FhirIcon.SLICE;
-		}
-		
+	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {		
 		List<Type> types = definition.getType();
 		if (!types.isEmpty()) {
 			for (Type type : types) {
@@ -71,6 +65,10 @@ public enum FhirIcon {
 				
 				if (maybeImplementingType.isPresent()) {
 					Class<?> implementingType = maybeImplementingType.get();
+					
+					if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
+						return FhirIcon.REFERENCE;
+					}
 					
 					if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
 						return FhirIcon.DATATYPE;

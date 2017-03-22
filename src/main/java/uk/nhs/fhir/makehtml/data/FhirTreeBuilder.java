@@ -58,10 +58,6 @@ public class FhirTreeBuilder {
 		path.remove(path.size() - 1);
 	}
 	
-	public FhirTreeData getTree() {
-		return new FhirTreeData(rootNode); 
-	}
-	
 	private static boolean pathIsSubpath(List<String> path, List<String> ancestorPath) {
 		if (ancestorPath.size() > path.size()) {
 			return false;
@@ -73,5 +69,9 @@ public class FhirTreeBuilder {
 			}
 		}
 		return true;
+	}
+	
+	public FhirTreeData getTree() {
+		return new FhirTreeData(rootNode); 
 	}
 }

@@ -1,10 +1,9 @@
 package uk.nhs.fhir.makehtml.data;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
-
-import uk.nhs.fhir.util.LinkData;
 
 public class FhirTreeNode {
 	private final FhirTreeNodeId id;
@@ -12,29 +11,50 @@ public class FhirTreeNode {
 	private final FhirCardinality cardinality;
 	private final LinkData typeLink;
 	private final String information;
-	private final List<ResourceInfo> resourceInfos;
+	private final List<ResourceInfo> constraints;
+	private final String path;
+
+	private Optional<SlicingInfo> slicingInfo = Optional.empty();
+	private Optional<String> fixedValue = Optional.empty();
+	private Optional<String> example = Optional.empty();
+	private Optional<String> defaultValue = Optional.empty();
+	private Optional<BindingInfo> binding = Optional.empty();
 	
 	private FhirTreeNode parent = null;
 	
 	private final List<FhirTreeNode> children = Lists.newArrayList();
 
 	public FhirTreeNode(
-			FhirTreeNodeId id, 
+			FhirTreeNodeId id,
 			ResourceFlags flags, 
 			FhirCardinality cardinality, 
 			LinkData typeLink, 
-			String information, 
-			List<ResourceInfo> resourceInfos) {
+			String information,
+			List<ResourceInfo> constraints,
+			String path) {
 		this.id = id;
 		this.resourceFlags = flags;
 		this.cardinality = cardinality;
 		this.typeLink = typeLink;
 		this.information = information;
-		this.resourceInfos = resourceInfos;
+		this.constraints = constraints;
+		this.path = path;
 	}
 	
 	public FhirTreeNodeId getId() {
 		return id;
+	}
+	
+	public boolean hasSlicingInfo() {
+		return slicingInfo.isPresent();
+	}
+	
+	public Optional<SlicingInfo> getSlicingInfo() {
+		return slicingInfo;
+	}
+
+	public void setSlicingInfo(SlicingInfo slicingInfo) {
+		this.slicingInfo = Optional.ofNullable(slicingInfo);
 	}
 	
 	public FhirCardinality getCardinality() {
@@ -53,8 +73,9 @@ public class FhirTreeNode {
 		return information;
 	}
 	
-	public List<ResourceInfo> getResourceInfos() {
-		return resourceInfos;
+	public void addChild(int index, FhirTreeNode child) {
+		children.add(index, child);
+		child.setParent(this);
 	}
 	
 	public void addChild(FhirTreeNode child) {
@@ -80,5 +101,66 @@ public class FhirTreeNode {
 	
 	public boolean isRemovedByProfile() {
 		return cardinality.getMax().equals(FhirElementCount.NONE);
+	}
+	
+	public List<ResourceInfo> getConstraints() {
+		return constraints;
+	}
+	
+	public String getPath() {
+		return path;
+	}
+	
+	public String getPathName() {
+		String[] pathTokens = path.split("\\.");
+		return pathTokens[pathTokens.length - 1];
+	}
+
+	public boolean isFixedValue() {
+		return fixedValue.isPresent();
+	}
+	
+	public Optional<String> getFixedValue() {
+		return fixedValue;
+	}
+
+	public void setFixedValue(String fixedValue) {
+		this.fixedValue = Optional.of(fixedValue);
+	}
+
+	public boolean hasExample() {
+		return example.isPresent();
+	}
+	
+	public Optional<String> getExample() {
+		return example;
+	}
+
+	public void setExample(String exampleValue) {
+		this.example = Optional.of(exampleValue);
+	}
+
+	public boolean hasDefaultValue() {
+		return defaultValue.isPresent();
+	}
+
+	public Optional<String> getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = Optional.of(defaultValue);
+	}
+
+	public boolean hasBinding() {
+		return binding.isPresent();
+	}
+	
+	public Optional<BindingInfo> getBinding() {
+		return binding;
+	}
+	
+	public void setBinding(BindingInfo binding) {
+		this.binding = Optional.of(binding);
 	}
 }
