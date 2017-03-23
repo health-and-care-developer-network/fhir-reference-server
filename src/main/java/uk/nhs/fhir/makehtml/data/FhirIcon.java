@@ -11,6 +11,8 @@ import ca.uhn.fhir.model.api.ICompositeDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.HTMLConstants;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -27,8 +29,6 @@ public enum FhirIcon {
 	REUSE("icon_reuse", "png", FhirIcon.reuseBase64),
 	SLICE("icon_slice", "png", FhirIcon.sliceBase64),
 	TARGET("target", "png", FhirIcon.targetBase64);
-
-	public static final String urlRoot = "http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/"; 
 	
 	private final String name;
 	private final String extension;
@@ -45,7 +45,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return urlRoot + name + "." + extension;
+		return HTMLConstants.NHS_IMAGES_DIR + name + "." + extension;
 	}
 	
 	public String getBase64() {
@@ -58,27 +58,46 @@ public enum FhirIcon {
 
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {		
 		List<Type> types = definition.getType();
+		
+		boolean foundExtension = false;
 		if (!types.isEmpty()) {
 			for (Type type : types) {
 				String typeName = type.getCode();
-				Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
-				
-				if (maybeImplementingType.isPresent()) {
-					Class<?> implementingType = maybeImplementingType.get();
+				if (typeName != null) {
 					
-					if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-						return FhirIcon.REFERENCE;
-					}
-					
-					if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-						return FhirIcon.DATATYPE;
-					}
-					
-					if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-						return FhirIcon.PRIMITIVE;
+					if (typeName.equals("Extension")) {
+						foundExtension = true;
+						
+						Optional<FhirIcon> maybeForExtension = maybeForExtension(type, definition);
+						if (maybeForExtension.isPresent()) {
+							return maybeForExtension.get();
+						}
+						
+					} else {
+						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
+						
+						if (maybeImplementingType.isPresent()) {
+							Class<?> implementingType = maybeImplementingType.get();
+							
+							if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
+								return FhirIcon.REFERENCE;
+							}
+							
+							if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
+								return FhirIcon.DATATYPE;
+							}
+							
+							if (BasePrimitive.class.isAssignableFrom(implementingType)) {
+								return FhirIcon.PRIMITIVE;
+							}
+						}
 					}
 				}
 			}
+		}
+		
+		if (foundExtension) {
+			return FhirIcon.EXTENSION_COMPLEX;
 		}
 		
 		String path = definition.getPath();
@@ -91,6 +110,40 @@ public enum FhirIcon {
 		return FhirIcon.ELEMENT;
 	}
 	
+	private static Optional<FhirIcon> maybeForExtension(Type type, ElementDefinitionDt definition) {
+		
+		List<UriDt> profiles = type.getProfile();
+		if (profiles.isEmpty()) {
+			return Optional.empty();
+		}
+
+		boolean hasPrimitiveExtension = false;
+		boolean hasNonPrimitiveExtension = false;
+		
+		for (UriDt uri : profiles) {
+			String[] tokens = uri.getValue().split("/");
+			String uriTypeName = tokens[tokens.length - 1];
+			Optional<Class<?>> implementingType = FhirDataTypes.getImplementingType(uriTypeName);
+			if (implementingType.isPresent()) {
+				Class<?> implementingClass = implementingType.get();
+				if (BasePrimitive.class.isAssignableFrom(implementingClass)) {
+					hasPrimitiveExtension = true;
+				} else {
+					hasNonPrimitiveExtension = true;
+				}
+			}
+		}
+		
+		if (hasNonPrimitiveExtension) {
+			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
+		} else if (hasPrimitiveExtension) {
+			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+		} else {
+			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
+			return Optional.empty();
+		}
+	}
+
 	private static final String choiceBase64 = "R0lGODlhEAAQAMQfAGm6/idTd4yTmF+v8Xa37KvW+lyh3KHJ62aq41ee2bXZ98nm/2mt5W2Ck5XN/C1chEZieho8WXXA/2Gn4P39/W+y6V+l3qjP8Njt/lx2izxPYGyv51Oa1EJWZ////////yH5BAEAAB8ALAAAAAAQABAAAAWH4Cd+Xml6Y0pCQts0EKp6GbYshaM/skhjhCChUmFIeL4OsHIxXRAISQTl6SgIG8+FgfBMoh2qtbLZQr0TQJhk3TC4pYPBApiyFVDEwSOf18UFXxMWBoUJBn9sDgmDewcJCRyJJBoEkRyYmAABPZQEAAOhA5seFDMaDw8BAQ9TpiokJyWwtLUhADs=";
 	private static final String datatypeBase64 = "R0lGODlhEAAQAOZ/APrkusOiYvvfqbiXWaV2G+jGhdq1b8GgYf3v1frw3vTUlsWkZNewbcSjY/DQkad4Hb6dXv3u0f3v1ObEgfPTlerJiP3w1v79+e7OkPrfrfnjuNOtZPrpydaxa+/YrvvdpP779ZxvFPvnwKKBQaFyF/369M2vdaqHRPz58/HNh/vowufFhfroxO3OkPrluv779tK0e6JzGProwvrow9m4eOnIifPTlPDPkP78+Naxaf3v0/zowfXRi+bFhLWUVv379/rnwPvszv3rye3LiPvnv+3MjPDasKiIS/789/3x2f747eXDg+7Mifvu0tu7f+/QkfDTnPXWmPrjsvrjtPbPgrqZW+/QlPz48K2EMv36866OUPvowat8Ivvgq/Pbrvzgq/PguvrgrqN0Gda2evfYm9+7d/rpw9q6e/LSku/Rl/XVl/LSlfrkt+zVqe7Wqv3x1/bNffbOf59wFdS6if3u0vrqyP3owPvepfXQivDQkO/PkKh9K7STVf779P///////yH5BAEAAH8ALAAAAAAQABAAAAfNgH+Cg36FfoOIhH4JBxBghYl/hQkNAV0IVT5GkJKLCwtQaSsSdx9aR26Gcwt2IkQaNRI6dBERIzCFDSgWSW8WCDkbBnoOQ3uFARc/JQJfCAZlT0x4ZFyFBxdNQT9ZCBNWKQoKUQ+FEDgcdTIAV14YDmg2CgSFA0hmQC5TLE4VRTdrKJAoxOeFCzZSwsw4U6BCizwUQhQyEaAPiAwCVNCY0FCNnA6GPAwYoETIFgY9loiRA4dToTYnsOxg8CBGHE6ICvEYQ4AKzkidfgoKBAA7";
 	private static final String elementBase64 = "R0lGODlhEAAQAMQfAOvGUf7ztuvPMf/78/fkl/Pbg+u8Rvjqteu2Pf3zxPz36Pz0z+vTmPzurPvuw/npofbjquvNefHVduuyN+uuMu3Oafbgjfnqvf/3zv/3xevPi+vRjP/20/bmsP///////yH5BAEAAB8ALAAAAAAQABAAAAV24CeOZGmepqeqqOgxjBZFa+19r4ftWQUAgqDgltthMshMIJAZ4jYDHsBARSAmFOJvq+g6HIdEFgcYmBWNxoNAsDjGHgBnmV5bCoUDHLBIq9sFEhIdcAYJdYASFRUQhQkLCwkOFwcdEBAXhVabE52ecDahKy0oIQA7";

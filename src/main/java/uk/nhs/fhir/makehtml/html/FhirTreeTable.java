@@ -80,6 +80,10 @@ public class FhirTreeTable {
 			FhirTreeNode nodeWithSlicing = null;
 			for (int i=0; i<children.size(); i++) {
 				FhirTreeNode child = children.get(i);
+				if (child instanceof FhirTreeSlicingNode) {
+					// slicing already handled for the children of this node
+					continue;
+				}
 				
 				Optional<SlicingInfo> slicingInfo = child.getSlicingInfo();
 				if (slicingInfo.isPresent()) {
@@ -194,7 +198,7 @@ public class FhirTreeTable {
 				new TreeNodeCell(treeIcons, node.getId().getFhirIcon(), node.getId().getName(), backgroundCSSClass),
 				new ResourceFlagsCell(node.getResourceFlags()),
 				new SimpleTextCell(node.getCardinality().toString()), 
-				new LinkCell(node.getTypeLink()), 
+				new LinkCell(node.getTypeLinks()), 
 				new ValueWithInfoCell(node.getInformation(), getNodeResourceInfos(node))));
 	}
 	
@@ -334,7 +338,7 @@ public class FhirTreeTable {
 	private List<CSSStyleBlock> getIconStyles() {
 		List<CSSStyleBlock> iconStyles = Lists.newArrayList();
 		
-		for (FhirIcon icon : getIcons()) {
+		/*for (FhirIcon icon : getIcons()) {
 			iconStyles.add(
 				new CSSStyleBlock(Lists.newArrayList("." + icon.getCSSClass()),
 					Lists.newArrayList(
@@ -344,7 +348,16 @@ public class FhirTreeTable {
 						new CSSRule("content", icon.getAsDataUrl()),
 						new CSSRule("width", "20"),
 						new CSSRule("height", "16"))));
-		}
+		}*/
+		
+		iconStyles.add(
+			new CSSStyleBlock(Lists.newArrayList(".fhir-tree-resource-icon"),
+				Lists.newArrayList(
+					new CSSRule("padding-right", "4px"),
+					new CSSRule("background-color", "white"),
+					new CSSRule("border", "0"),
+					new CSSRule("width", "20"),
+					new CSSRule("height", "16"))));
 		
 		return iconStyles;
 	}

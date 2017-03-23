@@ -19,6 +19,7 @@ import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
+import uk.nhs.fhir.makehtml.html.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.TablePNGGenerator;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
@@ -31,6 +32,9 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 	@Override
 	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
 		
+		StructureDefinitionMetadataFormatter metadata = new StructureDefinitionMetadataFormatter(source);
+		Element metadataPanel = metadata.getMetadataTable();
+		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
 		FhirTreeTable formattedTree = new FhirTreeTable(dataProvider.getTreeData());
 
@@ -42,6 +46,8 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 		addStyles(section);
 		getTableBackgroundStyles(formattedTable).forEach(section::addStyle);
 		formattedTree.getStyles().forEach(section::addStyle);
+		
+		section.addBodyElement(metadataPanel);
 		section.addBodyElement(panelElement);
 		return section;
 	}
@@ -88,5 +94,6 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 		ValueWithInfoCell.getStyles().forEach(section::addStyle);
 		LinkCell.getStyles().forEach(section::addStyle);
 		ResourceFlagsCell.getStyles().forEach(section::addStyle);
+		StructureDefinitionMetadataFormatter.getStyles().forEach(section::addStyle);
 	}
 }

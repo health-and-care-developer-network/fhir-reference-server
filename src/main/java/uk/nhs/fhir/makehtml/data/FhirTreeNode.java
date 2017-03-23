@@ -9,7 +9,7 @@ public class FhirTreeNode {
 	private final FhirTreeNodeId id;
 	private final ResourceFlags resourceFlags;
 	private final FhirCardinality cardinality;
-	private final LinkData typeLink;
+	private final List<LinkData> typeLinks;
 	private final String information;
 	private final List<ResourceInfo> constraints;
 	private final String path;
@@ -28,14 +28,14 @@ public class FhirTreeNode {
 			FhirTreeNodeId id,
 			ResourceFlags flags, 
 			FhirCardinality cardinality, 
-			LinkData typeLink, 
+			List<LinkData> typeLinks, 
 			String information,
 			List<ResourceInfo> constraints,
 			String path) {
 		this.id = id;
 		this.resourceFlags = flags;
 		this.cardinality = cardinality;
-		this.typeLink = typeLink;
+		this.typeLinks = typeLinks;
 		this.information = information;
 		this.constraints = constraints;
 		this.path = path;
@@ -65,8 +65,8 @@ public class FhirTreeNode {
 		return resourceFlags;
 	}
 	
-	public LinkData getTypeLink() {
-		return typeLink;
+	public List<LinkData> getTypeLinks() {
+		return typeLinks;
 	}
 	
 	public String getInformation() {

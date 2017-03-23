@@ -9,8 +9,8 @@ public class StructureDefinitionPreparer implements ResourcePreparer<StructureDe
 		// Here (while we have the resource in as a StructureDefinition) we resolve any invalid (c) character in the Copyright section too!
         String copyRight = structureDefinitionResource.getCopyrightElement().getValue();
         if(copyRight != null) {
-            copyRight = copyRight.replace("©", "&copy;");
-            copyRight = copyRight.replace("\\u00a9", "&copy;");
+            copyRight = copyRight.replace("©", "&#169;");
+            copyRight = copyRight.replace("\\u00a9", "&#169;");
             structureDefinitionResource.setCopyright(copyRight);
         }
         

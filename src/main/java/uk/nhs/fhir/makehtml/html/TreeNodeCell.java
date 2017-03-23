@@ -30,9 +30,17 @@ public class TreeNodeCell implements TableCell {
 	public Element makeCell() {
 		List<Content> contents = Lists.newArrayList();
 		for (FhirTreeIcon icon : treeIcons) {
-			contents.add(Elements.withAttributes("img", Lists.newArrayList(new Attribute("class", icon.getCssClass()))));
+			//contents.add(Elements.withAttributes("img", Lists.newArrayList(new Attribute("class", icon.getCssClass()))));
+			contents.add(
+				Elements.withAttributes("img", 
+					Lists.newArrayList(
+						new Attribute("src", icon.getNhsSrc()),
+						new Attribute("class", "fhir-tree-icon"))));
 		}
-		contents.add(Elements.withAttributes("img", Lists.newArrayList(new Attribute("class", fhirIcon.getCSSClass()))));
+		contents.add(Elements.withAttributes("img", 
+			Lists.newArrayList(
+				new Attribute("src", fhirIcon.getUrl()),
+				new Attribute("class", "fhir-tree-resource-icon"))));
 		contents.add(new Text(name));
 		
 		return Elements.withAttributeAndChildren("td", 

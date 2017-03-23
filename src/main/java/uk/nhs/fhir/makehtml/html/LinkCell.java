@@ -15,26 +15,34 @@ import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.util.Elements;
 
 public class LinkCell implements TableCell {
-	private final LinkData linkData;
+	private final List<LinkData> linkDatas;
 	private final List<String> cellClasses;
 	private final List<String> linkClasses;
-	
+
 	public LinkCell(LinkData linkData) {
 		this(linkData, Lists.newArrayList(), Lists.newArrayList());
 	}
 	
+	public LinkCell(List<LinkData> linkData) {
+		this(linkData, Lists.newArrayList(), Lists.newArrayList());
+	}
+	
 	public LinkCell(LinkData linkData, List<String> cellClasses, List<String> linkClasses) {
-		this.linkData = linkData;
+		this(Lists.newArrayList(linkData), cellClasses, linkClasses);
+	}
+	
+	public LinkCell(List<LinkData> linkData, List<String> cellClasses, List<String> linkClasses) {
+		this.linkDatas = linkData;
 		this.cellClasses = cellClasses;
 		this.linkClasses = linkClasses;
 	}
 	
 	@Override
 	public Element makeCell() {
-		if (linkData instanceof NestedLinkData) {
-			return makeNestedCell();
+		if (linkDatas.size() > 0) {
+			return makeMultiLinkCell();
 		} else {
-			return makeSimpleCell();
+			return makeEmptyCell();
 		}
 	}
 
@@ -45,12 +53,7 @@ public class LinkCell implements TableCell {
 	 * <a href="link1">Link 1</a> (<a href="link2">Link 2</a> | <a href="link3">Link 3</a>)
 	 * @return
 	 */
-	private Element makeNestedCell() {
-		if (!(linkData instanceof NestedLinkData)) {
-			throw new IllegalStateException("Cannot make a nested cell from a simple LinkData");
-		}
-		
-		NestedLinkData data = (NestedLinkData)linkData;
+	private List<Content> makeNestedLinkContents(NestedLinkData data) {
 		Element outerLink = makeLinkElement(data);
 		
 		List<Content> children = Lists.newArrayList(outerLink);
@@ -72,16 +75,29 @@ public class LinkCell implements TableCell {
 			children.add(new Text(")"));
 		}
 		
-		Element cell = makeDataCell(children);
-		
-		return cell;
+		return children;
 	}
 	
-	private Element makeSimpleCell() {
-		Element link = makeLinkElement(linkData);
-		Element cell = makeDataCell(Lists.newArrayList(link));
+	private Element makeMultiLinkCell() {
+		List<Content> cellContents = Lists.newArrayList();
+		boolean addedLink = false;
+		for (LinkData linkData : linkDatas) {
+			if (addedLink) {
+				cellContents.add(new Text(" | "));
+			}
+			if (linkData instanceof NestedLinkData) {
+				cellContents.addAll(makeNestedLinkContents((NestedLinkData)linkData));
+			} else {
+				cellContents.add(makeLinkElement(linkData));
+			}
+			addedLink = true;
+		}
 		
-		return cell;
+		return makeDataCell(cellContents);
+	}
+
+	private Element makeEmptyCell() {
+		return makeDataCell(Lists.newArrayList());
 	}
 	
 	Element makeDataCell(List<Content> children) {

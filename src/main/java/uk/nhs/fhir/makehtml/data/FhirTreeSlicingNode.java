@@ -3,6 +3,8 @@ package uk.nhs.fhir.makehtml.data;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.HTMLConstants;
+
 public class FhirTreeSlicingNode extends FhirTreeNode {
 
 	public FhirTreeSlicingNode(String slicedType, FhirCardinality cardinality, SlicingInfo slicingInfo, String path) {
@@ -10,7 +12,7 @@ public class FhirTreeSlicingNode extends FhirTreeNode {
 			new FhirTreeNodeId("Slice (" + slicedType + ")", null, FhirIcon.SLICE),
 			new ResourceFlags(),
 			cardinality,
-			new LinkData("http://hl7.org/fhir/profiling.html#slicing", "Slicing"),
+			Lists.newArrayList(new LinkData(HTMLConstants.HL7_DSTU2 + "/profiling.html#slicing", "Slice")),
 			"",
 			Lists.newArrayList(),
 			path);

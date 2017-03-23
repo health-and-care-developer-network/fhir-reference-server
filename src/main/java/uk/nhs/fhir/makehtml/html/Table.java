@@ -151,7 +151,7 @@ public class Table {
 				new CSSRule("-moz-box-sizing", "border-box"),
 				new CSSRule("box-sizing", "border-box"))));
 		
-		// Style hack to add space between thead and tbody
+		// Styling hack to add space between thead and tbody
 		styles.add(new CSSStyleBlock(
 			Lists.newArrayList(".fhir-table tbody:before"),
 			Lists.newArrayList(

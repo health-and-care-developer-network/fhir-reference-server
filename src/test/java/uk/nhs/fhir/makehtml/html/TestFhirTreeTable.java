@@ -23,7 +23,7 @@ public class TestFhirTreeTable {
 			new FhirTreeNodeId("test", null, FhirIcon.ELEMENT),
 			new ResourceFlags(),
 			new FhirCardinality("0", "1"),
-			new LinkData("#", "testlink"),
+			Lists.newArrayList(new LinkData("#", "testlink")),
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource");

@@ -105,7 +105,7 @@ public class TestFormatTable {
 			new TableTitle("Use", "info1", "50px"),
 			new TableTitle("Link", "info3", "70px"));
 		Table table = new Table(columns, Sets.newHashSet("class1"));
-		table.addRow(new TableRow(new SimpleTextCell("Search engine"), new LinkCell(new LinkData("https://www.google.com", "Google"))));
+		table.addRow(new TableRow(new SimpleTextCell("Search engine"), new LinkCell(Lists.newArrayList(new LinkData("https://www.google.com", "Google")))));
 		table.addRow(new TableRow(new SimpleTextCell("News"), new LinkCell(new LinkData("http://news.bbc.co.uk", "BBC News"))));
 		table.addRow(new TableRow(new SimpleTextCell("Encyclopedia"), new LinkCell(new LinkData("https://www.wikipedia.org", "Wikipedia"))));
 		Element tableElement = table.makeTable();

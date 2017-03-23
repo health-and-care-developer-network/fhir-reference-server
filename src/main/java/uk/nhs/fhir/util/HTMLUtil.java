@@ -27,7 +27,9 @@ public class HTMLUtil {
 		
 		XMLOutputter outputter = new XMLOutputter(format);
         outputter.output(document, writer);
-        return writer.toString();
+        
+        //fix html entities which will have had their apersands escaped
+        return writer.toString().replaceAll("&amp;#([\\dA-Fa-f]+);", "&#$1;");
 	}
 
     public static Document readFile(String filename) throws JDOMException, IOException {

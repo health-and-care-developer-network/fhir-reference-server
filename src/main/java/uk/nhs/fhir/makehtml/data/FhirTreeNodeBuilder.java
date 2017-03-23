@@ -15,25 +15,24 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.StringUtil;
 
 public class FhirTreeNodeBuilder {
-	private final FhirDocLinkFactory typeLinks = new FhirDocLinkFactory();
+	private final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
 	
 	public FhirTreeNode fromElementDefinition(ElementDefinitionDt elementDefinition) {
 		
 		String displayName = getDisplayName(elementDefinition);
 		
 		List<Type> snapshotElementTypes = elementDefinition.getType();
-		LinkData typeLink = null;
+		List<LinkData> typeLinks = Lists.newArrayList();
 		if (!snapshotElementTypes.isEmpty()) {
-			typeLink = getTypeLink(snapshotElementTypes);
-		}
-		
-		if (typeLink == null) {
-			typeLink = new LinkData("","");
+			typeLinks.addAll(getTypeLinks(snapshotElementTypes));
 		}
 
 		ResourceFlags flags = ResourceFlags.forDefinition(elementDefinition);
@@ -42,7 +41,7 @@ public class FhirTreeNodeBuilder {
 		
 		URL nameUrl;
 		try {
-			nameUrl = new URL("http://www.hl7.org");
+			nameUrl = new URL(HTMLConstants.HL7_ROOT);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -62,7 +61,7 @@ public class FhirTreeNodeBuilder {
 			new FhirTreeNodeId(displayName, nameUrl, icon),
 			flags,
 			cardinality,
-			typeLink, 
+			typeLinks, 
 			shortDescription,
 			resourceInfos,
 			path);
@@ -87,6 +86,9 @@ public class FhirTreeNodeBuilder {
 			if (example instanceof BasePrimitive) {
 				BasePrimitive<?> examplePrimitive = (BasePrimitive<?>)example;
 				node.setExample(examplePrimitive.getValueAsString());
+			} else if (example instanceof PeriodDt) {
+				PeriodDt examplePeriod = (PeriodDt)example;
+				node.setExample(StringUtil.periodToString(examplePeriod));
 			} else {
 				throw new IllegalStateException("Unhandled type for example value: " + example.getClass().getName());
 			}
@@ -120,29 +122,26 @@ public class FhirTreeNodeBuilder {
 		return node;
 	}
 
-	private LinkData getTypeLink(List<Type> snapshotElementTypes) {
-		LinkData typeLink = null;
+	private List<LinkData> getTypeLinks(List<Type> snapshotElementTypes) {
+		List<LinkData> typeLinks = Lists.newArrayList();
 		
 		List<Type> knownTypes = FhirDataTypes.knownTypes(snapshotElementTypes);
-		for (Type type : knownTypes) {
-			if (typeLink != null) {
-				System.out.println("Multiple type codes matched resources or element types."
-						+ " Don't know which type URL to use");
-			}
-			
-			String code = type.getCode();
-			
-			List<UriDt> profileUris = type.getProfile();
-			if (profileUris.isEmpty()) {
-				typeLink = typeLinks.forDataTypeName(code);
-			} else {
-				List<String> uris = Lists.newArrayList();
-				profileUris.forEach((UriDt uri) -> uris.add(uri.getValue()));
-				typeLink = typeLinks.withNestedLinks(code, uris);
+		if (!knownTypes.isEmpty()) {
+			for (Type type : knownTypes) {
+				String code = type.getCode();
+				
+				List<UriDt> profileUris = type.getProfile();
+				if (profileUris.isEmpty()) {
+					typeLinks.add(typeLinkFactory.forDataTypeName(code));
+				} else {
+					List<String> uris = Lists.newArrayList();
+					profileUris.forEach((UriDt uri) -> uris.add(uri.getValue()));
+					typeLinks.add(typeLinkFactory.withNestedLinks(code, uris));
+				}
 			}
 		}
 		
-		return typeLink;
+		return typeLinks;
 	}
 
 	static String getDisplayName(ElementDefinitionDt elementDefinition) {

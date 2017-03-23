@@ -8,6 +8,7 @@ import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
+import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 
@@ -20,7 +21,7 @@ public class FhirDocLinkFactory {
 			return forCodedType((CodeDt)fhirData);
 		} else {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
-			typeURL = "https://www.hl7.org/fhir/datatypes.html#" + dataTypeName;
+			typeURL = HTMLConstants.HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
 			
 			return new LinkData(typeURL, StringUtil.capitaliseLowerCase(dataTypeName));
 		}
@@ -53,29 +54,31 @@ public class FhirDocLinkFactory {
 
 	private String urlForDataTypeName(String dataTypeName) {
 		switch (FhirDataTypes.forType(dataTypeName)) {
-		case RESOURCE:
-			return urlForComplexDataType(dataTypeName);
-		case SIMPLE_ELEMENT:
-			return urlForSimpleDataType(dataTypeName);
-		case PRIMITIVE:
-			return urlForSimpleDataType(dataTypeName);
-		case COMPLEX_ELEMENT:
-			return urlForComplexDataType(dataTypeName);
-		case UNKNOWN:
-			// The code doesn't represent an element or a resource. 
-			// Don't try to unpack - just treat it as a 'Code' type.
-			dataTypeName = "Code";
-			return urlForSimpleDataType(dataTypeName);
-		default:
-			throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
+			case EXTENSION:
+				return HTMLConstants.HL7_DSTU2 + "/extensibility.html#Extension";
+			case RESOURCE:
+				return urlForComplexDataType(dataTypeName);
+			case SIMPLE_ELEMENT:
+				return urlForSimpleDataType(dataTypeName);
+			case PRIMITIVE:
+				return urlForSimpleDataType(dataTypeName);
+			case COMPLEX_ELEMENT:
+				return urlForComplexDataType(dataTypeName);
+			case UNKNOWN:
+				// The code doesn't represent an element or a resource. 
+				// Don't try to unpack - just treat it as a 'Code' type.
+				dataTypeName = "Code";
+				return urlForSimpleDataType(dataTypeName);
+			default:
+				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
-		return "https://www.hl7.org/fhir/" + complexTypeName.toLowerCase() + ".html";
+		return HTMLConstants.HL7_DSTU2 + "/" + complexTypeName.toLowerCase() + ".html";
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return "https://www.hl7.org/fhir/datatypes.html#" + dataTypeName.toLowerCase();
+		return HTMLConstants.HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
 	}
 }

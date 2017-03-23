@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.model.api.BaseElement;
 import ca.uhn.fhir.model.api.BasePrimitive;
+import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
@@ -50,7 +51,7 @@ public class FhirDataTypes {
 		
 		for (Type type : types) {
 			String code = type.getCode();
-			if (!forType(code).equals(FhirDataType.UNKNOWN)) {
+			if (code != null && !forType(code).equals(FhirDataType.UNKNOWN)) {
 				knownTypes.add(type);
 			}
 		}
@@ -69,7 +70,9 @@ public class FhirDataTypes {
 		if (nameToDefinition.containsKey(typeName)) {
 			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();
 			
-			if (implementsOrExtends(implementingClass, BaseResource.class)) {
+			if (implementsOrExtends(implementingClass, ExtensionDt.class)) {
+				return FhirDataType.EXTENSION;
+			} else if (implementsOrExtends(implementingClass, BaseResource.class)) {
 				return FhirDataType.RESOURCE;
 			} else if (implementsOrExtends(implementingClass, BasePrimitive.class)) {
 				return FhirDataType.PRIMITIVE;

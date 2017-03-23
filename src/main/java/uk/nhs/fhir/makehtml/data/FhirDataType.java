@@ -5,5 +5,6 @@ public enum FhirDataType {
 	COMPLEX_ELEMENT,
 	RESOURCE,
 	PRIMITIVE,
+	EXTENSION,
 	UNKNOWN;
 }
