@@ -34,7 +34,7 @@ public class TestFormatTable {
 		Element linkCell = new LinkCell(data).makeCell();
 		String simpleLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\">" 
-							+ "<a href=\"http://testURL\">" 
+							+ "<a class=\"fhir-link\" href=\"http://testURL\">" 
 								+ "test_link_text" 
 							+ "</a>" 
 						+ "</td>";
@@ -46,8 +46,8 @@ public class TestFormatTable {
 		LinkData data = new LinkData("http://testURL", "test_link_text");
 		Element linkCell = new LinkCell(data, Lists.newArrayList("cell-class-1", "cell-class-2"), Lists.newArrayList("link-class-1 link-class-2")).makeCell();
 		String formattedLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
-		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-1 cell-class-2\">" 
-							+ "<a class=\"fhir-link\" href=\"http://testURL\" class=\"link-class-1 link-class-2\">" 
+		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 cell-class-1\">" 
+							+ "<a class=\"link-class-1 link-class-2 fhir-link\" href=\"http://testURL\">" 
 								+ "test_link_text" 
 							+ "</a>" 
 						+ "</td>";
@@ -75,13 +75,13 @@ public class TestFormatTable {
 		table.addRow(new TableRow(new SimpleTextCell("first cell"), new SimpleTextCell("second cell")));
 		Element tableElement = table.makeTable();
 		String tableHTML = HTMLUtil.docToString(new Document(tableElement), false, false);
-		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\">"
+		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-table\">"
 							+ "<thead>"
-								+ "<tr>"
-									+ "<th title=\"hoverInfo\" style=\"width: 50px\">"
+								+ "<tr class=\"fhir-table-header-row\">"
+									+ "<th title=\"hoverInfo\" style=\"width: 50px\" class=\"fhir-table-title\">"
 										+ "ColumnName"
 									+ "</th>"
-									+ "<th title=\"hoverInfo2\" style=\"width: 60px\">"
+									+ "<th title=\"hoverInfo2\" style=\"width: 60px\" class=\"fhir-table-title\">"
 										+ "ColumnName2"
 									+ "</th>"
 								+ "</tr>"
@@ -110,11 +110,11 @@ public class TestFormatTable {
 		table.addRow(new TableRow(new SimpleTextCell("Encyclopedia"), new LinkCell(new LinkData("https://www.wikipedia.org", "Wikipedia"))));
 		Element tableElement = table.makeTable();
 		String tableHTML = HTMLUtil.docToString(new Document(tableElement), false, false);
-		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\">"
+		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-table\">"
 							+ "<thead>"
-								+ "<tr>"
-									+ "<th title=\"info1\" style=\"width: 50px\">Use</th>"
-									+ "<th title=\"info3\" style=\"width: 70px\">Link</th>"
+								+ "<tr class=\"fhir-table-header-row\">"
+									+ "<th title=\"info1\" style=\"width: 50px\" class=\"fhir-table-title\">Use</th>"
+									+ "<th title=\"info3\" style=\"width: 70px\" class=\"fhir-table-title\">Link</th>"
 								+ "</tr>"
 							+ "</thead>"
 							+ "<tbody>"

@@ -30,24 +30,6 @@ public class TestPNG {
 	}
 	
 	@Test
-	public void testBuildPixelArray() throws DataFormatException, IOException {
-		// a png with the first two lines dotted
-		String base64Input = "iVBORw0KGgoAAAANSUhEUgAAAyAAAAACCAYAAACg/LjIAAAAMElEQVR42u3QwQkAMAwDsezq/WdoskKgFAoy6HkfV5LamJ1tc7MHAAD+5QQAAOCZBkurQFbnaRSlAAAAAElFTkSuQmCC";
-		PNG png = PNG.parsePNGBase64(base64Input);
-		PNGChunk c = png.getChunks().get(0);
-		byte[] expected = c.inflatedData();
-		
-		TablePNGGenerator pngGenerator = new TablePNGGenerator();
-		boolean[] vlinesRequired = new boolean[]{true, true};
-		byte[] tableRawBytes = pngGenerator.getDataBytes(Style.DOTTED, vlinesRequired);
-		
-		Assert.assertEquals(tableRawBytes.length, expected.length);
-		for (int i=0; i<tableRawBytes.length; i++) {
-			Assert.assertEquals("byte at " + i + " didn't match", tableRawBytes[i], expected[i]);
-		}
-	}
-	
-	@Test
 	public void displayGenerated() throws ParserConfigurationException, IOException {
 		// one of the backgrounds from the HL7 FHIR website
 		//String base64Input = "iVBORw0KGgoAAAANSUhEUgAAAyAAAAACCAYAAACg/LjIAAAAMElEQVR42u3QwQkAMAwDsezq/WdoskKgFAoy6HkfV5LamJ1tc7MHAAD+5QQAAOCZBkurQFbnaRSlAAAAAElFTkSuQmCC";

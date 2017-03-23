@@ -72,19 +72,14 @@ public class FileProcessor {
 		    	output = processResource(resource);
 		    }
 
-		    LOG.fine(HTMLUtil.docToString(output, true, false));
+		    String renderedDoc = HTMLUtil.docToString(output, true, false);
 
-		    Document thisDoc = HTMLUtil.readFile(inFile);
-
-		    Optional<String> html = buildHTML(inFile, thisDoc);
-		    if (html.isPresent()) {
-		    	try {
-			        augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), html.get(), newBaseURL);
-		            FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
-		        } catch (UnsupportedEncodingException ex) {
-		            LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
-		        }
-		    }
+	    	try {
+		        augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), renderedDoc, newBaseURL);
+	            FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
+	        } catch (UnsupportedEncodingException ex) {
+	            LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
+	        }
 		}
 	}
 
