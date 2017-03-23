@@ -39,7 +39,7 @@ public class FhirTreeTable {
 			new TableTitle("Flags", "Features of the element", "5%", "60px"),
 			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "5%", "40px"),
 			new TableTitle("Type", "Reference to the type of the element", "20%", "80px"),
-			new TableTitle("Value", "Additional information about the element", "40%")
+			new TableTitle("Description/Constraints", "Additional information about the element", "40%")
 		);
 	}
 	
