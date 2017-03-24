@@ -60,15 +60,15 @@ public class ValueWithInfoCell implements TableCell {
 				new Attribute("class", nameClass),
 				name));
 		
-		List<Content> constraintInfoText = getConstraintInfoContents(resourceInfo);
+		List<Content> resourceInfoText = getResourceInfoContents(resourceInfo);
 		
 		if (useTidyStyle) {
 			constraintInfoNodes.add(
 				Elements.withAttributeAndChildren("span",
 					new Attribute("class", "fhir-text-italic"),
-					constraintInfoText));
+					resourceInfoText));
 		} else {
-			constraintInfoNodes.addAll(constraintInfoText);
+			constraintInfoNodes.addAll(resourceInfoText);
 		}
 		
 		for (String tag: resourceInfo.getExtraTags()) {
@@ -78,7 +78,7 @@ public class ValueWithInfoCell implements TableCell {
 		return constraintInfoNodes;
 	}
 
-	List<Content> getConstraintInfoContents(ResourceInfo resourceInfo) {
+	List<Content> getResourceInfoContents(ResourceInfo resourceInfo) {
 		boolean hasText = resourceInfo.getDescription().isPresent();
 		boolean hasLink = resourceInfo.getDescriptionLink().isPresent();
 		boolean bracketLink = hasText && hasLink;

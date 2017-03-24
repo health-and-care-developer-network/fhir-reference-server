@@ -12,7 +12,7 @@ public class FhirTreeSlicingNode extends FhirTreeNode {
 			new FhirTreeNodeId("Slice (" + slicedType + ")", null, FhirIcon.SLICE),
 			new ResourceFlags(),
 			cardinality,
-			Lists.newArrayList(new LinkData(HTMLConstants.HL7_DSTU2 + "/profiling.html#slicing", "Slice")),
+			Lists.newArrayList(new SimpleLinkData(HTMLConstants.HL7_DSTU2 + "/profiling.html#slicing", "Slice")),
 			"",
 			Lists.newArrayList(),
 			path);

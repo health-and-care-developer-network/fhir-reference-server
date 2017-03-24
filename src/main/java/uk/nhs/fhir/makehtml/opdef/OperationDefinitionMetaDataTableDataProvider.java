@@ -9,6 +9,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.StringUtil;
 import uk.nhs.fhir.util.TableTitle;
@@ -49,7 +50,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 	private OperationDefinitionMetaDataRowData createOperationKindRow(String desc, OperationKindEnum operationKind) {
 		return new OperationDefinitionMetaDataRowData(
 			desc, 
-			new LinkData(operationKind.getSystem(), OperationKindEnum.VALUESET_NAME),
+			new SimpleLinkData(operationKind.getSystem(), OperationKindEnum.VALUESET_NAME),
 			StringUtil.capitaliseLowerCase(operationKind.getCode()));
 	}
 

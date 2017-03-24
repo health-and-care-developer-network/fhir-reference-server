@@ -12,10 +12,7 @@ import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
 import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.SimpleTextCell;
-import uk.nhs.fhir.makehtml.html.Table;
-import uk.nhs.fhir.makehtml.html.TableRow;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.TableTitle;
 
@@ -30,7 +27,7 @@ public class TestFormatTable {
 	
 	@Test
 	public void testWriteLinkCell() throws IOException {
-		LinkData data = new LinkData("http://testURL", "test_link_text");
+		LinkData data = new SimpleLinkData("http://testURL", "test_link_text");
 		Element linkCell = new LinkCell(data).makeCell();
 		String simpleLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\">" 
@@ -43,7 +40,7 @@ public class TestFormatTable {
 	
 	@Test
 	public void testWriteFormattedLinkCell() throws IOException {
-		LinkData data = new LinkData("http://testURL", "test_link_text");
+		LinkData data = new SimpleLinkData("http://testURL", "test_link_text");
 		Element linkCell = new LinkCell(data, Lists.newArrayList("cell-class-1", "cell-class-2"), Lists.newArrayList("link-class-1 link-class-2")).makeCell();
 		String formattedLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 cell-class-1\">" 
@@ -105,9 +102,9 @@ public class TestFormatTable {
 			new TableTitle("Use", "info1", "50px"),
 			new TableTitle("Link", "info3", "70px"));
 		Table table = new Table(columns, Sets.newHashSet("class1"));
-		table.addRow(new TableRow(new SimpleTextCell("Search engine"), new LinkCell(Lists.newArrayList(new LinkData("https://www.google.com", "Google")))));
-		table.addRow(new TableRow(new SimpleTextCell("News"), new LinkCell(new LinkData("http://news.bbc.co.uk", "BBC News"))));
-		table.addRow(new TableRow(new SimpleTextCell("Encyclopedia"), new LinkCell(new LinkData("https://www.wikipedia.org", "Wikipedia"))));
+		table.addRow(new TableRow(new SimpleTextCell("Search engine"), new LinkCell(Lists.newArrayList(new SimpleLinkData("https://www.google.com", "Google")))));
+		table.addRow(new TableRow(new SimpleTextCell("News"), new LinkCell(new SimpleLinkData("http://news.bbc.co.uk", "BBC News"))));
+		table.addRow(new TableRow(new SimpleTextCell("Encyclopedia"), new LinkCell(new SimpleLinkData("https://www.wikipedia.org", "Wikipedia"))));
 		Element tableElement = table.makeTable();
 		String tableHTML = HTMLUtil.docToString(new Document(tableElement), false, false);
 		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-table\">"

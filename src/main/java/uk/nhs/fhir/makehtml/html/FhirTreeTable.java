@@ -236,7 +236,8 @@ public class FhirTreeTable {
 		
 		// Example
 		if (node.hasExample()) {
-			resourceInfos.add(makeResourceInfoWithMaybeUrl("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
+			// never display as an actual link
+			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
 		// Default Value

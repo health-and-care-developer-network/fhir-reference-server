@@ -73,6 +73,15 @@ public class FileProcessor {
 		    }
 
 		    String renderedDoc = HTMLUtil.docToString(output, true, false);
+		    
+		    boolean writeRenderedHtmlFiles = true;
+		    if (writeRenderedHtmlFiles) {
+		    	String htmlDirPath = outPath + separatorChar + "html";
+		    	File htmlDir = new File(htmlDirPath);
+		    	htmlDir.mkdir();
+		    	String htmlOutFilename = htmlDirPath + separatorChar + thisFile.getName();
+		    	FileWriter.writeFile(htmlOutFilename, renderedDoc.getBytes("UTF-8"));
+		    }
 
 	    	try {
 		        augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), renderedDoc, newBaseURL);

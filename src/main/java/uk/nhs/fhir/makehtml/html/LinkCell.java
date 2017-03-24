@@ -1,6 +1,8 @@
 package uk.nhs.fhir.makehtml.html;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -12,6 +14,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.Elements;
 
 public class LinkCell implements TableCell {
@@ -52,12 +55,12 @@ public class LinkCell implements TableCell {
 	 * <a href="link1">Link 1</a> (<a href="link2">Link 2</a>)
 	 * <a href="link1">Link 1</a> (<a href="link2">Link 2</a> | <a href="link3">Link 3</a>)
 	 * @return
-	 */
-	private List<Content> makeNestedLinkContents(NestedLinkData data) {
-		Element outerLink = makeLinkElement(data);
+	 */	
+	private List<Content> makeNestedLinkContents(SimpleLinkData primaryLink, List<SimpleLinkData> nestedLinks) {
+		
+		Element outerLink = makeLinkElement(primaryLink);
 		
 		List<Content> children = Lists.newArrayList(outerLink);
-		List<LinkData> nestedLinks = data.getNestedLinks();
 		if (!nestedLinks.isEmpty()) {
 			children.add(new Text(" ("));
 			
@@ -81,14 +84,36 @@ public class LinkCell implements TableCell {
 	private Element makeMultiLinkCell() {
 		List<Content> cellContents = Lists.newArrayList();
 		boolean addedLink = false;
+		
+		// Combine any nested links with the same outer link
+		Map<SimpleLinkData, List<SimpleLinkData>> links = new LinkedHashMap<>();
 		for (LinkData linkData : linkDatas) {
+			SimpleLinkData key = linkData.getPrimaryLinkData();
+			
+			List<SimpleLinkData> containedLinks;
+			if (!links.containsKey(key)) {
+				containedLinks = Lists.newArrayList();
+				links.put(key, containedLinks);
+			} else {
+				containedLinks = links.get(key);
+			}
+			
+			if (linkData instanceof NestedLinkData) {
+				List<SimpleLinkData> nestedLinks = ((NestedLinkData) linkData).getNestedLinks();
+				containedLinks.addAll(nestedLinks);
+			}
+		}
+		
+		for (Map.Entry<SimpleLinkData, List<SimpleLinkData>> link : links.entrySet()) {
 			if (addedLink) {
 				cellContents.add(new Text(" | "));
 			}
-			if (linkData instanceof NestedLinkData) {
-				cellContents.addAll(makeNestedLinkContents((NestedLinkData)linkData));
+			
+			SimpleLinkData primaryLink = link.getKey();
+			if (link.getValue().isEmpty()) {
+				cellContents.add(makeLinkElement(primaryLink));
 			} else {
-				cellContents.add(makeLinkElement(linkData));
+				cellContents.addAll(makeNestedLinkContents(primaryLink, link.getValue()));
 			}
 			addedLink = true;
 		}

@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
@@ -12,7 +14,10 @@ import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
+import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
@@ -75,28 +80,75 @@ public class StructureDefinitionMetadataFormatter {
 		Optional<String> fhirVersion = Optional.ofNullable(source.getFhirVersion());
 		Optional<String> contextType = Optional.ofNullable(source.getContextType());
 		
+		List<List<Content>> identifierCells = Lists.newArrayList();
 		for (IdentifierDt identifier : source.getIdentifier()) {
+			List<Content> identifierCell = Lists.newArrayList();
+			identifierCells.add(identifierCell);
 			
+			Optional<String> use = Optional.ofNullable(identifier.getUse());
+			Optional<String> type = Optional.ofNullable(identifier.getType().getText());
+			Optional<String> system = Optional.ofNullable(identifier.getSystem());
+			Optional<String> value = Optional.ofNullable(identifier.getValue());
+			Optional<PeriodDt> period = Optional.ofNullable(identifier.getPeriod());
+			ResourceReferenceDt assigner = identifier.getAssigner();
+
+			if (false) {
+				StringUtil.printIfPresent("Use", use);
+				StringUtil.printIfPresent("Type", type);
+				StringUtil.printIfPresent("System", system);
+				StringUtil.printIfPresent("Value", value);
+				System.out.println("Period: " + StringUtil.periodToString(period.get()));
+				System.out.println(assigner.getDisplay().getValue());
+			}
+			
+			//TODO test with example data
+			throw new NotImplementedException("Identifier");
 		}
 		
-		for (Contact contact : source.getContact()) {
-			
-		}
+		List<Content> publishingOrgContacts = getPublishingOrgContactsContents();
 		
 		for (CodeableConceptDt useContext : source.getUseContext()) {
-			
+			// TODO use contexts
 		}
 		
 		for (CodingDt code : source.getCode()) {
-			
+			//TODO organisation codes
 		}
 		
-		for (Mapping mapping : source.getMapping()) {
+		List<Mapping> mappings = source.getMapping();
+		List<Content> externalSpecMappings = Lists.newArrayList();
+		boolean multipleMappings = mappings.size() >= 2;
+		if (multipleMappings) {
+			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-block-title"), "External Specifications"));
+		}
+		for (Mapping mapping : mappings) {
+			// always present
+			String identity = mapping.getIdentity();
 			
+			Optional<String> mappingUri = Optional.ofNullable(mapping.getUri());
+			Optional<String> mappingName = Optional.ofNullable(mapping.getName());
+			Optional<String> mappingComments = Optional.ofNullable(mapping.getComments());
+			
+			String displayName = mappingName.orElse(identity);
+			
+			if (!externalSpecMappings.isEmpty()) {
+				externalSpecMappings.add(Elements.newElement("br"));
+			}
+			
+			displayName += ": ";
+			
+			externalSpecMappings.add(
+				Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), displayName));
+			if (mappingUri.isPresent()) {
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-value"), mappingUri.get()));
+			}
+			if (mappingComments.isPresent()) {
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-value"), "(" + mappingComments.get() + ")"));
+			}
 		}
 		
 		for (StringDt context : source.getContext()) {
-			
+			// TODO contexts
 		}
 		
 		Element colgroup = Elements.newElement("colgroup");
@@ -143,6 +195,18 @@ public class StructureDefinitionMetadataFormatter {
 				labelledValueCell("Requirements", requirements, 1),
 				labelledValueCell("Context type", contextType, 1)));
 		
+		if (!publishingOrgContacts.isEmpty()) {
+			tableContent.add(
+				Elements.withChild("tr", 
+					cell(publishingOrgContacts, 4)));
+		}
+		
+		if (!externalSpecMappings.isEmpty()) {
+			tableContent.add(
+				Elements.withChild("tr", 
+					cell(externalSpecMappings, 4)));
+		}
+		
 		if (copyrightInfo.isPresent()) {
 			tableContent.add(
 				Elements.withChild("tr", 
@@ -160,6 +224,38 @@ public class StructureDefinitionMetadataFormatter {
 		FhirPanel panel = new FhirPanel(panelTitle, table);
 		
 		return panel.makePanel();
+	}
+
+	List<Content> getPublishingOrgContactsContents() {
+		List<Content> publishingOrgContacts = Lists.newArrayList();
+		for (Contact contact : source.getContact()) {			
+			Optional<String> individualName  = Optional.ofNullable(contact.getName());
+			List<ContactPointDt> individualTelecoms = contact.getTelecom();
+			if (!individualTelecoms.isEmpty()) {
+				if (!publishingOrgContacts.isEmpty()) {
+					publishingOrgContacts.add(Elements.newElement("br"));
+				}
+				
+				String telecomDesc = individualName.isPresent() ? individualName.get() : "General";
+				publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), telecomDesc));
+				if (individualTelecoms.size() == 1) {
+					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), ": "));
+					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-value"), individualTelecoms.get(0).getValue()));
+				} else {
+					for (ContactPointDt individualTelecom : individualTelecoms) {
+						publishingOrgContacts.add(Elements.newElement("br"));
+						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-value"), "\t" + individualTelecom.getValue()));
+					}
+				}
+			}
+		}
+		
+		if (!publishingOrgContacts.isEmpty()) {
+			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-label"), "Contacts"));
+			publishingOrgContacts.add(1, Elements.newElement("br"));
+		}
+		
+		return publishingOrgContacts;
 	}
 	
 	private Element labelledValueCell(String label, Optional<String> value, int colspan) {
@@ -182,11 +278,15 @@ public class StructureDefinitionMetadataFormatter {
 			cellSpans.add(valueSpan(value, alwaysBig));
 		}
 		
+		return cell(cellSpans, colspan);
+	}
+	
+	private Element cell(List<? extends Content> content, int colspan) {
 		return Elements.withAttributesAndChildren("td", 
 			Lists.newArrayList(
 				new Attribute("class", "fhir-metadata-cell"),
 				new Attribute("colspan", Integer.toString(colspan))),
-			cellSpans);
+			content);
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty) {
@@ -240,7 +340,7 @@ public class StructureDefinitionMetadataFormatter {
 					new CSSRule("border", "1px solid #f0f0f0"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label"),
+					Lists.newArrayList(".fhir-metadata-label", ".fhir-telecom-name"),
 					Lists.newArrayList(
 						new CSSRule("color", "#808080"),
 						new CSSRule("font-weight", "bold"),
@@ -253,15 +353,23 @@ public class StructureDefinitionMetadataFormatter {
 						new CSSRule("font-weight", "normal"))));
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value"),
+				Lists.newArrayList(".fhir-metadata-value", ".fhir-telecom-value"),
 				Lists.newArrayList(
 					new CSSRule("color", "#000000"),
 					new CSSRule("font-size", "13"))));
 		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value-smalltext"),
-				Lists.newArrayList(
-					new CSSRule("font-size", "10"))));
+				new CSSStyleBlock(
+					Lists.newArrayList(".fhir-metadata-value-smalltext"),
+					Lists.newArrayList(
+						new CSSRule("font-size", "10"))));
+		styles.add(
+				new CSSStyleBlock(
+					Lists.newArrayList(".fhir-metadata-block-title"),
+					Lists.newArrayList(
+							new CSSRule("color", "#808080"),
+							new CSSRule("font-weight", "bold"),
+							new CSSRule("text-decoration", "underline"),
+							new CSSRule("font-size", "13"))));
 		
 		return styles;
 	}

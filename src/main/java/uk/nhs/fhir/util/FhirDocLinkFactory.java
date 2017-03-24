@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
 public class FhirDocLinkFactory {
 	
@@ -23,7 +24,7 @@ public class FhirDocLinkFactory {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
 			typeURL = HTMLConstants.HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
 			
-			return new LinkData(typeURL, StringUtil.capitaliseLowerCase(dataTypeName));
+			return new SimpleLinkData(typeURL, StringUtil.capitaliseLowerCase(dataTypeName));
 		}
 	}
 
@@ -35,18 +36,18 @@ public class FhirDocLinkFactory {
 	
 	public LinkData forDataTypeName(String dataTypeName) {
 		String url = urlForDataTypeName(dataTypeName);
-		return new LinkData(url, StringUtil.capitaliseLowerCase(dataTypeName));
+		return new SimpleLinkData(url, StringUtil.capitaliseLowerCase(dataTypeName));
 	}
 
 	public LinkData withNestedLinks(String dataTypeName, List<String> nestedLinkUris) {
 		String url = urlForDataTypeName(dataTypeName);
-		LinkData outer = new LinkData(url, StringUtil.capitaliseLowerCase(dataTypeName));
+		SimpleLinkData outer = new SimpleLinkData(url, StringUtil.capitaliseLowerCase(dataTypeName));
 		
-		List<LinkData> nestedLinks = Lists.newArrayList();
+		List<SimpleLinkData> nestedLinks = Lists.newArrayList();
 		for (String nestedLinkUri : nestedLinkUris) {
 			String[] uriTokens = nestedLinkUri.split("/");
 			String linkTargetName = uriTokens[uriTokens.length - 1];
-			nestedLinks.add(new LinkData(nestedLinkUri, StringUtil.capitaliseLowerCase(linkTargetName)));
+			nestedLinks.add(new SimpleLinkData(nestedLinkUri, StringUtil.capitaliseLowerCase(linkTargetName)));
 		}
 		
 		return new NestedLinkData(outer, nestedLinks);

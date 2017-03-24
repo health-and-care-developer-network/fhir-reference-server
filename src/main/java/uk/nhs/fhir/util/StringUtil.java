@@ -3,6 +3,7 @@ package uk.nhs.fhir.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -62,5 +63,11 @@ public class StringUtil {
 		Date end = period.getEnd();
 		
 		return dateToString(start) + " - " + dateToString(end);
+	}
+
+	public static void printIfPresent(String desc, Optional<String> s) {
+		if (s.isPresent()) {
+			System.out.println(desc + ": " + s.get());
+		}
 	}
 }

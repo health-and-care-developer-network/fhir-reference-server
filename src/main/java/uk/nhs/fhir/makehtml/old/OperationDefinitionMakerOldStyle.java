@@ -16,6 +16,7 @@ import ca.uhn.fhir.model.dstu2.valueset.ResourceTypeEnum;
 import ca.uhn.fhir.model.primitive.BoundCodeDt;
 import uk.nhs.fhir.makehtml.Constants;
 import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
 public class OperationDefinitionMakerOldStyle extends HTMLMaker<OperationDefinition> {
 
@@ -66,13 +67,13 @@ public class OperationDefinitionMakerOldStyle extends HTMLMaker<OperationDefinit
 				String code = type.getValueAsString();
 				System.out.println(code);
 				if (code.equals("DomainResource")) {
-					links.add(new LinkData("https://www.hl7.org/fhir/domainresource.html", code));
+					links.add(new SimpleLinkData("https://www.hl7.org/fhir/domainresource.html", code));
 				} else if (Arrays.asList(Constants.BASERESOURCETYPES).contains(code)) {
-					links.add(new LinkData("https://www.hl7.org/fhir/datatypes.html#" + code, code));
+					links.add(new SimpleLinkData("https://www.hl7.org/fhir/datatypes.html#" + code, code));
 				} else if (Arrays.asList(Constants.RESOURCETYPES).contains(code)) {
-					links.add(new LinkData("https://www.hl7.org/fhir/" + code + ".html", code));
+					links.add(new SimpleLinkData("https://www.hl7.org/fhir/" + code + ".html", code));
 				} else {
-					links.add(new LinkData("#", code));
+					links.add(new SimpleLinkData("#", code));
 				}
 			}
 			table.dataRow(links, "Type", "Invoke at resource level for these types");
