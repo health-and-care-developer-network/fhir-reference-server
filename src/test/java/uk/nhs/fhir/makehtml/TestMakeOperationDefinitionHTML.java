@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.ConfigurationException;
@@ -25,6 +26,7 @@ import uk.nhs.fhir.util.SharedFhirContext;
 
 public class TestMakeOperationDefinitionHTML {
 	@Test
+	@Ignore
 	public void testMakeUsingHapi() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException, TransformerException {
 		IParser parser = SharedFhirContext.get().newXmlParser();
 		try (
@@ -39,6 +41,7 @@ public class TestMakeOperationDefinitionHTML {
 	}
 	
 	@Test
+	@Ignore
 	public void testCreateOperationDefinitionDoc() throws ParserConfigurationException, TransformerException, IOException {
 		OperationDefinition def = new OperationDefinition();
 		Contact contact1 = new Contact();

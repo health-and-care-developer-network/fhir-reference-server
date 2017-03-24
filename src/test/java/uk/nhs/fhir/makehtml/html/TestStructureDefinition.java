@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.ConfigurationException;
@@ -29,6 +30,7 @@ public class TestStructureDefinition {
 	private static final String testOutputPath = System.getProperty("user.home") + "/Desktop/test.html";
 	
 	@Test
+	@Ignore
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
 		IParser parser = SharedFhirContext.get().newXmlParser();
 		try (
