@@ -26,6 +26,8 @@ import uk.nhs.fhir.util.SharedFhirContext;
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
 	
+	private static final String testOutputPath = System.getProperty("user.home") + "/Desktop/test.html";
+	
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
 		IParser parser = SharedFhirContext.get().newXmlParser();
@@ -45,7 +47,7 @@ public class TestStructureDefinition {
 			HTMLDocSection section = maker.makeSectionHTML(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
 			doc.addSection(section);
-			Files.write(Paths.get("/home/jon/Desktop/test.html"), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 		}
 	}
 }

@@ -79,7 +79,7 @@ public class FileProcessor {
 		    	String htmlDirPath = outPath + separatorChar + "html";
 		    	File htmlDir = new File(htmlDirPath);
 		    	htmlDir.mkdir();
-		    	String htmlOutFilename = htmlDirPath + separatorChar + thisFile.getName();
+		    	String htmlOutFilename = htmlDirPath + separatorChar + thisFile.getName().replace(".xml", ".html");
 		    	FileWriter.writeFile(htmlOutFilename, renderedDoc.getBytes("UTF-8"));
 		    }
 
