@@ -107,12 +107,19 @@ public class StructureDefinitionMetadataFormatter {
 		
 		List<Content> publishingOrgContacts = getPublishingOrgContactsContents();
 		
+		List<String> useContexts = Lists.newArrayList();
 		for (CodeableConceptDt useContext : source.getUseContext()) {
-			// TODO use contexts
+			for (CodingDt coding : useContext.getCoding()) {
+				// think text should be enough
+			}
+			
+			String text = useContext.getText();
+			useContexts.add(text);
 		}
 		
+		List<String> indexingCodes = Lists.newArrayList();
 		for (CodingDt code : source.getCode()) {
-			//TODO organisation codes
+			indexingCodes.add(code.getCode());
 		}
 		
 		List<Mapping> mappings = source.getMapping();
@@ -147,8 +154,9 @@ public class StructureDefinitionMetadataFormatter {
 			}
 		}
 		
+		List<String> useLocationContexts = Lists.newArrayList();
 		for (StringDt context : source.getContext()) {
-			// TODO contexts
+			useLocationContexts.add(context.getValue());
 		}
 		
 		Element colgroup = Elements.newElement("colgroup");
@@ -205,6 +213,18 @@ public class StructureDefinitionMetadataFormatter {
 			tableContent.add(
 				Elements.withChild("tr", 
 					cell(externalSpecMappings, 4)));
+		}
+		
+		if (!indexingCodes.isEmpty()) {
+			throw new NotImplementedException("Code");
+		}
+		
+		if (!useContexts.isEmpty()) {
+			throw new NotImplementedException("UseContext");
+		}
+		
+		if (!useLocationContexts.isEmpty()) {
+			throw new NotImplementedException("Context");
 		}
 		
 		if (copyrightInfo.isPresent()) {

@@ -30,7 +30,6 @@ public class TestStructureDefinition {
 	private static final String testOutputPath = System.getProperty("user.home") + "/Desktop/test.html";
 	
 	@Test
-	@Ignore
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
 		IParser parser = SharedFhirContext.get().newXmlParser();
 		try (

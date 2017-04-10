@@ -22,6 +22,9 @@ import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
+	// nest all sliced nodes within a single slice node
+	private static final boolean slicingNodesShuffled = false;
+	
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
 	
@@ -50,7 +53,9 @@ public class FhirTreeTable {
 			stripRemovedElements(data.getRoot());
 		}
 		
-		addSlicingNodes(data.getRoot());
+		if (slicingNodesShuffled) {
+			addSlicingNodes(data.getRoot());
+		}
 		
 		FhirTreeNode root = data.getRoot();
 		root.getId().setFhirIcon(FhirIcon.RESOURCE);

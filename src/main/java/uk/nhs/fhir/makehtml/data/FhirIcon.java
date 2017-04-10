@@ -96,6 +96,10 @@ public enum FhirIcon {
 			}
 		}
 		
+		if (!definition.getSlicing().isEmpty()) {
+			return FhirIcon.SLICE;
+		}
+		
 		if (foundExtension) {
 			return FhirIcon.EXTENSION_COMPLEX;
 		}
