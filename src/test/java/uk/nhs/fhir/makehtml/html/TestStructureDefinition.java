@@ -32,7 +32,7 @@ public class TestStructureDefinition {
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
 		IParser parser = SharedFhirContext.get().newXmlParser();
 		try (
-			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition3.xml").getFile()));
+			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition2.xml").getFile()));
 		) {
 			reader.mark(1);
 			int read = reader.read();
