@@ -10,7 +10,6 @@ import java.nio.file.StandardOpenOption;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.ConfigurationException;

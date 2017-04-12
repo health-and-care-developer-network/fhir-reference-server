@@ -45,6 +45,8 @@ public class SlicingInfo {
 		
 		if (ordered != null) {
 			info.add("Ordering: " + ordered.toString());
+		} else {
+			info.add("Ordering: false");
 		}
 		
 		if (!Strings.isNullOrEmpty(rules)) {

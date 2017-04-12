@@ -20,6 +20,7 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
@@ -59,6 +60,8 @@ public class FhirTreeTable {
 			removeExtensionsSlicingNodes(data.getRoot());
 		}
 		
+		addSlicingIcons(data.getRoot());
+		
 		FhirTreeNode root = data.getRoot();
 		root.getId().setFhirIcon(FhirIcon.RESOURCE);
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
@@ -70,15 +73,26 @@ public class FhirTreeTable {
 		return tableRows;
 	}
 
-	private void removeExtensionsSlicingNodes(FhirTreeNode root) {
-		List<FhirTreeNode> rootChildren = root.getChildren();
+	private void addSlicingIcons(FhirTreeNode node) {
+		if (node.getSlicingInfo().isPresent()) {
+			node.getId().setFhirIcon(FhirIcon.SLICE);
+		}
+		
+		for (FhirTreeNode child : node.getChildren()) {
+			// call recursively over whole tree
+			addSlicingIcons(child);
+		}
+	}
+
+	private void removeExtensionsSlicingNodes(FhirTreeNode node) {
+		List<FhirTreeNode> children = node.getChildren();
 		
 		// if there is an extensions slicing node (immediately under root), remove it.
-		for (int i=rootChildren.size()-1; i>=0; i--) {
-			FhirTreeNode child = rootChildren.get(i);
+		for (int i=children.size()-1; i>=0; i--) {
+			FhirTreeNode child = children.get(i);
 			if (child.getPathName().equals("extension")
 			  && child.getSlicingInfo().isPresent()) {
-				rootChildren.remove(i);
+				children.remove(i);
 			} else {
 				// call recursively over whole tree
 				removeExtensionsSlicingNodes(child);
@@ -215,10 +229,13 @@ public class FhirTreeTable {
 			for (LinkData link : typeLinks) {
 				if (link instanceof NestedLinkData
 				  && link.getPrimaryLinkData().getText().equals("Extension")) {
-					try {
-						resourceInfos.add(new ResourceInfo("URL", new URL(link.getURL()), ResourceInfoType.EXTENSION_URL));
-					} catch (MalformedURLException e) {
-						throw new IllegalStateException("Failed to create URL for extension node");
+					NestedLinkData extensionLinkData = (NestedLinkData)link;
+					for (SimpleLinkData nestedLink : extensionLinkData.getNestedLinks()) {
+						try {
+							resourceInfos.add(new ResourceInfo("URL", new URL(nestedLink.getURL()), ResourceInfoType.EXTENSION_URL));
+						} catch (MalformedURLException e) {
+							throw new IllegalStateException("Failed to create URL for extension node");
+						}
 					}
 				}
 			}
