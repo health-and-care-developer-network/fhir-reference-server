@@ -8,6 +8,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
+import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -224,7 +225,11 @@ public class StructureDefinitionMetadataFormatter {
 		}
 		
 		if (!useLocationContexts.isEmpty()) {
-			throw new NotImplementedException("Context");
+			String useLocationContextsDescription = useLocationContexts.size() > 1 ? "Use context" : "Use contexts";  
+			
+			tableContent.add(
+				Elements.withChild("tr", 
+						labelledValueCell(useLocationContextsDescription, String.join(", ", useLocationContexts), 4)));
 		}
 		
 		if (copyrightInfo.isPresent()) {
