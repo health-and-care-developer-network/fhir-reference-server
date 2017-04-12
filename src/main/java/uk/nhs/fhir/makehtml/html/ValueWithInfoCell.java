@@ -118,6 +118,7 @@ public class ValueWithInfoCell implements TableCell {
 	private boolean useTidyStyle(ResourceInfoType type) {
 		switch (type) {
 		case SLICING:
+		case EXTENSION_URL:
 			return true;
 		default:
 			return false;

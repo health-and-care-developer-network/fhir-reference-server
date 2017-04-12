@@ -61,7 +61,9 @@ public class LinkCell implements TableCell {
 		Element outerLink = makeLinkElement(primaryLink);
 		
 		List<Content> children = Lists.newArrayList(outerLink);
-		if (!nestedLinks.isEmpty()) {
+		if (!nestedLinks.isEmpty()
+		  // exclude child links for Extensions (these should be displayed as URLs in the ResourceInfos instead
+		  && !primaryLink.getText().equals("Extension")) {
 			children.add(new Text(" ("));
 			
 			boolean first = true;

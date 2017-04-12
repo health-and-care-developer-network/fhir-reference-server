@@ -16,14 +16,16 @@ import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeSlicingNode;
+import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
-import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
-	// nest all sliced nodes within a single slice node
-	private static final boolean slicingNodesShuffled = false;
+	// Hide the slicing of extensions under the root node
+	private static final boolean dropExtensionSlicingNodes = true;
+	
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
@@ -53,8 +55,8 @@ public class FhirTreeTable {
 			stripRemovedElements(data.getRoot());
 		}
 		
-		if (slicingNodesShuffled) {
-			addSlicingNodes(data.getRoot());
+		if (dropExtensionSlicingNodes) {
+			removeExtensionsSlicingNodes(data.getRoot());
 		}
 		
 		FhirTreeNode root = data.getRoot();
@@ -68,69 +70,20 @@ public class FhirTreeTable {
 		return tableRows;
 	}
 
-	private void addSlicingNodes(FhirTreeNode node) {
-		List<FhirTreeNode> children = node.getChildren();
+	private void removeExtensionsSlicingNodes(FhirTreeNode root) {
+		List<FhirTreeNode> rootChildren = root.getChildren();
 		
-		// take care of any slicing within child nodes before we make any changes to the structure
-		for (FhirTreeNode child : node.getChildren()) {
-			addSlicingNodes(child);
-		}
-		
-		// identify each range of children contained within a slicing block
-		while (hasSlicing(children)) {
-			int sliceStartIndex = -1;
-			int sliceEndIndex = -1;
-			
-			// find the range of children incorporated in this slice
-			FhirTreeNode nodeWithSlicing = null;
-			for (int i=0; i<children.size(); i++) {
-				FhirTreeNode child = children.get(i);
-				if (child instanceof FhirTreeSlicingNode) {
-					// slicing already handled for the children of this node
-					continue;
-				}
-				
-				Optional<SlicingInfo> slicingInfo = child.getSlicingInfo();
-				if (slicingInfo.isPresent()) {
-					
-					nodeWithSlicing = child;
-					
-					String slicingPath = child.getPath();
-					sliceStartIndex = i;
-					
-					// seek to end of children with matching paths
-					sliceEndIndex = i;
-					while (sliceEndIndex+1 < children.size()
-					  && children.get(sliceEndIndex+1).getPath().equals(slicingPath)) {
-						sliceEndIndex++;
-					}
-					
-					break;
-				}
+		// if there is an extensions slicing node (immediately under root), remove it.
+		for (int i=rootChildren.size()-1; i>=0; i--) {
+			FhirTreeNode child = rootChildren.get(i);
+			if (child.getPathName().equals("extension")
+			  && child.getSlicingInfo().isPresent()) {
+				rootChildren.remove(i);
+			} else {
+				// call recursively over whole tree
+				removeExtensionsSlicingNodes(child);
 			}
-			
-			// create a slice node for the tree to contain the child nodes
-			FhirTreeNode slicingNode = new FhirTreeSlicingNode(nodeWithSlicing);
-			
-			// remove the child nodes from the parent node and add them to the slicing node
-			for (int i=sliceEndIndex; i>=sliceStartIndex; i--) {
-				FhirTreeNode slicedNode = children.remove(i);
-				slicingNode.addChild(0, slicedNode);
-			}
-			
-			// insert the slicing node into the place the children were
-			children.add(sliceStartIndex, slicingNode);
-			
-			// remove the slicing information from the node it was on
-			nodeWithSlicing.setSlicingInfo(null);
 		}
-	}
-
-	private boolean hasSlicing(List<FhirTreeNode> children) {
-		return children.stream()
-				.anyMatch(fhirTreeNode -> 
-					!(fhirTreeNode instanceof FhirTreeSlicingNode) 
-					  && fhirTreeNode.getSlicingInfo().isPresent());
 	}
 
 	/**
@@ -198,12 +151,13 @@ public class FhirTreeTable {
 	private void addTableRow(List<TableRow> tableRows, FhirTreeNode node, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
+		List<LinkData> typeLinks = node.getTypeLinks();
 		tableRows.add(
 			new TableRow(
 				new TreeNodeCell(treeIcons, node.getId().getFhirIcon(), node.getId().getName(), backgroundCSSClass),
 				new ResourceFlagsCell(node.getResourceFlags()),
 				new SimpleTextCell(node.getCardinality().toString()), 
-				new LinkCell(node.getTypeLinks()), 
+				new LinkCell(typeLinks), 
 				new ValueWithInfoCell(node.getInformation(), getNodeResourceInfos(node))));
 	}
 	
@@ -253,6 +207,21 @@ public class FhirTreeTable {
 		// Binding
 		if (node.hasBinding()) {
 			resourceInfos.add(new BindingResourceInfo(node.getBinding().get()));
+		}
+		
+		// Extensions
+		if (node.getPathName().equals("extension")) {
+			List<LinkData> typeLinks = node.getTypeLinks();
+			for (LinkData link : typeLinks) {
+				if (link instanceof NestedLinkData
+				  && link.getPrimaryLinkData().getText().equals("Extension")) {
+					try {
+						resourceInfos.add(new ResourceInfo("URL", new URL(link.getURL()), ResourceInfoType.EXTENSION_URL));
+					} catch (MalformedURLException e) {
+						throw new IllegalStateException("Failed to create URL for extension node");
+					}
+				}
+			}
 		}
 		
 		return resourceInfos;
