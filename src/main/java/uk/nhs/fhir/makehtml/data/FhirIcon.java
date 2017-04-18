@@ -174,38 +174,39 @@ public enum FhirIcon {
 		for (UriDt uri : profiles) {
 
 			String[] tokens = uri.getValue().split("/");
+			String[] args = NewMain.getArgs();
+			if (tokens.length>0 && args != null && args.length >0) {
+				StructureDefinition extension = null;
+				// Failed to retrieve from http request, try file access
 
-            StructureDefinition extension = null;
-            // Failed to retrieve from http request, try file access
-            String[] args = NewMain.getArgs();
-            String pathName = args[0]+"/"+tokens[tokens.length - 1]+".xml";
-            File file = new File(pathName);
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(file);
-                Reader reader = new InputStreamReader(fis);
-                IParser parser = ctx.newXmlParser();
-                extension = parser.parseResource(StructureDefinition.class,reader);
-                System.out.println(extension.getFhirVersion());
+				String pathName = args[0] + "/" + tokens[tokens.length - 1] + ".xml";
+				File file = new File(pathName);
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(file);
+					Reader reader = new InputStreamReader(fis);
+					IParser parser = ctx.newXmlParser();
+					extension = parser.parseResource(StructureDefinition.class, reader);
+					System.out.println(extension.getFhirVersion());
 
-                for (ElementDefinitionDt element : extension.getSnapshot().getElement())
-                {
-                    if (element.getPath().contains("Extension.extension.url")) {
-                        hasNonPrimitiveExtension = true;
-                        hasPrimitiveExtension = false;
-                    }
-                }
+					for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
+						if (element.getPath().contains("Extension.extension.url")) {
+							hasNonPrimitiveExtension = true;
+							hasPrimitiveExtension = false;
+						}
+					}
 
-            } catch (IOException ie) {
-                ie.printStackTrace();
-            } finally {
-                try {
-                    if (fis != null)
-                        fis.close();
-                } catch (IOException ex) {
-                   // throw new IOException();
-                }
-            }
+				} catch (IOException ie) {
+					ie.printStackTrace();
+				} finally {
+					try {
+						if (fis != null)
+							fis.close();
+					} catch (IOException ex) {
+						// throw new IOException();
+					}
+				}
+			}
 		}
 		/*
 		if (hasNonPrimitiveExtension) {
