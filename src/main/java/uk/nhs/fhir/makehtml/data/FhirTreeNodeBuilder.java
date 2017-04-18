@@ -17,7 +17,6 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
@@ -39,13 +38,6 @@ public class FhirTreeNodeBuilder {
 		
 		FhirCardinality cardinality = new FhirCardinality(elementDefinition);
 		
-		URL nameUrl;
-		try {
-			nameUrl = new URL(HTMLConstants.HL7_ROOT);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-		
 		FhirIcon icon = FhirIcon.forElementDefinition(elementDefinition);
 		
 		String shortDescription = elementDefinition.getShort();
@@ -58,7 +50,7 @@ public class FhirTreeNodeBuilder {
 		String path = elementDefinition.getPath();
 			
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId(displayName, nameUrl, icon),
+			new FhirTreeNodeId(displayName, icon),
 			flags,
 			cardinality,
 			typeLinks, 
@@ -144,7 +136,7 @@ public class FhirTreeNodeBuilder {
 		return typeLinks;
 	}
 
-	static String getDisplayName(ElementDefinitionDt elementDefinition) {
+	public static String getDisplayName(ElementDefinitionDt elementDefinition) {
 		String name = elementDefinition.getName();
 		boolean hasName = !Strings.isNullOrEmpty(name);
 		
@@ -159,7 +151,7 @@ public class FhirTreeNodeBuilder {
 		
 		String displayName;
 		
-		if (hasName && hasPath) {
+		if (hasName && hasPath && !pathName.equals(name)) {
 			displayName = pathName + " (" + name + ")";
 		} else if (hasPath) {
 			displayName = pathName;

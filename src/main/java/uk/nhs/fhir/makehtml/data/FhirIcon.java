@@ -58,7 +58,7 @@ public enum FhirIcon {
 		return "url('data:image/" + extension + ";base64," + base64 + "')";
 	}
 
-	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {		
+	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
 		List<Type> types = definition.getType();
 		
 		boolean foundExtension = false;

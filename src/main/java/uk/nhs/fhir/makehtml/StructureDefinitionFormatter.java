@@ -36,7 +36,7 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 		Element metadataPanel = metadata.getMetadataTable();
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
-		FhirTreeTable formattedTree = new FhirTreeTable(dataProvider.getTreeData());
+		FhirTreeTable formattedTree = new FhirTreeTable(dataProvider.getSnapshotTreeData());
 
 		Table fhirTable = formattedTree.asTable(false);
 		Element formattedTable = fhirTable.makeTable();
@@ -49,6 +49,9 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 		
 		section.addBodyElement(metadataPanel);
 		section.addBodyElement(panelElement);
+		
+		//section.addBodyElement(new FhirPanel(new FhirTreeTable(dataProvider.getDifferentialTreeData()).asTable(false).makeTable()).makePanel());
+		
 		return section;
 	}
 	

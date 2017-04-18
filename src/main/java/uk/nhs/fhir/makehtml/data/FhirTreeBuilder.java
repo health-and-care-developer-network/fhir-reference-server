@@ -13,12 +13,19 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
  */
 public class FhirTreeBuilder {
 
-	private final FhirTreeNodeBuilder nodeBuilder = new FhirTreeNodeBuilder();
+	protected final FhirTreeNodeBuilder nodeBuilder;
 	
 	private List<String> path = Lists.newArrayList();
 	private int removedLevel = -1;
 	private FhirTreeNode rootNode = null;
 	private FhirTreeNode currentNode = null;
+	
+	public FhirTreeBuilder() {
+		this(new FhirTreeNodeBuilder());
+	}
+	public FhirTreeBuilder(FhirTreeNodeBuilder nodeBuilder) {
+		this.nodeBuilder = nodeBuilder;
+	}
 	
 	public void addElementDefinition(ElementDefinitionDt elementDefinition) {
 		String newElementPath = elementDefinition.getPath();

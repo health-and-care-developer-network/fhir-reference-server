@@ -20,7 +20,7 @@ public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId("test", null, FhirIcon.ELEMENT),
+			new FhirTreeNodeId("test", FhirIcon.ELEMENT),
 			new ResourceFlags(),
 			new FhirCardinality("0", "1"),
 			Lists.newArrayList(new SimpleLinkData("#", "testlink")),

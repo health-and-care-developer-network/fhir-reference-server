@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -15,7 +14,6 @@ import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeSlicingNode;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
@@ -74,7 +72,7 @@ public class FhirTreeTable {
 	}
 
 	private void addSlicingIcons(FhirTreeNode node) {
-		if (node.getSlicingInfo().isPresent()) {
+		if (node.hasSlicingInfo()) {
 			node.getId().setFhirIcon(FhirIcon.SLICE);
 		}
 		
@@ -91,7 +89,7 @@ public class FhirTreeTable {
 		for (int i=children.size()-1; i>=0; i--) {
 			FhirTreeNode child = children.get(i);
 			if (child.getPathName().equals("extension")
-			  && child.getSlicingInfo().isPresent()) {
+			  && child.hasSlicingInfo()) {
 				children.remove(i);
 			} else {
 				// call recursively over whole tree
@@ -149,7 +147,7 @@ public class FhirTreeTable {
 				}
 			}
 			
-			if (childNode.hasChildren() && !(childNode instanceof FhirTreeSlicingNode)) {
+			if (childNode.hasChildren()) {
 				FhirIcon currentIcon = childNode.getId().getFhirIcon();
 				// update default icon to folder icon
 				if (currentIcon.equals(FhirIcon.DATATYPE)) {
@@ -179,7 +177,7 @@ public class FhirTreeTable {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
 		
 		// slicing
-		if (node.getSlicingInfo().isPresent()) {
+		if (node.hasSlicingInfo()) {
 			Optional<ResourceInfo> slicingResourceInfo = node.getSlicingInfo().get().toResourceInfo();
 			if (slicingResourceInfo.isPresent()) {
 				resourceInfos.add(slicingResourceInfo.get());
@@ -258,20 +256,6 @@ public class FhirTreeTable {
 
 	private boolean looksLikeUrl(String description) {
 		return description.startsWith("http://") || description.startsWith("https://");
-	}
-
-	public Set<FhirIcon> getIcons() {
-		Set<FhirIcon> icons = Sets.newHashSet();
-		addIcons(data.getRoot(), icons);
-		return icons;
-	}
-	
-	public void addIcons(FhirTreeNode node, Set<FhirIcon> icons) {
-		icons.add(node.getId().getFhirIcon());
-		
-		for (FhirTreeNode child : node.getChildren()) {
-			addIcons(child, icons);
-		}
 	}
 	
 	private boolean[] listToBoolArray(List<Boolean> bools) {

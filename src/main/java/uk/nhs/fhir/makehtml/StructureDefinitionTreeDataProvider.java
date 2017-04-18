@@ -4,7 +4,6 @@ import java.util.List;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Differential;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
 import uk.nhs.fhir.makehtml.data.FhirTreeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
@@ -17,7 +16,7 @@ public class StructureDefinitionTreeDataProvider {
 		this.source = source;
 	}
 	
-	public FhirTreeData getTreeData() {
+	public FhirTreeData getSnapshotTreeData() {
 
 		FhirTreeBuilder fhirTreeBuilder = new FhirTreeBuilder();
 		
@@ -29,12 +28,18 @@ public class StructureDefinitionTreeDataProvider {
 		
 		FhirTreeData tree = fhirTreeBuilder.getTree();
 		
-		Differential differential = source.getDifferential();
-		List<ElementDefinitionDt> differentialElements = differential.getElement();
+		return tree;
+	}
+	
+	public FhirTreeData getDifferentialTreeData() {
+		DifferentialNodeBuilder nodeBuilder = new DifferentialNodeBuilder(getSnapshotTreeData());
+		FhirTreeBuilder fhirTreeBuilder = new FhirTreeBuilder(nodeBuilder);
+		
+		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
 		for (ElementDefinitionDt differentialElement : differentialElements) {
-			// min/max are optional, and default back to the base if not present
+			fhirTreeBuilder.addElementDefinition(differentialElement);
 		}
 		
-		return tree;
+		return fhirTreeBuilder.getTree();
 	}
 }
