@@ -1,13 +1,13 @@
 package uk.nhs.fhir.makehtml;
 
-import java.util.List;
-
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Differential;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
 import uk.nhs.fhir.makehtml.data.FhirTreeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
+
+import java.util.List;
 
 public class StructureDefinitionTreeDataProvider {
 	
