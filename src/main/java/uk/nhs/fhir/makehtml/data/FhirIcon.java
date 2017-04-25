@@ -76,12 +76,12 @@ public enum FhirIcon {
 						foundExtension = true;
 
 						/*
-						Optional<FhirIcon> maybeForExtension = maybeForExtension(type, definition);
-						if (maybeForExtension.isPresent()) {
-							return maybeForExtension.get();
-						}
+						KGM 25/Apr/2017
 						*/
-                        Optional<FhirIcon> maybeForExtension = lookupExtension(type, definition);
+                        Optional<FhirIcon> lookupExtension = lookupExtension(type, definition);
+						if (lookupExtension.isPresent()) {
+							return lookupExtension.get();
+						}
                     } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 						
@@ -122,7 +122,7 @@ public enum FhirIcon {
 		
 		return FhirIcon.ELEMENT;
 	}
-	
+	/*
 	private static Optional<FhirIcon> maybeForExtension(Type type, ElementDefinitionDt definition) {
 		
 		List<UriDt> profiles = type.getProfile();
@@ -156,7 +156,7 @@ public enum FhirIcon {
 			return Optional.empty();
 		}
 	}
-
+*/
 
 
 	private static Optional<FhirIcon> lookupExtension(Type type, ElementDefinitionDt definition)  {
@@ -165,11 +165,11 @@ public enum FhirIcon {
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {
-			return Optional.empty();
+		    // Extension isn't profiled. So using base type and is simple
+			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
 		}
 
-		boolean hasPrimitiveExtension = false;
-		boolean hasNonPrimitiveExtension = false;
+		boolean hasPrimitiveExtension = true;
 
 		for (UriDt uri : profiles) {
 
@@ -191,7 +191,7 @@ public enum FhirIcon {
 
 					for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
 						if (element.getPath().contains("Extension.extension.url")) {
-							hasNonPrimitiveExtension = true;
+
 							hasPrimitiveExtension = false;
 						}
 					}
@@ -215,14 +215,15 @@ public enum FhirIcon {
             System.out.println("0 - "+definition.getPath());
         }
         */
-		if (hasNonPrimitiveExtension) {
+		if (!hasPrimitiveExtension) {
 
 			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
 		} else if (hasPrimitiveExtension) {
 			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
 		} else {
 			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
-			return Optional.empty();
+			// KGM 25/Apr/2017 believe this is defunct
+            return Optional.empty();
 		}
 	}
 
