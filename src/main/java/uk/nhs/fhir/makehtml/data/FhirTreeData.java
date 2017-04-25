@@ -1,13 +1,13 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.google.common.base.Preconditions;
 
-public class FhirTreeData implements Iterable<FhirTreeNode> {
+public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	private final FhirTreeNode root;
 	
 	public FhirTreeData(FhirTreeNode root) {
@@ -21,17 +21,24 @@ public class FhirTreeData implements Iterable<FhirTreeNode> {
 	}
 
 	@Override
-	public Iterator<FhirTreeNode> iterator() {
+	public Iterator<FhirTreeTableContent> iterator() {
 		return new FhirTreeIterator (this);
+	}
+	
+	public void dumpTreeStructure() {
+		for (FhirTreeTableContent node : this) {
+			for (int i=0; i < (node.getPath().split("\\.").length - 1); i++) {
+				System.out.write('\t');
+			}
+			System.out.println(node.getName());
+		}
 	}
 }
 
-class FhirTreeIterator implements Iterator<FhirTreeNode> {
+class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
 
 	// Each node down the tree to the current node
-	List<FhirTreeNode> chain = new ArrayList<>();
-	// Index of the current child for the node with the matching index
-	List<Integer> childIndexes = new ArrayList<>();
+	Deque<FhirNodeAndChildIndex> chain = new ArrayDeque<>();
 	
 	private final FhirTreeData data;
 	
@@ -45,14 +52,10 @@ class FhirTreeIterator implements Iterator<FhirTreeNode> {
 		if (!returnedRoot()) {
 			return true;
 		}
-		
-		if (current().hasChildren()) {
-			return true;
-		}
 
 		// true if any node in the chain to the current node has further children to offer
-		for (int i=0; i<=chain.size()-2; i++) {
-			if (nodeHasNextChild(i)) {
+		for (FhirNodeAndChildIndex node : chain) {
+			if (node.hasMoreChildren()) {
 				return true;
 			}
 		}
@@ -65,23 +68,33 @@ class FhirTreeIterator implements Iterator<FhirTreeNode> {
 	}
 
 	@Override
-	public FhirTreeNode next() {
+	public FhirTreeTableContent next() {
 		if (!returnedRoot()) {
 			return supplyRoot();
 		}
 		
-		if (current().hasChildren()) {
-			return firstChildOfCurrent();
+		while (true) {
+			if (chain.getLast().hasMoreChildren()) {
+				return nextChildOfCurrent();
+			} else if (chain.size() > 1) {
+				chain.removeLast();
+			} else {
+				throw new NoSuchElementException();
+			}
 		}
 		
-		// Iterate back from end, find first with more children to offer 
-		int parentOfCurrentIndex = chain.size()-2; 
+		/*int parentOfCurrentIndex = chain.size()-2;
 		for (int nodeIndex=parentOfCurrentIndex; nodeIndex>=0; nodeIndex--) {
+			FhirNodeAndChildIndex lastNode = chain.get(nodeIndex);
 			if (nodeHasNextChild(nodeIndex)) {
 				// update chain
 				int targetSize = nodeIndex + 1;
 				while (chain.size() > targetSize) {
-					chain.remove(maxChainIndex());
+					int currentNodeIndex = maxChainIndex();
+					chain.remove(currentNodeIndex);
+					if (childIndexes.size() > currentNodeIndex) {
+						childIndexes.remove(childIndexes.size()-1);
+					}
 				}
 				
 				// increment index entry
@@ -89,44 +102,55 @@ class FhirTreeIterator implements Iterator<FhirTreeNode> {
 				childIndexes.set(nodeIndex, nextChildIndex);
 
 				// add new node to chain and return
-				FhirTreeNode nextChildNode = chain.get(nodeIndex).getChildren().get(childIndexes.get(nodeIndex));
+				FhirTreeTableContent nextChildNode = fhirNodeAndChildIndex.getChildren().get(childIndexes.get(nodeIndex));
 				chain.add(nextChildNode);
 				return nextChildNode;
 			}
 		}
 		
-		throw new NoSuchElementException();
-	}
-	
-	private int maxChainIndex() {
-		return chain.size() - 1;
+		throw new NoSuchElementException();*/
 	}
 
-	private FhirTreeNode supplyRoot() {
-		FhirTreeNode root = data.getRoot();
-		chain.add(root);
+	private FhirTreeTableContent supplyRoot() {
+		FhirTreeTableContent root = data.getRoot();
+		chain.add(new FhirNodeAndChildIndex(root));
 		return root;
 	}
 	
-	private FhirTreeNode firstChildOfCurrent() {
-		childIndexes.add(new Integer(0));
-		FhirTreeNode child = current().getChildren().get(0);
-		chain.add(child);
+	private FhirTreeTableContent nextChildOfCurrent() {
+		FhirTreeTableContent child = chain.getLast().nextChild();
+		chain.add(new FhirNodeAndChildIndex(child));
 		return child;
 	}
+	
+	private class FhirNodeAndChildIndex {
+		private final FhirTreeTableContent node;
+		private Integer currentChildIndex;
+		
+		FhirNodeAndChildIndex(FhirTreeTableContent node) {
+			this.node = node;
+			this.currentChildIndex = null;
+		}
 
-	private FhirTreeNode current() {
-		int lastNodeIndex = chain.size()-1;
-		return chain.get(lastNodeIndex);
-	}
-	
-	private boolean nodeHasNextChild(int nodeIndex) {
-		int currentChildIndex = childIndexes.get(nodeIndex);
-		int maxChildIndex = getNodeChildCount(nodeIndex) - 1; 
-		return maxChildIndex > currentChildIndex;
-	}
-	
-	private int getNodeChildCount(int nodeIndex) {
-		return chain.get(nodeIndex).getChildren().size();
+		public boolean hasMoreChildren() {
+			if (node.getChildren().isEmpty()) {
+				return false;
+			} else if (currentChildIndex == null) {
+				return true;
+			} else {
+				int maxChildIndex = node.getChildren().size()-1;
+				return maxChildIndex > currentChildIndex;
+			}
+		}
+		
+		public FhirTreeTableContent nextChild() {
+			if (currentChildIndex == null) {
+				currentChildIndex = 0;
+			} else {
+				currentChildIndex++;
+			}
+			
+			return node.getChildren().get(currentChildIndex);
+		}
 	}
 }

@@ -65,6 +65,8 @@ public class FhirDataTypes {
 		// mysteriously missing any object representation
 		if (typeName.equals("backboneelement")) {
 			return FhirDataType.COMPLEX_ELEMENT;
+		} else if (typeName.equals("resource")) {
+			return FhirDataType.RESOURCE;
 		}
 		
 		if (nameToDefinition.containsKey(typeName)) {

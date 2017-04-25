@@ -41,7 +41,7 @@ public class TestFormatTable {
 	@Test
 	public void testWriteFormattedLinkCell() throws IOException {
 		LinkData data = new SimpleLinkData("http://testURL", "test_link_text");
-		Element linkCell = new LinkCell(data, Lists.newArrayList("cell-class-1", "cell-class-2"), Lists.newArrayList("link-class-1 link-class-2")).makeCell();
+		Element linkCell = new LinkCell(data, Sets.newHashSet("cell-class-1", "cell-class-2"), Sets.newHashSet("link-class-1 link-class-2")).makeCell();
 		String formattedLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 cell-class-1\">" 
 							+ "<a class=\"link-class-1 link-class-2 fhir-link\" href=\"http://testURL\">" 

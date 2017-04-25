@@ -36,7 +36,9 @@ public class FhirTreeNodeBuilder {
 
 		ResourceFlags flags = ResourceFlags.forDefinition(elementDefinition);
 		
-		FhirCardinality cardinality = new FhirCardinality(elementDefinition);
+		Integer min = elementDefinition.getMin();
+		String max = elementDefinition.getMax();
+		//FhirCardinality cardinality = new FhirCardinality(elementDefinition);
 		
 		FhirIcon icon = FhirIcon.forElementDefinition(elementDefinition);
 		
@@ -52,7 +54,9 @@ public class FhirTreeNodeBuilder {
 		FhirTreeNode node = new FhirTreeNode(
 			new FhirTreeNodeId(displayName, icon),
 			flags,
-			cardinality,
+			min,
+			max,
+			//cardinality,
 			typeLinks, 
 			shortDescription,
 			resourceInfos,

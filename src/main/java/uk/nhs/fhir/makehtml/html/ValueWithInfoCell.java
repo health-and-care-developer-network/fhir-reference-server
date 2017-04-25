@@ -15,7 +15,7 @@ import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
-public class ValueWithInfoCell implements TableCell {
+public class ValueWithInfoCell extends TableCell {
 
 	private final String value;
 	private final List<ResourceInfo> resourceInfos;

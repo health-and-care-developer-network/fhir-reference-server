@@ -14,8 +14,6 @@ import org.jdom2.util.IteratorIterable;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.Constants;
-
 public abstract class HTMLMakerOLD implements Constants {
 	public abstract String makeHTML(Document doc) throws ParserConfigurationException;
 	

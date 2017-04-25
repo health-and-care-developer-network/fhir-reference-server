@@ -36,21 +36,24 @@ public class StructureDefinitionFormatter extends ResourceFormatter<StructureDef
 		Element metadataPanel = metadata.getMetadataTable();
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
-		FhirTreeTable formattedTree = new FhirTreeTable(dataProvider.getSnapshotTreeData());
-
-		Table fhirTable = formattedTree.asTable(false);
-		Element formattedTable = fhirTable.makeTable();
-		Element panelElement = new FhirPanel(formattedTable).makePanel();
+		
+		FhirTreeTable snapshotTree = new FhirTreeTable(dataProvider.getSnapshotTreeData());
+		Table fhirTable = snapshotTree.asTable(false);
+		Element snapshotHtmlTable = fhirTable.makeTable();
+		
+		FhirTreeTable differentialTreeData = new FhirTreeTable(dataProvider.getDifferentialTreeData());
+		Table differentialTable = differentialTreeData.asTable(true);
+		Element differentialHtmlTable = differentialTable.makeTable();
 		
 		HTMLDocSection section = new HTMLDocSection();
 		addStyles(section);
-		getTableBackgroundStyles(formattedTable).forEach(section::addStyle);
-		formattedTree.getStyles().forEach(section::addStyle);
+		getTableBackgroundStyles(snapshotHtmlTable).forEach(section::addStyle);
+		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);
+		snapshotTree.getStyles().forEach(section::addStyle);
 		
 		section.addBodyElement(metadataPanel);
-		section.addBodyElement(panelElement);
-		
-		//section.addBodyElement(new FhirPanel(new FhirTreeTable(dataProvider.getDifferentialTreeData()).asTable(false).makeTable()).makePanel());
+		section.addBodyElement(new FhirPanel(snapshotHtmlTable).makePanel());
+		section.addBodyElement(new FhirPanel(differentialHtmlTable).makePanel());
 		
 		return section;
 	}

@@ -11,7 +11,6 @@ import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class Elements {
 
@@ -73,18 +72,17 @@ public class Elements {
         return e;
     }
     
-    public static Element addClasses(Element element, List<String> classes) {
-    	Set<String> uniqueClasses = Sets.newHashSet(classes); 
+    public static Element addClasses(Element element, Set<String> classes) {
     	
     	Attribute attribute = element.getAttribute("class");
 		if (attribute != null) {
 			String existingClasses = attribute.getValue();
 			List<String> existingClassesList = Arrays.asList(existingClasses.split(" "));
-			uniqueClasses.addAll(existingClassesList);
+			classes.addAll(existingClassesList);
 		}
     	
-    	if (!uniqueClasses.isEmpty()) {
-    		element.setAttribute("class", String.join(" ", uniqueClasses));
+    	if (!classes.isEmpty()) {
+    		element.setAttribute("class", String.join(" ", classes));
     	}
     	
     	return element;

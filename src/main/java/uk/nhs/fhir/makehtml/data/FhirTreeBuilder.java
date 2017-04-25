@@ -16,9 +16,8 @@ public class FhirTreeBuilder {
 	protected final FhirTreeNodeBuilder nodeBuilder;
 	
 	private List<String> path = Lists.newArrayList();
-	private int removedLevel = -1;
 	private FhirTreeNode rootNode = null;
-	private FhirTreeNode currentNode = null;
+	private FhirTreeTableContent currentNode = null;
 	
 	public FhirTreeBuilder() {
 		this(new FhirTreeNodeBuilder());
@@ -27,36 +26,61 @@ public class FhirTreeBuilder {
 		this.nodeBuilder = nodeBuilder;
 	}
 	
-	public void addElementDefinition(ElementDefinitionDt elementDefinition) {
+	public void addElementDefinition(ElementDefinitionDt elementDefinition, boolean allowDummyNodes) {
 		String newElementPath = elementDefinition.getPath();
 		List<String> pathElements = Lists.newArrayList(newElementPath.split("\\."));
 		String elementPathName = pathElements.remove(pathElements.size() - 1);
 		
-		stepOutTo(pathElements);
-		if (removedLevel > path.size()) {
-			//stepped out of the removed node
-			removedLevel = -1;
-		}
+		stepOutTo(pathElements, allowDummyNodes);
 		
 		FhirTreeNode newNode = nodeBuilder.fromElementDefinition(elementDefinition);
 		
+		appendNode(newNode);
+		path.add(elementPathName);
+	}
+	
+	private void appendNode(FhirTreeTableContent newNode) {
 		if (currentNode == null) {
-			rootNode = newNode;
-			currentNode = newNode;
+			if (newNode instanceof FhirTreeNode) {
+				FhirTreeNode fhirTreeNode = (FhirTreeNode)newNode;
+				rootNode = fhirTreeNode;
+				currentNode = newNode;
+			} else {
+				throw new IllegalStateException("Root cannot be a dummy node");
+			}
 		} else {
 			currentNode.addChild(newNode);
 			currentNode = newNode;
 		}
-		path.add(elementPathName);
 	}
-	
-	private void stepOutTo(List<String> targetPath) {
-		if (!pathIsSubpath(path, targetPath)) {
+	private void stepOutTo(List<String> targetPath, boolean allowDummyNodes) {
+		//System.out.println("stepping out to " + String.join(".", targetPath));
+		if (pathIsSubpath(path, targetPath)) {
+			int stepOutCount = path.size() - targetPath.size();
+			for (int i=0; i<stepOutCount; i++) {
+				stepOut();
+			}
+		} else if (allowDummyNodes) {
+			// trim path back until it only has nodes in common with the target path
+			while (!pathIsSubpath(targetPath, path)) {
+				stepOut();
+			}
+			
+			// add dummy nodes until we reach the target path
+			for (int i=path.size(); i<targetPath.size(); i++) {
+				String nextPathSegment = targetPath.get(i);
+				path.add(nextPathSegment);
+				String nextFullPath = String.join(".", path);
+				FhirTreeTableContent dummyNode = new DummyFhirTreeNode(currentNode, nextFullPath);
+				appendNode(dummyNode);
+			}
+		} else {
 			throw new IllegalArgumentException("Cannot step out from " + String.join(".", path) + " to " + String.join(".", targetPath));
 		}
-		int stepOutCount = path.size() - targetPath.size();
-		for (int i=0; i<stepOutCount; i++) {
-			stepOut();
+		
+		if (currentNode != null
+		  && currentNode.getPath().split("\\.").length != path.size()) {
+			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + String.join(", ", path));
 		}
 	}
 
@@ -66,6 +90,7 @@ public class FhirTreeBuilder {
 	}
 	
 	private static boolean pathIsSubpath(List<String> path, List<String> ancestorPath) {
+		//System.out.println("Checking path is subpath: " + String.join(".", path) + ", " + String.join(".", ancestorPath));
 		if (ancestorPath.size() > path.size()) {
 			return false;
 		}

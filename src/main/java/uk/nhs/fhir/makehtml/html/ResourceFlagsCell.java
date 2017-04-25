@@ -14,7 +14,7 @@ import uk.nhs.fhir.makehtml.data.ResourceFlag;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.util.Elements;
 
-public class ResourceFlagsCell implements TableCell {
+public class ResourceFlagsCell extends TableCell {
 
 	private final ResourceFlags resourceFlags;
 

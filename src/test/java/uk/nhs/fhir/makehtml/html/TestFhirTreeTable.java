@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.FhirCardinality;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
@@ -22,7 +21,8 @@ public class TestFhirTreeTable {
 		FhirTreeNode node = new FhirTreeNode(
 			new FhirTreeNodeId("test", FhirIcon.ELEMENT),
 			new ResourceFlags(),
-			new FhirCardinality("0", "1"),
+			0,
+			"1",
 			Lists.newArrayList(new SimpleLinkData("#", "testlink")),
 			"root info",
 			Lists.newArrayList(),

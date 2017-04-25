@@ -12,18 +12,20 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.util.Elements;
 
-public class TreeNodeCell implements TableCell {
+public class TreeNodeCell extends TableCell {
 
 	private final List<FhirTreeIcon> treeIcons;
 	private final FhirIcon fhirIcon;
 	private final String name;
 	private final String backgroundClass;
+	private final boolean strikethrough;
 	
-	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass) {
+	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough) {
 		this.name = name;
 		this.fhirIcon = fhirIcon;
 		this.treeIcons = treeIcons;
 		this.backgroundClass = backgroundClass;
+		this.strikethrough = strikethrough;
 	}
 	
 	@Override
@@ -41,7 +43,10 @@ public class TreeNodeCell implements TableCell {
 			Lists.newArrayList(
 				new Attribute("src", fhirIcon.getUrl()),
 				new Attribute("class", "fhir-tree-resource-icon"))));
-		contents.add(new Text(name));
+		contents.add(
+			strikethrough
+				? Elements.withAttributeAndText("span", new Attribute("class", "fhir-text-strikethrough"), name)
+				: new Text(name));
 		
 		return Elements.withAttributeAndChildren("td", 
 			new Attribute("class", backgroundClass + " fhir-tree-icons"), 

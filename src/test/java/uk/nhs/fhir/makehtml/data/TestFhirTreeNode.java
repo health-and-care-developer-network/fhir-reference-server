@@ -7,7 +7,8 @@ public class TestFhirTreeNode {
 		return new FhirTreeNode(
 			new FhirTreeNodeId(id, FhirIcon.ELEMENT), 
 			new ResourceFlags(), 
-			new FhirCardinality(0, "*"), 
+			0, 
+			"*", 
 			Lists.newArrayList(), 
 			"", 
 			Lists.newArrayList(), 
