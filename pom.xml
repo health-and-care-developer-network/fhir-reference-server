@@ -18,6 +18,7 @@
 			<version>2.3</version>
 			<type>jar</type>
 		</dependency>
+		<!-- Used by FHIR Validator -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu3</artifactId>
