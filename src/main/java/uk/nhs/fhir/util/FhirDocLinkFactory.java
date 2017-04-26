@@ -70,6 +70,8 @@ public class FhirDocLinkFactory {
 				// Don't try to unpack - just treat it as a 'Code' type.
 				dataTypeName = "Code";
 				return urlForSimpleDataType(dataTypeName);
+			case DOMAIN_RESOURCE:
+				return HTMLConstants.HL7_DSTU2 + "/domainresource.html";
 			default:
 				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}

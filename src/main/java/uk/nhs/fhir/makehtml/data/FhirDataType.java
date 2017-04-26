@@ -6,5 +6,6 @@ public enum FhirDataType {
 	RESOURCE,
 	PRIMITIVE,
 	EXTENSION,
-	UNKNOWN;
+	UNKNOWN,
+	DOMAIN_RESOURCE;
 }

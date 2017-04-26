@@ -33,6 +33,10 @@ public class FhirTreeTable {
 	public FhirTreeTable(FhirTreeData data) {
 		this.data = data;
 	}
+	
+	public FhirTreeData getData() {
+		return data;
+	}
 
 	public Table asTable(boolean showRemoved) {
 		return new Table(getColumns(), getRows(showRemoved), Sets.newHashSet());

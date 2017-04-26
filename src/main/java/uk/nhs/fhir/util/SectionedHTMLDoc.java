@@ -15,7 +15,7 @@ import uk.nhs.fhir.makehtml.HTMLDocSection;
 public class SectionedHTMLDoc extends HTMLDocSection {
 	
 	public void addSection(HTMLDocSection section) {
-		styles.addAll(section.getStyles());
+		styles.addStylesSection(section.getStyles());
 		headElements.addAll(section.getHeadElements());
 		bodyElements.addAll(section.getBodyElements());
 	}
@@ -25,7 +25,7 @@ public class SectionedHTMLDoc extends HTMLDocSection {
 		headElements.forEach((Content c) -> {head.add(c.clone());});
 		
 		List<String> formattedStyleBlocks = Lists.newArrayList();
-		styles.forEach((CSSStyleBlock block) -> formattedStyleBlocks.add(block.toFormattedString()));
+		styles.getBlocks().forEach((CSSStyleBlock block) -> formattedStyleBlocks.add(block.toFormattedString()));
 		
 		headElements.add(Elements.withText("style", "\n" + String.join("\n", formattedStyleBlocks) + "\n"));
 		

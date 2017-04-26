@@ -67,6 +67,8 @@ public class FhirDataTypes {
 			return FhirDataType.COMPLEX_ELEMENT;
 		} else if (typeName.equals("resource")) {
 			return FhirDataType.RESOURCE;
+		} else if (typeName.equals("domainresource")) {
+			return FhirDataType.DOMAIN_RESOURCE;
 		}
 		
 		if (nameToDefinition.containsKey(typeName)) {

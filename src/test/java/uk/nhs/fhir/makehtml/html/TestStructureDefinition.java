@@ -16,8 +16,7 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
-import uk.nhs.fhir.makehtml.HTMLDocSection;
-import uk.nhs.fhir.makehtml.StructureDefinitionFormatter;
+import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.util.HTMLUtil;
 import uk.nhs.fhir.util.SectionedHTMLDoc;
@@ -41,12 +40,13 @@ public class TestStructureDefinition {
 				reader.reset();
 			}
 			
-			StructureDefinitionFormatter maker = new StructureDefinitionFormatter();
 			StructureDefinition structureDefinition = (StructureDefinition)parser.parseResource(reader);
 			new StructureDefinitionPreparer().prepare(structureDefinition, null);
-			HTMLDocSection section = maker.makeSectionHTML(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
-			doc.addSection(section);
+			for (ResourceFormatter<StructureDefinition> formatter : ResourceFormatter.factoryForResource(structureDefinition)) {
+				doc.addSection(formatter.makeSectionHTML(structureDefinition));
+			}
+			
 			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 		}
 	}

@@ -49,7 +49,7 @@ public class StructureDefinitionTreeDataProvider {
 		}
 		
 		FhirTreeData differentialTree = fhirTreeBuilder.getTree();
-		differentialTree.dumpTreeStructure();
+		//differentialTree.dumpTreeStructure();
 		
 		FhirTreeData snapshotTreeData = getSnapshotTreeData();
 		addBackupNodes(differentialTree, snapshotTreeData);
@@ -151,7 +151,7 @@ public class StructureDefinitionTreeDataProvider {
 		List<FhirTreeNode> matchingNodes = Lists.newArrayList();
 		
 		for (FhirTreeTableContent node : new FhirTreeData(searchRoot)) {
-			System.out.println(node.getPath());
+			//System.out.println(node.getPath());
 			if (node.getPath().equals(differentialPath)) {
 				if (node instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)node;

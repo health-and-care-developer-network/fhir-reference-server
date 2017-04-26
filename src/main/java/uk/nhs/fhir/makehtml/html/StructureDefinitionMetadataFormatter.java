@@ -4,11 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -23,22 +24,24 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
-public class StructureDefinitionMetadataFormatter {
-	
-	private static final String BLANK = "";
-	
-	private final StructureDefinition source;
-	
-	public StructureDefinitionMetadataFormatter(StructureDefinition source){
-		this.source = source;
+public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter<StructureDefinition> {
+
+	@Override
+	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
+		HTMLDocSection section = new HTMLDocSection();
+		
+		Element metadataPanel = getMetadataTable(source);
+		section.addBodyElement(metadataPanel);
+		
+		return section;
 	}
 	
-	public Element getMetadataTable() {
+	public Element getMetadataTable(StructureDefinition source) {
 		
 		// These are all required and so should always be present
 		String name = source.getName();
@@ -92,21 +95,11 @@ public class StructureDefinitionMetadataFormatter {
 			Optional<String> value = Optional.ofNullable(identifier.getValue());
 			Optional<PeriodDt> period = Optional.ofNullable(identifier.getPeriod());
 			ResourceReferenceDt assigner = identifier.getAssigner();
-
-			if (false) {
-				StringUtil.printIfPresent("Use", use);
-				StringUtil.printIfPresent("Type", type);
-				StringUtil.printIfPresent("System", system);
-				StringUtil.printIfPresent("Value", value);
-				System.out.println("Period: " + StringUtil.periodToString(period.get()));
-				System.out.println(assigner.getDisplay().getValue());
-			}
 			
-			//TODO test with example data
 			throw new NotImplementedException("Identifier");
 		}
 		
-		List<Content> publishingOrgContacts = getPublishingOrgContactsContents();
+		List<Content> publishingOrgContacts = getPublishingOrgContactsContents(source);
 		
 		List<String> useContexts = Lists.newArrayList();
 		for (CodeableConceptDt useContext : source.getUseContext()) {
@@ -251,7 +244,7 @@ public class StructureDefinitionMetadataFormatter {
 		return panel.makePanel();
 	}
 
-	List<Content> getPublishingOrgContactsContents() {
+	List<Content> getPublishingOrgContactsContents(StructureDefinition source) {
 		List<Content> publishingOrgContacts = Lists.newArrayList();
 		for (Contact contact : source.getContact()) {			
 			Optional<String> individualName  = Optional.ofNullable(contact.getName());
@@ -281,121 +274,5 @@ public class StructureDefinitionMetadataFormatter {
 		}
 		
 		return publishingOrgContacts;
-	}
-	
-	private Element labelledValueCell(String label, Optional<String> value, int colspan) {
-		String displayValue = value.isPresent() ? value.get() : BLANK;
-		return labelledValueCell(label, displayValue, colspan);
-	}
-	
-	private Element labelledValueCell(String label, String value, int colspan) {
-		return labelledValueCell(label, value, colspan, false);
-	}
-		
-	private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig) {
-		Preconditions.checkNotNull(value, "value data");
-		
-		List<Element> cellSpans = Lists.newArrayList();
-		if (label.length() > 0) {
-			cellSpans.add(labelSpan(label, value.isEmpty()));
-		}
-		if (value.length() > 0) {
-			cellSpans.add(valueSpan(value, alwaysBig));
-		}
-		
-		return cell(cellSpans, colspan);
-	}
-	
-	private Element cell(List<? extends Content> content, int colspan) {
-		return Elements.withAttributesAndChildren("td", 
-			Lists.newArrayList(
-				new Attribute("class", "fhir-metadata-cell"),
-				new Attribute("colspan", Integer.toString(colspan))),
-			content);
-	}
-	
-	private Element labelSpan(String label, boolean valueIsEmpty) {
-		String cssClass = "fhir-metadata-label";
-		if (valueIsEmpty) {
-			cssClass += " fhir-metadata-label-empty";
-		}
-		
-		if (label.length() > 0) {
-			label += ": ";
-		} else {
-			// if the content is entirely empty, the title span somehow swallows the value span
-			// so use a zero-width space character.
-			label = "&#8203;";
-		}
-		
-		return Elements.withAttributeAndText("span", 
-			new Attribute("class", cssClass), 
-			label);
-	}
-	
-	private Element valueSpan(String value, boolean alwaysLargeText) {
-		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
-		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = "fhir-metadata-value";
-		if (!largeText) fhirMetadataClass += " fhir-metadata-value-smalltext";
-		
-		if (url) {
-			return Elements.withAttributeAndChild("span", 
-				new Attribute("class", fhirMetadataClass), 
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("class", "fhir-link"), 
-						new Attribute("href", value)), 
-				value));
-			
-		} else {
-			return Elements.withAttributeAndText("span", 
-				new Attribute("class", fhirMetadataClass), 
-				value);
-		}
-	}
-	
-	public static List<CSSStyleBlock> getStyles() {
-		List<CSSStyleBlock> styles = Lists.newArrayList();
-
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-cell"),
-				Lists.newArrayList(
-					new CSSRule("border", "1px solid #f0f0f0"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label", ".fhir-telecom-name"),
-					Lists.newArrayList(
-						new CSSRule("color", "#808080"),
-						new CSSRule("font-weight", "bold"),
-						new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label-empty"),
-					Lists.newArrayList(
-						new CSSRule("color", "#D0D0D0"),
-						new CSSRule("font-weight", "normal"))));
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value", ".fhir-telecom-value"),
-				Lists.newArrayList(
-					new CSSRule("color", "#000000"),
-					new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-value-smalltext"),
-					Lists.newArrayList(
-						new CSSRule("font-size", "10"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-block-title"),
-					Lists.newArrayList(
-							new CSSRule("color", "#808080"),
-							new CSSRule("font-weight", "bold"),
-							new CSSRule("text-decoration", "underline"),
-							new CSSRule("font-size", "13"))));
-		
-		return styles;
 	}
 }

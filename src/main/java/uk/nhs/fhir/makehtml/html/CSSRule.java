@@ -13,6 +13,10 @@ public class CSSRule {
 	public String getName() {
 		return name;
 	}
+
+	public String getArguments() {
+		return arguments;
+	}
 	
 	public String toFormattedString() {
 		return new StringBuilder()
@@ -20,5 +24,22 @@ public class CSSRule {
 			.append(": ")
 			.append(arguments)
 			.toString();
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode() + arguments.hashCode();
+	}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		} else if (!(o instanceof CSSRule)) {
+			return false;
+		} else {
+			CSSRule other = (CSSRule)o;
+			return name.equals(other.getName())
+			  && arguments.equals(other.getArguments());
+		}
 	}
 }
