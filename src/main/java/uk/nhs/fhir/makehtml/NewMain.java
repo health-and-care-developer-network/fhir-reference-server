@@ -43,13 +43,20 @@ public class NewMain {
     	this.outPath = outPath;
     	this.newBaseURL = newBaseURL;
     }
-    
+
+    private static String[] savedArgs;
+    public static String[] getArgs() {
+        return savedArgs;
+    }
+
     /**
      * Main entry point.
      *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        savedArgs= args;
 
     	if((args.length == 2) || (args.length == 3)) {
             String inputDir = args[0];

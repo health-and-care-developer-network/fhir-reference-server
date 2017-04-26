@@ -1,18 +1,23 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.base.Strings;
-
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.ICompositeDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
+import ca.uhn.fhir.parser.IParser;
+import com.google.common.base.Strings;
 import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.util.SharedFhirContext;
+
+import java.io.*;
+import java.util.List;
+import java.util.Optional;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -69,13 +74,15 @@ public enum FhirIcon {
 					
 					if (typeName.equals("Extension")) {
 						foundExtension = true;
-						
-						Optional<FhirIcon> maybeForExtension = maybeForExtension(type, definition);
-						if (maybeForExtension.isPresent()) {
-							return maybeForExtension.get();
+
+						/*
+						KGM 25/Apr/2017
+						*/
+                        Optional<FhirIcon> lookupExtension = lookupExtension(type, definition);
+						if (lookupExtension.isPresent()) {
+							return lookupExtension.get();
 						}
-						
-					} else {
+                    } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 						
 						if (maybeImplementingType.isPresent()) {
@@ -115,7 +122,7 @@ public enum FhirIcon {
 		
 		return FhirIcon.ELEMENT;
 	}
-	
+	/*
 	private static Optional<FhirIcon> maybeForExtension(Type type, ElementDefinitionDt definition) {
 		
 		List<UriDt> profiles = type.getProfile();
@@ -147,6 +154,76 @@ public enum FhirIcon {
 		} else {
 			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
 			return Optional.empty();
+		}
+	}
+*/
+
+
+	private static Optional<FhirIcon> lookupExtension(Type type, ElementDefinitionDt definition)  {
+
+		FhirContext ctx = SharedFhirContext.get();
+
+		List<UriDt> profiles = type.getProfile();
+		if (profiles.isEmpty()) {
+		    // Extension isn't profiled. So using base type and is simple
+			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+		}
+
+		boolean hasPrimitiveExtension = true;
+
+		for (UriDt uri : profiles) {
+
+			String[] tokens = uri.getValue().split("/");
+			String[] args = NewMain.getArgs();
+			if (tokens.length>0 && args != null && args.length >0) {
+				StructureDefinition extension = null;
+				// Failed to retrieve from http request, try file access
+
+				String pathName = args[0] + "/" + tokens[tokens.length - 1] + ".xml";
+				File file = new File(pathName);
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(file);
+					Reader reader = new InputStreamReader(fis);
+					IParser parser = ctx.newXmlParser();
+					extension = parser.parseResource(StructureDefinition.class, reader);
+					System.out.println(extension.getFhirVersion());
+
+					for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
+						if (element.getPath().contains("Extension.extension.url")) {
+
+							hasPrimitiveExtension = false;
+						}
+					}
+
+				} catch (IOException ie) {
+					ie.printStackTrace();
+				} finally {
+					try {
+						if (fis != null)
+							fis.close();
+					} catch (IOException ex) {
+						// throw new IOException();
+					}
+				}
+			}
+		}
+		/*
+		if (hasNonPrimitiveExtension) {
+            System.out.println("* - "+definition.getPath());
+        } else {
+            System.out.println("0 - "+definition.getPath());
+        }
+        */
+		if (!hasPrimitiveExtension) {
+
+			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
+		} else if (hasPrimitiveExtension) {
+			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+		} else {
+			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
+			// KGM 25/Apr/2017 believe this is defunct
+            return Optional.empty();
 		}
 	}
 

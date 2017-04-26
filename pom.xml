@@ -9,9 +9,22 @@
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-dstu2</artifactId>
-            <version>2.0</version>
+            <version>2.4</version>
             <type>jar</type>
         </dependency>
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-validation-resources-dstu2</artifactId>
+			<version>2.3</version>
+			<type>jar</type>
+		</dependency>
+		<!-- Used by FHIR Validator -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-structures-dstu3</artifactId>
+			<version>2.4</version>
+			<type>jar</type>
+		</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -51,27 +64,27 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
-	    <plugins>
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-shade-plugin</artifactId>
-	        <version>1.7.1</version>
-	        <executions>
-	          <execution>
-	            <phase>package</phase>
-	            <goals>
-	              <goal>shade</goal>
-	            </goals>
-	            <configuration>
-	              <transformers>
-	                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-	                  <mainClass>org.sonatype.haven.HavenCli</mainClass>
-	                </transformer>
-	              </transformers>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
+		<plugins>
+			  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.7.1</version>
+				<executions>
+				  <execution>
+					<phase>package</phase>
+					<goals>
+					  <goal>shade</goal>
+					</goals>
+					<configuration>
+					  <transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+						  <mainClass>uk.nhs.fhir.makehtml.NewMain</mainClass>
+						</transformer>
+					  </transformers>
+					</configuration>
+				  </execution>
+				</executions>
+			  </plugin>
 	    </plugins>
 	</build>
 </project>
