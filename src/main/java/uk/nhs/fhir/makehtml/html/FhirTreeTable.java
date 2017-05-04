@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.DummyFhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
@@ -254,7 +255,20 @@ public class FhirTreeTable {
 		
 		// Binding
 		if (childNode.hasBinding()) {
-			resourceInfos.add(new BindingResourceInfo(childNode.getBinding().get()));
+			BindingInfo childBinding = childNode.getBinding().get();
+			BindingInfo bindingToAdd = childBinding;
+			
+			// Differential binding may only contain part of the data.
+			// However, if it is present at all, it indicates a change, so should be displayed.
+			if (childNode.hasBackupNode()) {
+				FhirTreeNode backup = childNode.getBackupNode().get();
+				if (backup.hasBinding()) {
+					BindingInfo backupBinding = backup.getBinding().get();
+					bindingToAdd = BindingInfo.resolveWithBackupData(childBinding, backupBinding);
+				}
+			}
+			
+			resourceInfos.add(new BindingResourceInfo(bindingToAdd));
 		}
 		
 		// Extensions

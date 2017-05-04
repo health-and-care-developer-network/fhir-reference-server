@@ -14,10 +14,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Document;
+import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
 
 import ca.uhn.fhir.context.FhirContext;
+import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
 import uk.nhs.fhir.util.HTMLUtil;
@@ -47,21 +49,29 @@ public class FileProcessor {
 		    String outFilename = outPath + separatorChar + thisFile.getName();
 		    LOG.info("\n\n=========================================\nProcessing file: " + inFile + "\n=========================================");
 		    
-		    Document output = parseFile(thisFile);
-
-		    String renderedDoc = HTMLUtil.docToString(output, true, false);
+		    SectionedHTMLDoc output = parseFile(thisFile);
 		    
 		    boolean writeRenderedHtmlFiles = true;
 		    if (writeRenderedHtmlFiles) {
+			    Document outputDoc = output.getHTML();
+			    String renderedDoc = HTMLUtil.docToString(outputDoc, true, false);
+			    
 		    	String htmlDirPath = outPath + separatorChar + "html";
 		    	File htmlDir = new File(htmlDirPath);
 		    	htmlDir.mkdir();
+		    	
 		    	String htmlOutFilename = htmlDirPath + separatorChar + thisFile.getName().replace(".xml", ".html");
 		    	FileWriter.writeFile(htmlOutFilename, renderedDoc.getBytes("UTF-8"));
 		    }
 
 	    	try {
-		        augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), renderedDoc, newBaseURL);
+	    		Element textSection = Elements.withChildren("div", 
+    				output.createStyleSection(),
+    				Elements.withChildren("div", output.getBodyElements()));
+			    
+			    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
+			    
+		        augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), renderedTextSection, newBaseURL);
 	            FileWriter.writeFile(outFilename, augmentedResource.getBytes("UTF-8"));
 	        } catch (UnsupportedEncodingException ex) {
 	            LOG.severe("UnsupportedEncodingException getting resource into UTF-8");
@@ -69,14 +79,14 @@ public class FileProcessor {
 		}
 	}
 
-	Document parseFile(File thisFile) throws ParserConfigurationException, IOException, FileNotFoundException {
+	SectionedHTMLDoc parseFile(File thisFile) throws ParserConfigurationException, IOException, FileNotFoundException {
 		try (FileReader fr = new FileReader(thisFile)) {
 			IBaseResource resource = fhirContext.newXmlParser().parseResource(fr);
 			return processResource(resource);
 		}
 	}
 
-	private <T extends IBaseResource> Document processResource(T resource) throws ParserConfigurationException {
+	private <T extends IBaseResource> SectionedHTMLDoc processResource(T resource) throws ParserConfigurationException {
 		List<ResourceFormatter<T>> formatters = ResourceFormatter.factoryForResource(resource);
 		SectionedHTMLDoc doc = new SectionedHTMLDoc();
 		
@@ -84,6 +94,6 @@ public class FileProcessor {
 			doc.addSection(formatter.makeSectionHTML(resource));
 		}
 		
-		return doc.getHTML();
+		return doc;
 	}
 }

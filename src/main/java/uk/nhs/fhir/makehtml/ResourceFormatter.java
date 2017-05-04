@@ -29,6 +29,7 @@ public abstract class ResourceFormatter<T extends IBaseResource> {
 			return Lists.newArrayList(
 				(ResourceFormatter<T>) new OperationDefinitionFormatter());
 		} else if (resource instanceof StructureDefinition) {
+			
 			ArrayList<ResourceFormatter<T>> structureDefinitionFormatters = Lists.newArrayList(
 				(ResourceFormatter<T>) new StructureDefinitionMetadataFormatter(),
 				(ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
@@ -40,6 +41,7 @@ public abstract class ResourceFormatter<T extends IBaseResource> {
 			}
 			
 			return structureDefinitionFormatters;
+			
 		} else if (resource instanceof ValueSet) {
 			return Lists.newArrayList((ResourceFormatter<T>) new ValueSetFormatter());
 		}
