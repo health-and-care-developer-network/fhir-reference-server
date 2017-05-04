@@ -418,23 +418,30 @@ public class PlainContent extends CORSInterceptor {
         StringBuilder content = new StringBuilder();
         ValueSet valSet;
         valSet = myWebHandler.getVSByName(resourceName);
+        String textSection = valSet.getText().getDivAsString();
+        
+        
         content.append("<h2 class='resourceType'>" + valSet.getName() + " (ValueSet)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
-        content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
+        if (textSection == null) {
+        	// Only output summary fields if there is nothing in the text section as these are duplicated in there..
+	        content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
+	        content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
+	        content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
+	        content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
+	        content.append("<li id='description'>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
+	        content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
+	        content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
+	        content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
+	        content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
+        }
+        // These ones aren't in the test section, so output them in all cases
         content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getStructureFhirVersionEnum()) + "</li>");
         content.append("<li>Show Raw ValueSet: <a href='./" + resourceName + "?_format=xml'>XML</a>"
         		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
         content.append("</div>");
-        String textSection = valSet.getText().getDivAsString();
+        
         if (textSection != null) {
 	        content.append("<div class='treeView'>");
 	        content.append(textSection);

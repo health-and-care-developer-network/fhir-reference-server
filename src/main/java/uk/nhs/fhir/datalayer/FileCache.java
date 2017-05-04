@@ -177,51 +177,53 @@ public class FileCache {
                     return name.toLowerCase().endsWith(fileExtension);
                 }
             });
-            
-        for (File thisFile : fileList) {
-            if (thisFile.isFile()) {
-                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
-                
-                String name = null;
-                String actualName = null;
-                boolean extension = false;
-                String baseType = "Other";
-                String displayGroup = null;
-                boolean example = false;
-                
-                try {
-	                if (resourceType == STRUCTUREDEFINITION) {
-	                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
-	                	name = profile.getName();
-	                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-	                    baseType = profile.getConstrainedType();
-	                    actualName = getActualNameFromURL(profile.getUrl(), name);
-	                    displayGroup = baseType;
-	                } else if (resourceType == VALUESET) {
-	                	displayGroup = "Code List";
-	                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
-	                	name = profile.getName();
-	                	actualName = getActualNameFromURL(profile.getUrl(), name);
-	                	if (FHIRUtils.isValueSetSNOMED(profile)) {
-	                		displayGroup = "SNOMED CT Code List";
-	                	}
-	                } else if (resourceType == OPERATIONDEFINITION) {
-	                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
-	                	name = operation.getName();
-	                    actualName = getActualNameFromURL(operation.getUrl(), name);
-	                    displayGroup = "Operations";
-	                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-	                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
-	                	name = guide.getName();
-	                    actualName = getActualNameFromURL(guide.getUrl(), name);
-	                    displayGroup = "Implementation Guides";
+        
+        if (fileList != null) {
+	        for (File thisFile : fileList) {
+	            if (thisFile.isFile()) {
+	                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
+	                
+	                String name = null;
+	                String actualName = null;
+	                boolean extension = false;
+	                String baseType = "Other";
+	                String displayGroup = null;
+	                boolean example = false;
+	                
+	                try {
+		                if (resourceType == STRUCTUREDEFINITION) {
+		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+		                	name = profile.getName();
+		                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+		                    baseType = profile.getConstrainedType();
+		                    actualName = getActualNameFromURL(profile.getUrl(), name);
+		                    displayGroup = baseType;
+		                } else if (resourceType == VALUESET) {
+		                	displayGroup = "Code List";
+		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
+		                	name = profile.getName();
+		                	actualName = getActualNameFromURL(profile.getUrl(), name);
+		                	if (FHIRUtils.isValueSetSNOMED(profile)) {
+		                		displayGroup = "SNOMED CT Code List";
+		                	}
+		                } else if (resourceType == OPERATIONDEFINITION) {
+		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+		                	name = operation.getName();
+		                    actualName = getActualNameFromURL(operation.getUrl(), name);
+		                    displayGroup = "Operations";
+		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
+		                	name = guide.getName();
+		                    actualName = getActualNameFromURL(guide.getUrl(), name);
+		                    displayGroup = "Implementation Guides";
+		                }
+		                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
+		                										displayGroup, example, actualName));
+	                } catch (Exception ex) {
+	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
 	                }
-	                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-	                										displayGroup, example, actualName));
-                } catch (Exception ex) {
-                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
-                }
-            }
+	            }
+	        }
         }
         
         // Sort our collection into alpha order by resource name

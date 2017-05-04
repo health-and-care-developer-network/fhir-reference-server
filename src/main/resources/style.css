@@ -49,6 +49,7 @@ h2.resourceType {
     line-height: 1.2em;
 }
 
+/*
 .treeView tr {
     line-height: 0.8em;
 }
@@ -56,6 +57,7 @@ h2.resourceType {
 .renderedValueSet td {
     padding: 5px;
 }
+*/
 
 .operationTable th {
     background: #f0f0f0;
