@@ -21,8 +21,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static uk.nhs.fhir.makehtml.Constants.END_TABLE_CELL;
-import static uk.nhs.fhir.makehtml.Constants.START_TABLE_CELL;
+import static uk.nhs.fhir.makehtml.old.Constants.END_TABLE_CELL;
+import static uk.nhs.fhir.makehtml.old.Constants.START_TABLE_CELL;
 
 /**
  *

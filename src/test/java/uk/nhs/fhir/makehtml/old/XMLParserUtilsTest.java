@@ -3,26 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import com.google.common.collect.Lists;
+
+import uk.nhs.fhir.util.HTMLUtil;
 
 /**
  *
@@ -148,22 +149,17 @@ public class XMLParserUtilsTest {
                 "    </element>\n" +
                 "  </differential>\n" +
                 "</StructureDefinition>";
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            document = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+            document = HTMLUtil.parseString(xml);
+        } catch (IOException | JDOMException ex) {
             Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        NodeList snapshot = document.getElementsByTagName("snapshot");
-        Element snapshotNode = (Element) snapshot.item(0);
-        NodeList elements = snapshotNode.getElementsByTagName("element");
-        element = (Element) elements.item(0);
-        elementReference = (Element) elements.item(2);
-        elementQuantity =  (Element) elements.item(3);
+        
+        List<Element> snapshot = XMLParserUtils.descendantsList(document, "snapshot");
+        Element snapshotNode = snapshot.get(0);
+        List<Element> elements = XMLParserUtils.descendantsList(snapshotNode, "element");
+        element = elements.get(0);
+        elementReference = elements.get(2);
+        elementQuantity =  elements.get(3);
     }
     
     @After
@@ -209,9 +205,9 @@ public class XMLParserUtilsTest {
     @Test
     public void testGetElementTypeList() {
         System.out.println("getElementTypeList");
-        ArrayList<String> expResult = new ArrayList<String>();
+        List<String> expResult = Lists.newArrayList();
         expResult.add("DomainResource");
-        ArrayList<String> result = XMLParserUtils.getElementTypeList(element);
+        List<String> result = XMLParserUtils.getElementTypeList(element);
         assertEquals(expResult, result);
     }
 
