@@ -1,6 +1,7 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,7 +26,8 @@ import uk.nhs.fhir.util.SharedFhirContext;
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
 	
-	private static final String testOutputPath = System.getProperty("user.home") + "/Desktop/test.html";
+	private static final String testOutputDirectory = System.getProperty("user.home") + "/Desktop";
+	private static final String testOutputPath = testOutputDirectory + "/test.html";
 	
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
@@ -47,7 +49,16 @@ public class TestStructureDefinition {
 				doc.addSection(formatter.makeSectionHTML(structureDefinition));
 			}
 			
-			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+			createOutputDirectory();
+			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 		}
+	}
+	
+	private static void createOutputDirectory() {
+		// Create output directory (and parents) if they don't exist
+		File directory = new File(testOutputDirectory);
+	    if (! directory.exists()){
+	        directory.mkdirs();
+	    }
 	}
 }
