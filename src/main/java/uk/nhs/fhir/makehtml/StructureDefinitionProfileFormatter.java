@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jdom2.Element;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
 import uk.nhs.fhir.makehtml.html.StructureDefinitionMetadataFormatter;
@@ -17,11 +18,20 @@ public class StructureDefinitionProfileFormatter extends TreeTableFormatter<Stru
 	@Override
 	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
 
+		boolean isExtension = source.getConstrainedType().equals("Extension");
+		
 		HTMLDocSection section = new HTMLDocSection();
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
 		FhirTreeTable snapshotTree = new FhirTreeTable(dataProvider.getSnapshotTreeData());
-		Table snapshotTable = snapshotTree.asTable(false, Optional.of(dataProvider.getDifferentialTreeData()));
+		
+		/*
+		 * The differential data is used to remove children of slicing nodes which are not modified
+		 * from the base resource.
+		 */
+		FhirTreeData differentialTreeData2 = dataProvider.getDifferentialTreeData();
+		FhirTreeData differentialTreeData = isExtension ? null : differentialTreeData2;
+		Table snapshotTable = snapshotTree.asTable(false, Optional.ofNullable(differentialTreeData));
 		Element snapshotHtmlTable = snapshotTable.makeTable();
 
 		addStyles(section);

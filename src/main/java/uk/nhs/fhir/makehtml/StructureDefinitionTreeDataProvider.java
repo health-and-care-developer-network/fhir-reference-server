@@ -1,6 +1,7 @@
 package uk.nhs.fhir.makehtml;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -217,14 +218,17 @@ public class StructureDefinitionTreeDataProvider {
 					}
 				}
 			}
-		} else {
-			// most nodes
-			String fullDiscriminatorPath = element.getPath() + "." + discriminatorPath;
-			FhirTreeTableContent discriminatorDescendant = findUniqueDescendantMatchingPath(element, fullDiscriminatorPath);
-			FhirTreeTableContent pathMatchDiscriminatorDescendant = findUniqueDescendantMatchingPath(pathMatch, fullDiscriminatorPath);
-			if (discriminatorFixedValueMatchesLink(discriminatorDescendant, pathMatchDiscriminatorDescendant)) {
-				return true;
-			}
+			
+		}
+		
+		// most nodes
+		String fullDiscriminatorPath = element.getPath() + "." + discriminatorPath;
+		Optional<FhirTreeTableContent> discriminatorDescendant = findUniqueDescendantMatchingPath(element, fullDiscriminatorPath);
+		Optional<FhirTreeTableContent> pathMatchDiscriminatorDescendant = findUniqueDescendantMatchingPath(pathMatch, fullDiscriminatorPath);
+		if (discriminatorDescendant.isPresent()
+		  && pathMatchDiscriminatorDescendant.isPresent()
+		  && discriminatorFixedValueMatchesLink(discriminatorDescendant.get(), pathMatchDiscriminatorDescendant.get())) {
+			return true;
 		}
 		
 		return false;
@@ -253,7 +257,7 @@ public class StructureDefinitionTreeDataProvider {
 		return matchFixedValue.equals(fixedValue);
 	}
 
-	FhirTreeTableContent findUniqueDescendantMatchingPath(FhirTreeNode searchRoot, String fullDiscriminatorPath) {
+	Optional<FhirTreeTableContent> findUniqueDescendantMatchingPath(FhirTreeNode searchRoot, String fullDiscriminatorPath) {
 		List<FhirTreeTableContent> childNodesMatchingDiscriminatorPath = Lists.newArrayList();
 		for (FhirTreeTableContent descendantNode : new FhirTreeData(searchRoot)) {
 			if (descendantNode.getPath().equals(fullDiscriminatorPath)) {
@@ -270,13 +274,12 @@ public class StructureDefinitionTreeDataProvider {
 		if (childNodesMatchingDiscriminatorPath.size() == 1) {
 			discriminatorDescendant = childNodesMatchingDiscriminatorPath.get(0);
 		} else if (childNodesMatchingDiscriminatorPath.size() == 0) {
-			throw new IllegalStateException("No descendants matching discriminator " + fullDiscriminatorPath 
-					+ " found for element at " + searchRoot.getPath());
+			discriminatorDescendant = null;
 		} else {
 			throw new IllegalStateException("Multiple descendants matching discriminator " + fullDiscriminatorPath 
 					+ " found for element at " + searchRoot.getPath());
 		}
 		
-		return discriminatorDescendant;
+		return Optional.ofNullable(discriminatorDescendant);
 	}
 }

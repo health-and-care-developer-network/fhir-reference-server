@@ -30,17 +30,21 @@ public abstract class ResourceFormatter<T extends IBaseResource> {
 				(ResourceFormatter<T>) new OperationDefinitionFormatter());
 		} else if (resource instanceof StructureDefinition) {
 			
+			/*
 			ArrayList<ResourceFormatter<T>> structureDefinitionFormatters = Lists.newArrayList(
 				(ResourceFormatter<T>) new StructureDefinitionMetadataFormatter(),
 				(ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
+			
 
 			StructureDefinition sd = (StructureDefinition)resource;
 			if (!sd.getConstrainedType().equals("Extension")) {
 				structureDefinitionFormatters.add(
 					(ResourceFormatter<T>) new StructureDefinitionDifferentialFormatter());
 			}
+
+			return structureDefinitionFormatters;*/
 			
-			return structureDefinitionFormatters;
+			return Lists.newArrayList((ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
 			
 		} else if (resource instanceof ValueSet) {
 			return Lists.newArrayList((ResourceFormatter<T>) new ValueSetFormatter());
