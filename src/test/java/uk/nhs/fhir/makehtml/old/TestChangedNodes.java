@@ -1,50 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.old;
 
-import java.io.ByteArrayInputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-/**
- *
- * @author tim
- */
-public class NewMainTest {
-    Document document;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.nhs.fhir.util.HTMLUtil;
+
+public class TestChangedNodes {
+
+	Document document;
     Element element;
     Element elementReference;
     Element elementQuantity;
-    NodeList difflist;
-    
-    public NewMainTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    List<Element> difflist;
     
     @Before
     public void setUp() {
@@ -182,74 +162,26 @@ public class NewMainTest {
                 "    </element>\n" +
                 "  </differential>\n" +
                 "</StructureDefinition>";
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            document = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+
+            document = HTMLUtil.parseString(xml);
+        } catch (IOException | JDOMException ex) {
             Logger.getLogger(XMLParserUtilsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        difflist = document.getElementsByTagName("differential");
-        Element snapshotNode = (Element) difflist.item(0);
-        NodeList elements = snapshotNode.getElementsByTagName("element");
-        element = (Element) elements.item(0);
-        elementReference = (Element) elements.item(2);
-        elementQuantity =  (Element) elements.item(3);
+        difflist = XMLParserUtils.descendantsList(document, "snapshot");
+        Element snapshotNode = difflist.get(0);
+        List<Element> elements = XMLParserUtils.descendantsList(snapshotNode, "element");
+        element = elements.get(0);
+        elementReference = elements.get(2);
+        elementQuantity = elements.get(3);
     }
-    
-    @After
-    public void tearDown() {
-    }
-
-
-    /**
-     * Test of decorateTypeName method, of class NewMain.
-     */
-    @Test
-    public void testDecorateTypeName() {
-        System.out.println("decorateTypeName");
-        NewMain instance = new NewMain();
-        String type = "DomainResource";
-        String expResult = "<a href='https://www.hl7.org/fhir/domainresource.html'>DomainResource</a>";
-        String result = instance.decorateTypeName(type);
-        assertEquals(expResult, result);
-
-        type = "boolean";
-        expResult = "<a href='https://www.hl7.org/fhir/datatypes.html#boolean'>boolean</a>";
-        result = instance.decorateTypeName(type);
-        assertEquals(expResult, result);
-    
-        type = "failSafeValue";
-        expResult = type;
-        result = instance.decorateTypeName(type);
-        assertEquals(expResult, result);
-    
-    }
-
-    /**
-     * Test of decorateResourceName method, of class NewMain.
-     */
-    @Test
-    public void testDecorateResourceName() {
-        System.out.println("decorateResourceName");
-        String type = "Address";
-        NewMain instance = new NewMain();
-        String expResult = "<a href='https://www.hl7.org/fhir/address.html'>Address</a>";
-        String result = instance.decorateResourceName(type);
-        assertEquals(expResult, result);
-    }
-
-
+	
     /**
      * Test of GetChangedNodes method, of class NewMain.
      */
     @Test
     public void testGetChangedNodes() {
         System.out.println("GetChangedNodes");
-        NewMain instance = new NewMain();
+        HTMLMakerOLD instance = new DummyHTMLMakerOLD();
 
         ArrayList<String> result = instance.GetChangedNodes(document);
         assertEquals(2, result.size());
@@ -260,5 +192,4 @@ public class NewMainTest {
         
         assertFalse(result.contains("Should.Not.Find.Me"));
     }
-    
 }
