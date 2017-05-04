@@ -1,5 +1,7 @@
 package uk.nhs.fhir.makehtml;
 
+import java.util.Optional;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Element;
@@ -18,7 +20,7 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
 		
 		FhirTreeTable differentialTreeData = new FhirTreeTable(dataProvider.getDifferentialTreeData());
-		Table differentialTable = differentialTreeData.asTable(true);
+		Table differentialTable = differentialTreeData.asTable(true, Optional.empty());
 		Element differentialHtmlTable = differentialTable.makeTable();
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);

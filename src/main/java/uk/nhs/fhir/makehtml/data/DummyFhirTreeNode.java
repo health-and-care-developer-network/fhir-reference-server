@@ -175,4 +175,9 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public Optional<FhirTreeNode> getBackupNode() {
 		return Optional.of(backup);
 	}
+	
+	@Override
+	public String toString() {
+		return "{" + getPath() + "}";
+	}
 }

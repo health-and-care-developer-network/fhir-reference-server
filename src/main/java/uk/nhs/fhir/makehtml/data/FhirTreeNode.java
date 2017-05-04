@@ -89,9 +89,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public Optional<String> getMax() {
 		return max;
 	}
+	
 	/*
-	 * Return true if we have a backup node and it is able to supply
-	 * some missing cardinality information.
+	 * Return true if we have a backup node and we don't have any
+	 * cardinality information.
 	 */
 	public boolean useBackupCardinality() {
 		return (backupNode != null
@@ -246,5 +247,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public Optional<FhirTreeNode> getBackupNode() {
 		return Optional.of(backupNode);
+	}
+	
+	@Override
+	public String toString() {
+		return getPath();
 	}
 }

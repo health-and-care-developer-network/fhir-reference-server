@@ -6,7 +6,7 @@ import junit.framework.Assert;
 
 public class TestFhirTreeData {
 	
-	private int nodesCount(FhirTreeData data) {
+	public static int nodesCount(FhirTreeData data) {
 		int total = 0;
 		
 		for (FhirTreeTableContent node : data) {

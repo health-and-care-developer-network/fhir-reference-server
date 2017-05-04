@@ -1,5 +1,7 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.util.Set;
+
 import com.google.common.collect.Lists;
 
 public class TestFhirTreeNode {
@@ -13,5 +15,11 @@ public class TestFhirTreeNode {
 			"", 
 			Lists.newArrayList(), 
 			path);
+	}
+	
+	public static FhirTreeNode testSlicingNode(String id, String path, Set<String> discriminators) {
+		FhirTreeNode node = testNode(id, path);
+		node.setSlicingInfo(new SlicingInfo("Test desc", discriminators, Boolean.FALSE, "Test rules"));
+		return node;
 	}
 }

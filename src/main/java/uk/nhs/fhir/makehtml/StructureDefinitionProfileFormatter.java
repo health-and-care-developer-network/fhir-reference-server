@@ -1,5 +1,7 @@
 package uk.nhs.fhir.makehtml;
 
+import java.util.Optional;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Element;
@@ -19,7 +21,7 @@ public class StructureDefinitionProfileFormatter extends TreeTableFormatter<Stru
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
 		FhirTreeTable snapshotTree = new FhirTreeTable(dataProvider.getSnapshotTreeData());
-		Table snapshotTable = snapshotTree.asTable(false);
+		Table snapshotTable = snapshotTree.asTable(false, Optional.of(dataProvider.getDifferentialTreeData()));
 		Element snapshotHtmlTable = snapshotTable.makeTable();
 
 		addStyles(section);

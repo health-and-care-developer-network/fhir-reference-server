@@ -1,6 +1,7 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.jdom2.Document;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class TestFhirTreeTable {
 			Lists.newArrayList(),
 			"path.to.resource");
 		FhirTreeData data = new FhirTreeData(node);
-		Table table = new FhirTreeTable(data).asTable(false);
+		Table table = new FhirTreeTable(data).asTable(false, Optional.empty());
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);
 		System.out.println(output);

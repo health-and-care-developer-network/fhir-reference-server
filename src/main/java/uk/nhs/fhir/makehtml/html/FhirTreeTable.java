@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -21,6 +22,7 @@ import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.UnchangedSliceInfoRemover;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
@@ -38,8 +40,8 @@ public class FhirTreeTable {
 		return data;
 	}
 
-	public Table asTable(boolean showRemoved) {
-		return new Table(getColumns(), getRows(showRemoved), Sets.newHashSet());
+	public Table asTable(boolean showRemoved, Optional<FhirTreeData> differential) {
+		return new Table(getColumns(), getRows(showRemoved, differential), Sets.newHashSet());
 	}
 	
 	private List<TableTitle> getColumns() {
@@ -52,7 +54,7 @@ public class FhirTreeTable {
 		);
 	}
 	
-	private List<TableRow> getRows(boolean showRemoved) {
+	private List<TableRow> getRows(boolean showRemoved, Optional<FhirTreeData> differential) {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
 		if (!showRemoved) {
@@ -61,6 +63,11 @@ public class FhirTreeTable {
 		
 		if (dropExtensionSlicingNodes) {
 			removeExtensionsSlicingNodes(data.getRoot());
+		}
+		
+		if (differential.isPresent()) {
+			UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(differential.get());
+			remover.process(data);
 		}
 		
 		stripChildlessDummyNodes(data.getRoot());
@@ -217,7 +224,7 @@ public class FhirTreeTable {
 		FhirTreeTableContent ancestor = childNode.getParent();
 		while (ancestor != null) {
 			if (ancestor.hasSlicingInfo()) {
-				List<String> discriminatorPaths = ancestor.getSlicingInfo().get().getDiscriminatorPaths();
+				Set<String> discriminatorPaths = ancestor.getSlicingInfo().get().getDiscriminatorPaths();
 				String discriminatorPathRoot = ancestor.getPath() + ".";
 				for (String discriminatorPath : discriminatorPaths) {
 					if ((discriminatorPathRoot + discriminatorPath).equals(childNode.getPath())) {

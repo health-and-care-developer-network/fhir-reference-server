@@ -1,14 +1,15 @@
 package uk.nhs.fhir.makehtml;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
-import uk.nhs.fhir.makehtml.data.FhirTreeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
@@ -27,7 +28,7 @@ public class StructureDefinitionTreeDataProvider {
 	
 	public FhirTreeData getSnapshotTreeData() {
 
-		FhirTreeBuilder fhirTreeBuilder = new FhirTreeBuilder();
+		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder();
 		
 		Snapshot snapshot = source.getSnapshot();
 		List<ElementDefinitionDt> snapshotElements = snapshot.getElement();
@@ -41,7 +42,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData() {
-		FhirTreeBuilder fhirTreeBuilder = new FhirTreeBuilder(new FhirTreeNodeBuilder());
+		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder(new FhirTreeNodeBuilder());
 		
 		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
 		for (ElementDefinitionDt differentialElement : differentialElements) {
@@ -166,7 +167,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 
 	private FhirTreeNode matchOnDiscriminatorPaths(FhirTreeNode element, List<FhirTreeNode> pathMatches, SlicingInfo slicingInfo) {
-		List<String> discriminatorPaths = slicingInfo.getDiscriminatorPaths();
+		Set<String> discriminatorPaths = slicingInfo.getDiscriminatorPaths();
 		
 		// nodes which match on discriminator (as well as path)
 		List<FhirTreeNode> discriminatorMatches = Lists.newArrayList();

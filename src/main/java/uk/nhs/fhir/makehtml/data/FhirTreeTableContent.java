@@ -53,5 +53,4 @@ public interface FhirTreeTableContent {
 	void setBackupNode(FhirTreeNode backupNode);
 	boolean hasBackupNode();
 	Optional<FhirTreeNode> getBackupNode();
-	
 }

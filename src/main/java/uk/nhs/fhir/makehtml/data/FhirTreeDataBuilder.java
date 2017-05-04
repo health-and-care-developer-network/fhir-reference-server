@@ -11,7 +11,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
  * based primarily on their 'path' attributes.
  * @author jon
  */
-public class FhirTreeBuilder {
+public class FhirTreeDataBuilder {
 
 	protected final FhirTreeNodeBuilder nodeBuilder;
 	
@@ -19,10 +19,10 @@ public class FhirTreeBuilder {
 	private FhirTreeNode rootNode = null;
 	private FhirTreeTableContent currentNode = null;
 	
-	public FhirTreeBuilder() {
+	public FhirTreeDataBuilder() {
 		this(new FhirTreeNodeBuilder());
 	}
-	public FhirTreeBuilder(FhirTreeNodeBuilder nodeBuilder) {
+	public FhirTreeDataBuilder(FhirTreeNodeBuilder nodeBuilder) {
 		this.nodeBuilder = nodeBuilder;
 	}
 	
