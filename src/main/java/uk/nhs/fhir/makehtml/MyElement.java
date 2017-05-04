@@ -15,8 +15,9 @@
  */
 package uk.nhs.fhir.makehtml;
 
+import static uk.nhs.fhir.makehtml.old.Constants.*;
+
 import org.apache.commons.lang3.StringUtils;
-import static uk.nhs.fhir.makehtml.Constants.*;
 
 /**
  *

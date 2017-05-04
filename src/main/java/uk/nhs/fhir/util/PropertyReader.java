@@ -26,7 +26,6 @@ public class PropertyReader implements GlobalConstants {
 	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());
 	
     private static Properties defaultProperties;
-    private static String home;
 
     // When this class is loaded by the JVM, immediately read the property file
     static {

@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml.resources;
 
-public class ResourceRow implements Comparable {
+public class ResourceRow implements Comparable<ResourceRow> {
 	
 	private String name = null;
 	private String description = null;
@@ -34,8 +34,7 @@ public class ResourceRow implements Comparable {
 	}
 
 	@Override
-	public int compareTo(Object arg0) {
-		ResourceRow other = (ResourceRow)arg0;
+	public int compareTo(ResourceRow other) {
 		if (other.getName().equals(name) && other.getUrl().equals(url)) {
 			return 0;
 		} else {
