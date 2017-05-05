@@ -26,7 +26,7 @@ public class FhirTreeNodeBuilder {
 	
 	public FhirTreeNode fromElementDefinition(ElementDefinitionDt elementDefinition) {
 		
-		String displayName = getDisplayName(elementDefinition);
+		Optional<String> name = Optional.ofNullable(elementDefinition.getName());
 		
 		List<Type> snapshotElementTypes = elementDefinition.getType();
 		List<LinkData> typeLinks = Lists.newArrayList();
@@ -52,7 +52,8 @@ public class FhirTreeNodeBuilder {
 		String path = elementDefinition.getPath();
 			
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId(displayName, icon),
+			icon,
+			name,
 			flags,
 			min,
 			max,
@@ -138,34 +139,6 @@ public class FhirTreeNodeBuilder {
 		}
 		
 		return typeLinks;
-	}
-
-	public static String getDisplayName(ElementDefinitionDt elementDefinition) {
-		String name = elementDefinition.getName();
-		boolean hasName = !Strings.isNullOrEmpty(name);
-		
-		String path = elementDefinition.getPath();
-		boolean hasPath = !Strings.isNullOrEmpty(path);
-		
-		String pathName = null;
-		if (hasPath) {
-			String[] pathTokens = path.split("\\.");
-			pathName = pathTokens[pathTokens.length - 1]; 
-		}
-		
-		String displayName;
-		
-		if (hasName && hasPath && !pathName.equals(name)) {
-			displayName = pathName + " (" + name + ")";
-		} else if (hasPath) {
-			displayName = pathName;
-		} else if (hasName) {
-			displayName = name;
-		} else {
-			throw new IllegalStateException("No name or path information");
-		}
-		
-		return displayName;
 	}
 
 }
