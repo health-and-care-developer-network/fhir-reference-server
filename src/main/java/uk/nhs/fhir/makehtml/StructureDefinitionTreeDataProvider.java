@@ -73,7 +73,7 @@ public class StructureDefinitionTreeDataProvider {
 	 */
 	private FhirTreeNode findBackupNode(FhirTreeTableContent differentialNode, FhirTreeData snapshotTreeData) {
 		
-		FhirTreeNode searchRoot = snapshotTreeData.getRoot();
+		FhirTreeNode searchRoot = (FhirTreeNode) snapshotTreeData.getRoot();
 		if (hasSlicedParent(differentialNode)) {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}

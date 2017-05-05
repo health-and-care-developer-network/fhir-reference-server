@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,6 +12,7 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.makehtml.html.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
@@ -28,7 +30,7 @@ public abstract class ResourceFormatter<T extends IBaseResource> {
 				(ResourceFormatter<T>) new OperationDefinitionFormatter());
 		} else if (resource instanceof StructureDefinition) {
 			
-			/*
+			
 			ArrayList<ResourceFormatter<T>> structureDefinitionFormatters = Lists.newArrayList(
 				(ResourceFormatter<T>) new StructureDefinitionMetadataFormatter(),
 				(ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
@@ -40,9 +42,9 @@ public abstract class ResourceFormatter<T extends IBaseResource> {
 					(ResourceFormatter<T>) new StructureDefinitionDifferentialFormatter());
 			}
 
-			return structureDefinitionFormatters;*/
+			return structureDefinitionFormatters;
 			
-			return Lists.newArrayList((ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
+			//return Lists.newArrayList((ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
 			
 		} else if (resource instanceof ValueSet) {
 			return Lists.newArrayList((ResourceFormatter<T>) new ValueSetFormatter());

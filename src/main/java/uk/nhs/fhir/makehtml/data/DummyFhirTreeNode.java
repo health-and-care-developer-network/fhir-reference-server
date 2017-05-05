@@ -14,7 +14,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	private final String path;
 	
 	public DummyFhirTreeNode(FhirTreeTableContent parent, String path) {
-		Preconditions.checkNotNull(parent);
+		//Preconditions.checkNotNull(parent);
 		Preconditions.checkNotNull(path);
 		
 		this.parent = parent;
