@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,7 +11,6 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import uk.nhs.fhir.makehtml.html.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
