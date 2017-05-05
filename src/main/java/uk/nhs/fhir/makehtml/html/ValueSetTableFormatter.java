@@ -33,16 +33,80 @@ public class ValueSetTableFormatter {
 	public Element getConceptDataTable() {
 
 
-		Element colgroup = Elements.newElement("colgroup");
 		int columns = 4;
-
+        Boolean filterPresent = false;
         conceptMap = getConceptMap();
 
         if (conceptMap != null) {
             columns = 5;
         }
+        for (ValueSet.ComposeInclude include: source.getCompose().getInclude()) {
+            if (include.getFilter().size() > 0) filterPresent = true;
+        }
+
+        Element colgroup = Elements.newElement("colgroup");
 
         Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
+
+        int percentPerColumn = 100/columns;
+
+        // Display when ConceptMap present
+        if (columns == 5) {
+            percentPerColumn = 10;
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+
+        }
+        else if (!filterPresent && columns == 4)
+        {
+            // Basic list of codes
+
+            percentPerColumn = 10;
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(4 * percentPerColumn) + "%"))));
+        } else {
+            for (int i = 0; i < columns; i++) {
+                colgroup.addContent(
+                        Elements.withAttributes("col",
+                                Lists.newArrayList(
+                                        new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
+            }
+        }
+
+
+
 
         List<Element> tableContent = Lists.newArrayList(colgroup);
          /*
@@ -62,7 +126,7 @@ public class ValueSetTableFormatter {
             String displayDefinition = (definition!=null && definition.isPresent()) ? definition.get() : BLANK;
             if (first) {
                 tableContent.add(codeHeader(true));
-                tableContent.add(codeSystem(displaySystem,true, "Inline code system"));
+                tableContent.add(codeSystem(displaySystem,true, false, "Inline code system"));
             }
             tableContent.add(
                         codeContent(concept.getCode(), displayDisplay, displayDefinition, getConceptMapping(concept.getCode())));
@@ -104,7 +168,7 @@ public class ValueSetTableFormatter {
                     String displayVersion = (version != null && version.isPresent() ) ? version.get() : BLANK;
                     tableContent.add(codeHeader(false));
                     tableContent.add(
-                            codeSystem( include.getSystem() ,false, "External Code System"));
+                            codeSystem( include.getSystem() ,false, true, "External Code System"));
                     first = false;
                 }
 
@@ -129,7 +193,7 @@ public class ValueSetTableFormatter {
                     first = false;
                 }
                 if (composeFirst && include.getSystem() != null) {
-                    tableContent.add(codeSystem( include.getSystem(), false, "External Code System"));
+                    tableContent.add(codeSystem( include.getSystem(), false, true,"External Code System"));
                     composeFirst = false;
                 }
 
@@ -216,11 +280,11 @@ public class ValueSetTableFormatter {
         }
         return conceptMap;
     }
-    private Element codeSystem(String displaySystem, Boolean internal, String hint)
+    private Element codeSystem(String displaySystem, Boolean internal, Boolean reference, String hint)
     {
         if (conceptMap == null) {
             return Elements.withChildren("tr",
-                    labelledValueCell(BLANK, displaySystem, 1, true, false, false, internal, hint),
+                    labelledValueCell(BLANK, displaySystem, 1, true, false, reference, internal, hint),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true));
@@ -228,7 +292,7 @@ public class ValueSetTableFormatter {
         else
         {
             return Elements.withChildren("tr",
-                    labelledValueCell(BLANK, displaySystem, 1, true, false, false, internal, hint),
+                    labelledValueCell(BLANK, displaySystem, 1, true, false, reference, internal, hint),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
@@ -353,7 +417,7 @@ public class ValueSetTableFormatter {
                         Elements.withAttributesAndChildren("a",
                                 Lists.newArrayList(
                                         new Attribute("class", "fhir-link"),
-                                        new Attribute("href", value),
+                                        new Attribute("href", Dstu2Fix.dstu2links(value)),
                                          new Attribute("title", hint)),
                                 Lists.newArrayList(
                                         new Text(value),
@@ -370,17 +434,18 @@ public class ValueSetTableFormatter {
 
                                     Lists.newArrayList(
                                             new Attribute("class", "fhir-link"),
-                                            new Attribute("href", value),
+                                            new Attribute("href", Dstu2Fix.dstu2links(value)),
                                             new Attribute("title", hint)),
-                                    value),
-                                new Text(" (internal)")));
+                                    value)
+                        //        ,new Text(" (internal)") // Removed internal, using icon for external instead
+                        ));
             } else {
                 return Elements.withAttributeAndChild("span",
                         new Attribute("class", fhirMetadataClass),
                         Elements.withAttributesAndText("a",
                                 Lists.newArrayList(
                                         new Attribute("class", "fhir-link"),
-                                        new Attribute("href", value),
+                                        new Attribute("href", Dstu2Fix.dstu2links(value)),
                                         new Attribute("title", hint)),
                                 value));
             }

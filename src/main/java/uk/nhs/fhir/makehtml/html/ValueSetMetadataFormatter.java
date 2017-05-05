@@ -10,8 +10,9 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.util.Elements;
-import uk.nhs.fhir.util.StringUtil;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -63,25 +64,40 @@ public class ValueSetMetadataFormatter {
 		Optional<String> description = Optional.ofNullable(source.getDescription());
 		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
 		Optional<String> copyright = Optional.ofNullable(source.getCopyright());
-		//Optional<String> title = Optional.ofNullable(source.getTitle());
+
+		Optional<String> requirement = Optional.ofNullable(source.getRequirements());
 
 		String gridName = name.get();
 		if (version.isPresent()) {
 			gridName += " (v" + version.get() + ")";
 		}
-
+        DateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
 		Date date = source.getDate();
 		Optional<String> displayDate =
 				(date == null) ?
 						Optional.empty() :
-						Optional.of(StringUtil.dateToString(date));
+						Optional.of(df.format(date));
+        if (!displayDate.isPresent())
+        {
+            Date lastUpdated = source.getMeta().getLastUpdated();
+            if (lastUpdated != null)
+            displayDate = Optional.of(df.format(lastUpdated));
+        }
 
 
+        Element colgroup = Elements.newElement("colgroup");
+        int columns = 4;
+        Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
 
-		Element colgroup = Elements.newElement("colgroup");
-		int columns = 4;
+        int percentPerColumn = 100/columns;
+        for (int i=0; i<columns; i++) {
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
+        }
 
-		List<Element> tableContent = Lists.newArrayList(colgroup);
+        List<Element> tableContent = Lists.newArrayList(colgroup);
 
 		tableContent.add(
 			Elements.withChildren("tr",
@@ -100,15 +116,25 @@ public class ValueSetMetadataFormatter {
 				Elements.withChildren("tr",
 						labelledValueCell("Description", description.get(), 4, true)
 				));
-		tableContent.add(
-				Elements.withChildren("tr",
-						labelledValueCell("Publisher", publisher, 4)
-						));
-
-		tableContent.add(
-				Elements.withChildren("tr",
-						labelledValueCell("Copyright", copyright, 4)
-				));
+        // KGM 5/May/2017
+        if (requirement.isPresent()) {
+            tableContent.add(
+                    Elements.withChildren("tr",
+                            labelledValueCell("Requirements", requirement.get(), 4, true)
+                    ));
+        }
+        if (publisher.isPresent()) {
+            tableContent.add(
+                    Elements.withChildren("tr",
+                            labelledValueCell("Publisher", publisher.get(), 4)
+                    ));
+        }
+        if (copyright.isPresent()) {
+            tableContent.add(
+                    Elements.withChildren("tr",
+                            labelledValueCell("Copyright", copyright.get(), 4, true)
+                    ));
+        }
 		if (reference.isPresent()) {
 			tableContent.add(
 					Elements.withChildren("tr",
@@ -189,6 +215,8 @@ public class ValueSetMetadataFormatter {
 			new Attribute("class", cssClass), 
 			label);
 	}
+
+
 	
 	private Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
@@ -202,7 +230,7 @@ public class ValueSetMetadataFormatter {
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("class", "fhir-link"), 
-						new Attribute("href", value)), 
+						new Attribute("href", Dstu2Fix.dstu2links(value))),
 				value));
 			
 		} else {
