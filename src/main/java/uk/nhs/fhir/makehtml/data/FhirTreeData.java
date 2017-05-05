@@ -30,7 +30,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			for (int i=0; i < (node.getPath().split("\\.").length - 1); i++) {
 				System.out.write('\t');
 			}
-			System.out.println(node.getName());
+			System.out.println(node.getDisplayName());
 		}
 	}
 }

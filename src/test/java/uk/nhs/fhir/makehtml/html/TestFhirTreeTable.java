@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeNodeId;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HTMLUtil;
@@ -20,7 +19,8 @@ public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId("test", FhirIcon.ELEMENT),
+			FhirIcon.ELEMENT,
+			Optional.of("test"),
 			new ResourceFlags(),
 			0,
 			"1",
