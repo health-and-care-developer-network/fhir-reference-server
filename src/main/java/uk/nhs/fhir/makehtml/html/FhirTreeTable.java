@@ -76,7 +76,7 @@ public class FhirTreeTable {
 		addSlicingIcons(data.getRoot());
 		
 		FhirTreeNode root = data.getRoot();
-		root.getId().setFhirIcon(FhirIcon.RESOURCE);
+		root.setFhirIcon(FhirIcon.RESOURCE);
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
@@ -103,7 +103,7 @@ public class FhirTreeTable {
 		if (node.hasSlicingInfo()) {
 			if (node instanceof FhirTreeNode) {
 				FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
-				fhirTreeNode.getId().setFhirIcon(FhirIcon.SLICE);
+				fhirTreeNode.setFhirIcon(FhirIcon.SLICE);
 			} else {
 				throw new IllegalStateException("Dummy node with slicing info");
 			}
@@ -182,10 +182,10 @@ public class FhirTreeTable {
 			if (childNode.hasChildren()
 			  && childNode instanceof FhirTreeNode) {
 				FhirTreeNode fhirTreeNode = (FhirTreeNode)childNode;
-				FhirIcon currentIcon = fhirTreeNode.getId().getFhirIcon();
+				FhirIcon currentIcon = fhirTreeNode.getFhirIcon();
 				// update default icon to folder icon
 				if (currentIcon.equals(FhirIcon.DATATYPE)) {
-					fhirTreeNode.getId().setFhirIcon(FhirIcon.ELEMENT);
+					fhirTreeNode.setFhirIcon(FhirIcon.ELEMENT);
 				}
 			}
 
@@ -203,7 +203,7 @@ public class FhirTreeTable {
 		
 		tableRows.add(
 			new TableRow(
-				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getName(), backgroundCSSClass, removedByProfile),
+				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
 				new SimpleTextCell(nodeToAdd.getCardinality().toString(), nodeToAdd.useBackupCardinality(), removedByProfile), 
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile), 
