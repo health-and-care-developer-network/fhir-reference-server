@@ -3,6 +3,7 @@ package uk.nhs.fhir.makehtml.html;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -10,6 +11,7 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.LinkData;
@@ -17,29 +19,38 @@ import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.Elements;
 
-public class LinkCell implements TableCell {
+public class LinkCell extends TableCell {
 	private final List<LinkData> linkDatas;
-	private final List<String> cellClasses;
-	private final List<String> linkClasses;
+	private final Set<String> cellClasses;
+	private final Set<String> linkClasses;
 
 	public LinkCell(LinkData linkData) {
-		this(linkData, Lists.newArrayList(), Lists.newArrayList());
+		this(linkData, Sets.newHashSet(), Sets.newHashSet());
 	}
 	
 	public LinkCell(List<LinkData> linkData) {
-		this(linkData, Lists.newArrayList(), Lists.newArrayList());
+		this(linkData, false);
 	}
 	
-	public LinkCell(LinkData linkData, List<String> cellClasses, List<String> linkClasses) {
-		this(Lists.newArrayList(linkData), cellClasses, linkClasses);
+	public LinkCell(List<LinkData> typeLinks, boolean faded) {
+		this(typeLinks, faded, false);
 	}
 	
-	public LinkCell(List<LinkData> linkData, List<String> cellClasses, List<String> linkClasses) {
+	public LinkCell(LinkData linkData, Set<String> cellClasses, Set<String> linkClasses) {
+		this(Lists.newArrayList(linkData), cellClasses, linkClasses, false, false);
+	}
+
+	public LinkCell(List<LinkData> typeLinks, boolean faded, boolean strikethrough) {
+		this(typeLinks, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough);
+	}
+	
+	public LinkCell(List<LinkData> linkData, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
+		super(faded, strikethrough);
 		this.linkDatas = linkData;
 		this.cellClasses = cellClasses;
 		this.linkClasses = linkClasses;
 	}
-	
+
 	@Override
 	public Element makeCell() {
 		if (linkDatas.size() > 0) {
@@ -128,6 +139,13 @@ public class LinkCell implements TableCell {
 	}
 	
 	Element makeDataCell(List<Content> children) {
+		if (getFaded()) {
+			cellClasses.add("fhir-text-faded");
+		}
+		if (getStrikethrough()) {
+			cellClasses.add("fhir-text-strikethrough");
+		}
+		
 		return Elements.addClasses(
 			Elements.withChildren("td", children),
 			cellClasses);
@@ -154,6 +172,16 @@ public class LinkCell implements TableCell {
 					new CSSRule("text-decoration", "none"),
 					new CSSRule("color", "#005EB8"))));
 
+		styles.add(
+			new CSSStyleBlock(Lists.newArrayList(".fhir-text-faded"),
+				Lists.newArrayList(
+					new CSSRule("opacity", "0.4"))));
+		
+		styles.add(
+			new CSSStyleBlock(Lists.newArrayList(".fhir-text-strikethrough"),
+				Lists.newArrayList(
+					new CSSRule("text-decoration", "line-through"))));
+		
 		return styles;
 	}
 }

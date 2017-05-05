@@ -6,8 +6,10 @@ import org.jdom2.Content;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.html.CSSStyleSection;
+
 public class HTMLDocSection {
-	protected List<CSSStyleBlock> styles = Lists.newArrayList();
+	protected CSSStyleSection styles = new CSSStyleSection();
 	protected List<Content> headElements = Lists.newArrayList();
 	protected List<Content> bodyElements = Lists.newArrayList();
 
@@ -20,10 +22,10 @@ public class HTMLDocSection {
 	}
 	
 	public void addStyle(CSSStyleBlock style) {
-		styles.add(style);
+		styles.addBlock(style);
 	}
 	
-	public List<CSSStyleBlock> getStyles() {
+	public CSSStyleSection getStyles() {
 		return styles;
 	}
 	

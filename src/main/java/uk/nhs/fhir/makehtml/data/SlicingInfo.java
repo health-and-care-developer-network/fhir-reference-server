@@ -2,28 +2,40 @@ package uk.nhs.fhir.makehtml.data;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
-import ca.uhn.fhir.model.primitive.StringDt;
 
 public class SlicingInfo {
 
 	private final String description;
-	private final List<String> discriminatorPaths = Lists.newArrayList();
+	private final Set<String> discriminatorPaths = Sets.newHashSet();
 	private final Boolean ordered;
 	private final String rules;
 	
 	public SlicingInfo(Slicing slicing) {
-		this.description = slicing.getDescription();
-		slicing.getDiscriminator().forEach((StringDt discriminator) -> discriminatorPaths.add(discriminator.getValue()));
-		this.ordered = slicing.getOrdered();
-		this.rules = slicing.getRules();
+		this(
+			slicing.getDescription(),
+			slicing.getDiscriminator().stream()
+				.map(stringDt -> stringDt.getValue())
+				.collect(Collectors.toSet()),
+			slicing.getOrdered(),
+			slicing.getRules());
+	}
+	
+	public SlicingInfo(String description, Set<String> discriminatorPaths, Boolean ordered, String rules) {
+		this.description = description;
+		this.discriminatorPaths.addAll(discriminatorPaths);
+		this.ordered = ordered;
+		this.rules = rules;
 	}
 
-	public List<String> getDiscriminatorPaths() {
+	public Set<String> getDiscriminatorPaths() {
 		return discriminatorPaths;
 	}
 
@@ -38,7 +50,7 @@ public class SlicingInfo {
 		}
 		
 		if (discriminatorPaths.size() == 1) {
-			info.add("Discriminator: " + discriminatorPaths.get(0));
+			info.add("Discriminator: " + discriminatorPaths.iterator().next());
 		} else if (discriminatorPaths.size() > 1) {
 			info.add("Discriminators: [" + String.join(" ", discriminatorPaths) + "]");
 		}

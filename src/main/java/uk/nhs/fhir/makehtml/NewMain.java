@@ -20,10 +20,6 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.old.ImplementationGuideHTMLMakerOLD;
-import uk.nhs.fhir.makehtml.old.OperationDefinitionHTMLMakerOLD;
-import uk.nhs.fhir.makehtml.old.StructureDefinitionHTMLMakerOLD;
-import uk.nhs.fhir.makehtml.old.ValueSetHTMLMakerOLD;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
@@ -36,7 +32,7 @@ import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
-	public static final boolean STRICT = true;
+	public static final boolean STRICT = false;
 
     private final File inputDirectory;
     private final String outPath;
@@ -81,12 +77,7 @@ public class NewMain {
             		new ImplementationGuidePreparer());	
             
             FileProcessor fileProcessor =
-    	    	new FileProcessor(
-    	    		new StructureDefinitionHTMLMakerOLD(),
-    	    		new ValueSetHTMLMakerOLD(),
-    	    		new OperationDefinitionHTMLMakerOLD(),
-    	    		new ImplementationGuideHTMLMakerOLD(new File(inputDir), newBaseURL),
-    	    		resourceBuilder);
+    	    	new FileProcessor(resourceBuilder);
             
             instance.process(fileProcessor);
         }

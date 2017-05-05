@@ -1,13 +1,13 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.jdom2.Document;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.FhirCardinality;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
@@ -20,15 +20,16 @@ public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			new FhirTreeNodeId("test", null, FhirIcon.ELEMENT),
+			new FhirTreeNodeId("test", FhirIcon.ELEMENT),
 			new ResourceFlags(),
-			new FhirCardinality("0", "1"),
+			0,
+			"1",
 			Lists.newArrayList(new SimpleLinkData("#", "testlink")),
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource");
 		FhirTreeData data = new FhirTreeData(node);
-		Table table = new FhirTreeTable(data).asTable(false);
+		Table table = new FhirTreeTable(data).asTable(false, Optional.empty());
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);
 		System.out.println(output);
