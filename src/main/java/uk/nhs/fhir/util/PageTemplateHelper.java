@@ -20,11 +20,11 @@ public class PageTemplateHelper {
     private String ServerConformanceTemplate = null;
     
     public PageTemplateHelper() {
-        SDtemplate = FileLoader.loadFileOnClasspath("/template/profiles.html");
-        VStemplate = FileLoader.loadFileOnClasspath("/template/valuesets.html");
-        ODtemplate = FileLoader.loadFileOnClasspath("/template/operations.html");
-        IGtemplate = FileLoader.loadFileOnClasspath("/template/guides.html");
-        ServerConformanceTemplate = FileLoader.loadFileOnClasspath("/template/serverconformance.html");
+        SDtemplate = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("SDtemplate"));
+        VStemplate = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("VStemplate"));
+        ODtemplate = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("ODtemplate"));
+        IGtemplate = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("IGtemplate"));
+        ServerConformanceTemplate = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("ServerConformanceTemplate"));
     }
     
     public String wrapContentInTemplate(ResourceType resourceType, StringBuffer content) {

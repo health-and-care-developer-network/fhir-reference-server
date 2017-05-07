@@ -39,7 +39,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 	
 	@Override
 	public void init() throws ServletException {
-		template = FileLoader.loadFileOnClasspath("/template/index.html");
+		template = FileLoader.loadFileOnClasspath(PropertyReader.getProperty("IndexTemplate"));
         fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
         fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
         startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
