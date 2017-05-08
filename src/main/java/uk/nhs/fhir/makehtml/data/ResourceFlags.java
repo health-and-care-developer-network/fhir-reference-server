@@ -1,12 +1,11 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.List;
-import java.util.Set;
-
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import java.util.List;
+import java.util.Set;
 
 public class ResourceFlags {
 

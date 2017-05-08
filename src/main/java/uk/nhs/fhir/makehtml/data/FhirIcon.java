@@ -185,7 +185,7 @@ public enum FhirIcon {
 					Reader reader = new InputStreamReader(fis);
 					IParser parser = ctx.newXmlParser();
 					extension = parser.parseResource(StructureDefinition.class, reader);
-					System.out.println(extension.getFhirVersion());
+					// KGM 8/May/2017 System.out.println(extension.getFhirVersion());
 
 					for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
 						if (element.getPath().contains("Extension.extension.url")) {
