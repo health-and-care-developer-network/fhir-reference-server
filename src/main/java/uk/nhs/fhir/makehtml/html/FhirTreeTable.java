@@ -75,8 +75,12 @@ public class FhirTreeTable {
 		
 		addSlicingIcons(data.getRoot());
 		
-		FhirTreeNode root = data.getRoot();
-		root.setFhirIcon(FhirIcon.RESOURCE);
+		FhirTreeTableContent root = data.getRoot();
+		
+		// Dummy nodes don't store icon info. If it is a dummy node, it will inherit the correct icon anyway.
+		if (root instanceof FhirTreeData) {
+			root.setFhirIcon(FhirIcon.RESOURCE);
+		}
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
@@ -210,25 +214,25 @@ public class FhirTreeTable {
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
 	
-	private List<ResourceInfo> getNodeResourceInfos(FhirTreeTableContent childNode) {
+	private List<ResourceInfo> getNodeResourceInfos(FhirTreeTableContent node) {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
 		
 		// slicing
-		if (childNode.hasSlicingInfo()) {
-			Optional<ResourceInfo> slicingResourceInfo = childNode.getSlicingInfo().get().toResourceInfo();
+		if (node.hasSlicingInfo()) {
+			Optional<ResourceInfo> slicingResourceInfo = node.getSlicingInfo().get().toResourceInfo();
 			if (slicingResourceInfo.isPresent()) {
 				resourceInfos.add(slicingResourceInfo.get());
 			}
 		}
 		
 		// slicing discriminator
-		FhirTreeTableContent ancestor = childNode.getParent();
+		FhirTreeTableContent ancestor = node.getParent();
 		while (ancestor != null) {
 			if (ancestor.hasSlicingInfo()) {
 				Set<String> discriminatorPaths = ancestor.getSlicingInfo().get().getDiscriminatorPaths();
 				String discriminatorPathRoot = ancestor.getPath() + ".";
 				for (String discriminatorPath : discriminatorPaths) {
-					if ((discriminatorPathRoot + discriminatorPath).equals(childNode.getPath())) {
+					if ((discriminatorPathRoot + discriminatorPath).equals(node.getPath())) {
 						resourceInfos.add(new ResourceInfo("Slice discriminator", discriminatorPath, ResourceInfoType.SLICING_DISCRIMINATOR));
 					}
 				}
@@ -237,31 +241,31 @@ public class FhirTreeTable {
 		}
 		
 		// FixedValue
-		if (childNode.isFixedValue()) {
-			String description = childNode.getFixedValue().get();
+		if (node.isFixedValue()) {
+			String description = node.getFixedValue().get();
 			resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
 		}
 		
 		// Example
-		if (childNode.hasExample()) {
+		if (node.hasExample()) {
 			// never display as an actual link
-			resourceInfos.add(new ResourceInfo("Example Value", childNode.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
+			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
 		// Default Value
-		if (childNode.hasDefaultValue()) {
-			resourceInfos.add(makeResourceInfoWithMaybeUrl("Default Value", childNode.getDefaultValue().get(), ResourceInfoType.DEFAULT_VALUE));
+		if (node.hasDefaultValue()) {
+			resourceInfos.add(makeResourceInfoWithMaybeUrl("Default Value", node.getDefaultValue().get(), ResourceInfoType.DEFAULT_VALUE));
 		}
 		
 		// Binding
-		if (childNode.hasBinding()) {
-			BindingInfo childBinding = childNode.getBinding().get();
+		if (node.hasBinding()) {
+			BindingInfo childBinding = node.getBinding().get();
 			BindingInfo bindingToAdd = childBinding;
 			
 			// Differential binding may only contain part of the data.
 			// However, if it is present at all, it indicates a change, so should be displayed.
-			if (childNode.hasBackupNode()) {
-				FhirTreeNode backup = childNode.getBackupNode().get();
+			if (node.hasBackupNode()) {
+				FhirTreeNode backup = node.getBackupNode().get();
 				if (backup.hasBinding()) {
 					BindingInfo backupBinding = backup.getBinding().get();
 					bindingToAdd = BindingInfo.resolveWithBackupData(childBinding, backupBinding);
@@ -272,8 +276,8 @@ public class FhirTreeTable {
 		}
 		
 		// Extensions
-		if (childNode.getPathName().equals("extension")) {
-			List<LinkData> typeLinks = childNode.getTypeLinks();
+		if (node.getPathName().equals("extension")) {
+			List<LinkData> typeLinks = node.getTypeLinks();
 			for (LinkData link : typeLinks) {
 				if (link instanceof NestedLinkData
 				  && link.getPrimaryLinkData().getText().equals("Extension")) {

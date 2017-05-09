@@ -80,8 +80,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		boolean hasPath = !pathName.isEmpty();
 		
 		String displayName;
-		if (hasName && hasPath && !pathName.equals(name)) {
-			displayName = pathName + " (" + name + ")";
+		if (hasName && hasPath && !pathName.equals(name.get())) {
+			displayName = pathName + " (" + name.get() + ")";
 		} else if (hasPath) {
 			displayName = pathName;
 		} else if (hasName) {

@@ -8,15 +8,15 @@ import java.util.NoSuchElementException;
 import com.google.common.base.Preconditions;
 
 public class FhirTreeData implements Iterable<FhirTreeTableContent> {
-	private final FhirTreeNode root;
+	private final FhirTreeTableContent root;
 	
-	public FhirTreeData(FhirTreeNode root) {
+	public FhirTreeData(FhirTreeTableContent root) {
 		Preconditions.checkNotNull(root);
 		
 		this.root = root;
 	}
 	
-	public FhirTreeNode getRoot() {
+	public FhirTreeTableContent getRoot() {
 		return root;
 	}
 
