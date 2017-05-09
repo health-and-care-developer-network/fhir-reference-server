@@ -72,7 +72,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
         StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
 
 
-        FhirTreeNode node = dataProvider.getSnapshotTreeData().getRoot();
+        FhirTreeTableContent node = dataProvider.getSnapshotTreeData().getRoot();
 
         for (FhirTreeTableContent content : node.getChildren()) {
            // System.out.println(content.getName());

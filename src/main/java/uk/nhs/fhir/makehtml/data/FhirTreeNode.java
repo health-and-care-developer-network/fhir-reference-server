@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class FhirTreeNode implements FhirTreeTableContent {
-	private final FhirTreeNodeId id;
+	private FhirIcon icon;
+	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
 	private final Optional<String> max;
@@ -24,25 +25,26 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
-	// KGM Added Element 9/May/2017
-	private Optional<ElementDefinitionDt> element= Optional.empty();
-	
+	private Optional<ElementDefinitionDt> element = Optional.empty();
+
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
-	
+
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
 
 	public FhirTreeNode(
-			FhirTreeNodeId id,
+			FhirIcon icon,
+			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
 			String max,
-			//FhirCardinality cardinality, 
-			List<LinkData> typeLinks, 
+			//FhirCardinality cardinality,
+			List<LinkData> typeLinks,
 			String information,
 			List<ResourceInfo> constraints,
 			String path) {
-		this.id = id;
+		this.icon = icon;
+		this.name = name;
 		this.resourceFlags = flags;
 		this.min = Optional.ofNullable(min);
 		this.max = Optional.ofNullable(max);
@@ -52,9 +54,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.constraints = constraints;
 		this.path = path;
 	}
-	// KGM Added Element 9/May/2017
+
 	public FhirTreeNode(
-			FhirTreeNodeId id,
+			FhirIcon icon,
+			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
 			String max,
@@ -64,7 +67,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			List<ResourceInfo> constraints,
 			String path,
 			ElementDefinitionDt element ) {
-		this.id = id;
+		this.icon = icon;
+		this.name = name;
 		this.resourceFlags = flags;
 		this.min = Optional.ofNullable(min);
 		this.max = Optional.ofNullable(max);
@@ -75,31 +79,50 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.path = path;
 		this.element = Optional.ofNullable(element);
 	}
-	
-	public FhirTreeNodeId getId() {
-		return id;
-	}
 
 	@Override
 	public FhirIcon getFhirIcon() {
 		// If using default and we have a backup, use the backup icon
-		if (id.getFhirIcon().equals(FhirIcon.ELEMENT)
-		  && hasBackupNode()) {
+		if (icon.equals(FhirIcon.ELEMENT)
+				&& hasBackupNode()) {
 			return backupNode.getFhirIcon();
 		}
-		
-		return id.getFhirIcon();
+
+		return icon;
 	}
 
 	@Override
-	public String getName() {
-		return id.getName();
+	public void setFhirIcon(FhirIcon icon) {
+		this.icon = icon;
 	}
-	
+
+	public Optional<String> getName() {
+		return name;
+	}
+
+	public String getDisplayName() {
+		boolean hasName = name.isPresent() && !name.get().isEmpty();
+		String pathName = getPathName();
+		boolean hasPath = !pathName.isEmpty();
+
+		String displayName;
+		if (hasName && hasPath && !pathName.equals(name.get())) {
+			displayName = pathName + " (" + name.get() + ")";
+		} else if (hasPath) {
+			displayName = pathName;
+		} else if (hasName) {
+			displayName = name.get();
+		} else {
+			throw new IllegalStateException("No name or path information");
+		}
+
+		return displayName;
+	}
+
 	public boolean hasSlicingInfo() {
 		return slicingInfo.isPresent();
 	}
-	
+
 	public Optional<SlicingInfo> getSlicingInfo() {
 		return slicingInfo;
 	}
@@ -114,14 +137,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public Optional<String> getMax() {
 		return max;
 	}
-	
+
 	/*
 	 * Return true if we have a backup node and we don't have any
 	 * cardinality information.
 	 */
 	public boolean useBackupCardinality() {
 		return (backupNode != null
-		  && (!min.isPresent() && !max.isPresent()));
+				&& (!min.isPresent() && !max.isPresent()));
 	}
 	public FhirCardinality getCardinality() {
 		if (min.isPresent() && max.isPresent()) {
@@ -129,41 +152,41 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		} else {
 			Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
 			String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
-			
+
 			return new FhirCardinality(resolvedMin, resolvedMax);
 		}
 	}
-	
+
 	public ResourceFlags getResourceFlags() {
 		return resourceFlags;
 	}
-	
+
 	public List<LinkData> getTypeLinks() {
 		if (useBackupTypeLinks()) {
 			return backupNode.getTypeLinks();
 		}
-		
+
 		if (typeLinks.isEmpty()
-		  && FhirTypeByPath.recognisedPath(getPath())) {
-			
+				&& FhirTypeByPath.recognisedPath(getPath())) {
+
 			LinkData linkForPath = FhirTypeByPath.forPath(getPath());
 			typeLinks.add(linkForPath);
 		}
-		
-		if (NewMain.STRICT 
-		  && typeLinks.isEmpty()) {
+
+		if (NewMain.STRICT
+				&& typeLinks.isEmpty()) {
 			throw new IllegalStateException("Couldn't find any typelinks for " + getPath());
 		}
 
 		return typeLinks;
 	}
-	
+
 	public boolean useBackupTypeLinks() {
-		return (typeLinks.isEmpty() 
-		  && backupNode != null 
-		  && !backupNode.getTypeLinks().isEmpty());
+		return (typeLinks.isEmpty()
+				&& backupNode != null
+				&& !backupNode.getTypeLinks().isEmpty());
 	}
-	
+
 	public String getInformation() {
 		return information;
 	}
@@ -172,40 +195,40 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		children.add(index, child);
 		child.setParent(this);
 	}
-	
+
 	public void addChild(FhirTreeTableContent child) {
 		children.add(child);
 		child.setParent(this);
 	}
-	
+
 	public FhirTreeTableContent getParent() {
 		return parent;
 	}
-	
+
 	public void setParent(FhirTreeTableContent fhirTreeNode) {
 		this.parent = fhirTreeNode;
 	}
-	
+
 	public List<? extends FhirTreeTableContent> getChildren() {
 		return children;
 	}
-	
+
 	public boolean hasChildren() {
 		return children.size() > 0;
 	}
-	
+
 	public boolean isRemovedByProfile() {
 		return max.equals(Optional.of("0"));
 	}
-	
+
 	public List<ResourceInfo> getConstraints() {
 		return constraints;
 	}
-	
+
 	public String getPath() {
 		return path;
 	}
-	
+
 	public String getPathName() {
 		String[] pathTokens = path.split("\\.");
 		return pathTokens[pathTokens.length - 1];
@@ -214,7 +237,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public boolean isFixedValue() {
 		return fixedValue.isPresent();
 	}
-	
+
 	public Optional<String> getFixedValue() {
 		return fixedValue;
 	}
@@ -226,7 +249,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public boolean hasExample() {
 		return example.isPresent();
 	}
-	
+
 	public Optional<String> getExample() {
 		return example;
 	}
@@ -250,27 +273,18 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public boolean hasBinding() {
 		return binding.isPresent();
 	}
-	
+
 	public Optional<BindingInfo> getBinding() {
 		return binding;
 	}
-	
+
 	public void setBinding(BindingInfo binding) {
 		this.binding = Optional.of(binding);
 	}
-	
+
 	public void setBackupNode(FhirTreeNode backupNode) {
 		Preconditions.checkNotNull(backupNode);
 		this.backupNode = backupNode;
-	}
-
-	// KGM Added Element 9/May/2017
-	public Optional<ElementDefinitionDt> getElement() { return this.element; }
-
-	public boolean hasElement() { return this.element.isPresent(); }
-
-	public void setElement(ElementDefinitionDt exampleValue) {
-		this.element = Optional.ofNullable(exampleValue);
 	}
 
 	@Override
@@ -282,9 +296,19 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public Optional<FhirTreeNode> getBackupNode() {
 		return Optional.of(backupNode);
 	}
-	
+
 	@Override
 	public String toString() {
 		return getPath();
 	}
+
+	// KGM Added Element 9/May/2017
+	public Optional<ElementDefinitionDt> getElement() { return this.element; }
+
+	public boolean hasElement() { return this.element.isPresent(); }
+
+	public void setElement(ElementDefinitionDt exampleValue) {
+		this.element = Optional.ofNullable(exampleValue);
+	}
+
 }

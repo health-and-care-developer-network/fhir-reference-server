@@ -1,9 +1,9 @@
 package uk.nhs.fhir.makehtml.data;
 
+import com.google.common.base.Preconditions;
+
 import java.net.URL;
 import java.util.Optional;
-
-import com.google.common.base.Preconditions;
 
 public class BindingInfo {
 
