@@ -9,7 +9,8 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.NewMain;
 
 public class FhirTreeNode implements FhirTreeTableContent {
-	private final FhirTreeNodeId id;
+	private FhirIcon icon;
+	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
 	private final Optional<String> max;
@@ -31,7 +32,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
 
 	public FhirTreeNode(
-			FhirTreeNodeId id,
+			FhirIcon icon,
+			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
 			String max,
@@ -40,7 +42,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			String information,
 			List<ResourceInfo> constraints,
 			String path) {
-		this.id = id;
+		this.icon = icon;
+		this.name = name;
 		this.resourceFlags = flags;
 		this.min = Optional.ofNullable(min);
 		this.max = Optional.ofNullable(max);
@@ -50,25 +53,44 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.constraints = constraints;
 		this.path = path;
 	}
-	
-	public FhirTreeNodeId getId() {
-		return id;
-	}
 
 	@Override
 	public FhirIcon getFhirIcon() {
 		// If using default and we have a backup, use the backup icon
-		if (id.getFhirIcon().equals(FhirIcon.ELEMENT)
+		if (icon.equals(FhirIcon.ELEMENT)
 		  && hasBackupNode()) {
 			return backupNode.getFhirIcon();
 		}
 		
-		return id.getFhirIcon();
+		return icon;
+	}
+	
+	@Override
+	public void setFhirIcon(FhirIcon icon) {
+		this.icon = icon;
+	}
+	
+	public Optional<String> getName() {
+		return name;
 	}
 
-	@Override
-	public String getName() {
-		return id.getName();
+	public String getDisplayName() {
+		boolean hasName = name.isPresent() && !name.get().isEmpty();
+		String pathName = getPathName();
+		boolean hasPath = !pathName.isEmpty();
+		
+		String displayName;
+		if (hasName && hasPath && !pathName.equals(name.get())) {
+			displayName = pathName + " (" + name.get() + ")";
+		} else if (hasPath) {
+			displayName = pathName;
+		} else if (hasName) {
+			displayName = name.get();
+		} else {
+			throw new IllegalStateException("No name or path information");
+		}
+		
+		return displayName;
 	}
 	
 	public boolean hasSlicingInfo() {

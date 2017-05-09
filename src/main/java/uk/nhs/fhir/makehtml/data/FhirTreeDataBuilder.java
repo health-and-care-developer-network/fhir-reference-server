@@ -16,7 +16,7 @@ public class FhirTreeDataBuilder {
 	protected final FhirTreeNodeBuilder nodeBuilder;
 	
 	private List<String> path = Lists.newArrayList();
-	private FhirTreeNode rootNode = null;
+	private FhirTreeTableContent rootNode = null;
 	private FhirTreeTableContent currentNode = null;
 	
 	public FhirTreeDataBuilder() {
@@ -41,13 +41,8 @@ public class FhirTreeDataBuilder {
 	
 	private void appendNode(FhirTreeTableContent newNode) {
 		if (currentNode == null) {
-			if (newNode instanceof FhirTreeNode) {
-				FhirTreeNode fhirTreeNode = (FhirTreeNode)newNode;
-				rootNode = fhirTreeNode;
-				currentNode = newNode;
-			} else {
-				throw new IllegalStateException("Root cannot be a dummy node");
-			}
+			rootNode = newNode;
+			currentNode = newNode;
 		} else {
 			currentNode.addChild(newNode);
 			currentNode = newNode;
