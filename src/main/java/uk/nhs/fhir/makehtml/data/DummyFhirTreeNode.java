@@ -15,7 +15,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	private final String path;
 	
 	public DummyFhirTreeNode(FhirTreeTableContent parent, String path) {
-		Preconditions.checkNotNull(parent);
+		//Preconditions.checkNotNull(parent);
 		Preconditions.checkNotNull(path);
 		
 		this.parent = parent;
@@ -89,14 +89,19 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
+	public void setFhirIcon(FhirIcon icon) {
+		throw new IllegalStateException("Setting icon on a dummy node");
+	}
+	
+	@Override
 	public FhirIcon getFhirIcon() {
 		return backup.getFhirIcon();
 	}
 
 	@Override
-	public String getName() {
+	public String getDisplayName() {
 		if (backup != null) {
-			return backup.getName();
+			return backup.getDisplayName();
 		} else {
 			return path;
 		}

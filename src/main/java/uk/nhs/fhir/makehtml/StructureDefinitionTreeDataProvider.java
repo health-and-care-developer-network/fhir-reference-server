@@ -73,7 +73,7 @@ public class StructureDefinitionTreeDataProvider {
 	 */
 	private FhirTreeNode findBackupNode(FhirTreeTableContent differentialNode, FhirTreeData snapshotTreeData) {
 		
-		FhirTreeNode searchRoot = snapshotTreeData.getRoot();
+		FhirTreeNode searchRoot = (FhirTreeNode) snapshotTreeData.getRoot();
 		if (hasSlicedParent(differentialNode)) {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}
@@ -91,7 +91,7 @@ public class StructureDefinitionTreeDataProvider {
 				filterMatchesOnSlicingInfo(differentialNode, matchingNodes);
 				
 				if (differentialNode instanceof FhirTreeNode) {
-					return matchOnDiscriminatorPaths((FhirTreeNode)differentialNode, matchingNodes, slicingInfo);
+					return matchOnNameOrDiscriminatorPaths((FhirTreeNode)differentialNode, matchingNodes, slicingInfo);
 				} else {
 					throw new IllegalStateException("Multiple matches for dummy node " + differentialNode.getPath());
 				}
@@ -167,9 +167,36 @@ public class StructureDefinitionTreeDataProvider {
 		return matchingNodes;
 	}
 
-	private FhirTreeNode matchOnDiscriminatorPaths(FhirTreeNode element, List<FhirTreeNode> pathMatches, SlicingInfo slicingInfo) {
+	/**
+	 * Finds a matching node for a sliced element based on name or (failing that) on slicing discriminators.
+	 */
+	private FhirTreeNode matchOnNameOrDiscriminatorPaths(FhirTreeNode element, List<FhirTreeNode> pathMatches, SlicingInfo slicingInfo) {
 		Set<String> discriminatorPaths = slicingInfo.getDiscriminatorPaths();
 		
+		if (element.getName().isPresent()
+		  && !element.getName().get().isEmpty()) {
+			String name = element.getName().get();
+			
+			List<FhirTreeNode> nameMatches = Lists.newArrayList();
+			
+			for (FhirTreeNode pathMatch : pathMatches) {
+				if (pathMatch.getName().isPresent()
+				  && pathMatch.getName().get().equals(name)) {
+					nameMatches.add(pathMatch);
+				}
+			}
+			
+			if (nameMatches.size() > 0) {
+				if (nameMatches.size() == 1) {
+					return nameMatches.get(0);
+				} else {
+					throw new IllegalStateException("Multiple (" + nameMatches.size() + ") snapshot nodes matched"
+						+ " path " + element.getPath() + " and name " + name);
+				}
+			}
+		}
+		
+
 		// nodes which match on discriminator (as well as path)
 		List<FhirTreeNode> discriminatorMatches = Lists.newArrayList();
 		

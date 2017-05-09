@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -7,7 +8,8 @@ import com.google.common.collect.Lists;
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
 		return new FhirTreeNode(
-			new FhirTreeNodeId(id, FhirIcon.ELEMENT), 
+			FhirIcon.ELEMENT,
+			Optional.of(id), 
 			new ResourceFlags(), 
 			0, 
 			"*", 

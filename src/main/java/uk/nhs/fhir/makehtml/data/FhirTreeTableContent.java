@@ -28,7 +28,7 @@ public interface FhirTreeTableContent {
 
 	FhirIcon getFhirIcon();
 
-	String getName();
+	String getDisplayName();
 
 	ResourceFlags getResourceFlags();
 
@@ -59,4 +59,6 @@ public interface FhirTreeTableContent {
 	void setBackupNode(FhirTreeNode backupNode);
 	boolean hasBackupNode();
 	Optional<FhirTreeNode> getBackupNode();
+
+	void setFhirIcon(FhirIcon icon);
 }
