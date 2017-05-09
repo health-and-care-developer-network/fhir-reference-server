@@ -87,7 +87,7 @@ public class ValueSetFormatter extends ResourceFormatter<ValueSet> {
 		return section;
 	}
 
-	private void addStyles(HTMLDocSection section) {
+	public void addStyles(HTMLDocSection section) {
 		Table.getStyles().forEach(section::addStyle);
 		FhirPanel.getStyles().forEach(section::addStyle);
 		ValueWithInfoCell.getStyles().forEach(section::addStyle);

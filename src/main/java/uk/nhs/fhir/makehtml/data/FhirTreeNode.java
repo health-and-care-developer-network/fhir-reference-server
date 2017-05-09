@@ -1,12 +1,12 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.List;
-import java.util.Optional;
-
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
 import uk.nhs.fhir.makehtml.NewMain;
+
+import java.util.List;
+import java.util.Optional;
 
 public class FhirTreeNode implements FhirTreeTableContent {
 	private final FhirTreeNodeId id;
@@ -24,6 +24,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
+	// KGM Added Element 9/May/2017
+	private Optional<ElementDefinitionDt> element= Optional.empty();
 	
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -49,6 +51,29 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.information = information;
 		this.constraints = constraints;
 		this.path = path;
+	}
+	// KGM Added Element 9/May/2017
+	public FhirTreeNode(
+			FhirTreeNodeId id,
+			ResourceFlags flags,
+			Integer min,
+			String max,
+			//FhirCardinality cardinality,
+			List<LinkData> typeLinks,
+			String information,
+			List<ResourceInfo> constraints,
+			String path,
+			ElementDefinitionDt element ) {
+		this.id = id;
+		this.resourceFlags = flags;
+		this.min = Optional.ofNullable(min);
+		this.max = Optional.ofNullable(max);
+		//this.cardinality = cardinality;
+		this.typeLinks = typeLinks;
+		this.information = information;
+		this.constraints = constraints;
+		this.path = path;
+		this.element = Optional.ofNullable(element);
 	}
 	
 	public FhirTreeNodeId getId() {
@@ -237,6 +262,15 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public void setBackupNode(FhirTreeNode backupNode) {
 		Preconditions.checkNotNull(backupNode);
 		this.backupNode = backupNode;
+	}
+
+	// KGM Added Element 9/May/2017
+	public Optional<ElementDefinitionDt> getElement() { return this.element; }
+
+	public boolean hasElement() { return this.element.isPresent(); }
+
+	public void setElement(ElementDefinitionDt exampleValue) {
+		this.element = Optional.ofNullable(exampleValue);
 	}
 
 	@Override

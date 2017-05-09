@@ -1,10 +1,11 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.List;
-import java.util.Optional;
-
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
+import java.util.List;
+import java.util.Optional;
 
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
@@ -155,6 +156,13 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public boolean hasBinding() {
 		return false;
 	}
+
+	// KGM 9/May/2017
+	@Override
+	public boolean hasElement() { return false; }
+
+	@Override
+	public Optional<ElementDefinitionDt> getElement() { return Optional.empty(); }
 
 	@Override
 	public Optional<BindingInfo> getBinding() {

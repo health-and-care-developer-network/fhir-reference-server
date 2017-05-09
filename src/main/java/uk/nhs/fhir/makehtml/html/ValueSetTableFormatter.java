@@ -451,9 +451,9 @@ public class ValueSetTableFormatter {
             }
 			
 		} else {
-			return Elements.withAttributeAndText("span", 
-				new Attribute("class", fhirMetadataClass), 
-				value);
+			return Elements.withAttributeAndText("span",
+                    new Attribute("class", fhirMetadataClass),
+                    value);
 		}
 	}
 	

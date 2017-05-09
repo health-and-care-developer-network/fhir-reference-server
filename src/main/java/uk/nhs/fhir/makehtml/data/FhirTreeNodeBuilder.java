@@ -1,13 +1,5 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
@@ -17,9 +9,16 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.UriDt;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 
 public class FhirTreeNodeBuilder {
 	private final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
@@ -50,7 +49,8 @@ public class FhirTreeNodeBuilder {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
 			
 		String path = elementDefinition.getPath();
-			
+
+		// KGM Added Element 9/May/2017
 		FhirTreeNode node = new FhirTreeNode(
 			new FhirTreeNodeId(displayName, icon),
 			flags,
@@ -60,7 +60,9 @@ public class FhirTreeNodeBuilder {
 			typeLinks, 
 			shortDescription,
 			resourceInfos,
-			path);
+			path,
+
+			elementDefinition);
 
 		Slicing slicing = elementDefinition.getSlicing();
 		if (!slicing.isEmpty()) {

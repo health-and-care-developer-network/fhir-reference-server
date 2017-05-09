@@ -1,29 +1,25 @@
 package uk.nhs.fhir.makehtml.opdef;
 
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.jdom2.Attribute;
+import org.jdom2.Element;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.Table;
-import uk.nhs.fhir.makehtml.html.TableRow;
-import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.html.*;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.List;
+
 public class OperationDefinitionFormatter extends ResourceFormatter<OperationDefinition> {
-	
+
+	public OperationDefinitionFormatter() { this.resourceSectionType = ResourceSectionType.TREEVIEW;  }
+
 	@Override
 	public HTMLDocSection makeSectionHTML(OperationDefinition source) throws ParserConfigurationException {
 		
