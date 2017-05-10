@@ -61,13 +61,27 @@ public class FilesystemIF implements Datasource {
 
     /**
      * Gets a specific one
-     * @param name
+     * @param id
      * @return 
+     */
+    public StructureDefinition getSingleStructureDefinitionByID(String id) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting StructureDefinition with id=" + id + " looking for file: " + path.getAbsolutePath());
+        
+    	StructureDefinition foundProfile = (StructureDefinition)FHIRUtils.loadResourceFromFile(path);
+        return foundProfile;
+    }
+    
+    /**
+     * Get a single resource back by name
+     * @param name
+     * @return
      */
     public StructureDefinition getSingleStructureDefinitionByName(String name) {
     	ResourceEntity entry = FileCache.getSingleResourceByName(name);
     	File path = entry.getResourceFile();
-    	LOG.info("Getting StructureDefinition with name=" + name + " looking for file: " + path.getAbsolutePath());
+    	LOG.info("Getting StructureDefinition with id=" + name + " looking for file: " + path.getAbsolutePath());
         
     	StructureDefinition foundProfile = (StructureDefinition)FHIRUtils.loadResourceFromFile(path);
         return foundProfile;

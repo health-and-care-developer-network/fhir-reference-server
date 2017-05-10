@@ -32,7 +32,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    StructureDefinition getSingleStructureDefinitionByName(String name);
+    StructureDefinition getSingleStructureDefinitionByID(String name);
     
     /**
      * This is the method to do a search based on name, ie to find where
@@ -80,7 +80,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    ValueSet getSingleValueSetByName(String name);
+    ValueSet getSingleValueSetByID(String name);
 
     List<ValueSet> getAllValueSets();
     
@@ -95,7 +95,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    OperationDefinition getSingleOperationDefinitionByName(String name);
+    OperationDefinition getSingleOperationDefinitionByID(String name);
 
     List<OperationDefinition> getAllOperations();
     
@@ -105,7 +105,7 @@ public interface Datasource {
     
     
     // ImplementationGuides
-    ImplementationGuide getSingleImplementationGuideByName(String name);
+    ImplementationGuide getSingleImplementationGuideByID(String name);
 
     List<ImplementationGuide> getAllImplementationGuides();
     

@@ -243,12 +243,27 @@ public class FileCache {
         }
     }
     
+    public static ResourceEntity getSingleResourceByID(String id) {
+        if(updateRequired()) {
+            updateCache();
+        }
+    	for (ResourceEntity entry : resourceList) {
+    		/*if (entry.getResourceName().equals(id) || entry.getResourceID().equals(id)) {
+    			return entry;
+    		}*/
+    		if (entry.getResourceID().equals(id)) {
+    			return entry;
+    		}
+    	}
+    	return null;
+    }
+    
     public static ResourceEntity getSingleResourceByName(String name) {
         if(updateRequired()) {
             updateCache();
         }
     	for (ResourceEntity entry : resourceList) {
-    		if (entry.getResourceName().equals(name) || entry.getActualResourceName().equals(name)) {
+    		if (entry.getResourceName().equals(name)) {
     			return entry;
     		}
     	}

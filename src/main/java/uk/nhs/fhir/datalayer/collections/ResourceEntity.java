@@ -6,7 +6,7 @@ import uk.nhs.fhir.enums.ResourceType;
 
 public class ResourceEntity implements Comparable {
 	private String resourceName = null;
-	private String actualResourceName = null;
+	private String resourceID = null;
 	private File resourceFile = null;
 	private String group = null;
 	private ResourceType resourceType;
@@ -17,7 +17,7 @@ public class ResourceEntity implements Comparable {
 	
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
-							String actualResourceName) {
+							String resourceID) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -25,7 +25,7 @@ public class ResourceEntity implements Comparable {
 		this.baseType = baseType;
 		this.displayGroup = displayGroup;
 		this.example = example;
-		this.actualResourceName = actualResourceName;
+		this.resourceID = resourceID;
 	}
 	
 	public String getResourceName() {
@@ -85,12 +85,12 @@ public class ResourceEntity implements Comparable {
 		this.example = example;
 	}
 
-	public String getActualResourceName() {
-		return actualResourceName;
+	public String getResourceID() {
+		return resourceID;
 	}
 
-	public void setActualResourceName(String actualResourceName) {
-		this.actualResourceName = actualResourceName;
+	public void setResourceID(String resourceID) {
+		this.resourceID = resourceID;
 	}
 
 	@Override

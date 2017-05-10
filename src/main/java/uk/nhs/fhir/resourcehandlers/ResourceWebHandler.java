@@ -101,9 +101,9 @@ public class ResourceWebHandler {
                     sb.append(base);
                     sb.append(endOfBaseResourceBox);
                     for(ResourceEntity resource : myNames.get(base)) {
-                    	String name_for_url = resource.getActualResourceName();
+                    	String name_for_url = resource.getResourceID();
 						try {
-							name_for_url = URLEncoder.encode(resource.getActualResourceName(), Charset.defaultCharset().name());
+							name_for_url = URLEncoder.encode(resource.getResourceID(), Charset.defaultCharset().name());
 						} catch (UnsupportedEncodingException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -141,9 +141,9 @@ public class ResourceWebHandler {
         return sb.toString();
     }
         
-    public StructureDefinition getSDByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getSDByName(String name)");
-        StructureDefinition sd = myDataSource.getSingleStructureDefinitionByName(name);
+    public StructureDefinition getSDByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getSDByID(String id)");
+        StructureDefinition sd = myDataSource.getSingleStructureDefinitionByID(id);
         return sd;
     }
 

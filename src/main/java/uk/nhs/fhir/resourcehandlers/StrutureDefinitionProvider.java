@@ -112,8 +112,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Read
     public StructureDefinition getResourceById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        StructureDefinition foundItem = myDatasource.getSingleStructureDefinitionByName(name);
+        String id = theId.getIdPart().toString();
+        StructureDefinition foundItem = myDatasource.getSingleStructureDefinitionByID(id);
         return foundItem;
     }
 
