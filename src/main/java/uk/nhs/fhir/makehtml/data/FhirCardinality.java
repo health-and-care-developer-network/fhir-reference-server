@@ -39,10 +39,8 @@ public class FhirCardinality {
 	}
 }
 
-enum FhirElementCount {
-	NONE("0"),
-	ONE("1"),
-	MANY("*");
+class FhirElementCount {
+	public static final String MANY = "*";
 	
 	private final String displayString;
 	
@@ -50,30 +48,34 @@ enum FhirElementCount {
 		this.displayString = displayString;
 	}
 	
+	public boolean isMany() {
+		return displayString.equals(MANY);
+	}
+	
 	public String getDisplayString() {
 		return displayString;
 	}
 	
 	public static FhirElementCount fromString(String cardinalityString){
-		for (FhirElementCount count : FhirElementCount.values()) {
-			if (cardinalityString.equals(count.displayString)) {
-				return count;
-			}
+		// cardinality strings can only be integers or the special value * meaning many
+		if (!cardinalityString.equals(MANY)) {
+			Integer.parseInt(cardinalityString);
 		}
-		throw new IllegalArgumentException("Unrecognised cardinality range [" + cardinalityString + "]");
+		
+		return new FhirElementCount(cardinalityString);
 	}
 	
 	public static boolean validMinMaxPair(FhirElementCount min, FhirElementCount max) {
-		switch (max) {
-			case NONE: 
-				return min.equals(NONE);
-			case ONE: 
-			case MANY: 
-				return min.equals(NONE) || min.equals(ONE);
-			default: 
-				throw new IllegalArgumentException("failed to match max value [" + max.name() + "]");
+		if (min.isMany()) {
+			return false;
 		}
+		
+		if (max.isMany()) {
+			return true;
+		} 
+		
+		int maxValue = Integer.parseInt(max.displayString);
+		int minValue = Integer.parseInt(min.displayString);
+		return maxValue >= minValue;
 	}
-	
-	
 }

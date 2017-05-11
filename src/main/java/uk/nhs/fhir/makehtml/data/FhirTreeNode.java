@@ -124,10 +124,19 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (min.isPresent() && max.isPresent()) {
 			return new FhirCardinality(min.get(), max.get());
 		} else {
+			try {
 			Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
 			String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
-			
 			return new FhirCardinality(resolvedMin, resolvedMax);
+			} catch (NullPointerException e) {
+				if (backupNode == null 
+				  && !NewMain.STRICT) {
+					e.printStackTrace();
+					return new FhirCardinality(0, "*");
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 	

@@ -278,7 +278,11 @@ public class FhirTreeTable {
 				}
 			}
 			
-			resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
+				throw new IllegalStateException("Stand-in description being displayed - expected this to have been removed by cardinality in profile");
+			} else {
+				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			}
 		}
 		
 		// Extensions
