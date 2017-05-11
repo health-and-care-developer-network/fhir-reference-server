@@ -12,8 +12,10 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import uk.nhs.fhir.makehtml.html.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
+import uk.nhs.fhir.makehtml.structdef.StructureDefinitionDifferentialFormatter;
+import uk.nhs.fhir.makehtml.structdef.StructureDefinitionMetadataFormatter;
+import uk.nhs.fhir.makehtml.structdef.StructureDefinitionProfileFormatter;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
 // KGM 13/Apr/2017 Added ValueSet

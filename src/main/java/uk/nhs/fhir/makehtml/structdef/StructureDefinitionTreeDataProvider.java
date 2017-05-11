@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.structdef;
 
 import java.util.List;
 import java.util.Optional;

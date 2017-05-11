@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.context.FhirDataTypes;

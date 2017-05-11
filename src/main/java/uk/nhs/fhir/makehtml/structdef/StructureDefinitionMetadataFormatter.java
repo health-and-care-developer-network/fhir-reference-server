@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.html;
+package uk.nhs.fhir.makehtml.structdef;
 
 import java.util.Date;
 import java.util.List;
@@ -26,6 +26,8 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
+import uk.nhs.fhir.makehtml.html.FhirPanel;
+import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 

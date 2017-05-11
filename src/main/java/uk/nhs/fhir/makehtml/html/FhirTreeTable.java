@@ -252,8 +252,14 @@ public class FhirTreeTable {
 			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
+		if (node.hasDefaultValue()
+		  && node.isFixedValue()) {
+			throw new IllegalStateException("Found and example");
+		}
+		
 		// Default Value
-		if (node.hasDefaultValue()) {
+		if (node.hasDefaultValue()
+		  && !node.isFixedValue()) {
 			resourceInfos.add(makeResourceInfoWithMaybeUrl("Default Value", node.getDefaultValue().get(), ResourceInfoType.DEFAULT_VALUE));
 		}
 		

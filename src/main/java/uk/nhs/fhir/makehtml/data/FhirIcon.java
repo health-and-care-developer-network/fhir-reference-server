@@ -179,8 +179,19 @@ public enum FhirIcon {
 				StructureDefinition extension = null;
 				// Failed to retrieve from http request, try file access
 
-				String pathName = args[0] + "/" + tokens[tokens.length - 1] + ".xml";
+				String fileName = tokens[tokens.length - 1] + ".xml";
+				String pathName = args[0] + "/" + fileName;
 				File file = new File(pathName);
+				
+				if (!NewMain.STRICT && !file.exists()) {
+					for (File f : new File(args[0]).listFiles()) {
+						if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
+							file = f;
+							break;
+						}
+					}
+				}
+				
 				try (FileInputStream fis = new FileInputStream(file)){
 					Reader reader = new InputStreamReader(fis);
 					IParser parser = ctx.newXmlParser();
