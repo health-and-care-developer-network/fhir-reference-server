@@ -150,10 +150,19 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (min.isPresent() && max.isPresent()) {
 			return new FhirCardinality(min.get(), max.get());
 		} else {
-			Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
-			String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
-
-			return new FhirCardinality(resolvedMin, resolvedMax);
+			try {
+				Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
+				String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
+				return new FhirCardinality(resolvedMin, resolvedMax);
+			} catch (NullPointerException e) {
+				if (backupNode == null 
+				  && !NewMain.STRICT) {
+					e.printStackTrace();
+					return new FhirCardinality(0, "*");
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 
@@ -167,14 +176,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 
 		if (typeLinks.isEmpty()
-				&& FhirTypeByPath.recognisedPath(getPath())) {
+		  && FhirTypeByPath.recognisedPath(getPath())) {
 
 			LinkData linkForPath = FhirTypeByPath.forPath(getPath());
 			typeLinks.add(linkForPath);
 		}
 
 		if (NewMain.STRICT
-				&& typeLinks.isEmpty()) {
+		  && typeLinks.isEmpty()) {
 			throw new IllegalStateException("Couldn't find any typelinks for " + getPath());
 		}
 

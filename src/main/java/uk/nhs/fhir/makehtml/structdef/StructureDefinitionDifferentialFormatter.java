@@ -1,17 +1,22 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.structdef;
+
+import java.util.Optional;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.jdom2.Element;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import org.jdom2.Element;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
+import uk.nhs.fhir.makehtml.TreeTableFormatter;
+import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
 import uk.nhs.fhir.makehtml.html.Table;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.Optional;
-
 public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter<StructureDefinition> {
 
-	public StructureDefinitionDifferentialFormatter() { this.resourceSectionType = resourceSectionType.DIFFERENTIAL; }
+	public StructureDefinitionDifferentialFormatter() { this.resourceSectionType = ResourceSectionType.DIFFERENTIAL; }
 
 
 	@Override

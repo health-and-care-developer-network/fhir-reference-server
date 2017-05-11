@@ -252,8 +252,14 @@ public class FhirTreeTable {
 			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
+		if (node.hasDefaultValue()
+		  && node.isFixedValue()) {
+			throw new IllegalStateException("Found and example");
+		}
+		
 		// Default Value
-		if (node.hasDefaultValue()) {
+		if (node.hasDefaultValue()
+		  && !node.isFixedValue()) {
 			resourceInfos.add(makeResourceInfoWithMaybeUrl("Default Value", node.getDefaultValue().get(), ResourceInfoType.DEFAULT_VALUE));
 		}
 		
@@ -272,7 +278,11 @@ public class FhirTreeTable {
 				}
 			}
 			
-			resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
+				throw new IllegalStateException("Stand-in description being displayed - expected this to have been removed by cardinality in profile");
+			} else {
+				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			}
 		}
 		
 		// Extensions

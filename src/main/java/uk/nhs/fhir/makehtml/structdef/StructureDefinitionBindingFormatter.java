@@ -1,24 +1,36 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.structdef;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Element;
+import org.jdom2.Text;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import org.jdom2.Attribute;
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.Text;
-import uk.nhs.fhir.makehtml.data.*;
-import uk.nhs.fhir.makehtml.html.*;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
+import uk.nhs.fhir.makehtml.ResourceFormatter;
+import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.html.Dstu2Fix;
+import uk.nhs.fhir.makehtml.html.FhirPanel;
+import uk.nhs.fhir.makehtml.html.LinkCell;
+import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
+import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.util.Elements;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<StructureDefinition> {
 
@@ -35,8 +47,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
 	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
 
 		HTMLDocSection section = new HTMLDocSection();
-        List<String> done = new ArrayList<String>();
-
 
         Element colgroup = Elements.newElement("colgroup");
         int columns = 4;
@@ -135,7 +145,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
 
     Boolean isElementIsActive(FhirTreeTableContent node)
     {
-        if (node.getCardinality().getMax() == FhirElementCount.NONE)
+        if (node.isRemovedByProfile())
         {
             return false;
         }

@@ -3,7 +3,7 @@ package uk.nhs.fhir.makehtml.data;
 /**
  * Created by kevinmayfield on 09/05/2017.
  */
-public enum FhirElementCount {
+/*public enum FhirElementCount {
     NONE("0"),
     ONE("1"),
     MANY("*");
@@ -39,4 +39,4 @@ public enum FhirElementCount {
         }
     }
 
-}
+}*/

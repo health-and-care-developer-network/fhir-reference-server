@@ -51,10 +51,10 @@ public class ResourceFlagsCell extends TableCell {
 	public static List<CSSStyleBlock> getStyles() {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
-		styles.add(
+		/*styles.add(
 			new CSSStyleBlock(Lists.newArrayList(".fhir-resource-flag span"),
 				Lists.newArrayList(
-					new CSSRule("background-color", "#ffffbb"))));
+					new CSSRule("background-color", "#ffffbb"))));*/
 		
 		return styles;
 	}

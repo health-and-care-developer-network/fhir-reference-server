@@ -1,12 +1,16 @@
 package uk.nhs.fhir.makehtml.data;
 
-import com.google.common.base.Preconditions;
-
 import java.net.URL;
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
+
+import uk.nhs.fhir.makehtml.NewMain;
+
 public class BindingInfo {
 
+	public static final String STAND_IN_DESCRIPTION = "STAND IN STRING BECAUSE IT'S MISSING FROM THE SNAPSHOT";
+	
 	private final Optional<String> description;
 	private final Optional<URL> url;
 	private final String strength;
@@ -42,7 +46,16 @@ public class BindingInfo {
 		Optional<URL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
 		String resolvedStrength = !bindingStrength.isEmpty() ? bindingStrength : backupStrength; 
 		
-		Preconditions.checkArgument(resolvedDescription.isPresent() || resolvedUrl.isPresent(), "Description or URL must be present");
+		try {
+			Preconditions.checkArgument(resolvedDescription.isPresent() || resolvedUrl.isPresent(), "Description or URL must be present");
+		} catch (IllegalArgumentException e) {
+			if (!NewMain.STRICT) {
+				e.printStackTrace();
+				resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
+			} else {
+				throw e;
+			}
+		}
 		
 		return new BindingInfo(resolvedDescription, resolvedUrl, resolvedStrength);
 	}
