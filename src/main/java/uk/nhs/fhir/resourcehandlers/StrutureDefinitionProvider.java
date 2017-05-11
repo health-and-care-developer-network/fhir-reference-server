@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -113,7 +114,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Read
     public StructureDefinition getResourceById(@IdParam IdDt theId) {
         String id = theId.getIdPart().toString();
-        StructureDefinition foundItem = myDatasource.getSingleStructureDefinitionByID(id);
+        StructureDefinition foundItem = (StructureDefinition)myDatasource.getResourceByID(id);
         return foundItem;
     }
 
@@ -124,8 +125,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      * @return
      */
     @Search
-    public List<StructureDefinition> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-        List<StructureDefinition> foundList = myDatasource.getStructureDefinitionMatchByName(theNamePart.getValue());
+    public List<IBaseResource> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
+        List<IBaseResource> foundList = myDatasource.getResourceMatchByName(ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
 

@@ -93,7 +93,7 @@ public class OperationDefinitionProvider implements IResourceProvider  {
     @Read
     public OperationDefinition getResourceById(@IdParam IdDt theId) {
         String id = theId.getIdPart().toString();
-        OperationDefinition foundItem = myDataSource.getSingleOperationDefinitionByID(id);
+        OperationDefinition foundItem = (OperationDefinition)myDataSource.getResourceByID(id);
         return foundItem;
     }
     

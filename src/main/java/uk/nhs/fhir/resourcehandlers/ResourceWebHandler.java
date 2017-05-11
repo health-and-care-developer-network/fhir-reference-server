@@ -132,7 +132,7 @@ public class ResourceWebHandler {
 
     public String getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myNames = myDataSource.getAllStructureDefinitionNames(namePart);
+        List<String> myNames = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(ResourceType.STRUCTUREDEFINITION, namePart);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -144,25 +144,25 @@ public class ResourceWebHandler {
         
     public StructureDefinition getSDByID(String id) {
         LOG.fine("Called: ProfileWebHandler.getSDByID(String id)");
-        StructureDefinition sd = myDataSource.getSingleStructureDefinitionByID(id);
+        StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
         return sd;
     }
 
     public OperationDefinition getOperationByID(String id) {
         LOG.fine("Called: ProfileWebHandler.getOperationByID(String id)");
-        OperationDefinition od = myDataSource.getSingleOperationDefinitionByID(id);
+        OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(id);
         return od;
     }
 
     public ImplementationGuide getImplementationGuideByID(String id) {
         LOG.fine("Called: ProfileWebHandler.getImplementationGuideByID(String id)");
-        ImplementationGuide ig = myDataSource.getSingleImplementationGuideByID(id);
+        ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(id);
         return ig;
     }
     
     public ValueSet getVSByID(String id) {
         LOG.fine("Called: ProfileWebHandler.getVSByID(String id)");
-        ValueSet valSet = myDataSource.getSingleValueSetByID(id);
+        ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
         return valSet;
     }
 }

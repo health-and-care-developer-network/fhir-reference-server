@@ -18,11 +18,14 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 
 public interface Datasource {
 
@@ -32,7 +35,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    StructureDefinition getSingleStructureDefinitionByID(String name);
+	IBaseResource getResourceByID(String id);
     
     /**
      * This is the method to do a search based on name, ie to find where
@@ -41,7 +44,7 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart);
+    List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of StructureDefinition objects
@@ -72,7 +75,7 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<String> getAllStructureDefinitionNames(String theNamePart);
+    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
     /**
      * This is the method to get a specific ValueSet by name.
@@ -80,7 +83,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    ValueSet getSingleValueSetByID(String name);
+    //ValueSet getSingleValueSetByID(String name);
 
     List<ValueSet> getAllValueSets();
     
@@ -95,7 +98,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    OperationDefinition getSingleOperationDefinitionByID(String name);
+    //OperationDefinition getSingleOperationDefinitionByID(String name);
 
     List<OperationDefinition> getAllOperations();
     
@@ -105,7 +108,7 @@ public interface Datasource {
     
     
     // ImplementationGuides
-    ImplementationGuide getSingleImplementationGuideByID(String name);
+    //ImplementationGuide getSingleImplementationGuideByID(String name);
 
     List<ImplementationGuide> getAllImplementationGuides();
     

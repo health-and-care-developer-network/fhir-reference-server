@@ -122,7 +122,7 @@ public class ValueSetProvider implements IResourceProvider {
     @Read()
     public ValueSet getValueSetById(@IdParam IdDt theId) {
         String id = theId.getIdPart().toString();
-        ValueSet foundItem = myDataSource.getSingleValueSetByID(id);
+        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(id);
         return foundItem;
     }
     
@@ -163,7 +163,7 @@ public class ValueSetProvider implements IResourceProvider {
         
         List<String> ids = codeCache.findCode(theCode.getValue());
         for(String theID : ids) {
-            results.add(myDataSource.getSingleValueSetByID(theID));
+            results.add((ValueSet)myDataSource.getResourceByID(theID));
         }
         return results;
     }

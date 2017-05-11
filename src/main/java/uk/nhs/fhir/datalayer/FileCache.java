@@ -53,10 +53,6 @@ public class FileCache {
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
-    private static String profilePath = PropertyReader.getProperty("profilePath");
-    private static String valueSetPath = PropertyReader.getProperty("valusetPath");
-    private static String operationsPath = PropertyReader.getProperty("operationsPath");
-    private static String guidesPath = PropertyReader.getProperty("guidesPath");
     private static String fileExtension = PropertyReader.getProperty("fileExtension");
 
 
@@ -151,16 +147,16 @@ public class FileCache {
             LOG.fine("Updating cache from filesystem");
             
             // Load StructureDefinitions
-            ArrayList<ResourceEntity> newList = cacheFHIRResources(profilePath, STRUCTUREDEFINITION);
+            ArrayList<ResourceEntity> newList = cacheFHIRResources(STRUCTUREDEFINITION);
             
             // Add ValueSets
-            newList.addAll(cacheFHIRResources(valueSetPath, VALUESET));
+            newList.addAll(cacheFHIRResources(VALUESET));
             
             // Add operations
-            newList.addAll(cacheFHIRResources(operationsPath, OPERATIONDEFINITION));
+            newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
 
             // Add ImplementationGuides
-            newList.addAll(cacheFHIRResources(guidesPath, IMPLEMENTATIONGUIDE));
+            newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
             
             // Swap out for our new list
             resourceList = newList;
@@ -169,8 +165,9 @@ public class FileCache {
         }
     }
     
-    private static ArrayList<ResourceEntity> cacheFHIRResources(String path, ResourceType resourceType){
+    private static ArrayList<ResourceEntity> cacheFHIRResources(ResourceType resourceType){
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
+        String path = resourceType.getFilesystemPath();
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -269,6 +266,13 @@ public class FileCache {
     	}
     	return null;
     }
+
+	public static List<ResourceEntity> getResourceList() {
+		if(updateRequired()) {
+            updateCache();
+        }
+		return resourceList;
+	}
     
     /*
     private static void printCacheContent() {
