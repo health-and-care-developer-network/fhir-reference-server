@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -103,9 +104,9 @@ public class OperationDefinitionProvider implements IResourceProvider  {
      * @return
      */
     @Search
-    public List<OperationDefinition> getAllStructureDefinitions() {
+    public List<IBaseResource> getAllStructureDefinitions() {
         LOG.info("Request for ALL OperationDefinition objects");
-        List<OperationDefinition> foundList = myDataSource.getAllOperations();
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.OPERATIONDEFINITION);
         return foundList;
     }
 

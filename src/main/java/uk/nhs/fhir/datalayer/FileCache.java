@@ -116,12 +116,12 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List getResources(ResourceType resourceType) {
+    public static List<IBaseResource> getResources(ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
         // Load each resource file and put them in a list to return
-        ArrayList allFiles = new ArrayList();
+        ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
         for (ResourceEntity entry : resourceList) {
         	if (entry.getResourceType() == resourceType) {
         		IBaseResource vs = FHIRUtils.loadResourceFromFile(entry.getResourceFile());

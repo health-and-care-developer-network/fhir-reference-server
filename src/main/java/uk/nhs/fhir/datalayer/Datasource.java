@@ -51,7 +51,7 @@ public interface Datasource {
      *
      * @return
      */
-    List<StructureDefinition> getAllStructureDefinitions();
+    List<IBaseResource> getAllResourcesOfType(ResourceType resourceType);
 
     /**
      * Gets a full list of names for the web view of /StructureDefinition
@@ -59,7 +59,7 @@ public interface Datasource {
      *
      * @return
      */
-    List<String> getAllStructureDefinitionNames();
+    List<String> getAllResourceNames(ResourceType resourceType);
 
     /**
      * Gets a full list of names, grouped by base resource for the web view of
@@ -67,7 +67,7 @@ public interface Datasource {
      *
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource();
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType);
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -77,40 +77,17 @@ public interface Datasource {
      */
     public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
-    /**
-     * This is the method to get a specific ValueSet by name.
-     *
-     * @param name
-     * @return
-     */
-    //ValueSet getSingleValueSetByID(String name);
-
-    List<ValueSet> getAllValueSets();
     
     List<String> getAllValueSetNames();
     
     HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory();
     
 
-    /**
-     * Gets a specific one
-     *
-     * @param name
-     * @return
-     */
-    //OperationDefinition getSingleOperationDefinitionByID(String name);
-
-    List<OperationDefinition> getAllOperations();
-    
     List<String> getAllOperationNames();
     
     HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory();
     
-    
-    // ImplementationGuides
-    //ImplementationGuide getSingleImplementationGuideByID(String name);
 
-    List<ImplementationGuide> getAllImplementationGuides();
     
     List<String> getAllImplementationGuideNames();
     

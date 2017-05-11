@@ -136,9 +136,9 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      * @return
      */
     @Search
-    public List<StructureDefinition> getAllStructureDefinitions() {
+    public List<IBaseResource> getAllStructureDefinitions() {
         LOG.info("Request for ALL StructureDefinition objects");
-        List<StructureDefinition> foundList = myDatasource.getAllStructureDefinitions();
+        List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(ResourceType.STRUCTUREDEFINITION);
         return foundList;
     }
 //</editor-fold>

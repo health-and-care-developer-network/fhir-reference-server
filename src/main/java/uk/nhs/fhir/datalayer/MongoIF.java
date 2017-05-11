@@ -118,23 +118,31 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAll()
 	 */
     @Override
-	public List<StructureDefinition> getAllStructureDefinitions() {
-        LOG.info("Getting all StructureDefinitions");
+	public List<IBaseResource> getAllResourcesOfType(ResourceType resourceType) {
+        LOG.info("Getting all resources of type:" + resourceType.name());
         
-        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
+        List<IBaseResource> list = new ArrayList<IBaseResource>();
         
-        Cursor cursor;
-        cursor = profiles.find();
+        Cursor cursor = null;
+        switch(resourceType) {
+        	case STRUCTUREDEFINITION:
+        		cursor = profiles.find();
+        		break;
+        	case VALUESET:
+        		//cursor = profiles.find();
+        		// Still to be implemented
+        		break;
+        }
         try {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                IBaseResource foundDocRef = (IBaseResource) ctx.newJsonParser().parseResource((String) cursor.next().toString());
                 list.add(foundDocRef);
             }
         } finally {
             cursor.close();
         }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
+        LOG.info("Returning a list of : " + list.size());
         return list;
     }
     
@@ -142,7 +150,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames()
 	 */
     @Override
-	public List<String> getAllStructureDefinitionNames() {
+	public List<String> getAllResourceNames(ResourceType resourceType) {
         LOG.info("Getting all StructureDefinition Names");
         
         List<String> list = new ArrayList<String>();
@@ -192,14 +200,8 @@ public class MongoIF implements Datasource {
         return list;
     }*/
     
-    public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
-    	//TODO: Implement this for Mongo
-    	return null;
-    }
-
-    @Override
-    public List<ValueSet> getAllValueSets() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
+    	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -213,22 +215,12 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public List<OperationDefinition> getAllOperations() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
 	public List<String> getAllOperationNames() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public List<ImplementationGuide> getAllImplementationGuides() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

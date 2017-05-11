@@ -65,9 +65,9 @@ public class ResourceWebHandler {
         LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    public String getAllStructureDefinitionNames(String resourceType) {
+    /*public String getAllStructureDefinitionNames(String resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAllNames()");
-        List<String> myNames = myDataSource.getAllStructureDefinitionNames();
+        List<String> myNames = myDataSource.getAllResourceNames(ResourceType.STRUCTUREDEFINITION);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -75,7 +75,7 @@ public class ResourceWebHandler {
             sb.append("<br />");
         }
         return sb.toString();
-    }
+    }*/
     
     public String getAGroupedListOfResources(ResourceType resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
@@ -88,7 +88,7 @@ public class ResourceWebHandler {
             HashMap<String, List<ResourceEntity>> myNames = null;
             
             if(resourceType == STRUCTUREDEFINITION) {
-            	myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
+            	myNames = myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else if (resourceType == VALUESET) {
             	myNames = myDataSource.getAllValueSetNamesByCategory();
             } else if (resourceType == OPERATIONDEFINITION) {
@@ -132,11 +132,11 @@ public class ResourceWebHandler {
 
     public String getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myNames = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(ResourceType.STRUCTUREDEFINITION, namePart);
+        List<String> myResourceIDs = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
         StringBuilder sb = new StringBuilder();
         
-        for(String name : myNames) {
-            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(name).append('>').append(name).append("</a>");
+        for(String id : myResourceIDs) {
+            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(id).append('>').append(id).append("</a>");
             sb.append("<br />");
         }
         return sb.toString();

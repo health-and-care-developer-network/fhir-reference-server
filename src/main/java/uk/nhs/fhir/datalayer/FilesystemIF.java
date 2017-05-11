@@ -114,9 +114,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<StructureDefinition> getAllStructureDefinitions() {
-        LOG.info("Getting all StructureDefinitions");
-        return FileCache.getResources(ResourceType.STRUCTUREDEFINITION);
+    public List<IBaseResource> getAllResourcesOfType(ResourceType resourceType) {
+        LOG.info("Getting all resources of type: " + resourceType.name());
+        return FileCache.getResources(resourceType);
     }
     
     /**
@@ -124,9 +124,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<String> getAllStructureDefinitionNames() {
-        LOG.info("Getting all StructureDefinition Names");
-        return FileCache.getResourceNameList(ResourceType.STRUCTUREDEFINITION);
+    public List<String> getAllResourceNames(ResourceType resourceType) {
+        LOG.info("Getting all Resource Names for type: " + resourceType.name());
+        return FileCache.getResourceNameList(resourceType);
     }
     
     /**
@@ -135,9 +135,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
-        LOG.info("Getting all StructureDefinition Names by base resource");
-        return FileCache.getGroupedNameList(ResourceType.STRUCTUREDEFINITION);
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
+        LOG.info("Getting all Resource Names by base resource");
+        return FileCache.getGroupedNameList(resourceType);
     }
     
     /**
@@ -271,18 +271,7 @@ public class FilesystemIF implements Datasource {
         return valSetList;
     }
 
-    @Override
-    public List<ValueSet> getAllValueSets() {
-    	return FileCache.getResources(ResourceType.VALUESET);
-    }
-
-    
-	@Override
-	public List<OperationDefinition> getAllOperations() {
-		return FileCache.getResources(ResourceType.OPERATIONDEFINITION);
-	}
-
-	@Override
+    	@Override
 	public List<String> getAllOperationNames() {
         LOG.info("Getting all Operation Names");
         List<String> operationList = FileCache.getResourceNameList(ResourceType.OPERATIONDEFINITION);
@@ -293,12 +282,6 @@ public class FilesystemIF implements Datasource {
 	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
     	LOG.info("Getting all Operation Names by category");
         return FileCache.getGroupedNameList(ResourceType.OPERATIONDEFINITION);
-	}
-
-
-	@Override
-	public List<ImplementationGuide> getAllImplementationGuides() {
-		return FileCache.getResources(ResourceType.IMPLEMENTATIONGUIDE);
 	}
 
 	@Override

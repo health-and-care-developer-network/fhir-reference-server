@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -169,8 +170,8 @@ public class ValueSetProvider implements IResourceProvider {
     }
     
     @Search
-    public List<ValueSet> getAllValueSets() {
-        List<ValueSet> results = myDataSource.getAllValueSets();
+    public List<IBaseResource> getAllValueSets() {
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(ResourceType.VALUESET);
         return results;
     }
 //</editor-fold>
