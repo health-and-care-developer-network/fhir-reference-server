@@ -181,8 +181,8 @@ public class PlainContent extends CORSInterceptor {
     
     private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
-        String resourceName = theRequestDetails.getId().getIdPart();
-        content.append(getResourceContent(resourceName, mimeType, resourceType));
+        String resourceID = theRequestDetails.getId().getIdPart();
+        content.append(getResourceContent(resourceID, mimeType, resourceType));
         content.append("</div>");
     }
     
@@ -209,19 +209,19 @@ public class PlainContent extends CORSInterceptor {
 
         content.append(GenerateIntroSection());
 
-        String resourceName = theRequestDetails.getId().getIdPart();
+        String resourceID = theRequestDetails.getId().getIdPart();
 
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(DescribeStructureDefinition(resourceName));
+            content.append(DescribeStructureDefinition(resourceID));
         }
         if (resourceType == VALUESET) {
-            content.append(DescribeValueSet(resourceName));
+            content.append(DescribeValueSet(resourceID));
         }
         if (resourceType == OPERATIONDEFINITION) {
-        	content.append(DescribeOperationDefinition(resourceName));
+        	content.append(DescribeOperationDefinition(resourceID));
         }
         if (resourceType == IMPLEMENTATIONGUIDE) {
-        	content.append(DescribeImplementationGuide(resourceName));
+        	content.append(DescribeImplementationGuide(resourceID));
         }
         
         //content.append(GetXMLContent(resourceName));
@@ -230,7 +230,7 @@ public class PlainContent extends CORSInterceptor {
         
     }
     
-    private String getResourceContent(String resourceName, MimeType mimeType, ResourceType resourceType) {
+    private String getResourceContent(String resourceID, MimeType mimeType, ResourceType resourceType) {
     	
     	IBaseResource resource = null;
     	
@@ -240,31 +240,31 @@ public class PlainContent extends CORSInterceptor {
         textElement.setDiv("");
     	
     	if (resourceType == STRUCTUREDEFINITION) {
-    		StructureDefinition sd = myWebHandler.getSDByName(resourceName);
+    		StructureDefinition sd = myWebHandler.getSDByID(resourceID);
     		sd.setText(textElement);
     		resource = sd;
     	} else if (resourceType == VALUESET) {
-    		ValueSet vs = myWebHandler.getVSByName(resourceName);
+    		ValueSet vs = myWebHandler.getVSByID(resourceID);
     		vs.setText(textElement);
     		resource = vs;
     	} else if (resourceType == OPERATIONDEFINITION) {
-     		OperationDefinition od = myWebHandler.getOperationByName(resourceName);
+     		OperationDefinition od = myWebHandler.getOperationByID(resourceID);
      		od.setText(textElement);
      		resource = od;
     	} else if (resourceType == IMPLEMENTATIONGUIDE) {
-     		ImplementationGuide ig = myWebHandler.getImplementationGuideByName(resourceName);
+     		ImplementationGuide ig = myWebHandler.getImplementationGuideByID(resourceID);
      		ig.setText(textElement);
      		resource = ig;
      	}
         
         if (mimeType == JSON) {
-        	return getResourceAsJSON(resource, resourceName);
+        	return getResourceAsJSON(resource, resourceID);
         } else {
-        	return getResourceAsXML(resource, resourceName);
+        	return getResourceAsXML(resource, resourceID);
         }
     }
     
-    private String getResourceAsXML(IBaseResource resource, String url) {
+    private String getResourceAsXML(IBaseResource resource, String resourceID) {
         // Serialise it to XML
         FhirContext ctx = FhirContext.forDstu2();
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
@@ -272,8 +272,8 @@ public class PlainContent extends CORSInterceptor {
         String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
         // Wrap it in a div and pre tag
         StringBuffer out = new StringBuffer();
-        if (url != null) {
-        	out.append("<p><a href='./" + url + "'>Back to rendered view</a></p>");
+        if (resourceID != null) {
+        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
         }
         out.append("<div class='rawXML'><pre lang='xml'>");
         out.append(xml);
@@ -281,7 +281,7 @@ public class PlainContent extends CORSInterceptor {
         return out.toString();
     }
     
-    private String getResourceAsJSON(IBaseResource resource, String url) {
+    private String getResourceAsJSON(IBaseResource resource, String resourceID) {
         // Serialise it to JSON
         FhirContext ctx = FhirContext.forDstu2();
         String serialised = ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
@@ -289,8 +289,8 @@ public class PlainContent extends CORSInterceptor {
         //String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
         // Wrap it in a div and pre tag
         StringBuffer out = new StringBuffer();
-        if (url != null) {
-        	out.append("<p><a href='./" + url + "'>Back to rendered view</a></p>");
+        if (resourceID != null) {
+        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
         }
         out.append("<div class='rawXML'><pre lang='json'>");
         out.append(serialised);
@@ -302,13 +302,13 @@ public class PlainContent extends CORSInterceptor {
      * Code in here to create the HTML response to a request for a
      * StructureDefinition we hold.
      *
-     * @param resourceName Name of the SD we need to describe.
+     * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeStructureDefinition(String resourceName) {
+    private String DescribeStructureDefinition(String resourceID) {
         StringBuilder content = new StringBuilder();
         StructureDefinition sd;
-        sd = myWebHandler.getSDByName(resourceName);
+        sd = myWebHandler.getSDByID(resourceID);
         content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
@@ -322,8 +322,8 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(sd.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceName + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         String textSection = sd.getText().getDivAsString();
         if (textSection != null) {
@@ -339,13 +339,13 @@ public class PlainContent extends CORSInterceptor {
      * Code in here to create the HTML response to a request for a
      * StructureDefinition we hold.
      *
-     * @param resourceName Name of the SD we need to describe.
+     * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeOperationDefinition(String resourceName) {
+    private String DescribeOperationDefinition(String resourceID) {
         StringBuilder content = new StringBuilder();
         OperationDefinition od;
-        od = myWebHandler.getOperationByName(resourceName);
+        od = myWebHandler.getOperationByID(resourceID);
         content.append("<h2 class='resourceType'>" + od.getName() + " (OperationDefinition)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
@@ -359,8 +359,8 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceName + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         String textSection = od.getText().getDivAsString();
         if (textSection != null) {
@@ -375,13 +375,13 @@ public class PlainContent extends CORSInterceptor {
      * Code in here to create the HTML response to a request for a
      * StructureDefinition we hold.
      *
-     * @param resourceName Name of the SD we need to describe.
+     * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeImplementationGuide(String resourceName) {
+    private String DescribeImplementationGuide(String resourceID) {
         StringBuilder content = new StringBuilder();
         ImplementationGuide od;
-        od = myWebHandler.getImplementationGuideByName(resourceName);
+        od = myWebHandler.getImplementationGuideByID(resourceID);
         content.append("<h2 class='resourceType'>" + od.getName() + " (ImplementationGuide)</h2>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
@@ -394,8 +394,8 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
         content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
         content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ImplementationGuide: <a href='./" + resourceName + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("<li>Show Raw ImplementationGuide: <a href='./" + resourceID + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         String textSection = od.getText().getDivAsString();
         if (textSection != null) {
@@ -410,14 +410,14 @@ public class PlainContent extends CORSInterceptor {
     /**
      * Code to generate a HTML view of the named ValueSet
      *
-     * @param resourceName Named resource we need to describe.
+     * @param resourceID Named resource we need to describe.
      *
      * @return
      */
-    private String DescribeValueSet(String resourceName) {
+    private String DescribeValueSet(String resourceID) {
         StringBuilder content = new StringBuilder();
         ValueSet valSet;
-        valSet = myWebHandler.getVSByName(resourceName);
+        valSet = myWebHandler.getVSByID(resourceID);
         String textSection = valSet.getText().getDivAsString();
         
         
@@ -438,8 +438,8 @@ public class PlainContent extends CORSInterceptor {
         }
         // These ones aren't in the test section, so output them in all cases
         content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ValueSet: <a href='./" + resourceName + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceName + "?_format=json'>JSON</a></li>");
+        content.append("<li>Show Raw ValueSet: <a href='./" + resourceID + "?_format=xml'>XML</a>"
+        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
         content.append("</div>");
         
         if (textSection != null) {

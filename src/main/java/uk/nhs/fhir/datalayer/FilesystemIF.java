@@ -179,6 +179,21 @@ public class FilesystemIF implements Datasource {
     }
 
     /**
+     * Gets a specific ValueSet specified by id.
+     * 
+     * @param id
+     * @return 
+     */
+    public ValueSet getSingleValueSetByID(String id) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
+    	File path = entry.getResourceFile();
+    	LOG.info("Getting ValueSet with id=" + id + " looking for file: " + path.getAbsolutePath());
+        
+    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
+        return foundValSet;
+    }
+
+    /**
      * Gets a specific ValueSet specified by name.
      * 
      * @param name
@@ -192,7 +207,7 @@ public class FilesystemIF implements Datasource {
     	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
         return foundValSet;
     }
-
+    
     /**
      * This is the method to do a search based on name, ie to find where
      * name:contains=[parameter]
@@ -256,10 +271,10 @@ public class FilesystemIF implements Datasource {
 
     
 	@Override
-	public OperationDefinition getSingleOperationDefinitionByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
+	public OperationDefinition getSingleOperationDefinitionByID(String id) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
     	File path = entry.getResourceFile();
-    	LOG.info("Getting Operation with name=" + name + " looking for file: " + path.getAbsolutePath());
+    	LOG.info("Getting Operation with ID=" + id + " looking for file: " + path.getAbsolutePath());
         
     	OperationDefinition foundOperation = (OperationDefinition)FHIRUtils.loadResourceFromFile(path);
         return foundOperation;
@@ -285,10 +300,10 @@ public class FilesystemIF implements Datasource {
 
 	
 	@Override
-	public ImplementationGuide getSingleImplementationGuideByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
+	public ImplementationGuide getSingleImplementationGuideByID(String id) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
     	File path = entry.getResourceFile();
-    	LOG.info("Getting ImplementationGuide with name=" + name + " looking for file: " + path.getAbsolutePath());
+    	LOG.info("Getting ImplementationGuide with name=" + id + " looking for file: " + path.getAbsolutePath());
         
     	ImplementationGuide foundGuide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(path);
         return foundGuide;

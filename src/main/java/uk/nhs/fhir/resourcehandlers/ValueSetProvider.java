@@ -121,8 +121,8 @@ public class ValueSetProvider implements IResourceProvider {
      */
     @Read()
     public ValueSet getValueSetById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        ValueSet foundItem = myDataSource.getSingleValueSetByName(name);
+        String id = theId.getIdPart().toString();
+        ValueSet foundItem = myDataSource.getSingleValueSetByID(id);
         return foundItem;
     }
     
@@ -161,9 +161,9 @@ public class ValueSetProvider implements IResourceProvider {
         List<ValueSet> results = new ArrayList<ValueSet>();
         ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
         
-        List<String> names = codeCache.findCode(theCode.getValue());
-        for(String theName : names) {
-            results.add(myDataSource.getSingleValueSetByName(theName));
+        List<String> ids = codeCache.findCode(theCode.getValue());
+        for(String theID : ids) {
+            results.add(myDataSource.getSingleValueSetByID(theID));
         }
         return results;
     }

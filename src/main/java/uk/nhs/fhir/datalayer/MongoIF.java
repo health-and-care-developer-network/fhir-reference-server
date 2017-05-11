@@ -75,9 +75,9 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getSingleStructureDefinitionByName(java.lang.String)
 	 */
     @Override
-	public StructureDefinition getSingleStructureDefinitionByName(String name) {
-        LOG.info("Getting StructureDefinitions with name=" + name);
-        BasicDBObject query = new BasicDBObject("name", name);
+	public StructureDefinition getSingleStructureDefinitionByID(String id) {
+        LOG.info("Getting StructureDefinitions with id=" + id);
+        BasicDBObject query = new BasicDBObject("id", id);
         DBObject found = profiles.findOne(query);
         StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource(found.toString());
         return foundDocRef;
@@ -195,7 +195,7 @@ public class MongoIF implements Datasource {
     }
 
     @Override
-    public ValueSet getSingleValueSetByName(String name) {
+    public ValueSet getSingleValueSetByID(String id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -215,7 +215,7 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public OperationDefinition getSingleOperationDefinitionByName(String name) {
+	public OperationDefinition getSingleOperationDefinitionByID(String id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -235,7 +235,7 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public ImplementationGuide getSingleImplementationGuideByName(String name) {
+	public ImplementationGuide getSingleImplementationGuideByID(String id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

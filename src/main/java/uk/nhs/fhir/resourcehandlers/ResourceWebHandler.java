@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author Tim Coates
+ * @author Adam Hatherly
  */
 public class ResourceWebHandler {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
@@ -147,21 +148,21 @@ public class ResourceWebHandler {
         return sd;
     }
 
-    public OperationDefinition getOperationByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getOperationByName(String name)");
-        OperationDefinition od = myDataSource.getSingleOperationDefinitionByName(name);
+    public OperationDefinition getOperationByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getOperationByID(String id)");
+        OperationDefinition od = myDataSource.getSingleOperationDefinitionByID(id);
         return od;
     }
 
-    public ImplementationGuide getImplementationGuideByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByName(String name)");
-        ImplementationGuide ig = myDataSource.getSingleImplementationGuideByName(name);
+    public ImplementationGuide getImplementationGuideByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByID(String id)");
+        ImplementationGuide ig = myDataSource.getSingleImplementationGuideByID(id);
         return ig;
     }
     
-    public ValueSet getVSByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getVSByName(String name)");
-        ValueSet valSet = myDataSource.getSingleValueSetByName(name);
+    public ValueSet getVSByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getVSByID(String id)");
+        ValueSet valSet = myDataSource.getSingleValueSetByID(id);
         return valSet;
     }
 }

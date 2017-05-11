@@ -93,8 +93,8 @@ public class ImplementationGuideProvider implements IResourceProvider  {
      */
     @Read
     public ImplementationGuide getResourceById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        ImplementationGuide foundItem = myDataSource.getSingleImplementationGuideByName(name);
+        String id = theId.getIdPart().toString();
+        ImplementationGuide foundItem = myDataSource.getSingleImplementationGuideByID(id);
         return foundItem;
     }
     
