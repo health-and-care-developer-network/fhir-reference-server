@@ -19,6 +19,7 @@ import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -193,25 +194,25 @@ public class FileCache {
 		                	name = profile.getName();
 		                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
 		                    baseType = profile.getConstrainedType();
-		                    actualName = getActualNameFromURL(profile.getUrl(), name);
+		                    actualName = getResourceIDFromURL(profile.getUrl(), name);
 		                    displayGroup = baseType;
 		                } else if (resourceType == VALUESET) {
 		                	displayGroup = "Code List";
 		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = profile.getName();
-		                	actualName = getActualNameFromURL(profile.getUrl(), name);
+		                	actualName = getResourceIDFromURL(profile.getUrl(), name);
 		                	if (FHIRUtils.isValueSetSNOMED(profile)) {
 		                		displayGroup = "SNOMED CT Code List";
 		                	}
 		                } else if (resourceType == OPERATIONDEFINITION) {
 		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = operation.getName();
-		                    actualName = getActualNameFromURL(operation.getUrl(), name);
+		                    actualName = getResourceIDFromURL(operation.getUrl(), name);
 		                    displayGroup = "Operations";
 		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
 		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = guide.getName();
-		                    actualName = getActualNameFromURL(guide.getUrl(), name);
+		                    actualName = getResourceIDFromURL(guide.getUrl(), name);
 		                    displayGroup = "Implementation Guides";
 		                }
 		                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
@@ -227,17 +228,6 @@ public class FileCache {
         Collections.sort(newFileList);
         
         return newFileList;
-    }
-    
-    private static String getActualNameFromURL(String url, String def) {
-    	// Find the actual name of the resource from the URL
-        int idx = url.lastIndexOf('/');
-        if (idx > -1) {
-        	return url.substring(idx+1);
-        } else {
-        	// Can't find a real name in the URL!
-        	return def;
-        }
     }
     
     public static ResourceEntity getSingleResourceByID(String id) {
