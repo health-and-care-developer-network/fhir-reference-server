@@ -77,20 +77,12 @@ public interface Datasource {
      */
     public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
+    /**
+     * Gets a full list of names, grouped by category (specific to the resourcetype) for the web view
+     * 
+     * @param resourceType
+     * @return
+     */
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
     
-    List<String> getAllValueSetNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory();
-    
-
-    List<String> getAllOperationNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory();
-    
-
-    
-    List<String> getAllImplementationGuideNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory();
-
 }

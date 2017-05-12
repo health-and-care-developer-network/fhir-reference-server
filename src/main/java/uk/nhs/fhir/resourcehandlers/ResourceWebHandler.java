@@ -89,12 +89,8 @@ public class ResourceWebHandler {
             
             if(resourceType == STRUCTUREDEFINITION) {
             	myNames = myDataSource.getAllResourceNamesByBaseResource(resourceType);
-            } else if (resourceType == VALUESET) {
-            	myNames = myDataSource.getAllValueSetNamesByCategory();
-            } else if (resourceType == OPERATIONDEFINITION) {
-            	myNames = myDataSource.getAllOperationNamesByCategory();
-            } else if (resourceType == IMPLEMENTATIONGUIDE) {
-            	myNames = myDataSource.getAllImplementationGuideNamesByCategory();
+            } else {
+            	myNames = myDataSource.getAllResourceNamesByCategory(resourceType);
             }
             
             for(String base : myNames.keySet()) {

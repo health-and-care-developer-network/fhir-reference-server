@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,7 +49,7 @@ import uk.nhs.fhir.util.ServletStreamRawFile;
 @WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
 
-    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     Datasource dataSource = null;
@@ -69,7 +70,7 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
         } else if (request.getRequestURI().startsWith("/images/")) {
         	// Image files
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/png", request.getRequestURI());
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else {
             super.doGet(request, response);
         }

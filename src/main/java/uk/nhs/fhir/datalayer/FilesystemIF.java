@@ -141,13 +141,13 @@ public class FilesystemIF implements Datasource {
     }
     
     /**
-     * Gets a full list of valueset names grouped by the broad category of the valueset
-     * for the web view of /ValueSet requests.
+     * Gets a full list of resource names grouped by the broad category of the resource
+     * for the web view of /[ResourceType] requests.
      */
     @Override
-	public HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory() {
-    	LOG.info("Getting all ValueSet Names by category");
-        return FileCache.getGroupedNameList(ResourceType.VALUESET);
+	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
+    	LOG.info("Getting all Resource Names by category");
+        return FileCache.getGroupedNameList(resourceType);
 	}
     
 
@@ -270,31 +270,4 @@ public class FilesystemIF implements Datasource {
         
         return valSetList;
     }
-
-    	@Override
-	public List<String> getAllOperationNames() {
-        LOG.info("Getting all Operation Names");
-        List<String> operationList = FileCache.getResourceNameList(ResourceType.OPERATIONDEFINITION);
-        return operationList;
-	}
-
-	@Override
-	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
-    	LOG.info("Getting all Operation Names by category");
-        return FileCache.getGroupedNameList(ResourceType.OPERATIONDEFINITION);
-	}
-
-	@Override
-	public List<String> getAllImplementationGuideNames() {
-        LOG.info("Getting all ImplementationGuide Names");
-        List<String> guideList = FileCache.getResourceNameList(ResourceType.IMPLEMENTATIONGUIDE);
-        return guideList;
-	}
-
-	@Override
-	public HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory() {
-    	LOG.info("Getting all ImplementationGuide Names by category");
-        return FileCache.getGroupedNameList(ResourceType.IMPLEMENTATIONGUIDE);
-	}
-
 }

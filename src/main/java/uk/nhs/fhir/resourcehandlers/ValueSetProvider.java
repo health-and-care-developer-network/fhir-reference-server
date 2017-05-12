@@ -141,9 +141,10 @@ public class ValueSetProvider implements IResourceProvider {
      *    This method returns a list of ValueSets where the name matches the supplied parameter.
      */
     @Search()
-    public List<ValueSet> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
-        List<ValueSet> results = new ArrayList<ValueSet>();
-        return results;
+    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
+    	LOG.info("Request for ValueSet objects matching name: " + theName);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.VALUESET, theName.getValue());
+        return foundList;
     }
     
     /**

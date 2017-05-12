@@ -126,7 +126,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Search
     public List<IBaseResource> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-        List<IBaseResource> foundList = myDatasource.getResourceMatchByName(ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
+    	LOG.info("Request for StructureDefinition objects matching name: " + theNamePart);
+    	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
 
