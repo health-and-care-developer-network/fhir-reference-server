@@ -19,7 +19,9 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,35 +37,40 @@ import uk.nhs.fhir.resourcehandlers.*;
 
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.ServletStreamRawFile;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
  *
  * We create a datastore in initialize method, which we pass to each ResourceProvider so that all resources can be persisted to/from the same datastore.
  *
- * @author Tim Coates
+ * @author Tim Coates, Adam Hatherly
  */
 @WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
 
-    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     Datasource dataSource = null;
 
-    private static String css = FileLoader.loadFileOnClasspath("/style.css");
+    //private static String css = FileLoader.loadFileOnClasspath("/style.css");
+    //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.info("Requested URI: " + request.getRequestURI());
 
-        if(request.getRequestURI().equals("/style.css")) {
-            // Special case processing for the stylesheet as we are grabbing all URLs
-            response.setStatus(200);
-            response.setContentType("text/css");
-            PrintWriter outputStream = response.getWriter();
-            outputStream.append(css);
+        if(request.getRequestURI().endsWith(".css")) {
+            // Stylesheets
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
+        } else if (request.getRequestURI().endsWith("favicon.ico")) {
+        	// favicon.ico
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
+        } else if (request.getRequestURI().startsWith("/images/")) {
+        	// Image files
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else {
             super.doGet(request, response);
         }

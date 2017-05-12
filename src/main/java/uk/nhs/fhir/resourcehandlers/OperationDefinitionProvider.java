@@ -12,11 +12,13 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -92,8 +95,8 @@ public class OperationDefinitionProvider implements IResourceProvider  {
      */
     @Read
     public OperationDefinition getResourceById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        OperationDefinition foundItem = myDataSource.getSingleOperationDefinitionByName(name);
+        String id = theId.getIdPart().toString();
+        OperationDefinition foundItem = (OperationDefinition)myDataSource.getResourceByID(id);
         return foundItem;
     }
     
@@ -103,11 +106,23 @@ public class OperationDefinitionProvider implements IResourceProvider  {
      * @return
      */
     @Search
-    public List<OperationDefinition> getAllStructureDefinitions() {
+    public List<IBaseResource> getAllOperationDefinitions() {
         LOG.info("Request for ALL OperationDefinition objects");
-        List<OperationDefinition> foundList = myDataSource.getAllOperations();
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.OPERATIONDEFINITION);
         return foundList;
     }
 
+    /**
+     * Search by name, so will respond to queries of the form: /OperationDefinition?name:contains=blah
+     *
+     * @param theNamePart
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByNamePart(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
+    	LOG.info("Request for OperationDefinition objects matching name: " + theNamePart);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
+        return foundList;
+    }
 
 }

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  * This is an enum to hold whether the request is from a browser or not. It can be initialised using
@@ -13,22 +14,24 @@ import ca.uhn.fhir.rest.method.RequestDetails;
  */
 public enum ResourceType {
 	
-	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition"),
-	VALUESET("ValueSet", "ValueSet"),
-	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition"),
-	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide"),
-	CONFORMANCE("Conformance", "Conformance"), 
-	OTHER("Other", "Other");
+	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition", PropertyReader.getProperty("profilePath")),
+	VALUESET("ValueSet", "ValueSet", PropertyReader.getProperty("valusetPath")),
+	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition", PropertyReader.getProperty("operationsPath")),
+	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide", PropertyReader.getProperty("guidesPath")),
+	CONFORMANCE("Conformance", "Conformance", PropertyReader.getProperty("conformancePath")), 
+	OTHER("Other", "Other", null);
 	
 	private static final Logger LOG = Logger.getLogger(ResourceType.class.getName());
 	
-	private ResourceType(String displayName, String hapiName) {
+	private ResourceType(String displayName, String hapiName, String filesystemPath) {
 		this.displayName = displayName;
 		this.hapiName = hapiName;
+		this.filesystemPath = filesystemPath;
 	}
 	
 	private String displayName = null;
 	private String hapiName = null;
+	private String filesystemPath = null;
 	
 	@Override
 	public String toString() {
@@ -37,6 +40,10 @@ public enum ResourceType {
 	
 	public String getHAPIName() {
 		return this.hapiName;
+	}
+	
+	public String getFilesystemPath() {
+		return this.filesystemPath;
 	}
 	
     public static ResourceType getTypeFromRequest(RequestDetails theRequestDetails) {

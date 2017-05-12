@@ -1,0 +1,142 @@
+body {
+    background-color: #ffffff;
+    position: relative;
+    padding-top: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#header {
+    border-bottom: 1px solid silver;
+    background-color: #f5f5f5;
+    height: 80px;
+}
+
+#header h1, #header h2, #header h3 {
+    padding-top: 10px;
+    padding-left: 30px;
+    float: left;
+}
+
+#leftlogo {
+    float: left;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    margin-left: 0;
+    display: block;
+}
+
+#rightlogo {
+    float: right;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    margin-left: 0;
+    display: block;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #CCC;
+    font-size: 12px;
+    height: 20px;
+}
+
+footer div.links {
+    float: left;
+}
+
+footer div.copyright {
+    float: right;
+}
+
+h2.resourceType {
+    padding-top: 20px;
+}
+
+.fhirServerWarning {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #f2dede;
+    border-color: #eed3d7;
+    color: #b94a48;
+    padding: 15px;
+}
+.fhirServerNotice {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #f3fa8e;
+    border-color: #e9f271;
+    color: #ce5c00;
+    padding: 15px;
+}
+.resourceSummary {
+    border: thin solid #d4d2d2;
+    padding: 5px;
+    font-size: 0.8em;
+}
+.treeView, .operationTable, .guideContent {
+    border: thin solid #d4d2d2;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.renderedValueSet {
+    border: thin solid #d4d2d2;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.rawXML {
+    overflow-x: scroll;
+    border: thin solid #d4d2d2;
+    padding: 5px;
+    font-size: 0.6em;
+    margin-top: 5px;
+    line-height: 1.2em;
+}
+
+/*
+.treeView tr {
+    line-height: 0.8em;
+}
+
+.renderedValueSet td {
+    padding: 5px;
+}
+*/
+
+.operationTable th {
+    background: #f0f0f0;
+    min-width: 153px;
+}
+
+.operationTable td {
+    min-width: 153px;
+}
+
+.guideContent {
+	font-size: 0.8em;
+}
+
+.guideContent h1 {
+	padding-top: 5px;
+	font-size: 1.6em;
+}
+.guideContent h2 {
+	padding-top: 5px;
+	font-size: 1.4em;
+}
+
+.guideContent td, .guideContent th {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.guideContent th {
+	font-weight: bold;
+}
+
+.guideContent .nameCol {
+	width: 300px;
+}

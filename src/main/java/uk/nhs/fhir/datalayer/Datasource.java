@@ -18,11 +18,14 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 
 public interface Datasource {
 
@@ -32,7 +35,7 @@ public interface Datasource {
      * @param name
      * @return
      */
-    StructureDefinition getSingleStructureDefinitionByName(String name);
+	IBaseResource getResourceByID(String id);
     
     /**
      * This is the method to do a search based on name, ie to find where
@@ -41,14 +44,14 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart);
+    List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of StructureDefinition objects
      *
      * @return
      */
-    List<StructureDefinition> getAllStructureDefinitions();
+    List<IBaseResource> getAllResourcesOfType(ResourceType resourceType);
 
     /**
      * Gets a full list of names for the web view of /StructureDefinition
@@ -56,7 +59,7 @@ public interface Datasource {
      *
      * @return
      */
-    List<String> getAllStructureDefinitionNames();
+    List<String> getAllResourceNames(ResourceType resourceType);
 
     /**
      * Gets a full list of names, grouped by base resource for the web view of
@@ -64,7 +67,7 @@ public interface Datasource {
      *
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource();
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType);
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -72,45 +75,14 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<String> getAllStructureDefinitionNames(String theNamePart);
+    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
     /**
-     * This is the method to get a specific ValueSet by name.
-     *
-     * @param name
+     * Gets a full list of names, grouped by category (specific to the resourcetype) for the web view
+     * 
+     * @param resourceType
      * @return
      */
-    ValueSet getSingleValueSetByName(String name);
-
-    List<ValueSet> getAllValueSets();
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
     
-    List<String> getAllValueSetNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory();
-    
-
-    /**
-     * Gets a specific one
-     *
-     * @param name
-     * @return
-     */
-    OperationDefinition getSingleOperationDefinitionByName(String name);
-
-    List<OperationDefinition> getAllOperations();
-    
-    List<String> getAllOperationNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory();
-    
-    
-    // ImplementationGuides
-    ImplementationGuide getSingleImplementationGuideByName(String name);
-
-    List<ImplementationGuide> getAllImplementationGuides();
-    
-    List<String> getAllImplementationGuideNames();
-    
-    HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory();
-
 }

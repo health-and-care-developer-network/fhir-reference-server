@@ -53,10 +53,6 @@ public class FileCache {
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
-    private static String profilePath = PropertyReader.getProperty("profilePath");
-    private static String valueSetPath = PropertyReader.getProperty("valusetPath");
-    private static String operationsPath = PropertyReader.getProperty("operationsPath");
-    private static String guidesPath = PropertyReader.getProperty("guidesPath");
     private static String fileExtension = PropertyReader.getProperty("fileExtension");
 
 
@@ -120,12 +116,12 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List getResources(ResourceType resourceType) {
+    public static List<IBaseResource> getResources(ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
         // Load each resource file and put them in a list to return
-        ArrayList allFiles = new ArrayList();
+        ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
         for (ResourceEntity entry : resourceList) {
         	if (entry.getResourceType() == resourceType) {
         		IBaseResource vs = FHIRUtils.loadResourceFromFile(entry.getResourceFile());
@@ -151,16 +147,16 @@ public class FileCache {
             LOG.fine("Updating cache from filesystem");
             
             // Load StructureDefinitions
-            ArrayList<ResourceEntity> newList = cacheFHIRResources(profilePath, STRUCTUREDEFINITION);
+            ArrayList<ResourceEntity> newList = cacheFHIRResources(STRUCTUREDEFINITION);
             
             // Add ValueSets
-            newList.addAll(cacheFHIRResources(valueSetPath, VALUESET));
+            newList.addAll(cacheFHIRResources(VALUESET));
             
             // Add operations
-            newList.addAll(cacheFHIRResources(operationsPath, OPERATIONDEFINITION));
+            newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
 
             // Add ImplementationGuides
-            newList.addAll(cacheFHIRResources(guidesPath, IMPLEMENTATIONGUIDE));
+            newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
             
             // Swap out for our new list
             resourceList = newList;
@@ -169,8 +165,9 @@ public class FileCache {
         }
     }
     
-    private static ArrayList<ResourceEntity> cacheFHIRResources(String path, ResourceType resourceType){
+    private static ArrayList<ResourceEntity> cacheFHIRResources(ResourceType resourceType){
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
+        String path = resourceType.getFilesystemPath();
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -243,17 +240,39 @@ public class FileCache {
         }
     }
     
-    public static ResourceEntity getSingleResourceByName(String name) {
+    public static ResourceEntity getSingleResourceByID(String id) {
         if(updateRequired()) {
             updateCache();
         }
     	for (ResourceEntity entry : resourceList) {
-    		if (entry.getResourceName().equals(name) || entry.getActualResourceName().equals(name)) {
+    		/*if (entry.getResourceName().equals(id) || entry.getResourceID().equals(id)) {
+    			return entry;
+    		}*/
+    		if (entry.getResourceID().equals(id)) {
     			return entry;
     		}
     	}
     	return null;
     }
+    
+    public static ResourceEntity getSingleResourceByName(String name) {
+        if(updateRequired()) {
+            updateCache();
+        }
+    	for (ResourceEntity entry : resourceList) {
+    		if (entry.getResourceName().equals(name)) {
+    			return entry;
+    		}
+    	}
+    	return null;
+    }
+
+	public static List<ResourceEntity> getResourceList() {
+		if(updateRequired()) {
+            updateCache();
+        }
+		return resourceList;
+	}
     
     /*
     private static void printCacheContent() {

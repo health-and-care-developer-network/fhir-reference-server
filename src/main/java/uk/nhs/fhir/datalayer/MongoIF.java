@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.Cursor;
 import com.mongodb.DB;
@@ -34,10 +36,11 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
- *
+ * This hasn't kept up with the Filesystem implementation, so needs a lot of work if we want to use it in future
  * @author Tim Coates
  */
 public class MongoIF implements Datasource {
@@ -75,18 +78,18 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getSingleStructureDefinitionByName(java.lang.String)
 	 */
     @Override
-	public StructureDefinition getSingleStructureDefinitionByName(String name) {
-        LOG.info("Getting StructureDefinitions with name=" + name);
-        BasicDBObject query = new BasicDBObject("name", name);
+	public IBaseResource getResourceByID(String id) {
+        LOG.info("Getting Resource with id=" + id);
+        BasicDBObject query = new BasicDBObject("id", id);
         DBObject found = profiles.findOne(query);
-        StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource(found.toString());
+        IBaseResource foundDocRef = (IBaseResource) ctx.newJsonParser().parseResource(found.toString());
         return foundDocRef;
     }
 
     /* (non-Javadoc)
 	 * @see uk.nhs.fhir.datalayer.Datasource#getMatchByName(java.lang.String)
 	 */
-    @Override
+    /*@Override
 	public List<StructureDefinition> getStructureDefinitionMatchByName(String theNamePart) {
         LOG.info("Getting StructureDefinitions with name=" + theNamePart);
         List<StructureDefinition> list = new ArrayList<StructureDefinition>();
@@ -109,29 +112,37 @@ public class MongoIF implements Datasource {
         }        
         LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
         return list;
-    }
+    }*/
 
     /* (non-Javadoc)
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAll()
 	 */
     @Override
-	public List<StructureDefinition> getAllStructureDefinitions() {
-        LOG.info("Getting all StructureDefinitions");
+	public List<IBaseResource> getAllResourcesOfType(ResourceType resourceType) {
+        LOG.info("Getting all resources of type:" + resourceType.name());
         
-        List<StructureDefinition> list = new ArrayList<StructureDefinition>();
+        List<IBaseResource> list = new ArrayList<IBaseResource>();
         
-        Cursor cursor;
-        cursor = profiles.find();
+        Cursor cursor = null;
+        switch(resourceType) {
+        	case STRUCTUREDEFINITION:
+        		cursor = profiles.find();
+        		break;
+        	case VALUESET:
+        		//cursor = profiles.find();
+        		// Still to be implemented
+        		break;
+        }
         try {
             while(cursor.hasNext()) {
                 LOG.info("Got one...");
-                StructureDefinition foundDocRef = (StructureDefinition) ctx.newJsonParser().parseResource((String) cursor.next().toString());
+                IBaseResource foundDocRef = (IBaseResource) ctx.newJsonParser().parseResource((String) cursor.next().toString());
                 list.add(foundDocRef);
             }
         } finally {
             cursor.close();
         }        
-        LOG.info("Returning a list of : " + list.size() + "StructureDefinitions");
+        LOG.info("Returning a list of : " + list.size());
         return list;
     }
     
@@ -139,7 +150,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames()
 	 */
     @Override
-	public List<String> getAllStructureDefinitionNames() {
+	public List<String> getAllResourceNames(ResourceType resourceType) {
         LOG.info("Getting all StructureDefinition Names");
         
         List<String> list = new ArrayList<String>();
@@ -163,7 +174,7 @@ public class MongoIF implements Datasource {
     /* (non-Javadoc)
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames(java.lang.String)
 	 */
-    @Override
+    /*@Override
 	public List<String> getAllStructureDefinitionNames(String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
@@ -187,70 +198,24 @@ public class MongoIF implements Datasource {
         }        
         LOG.info("Returning a list of : " + list.size() + "StructureDefinition names");
         return list;
-    }
+    }*/
     
-    public HashMap<String, List<ResourceEntity>> getAllStructureDefinitionNamesByBaseResource() {
-    	//TODO: Implement this for Mongo
-    	return null;
-    }
-
-    @Override
-    public ValueSet getSingleValueSetByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<ValueSet> getAllValueSets() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<String> getAllValueSetNames() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
+    	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 	@Override
-	public HashMap<String, List<ResourceEntity>> getAllValueSetNamesByCategory() {
+	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
-	public OperationDefinition getSingleOperationDefinitionByName(String name) {
+	public List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<OperationDefinition> getAllOperations() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public List<String> getAllOperationNames() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public HashMap<String, List<ResourceEntity>> getAllOperationNamesByCategory() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public ImplementationGuide getSingleImplementationGuideByName(String name) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public List<ImplementationGuide> getAllImplementationGuides() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public List<String> getAllImplementationGuideNames() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public HashMap<String, List<ResourceEntity>> getAllImplementationGuideNamesByCategory() {
+	public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

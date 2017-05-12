@@ -31,7 +31,14 @@ public class PropertyReader implements GlobalConstants {
     // When this class is loaded by the JVM, immediately read the property file
     static {
     	defaultProperties = new Properties();
-    	initialise(defaultProperties, PROPERTY_FILE);        
+    	
+    	String configFile = System.getenv("CONFIG_FILE");
+    	if (configFile == null) {
+    		initialise(defaultProperties, PROPERTY_FILE);
+    	} else {
+    		System.out.println("Using custom configuration from: " + configFile);
+    		initialise(defaultProperties, configFile);
+    	}
     }
 
     /**

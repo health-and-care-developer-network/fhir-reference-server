@@ -25,6 +25,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -93,8 +94,8 @@ public class ImplementationGuideProvider implements IResourceProvider  {
      */
     @Read
     public ImplementationGuide getResourceById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        ImplementationGuide foundItem = myDataSource.getSingleImplementationGuideByName(name);
+        String id = theId.getIdPart().toString();
+        ImplementationGuide foundItem = (ImplementationGuide)myDataSource.getResourceByID(id);
         return foundItem;
     }
     
@@ -104,9 +105,9 @@ public class ImplementationGuideProvider implements IResourceProvider  {
      * @return
      */
     @Search
-    public List<ImplementationGuide> getAllImplementationGuides() {
+    public List<IBaseResource> getAllImplementationGuides() {
         LOG.info("Request for ALL ImplementationGuide objects");
-        List<ImplementationGuide> foundList = myDataSource.getAllImplementationGuides();
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.IMPLEMENTATIONGUIDE);
         return foundList;
     }
 

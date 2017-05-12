@@ -25,6 +25,7 @@ import java.util.List;
  * hosted on this server.
  * 
  * @author tim.coates@hscic.gov.uk
+ * @author Adam Hatherly
  */
 public class ValueSetCodesCache {
     private static List<cacheObject> _cache;
@@ -51,7 +52,7 @@ public class ValueSetCodesCache {
         
         // First we should remove any items previously added from this ValueSet
         for(cacheObject cacheItem : _cache) {
-            if(cacheItem._valueSet.equals(theSet.getName())) {
+            if(cacheItem._valueSetID.equals(theSet.getId().getIdPart())) {
                 _cache.remove(cacheItem);
             }
         }
@@ -59,7 +60,7 @@ public class ValueSetCodesCache {
         // Now we simply iterate through the ValueSet, adding each code we come across.
         List<CodeSystemConcept> codes = theSet.getCodeSystem().getConcept();
         for(CodeSystemConcept code : codes) {
-            _cache.add(new cacheObject(code.getCode(), theSet.getName()));
+            _cache.add(new cacheObject(code.getCode(), theSet.getId().getIdPart()));
         }
     }
     
@@ -83,14 +84,14 @@ public class ValueSetCodesCache {
      *              <display value="Fully Registered"/>
      *          </concept>
      * 
-     * @return A List of ValueSet names, where this code was found.
+     * @return A List of ValueSet IDs, where this code was found.
      */
     public static List<String> findCode(String code) {
         List<String> matches = new ArrayList<String>();
         
         for(cacheObject cacheItem : _cache) {
             if(cacheItem._code.equals(code)) {
-                matches.add(cacheItem._valueSet);
+                matches.add(cacheItem._valueSetID);
             }
         }               
         return matches;
@@ -98,22 +99,22 @@ public class ValueSetCodesCache {
     
     /**
      * Private internal class, to represent the items we're caching. Each on is simply a pair of the
-     * code, and the ValueSet name.
+     * code, and the ValueSet ID.
      * 
      */
     private class cacheObject {
         protected String _code;
-        protected String _valueSet;
+        protected String _valueSetID;
 
         /**
          * Constructor.
          * 
          * @param newCode
-         * @param newValueSet 
+         * @param newValueSetID
          */
-        public cacheObject(String newCode, String newValueSet) {
+        public cacheObject(String newCode, String newValueSetID) {
             this._code = newCode;
-            this._valueSet = newValueSet;
+            this._valueSetID = newValueSetID;
         }
     }
 }

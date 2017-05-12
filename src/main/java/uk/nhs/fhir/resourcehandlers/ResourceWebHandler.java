@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author Tim Coates
+ * @author Adam Hatherly
  */
 public class ResourceWebHandler {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
@@ -64,9 +65,9 @@ public class ResourceWebHandler {
         LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    public String getAllStructureDefinitionNames(String resourceType) {
+    /*public String getAllStructureDefinitionNames(String resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAllNames()");
-        List<String> myNames = myDataSource.getAllStructureDefinitionNames();
+        List<String> myNames = myDataSource.getAllResourceNames(ResourceType.STRUCTUREDEFINITION);
         StringBuilder sb = new StringBuilder();
         
         for(String name : myNames) {
@@ -74,7 +75,7 @@ public class ResourceWebHandler {
             sb.append("<br />");
         }
         return sb.toString();
-    }
+    }*/
     
     public String getAGroupedListOfResources(ResourceType resourceType) {
         LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
@@ -87,13 +88,9 @@ public class ResourceWebHandler {
             HashMap<String, List<ResourceEntity>> myNames = null;
             
             if(resourceType == STRUCTUREDEFINITION) {
-            	myNames = myDataSource.getAllStructureDefinitionNamesByBaseResource();
-            } else if (resourceType == VALUESET) {
-            	myNames = myDataSource.getAllValueSetNamesByCategory();
-            } else if (resourceType == OPERATIONDEFINITION) {
-            	myNames = myDataSource.getAllOperationNamesByCategory();
-            } else if (resourceType == IMPLEMENTATIONGUIDE) {
-            	myNames = myDataSource.getAllImplementationGuideNamesByCategory();
+            	myNames = myDataSource.getAllResourceNamesByBaseResource(resourceType);
+            } else {
+            	myNames = myDataSource.getAllResourceNamesByCategory(resourceType);
             }
             
             for(String base : myNames.keySet()) {
@@ -101,9 +98,9 @@ public class ResourceWebHandler {
                     sb.append(base);
                     sb.append(endOfBaseResourceBox);
                     for(ResourceEntity resource : myNames.get(base)) {
-                    	String name_for_url = resource.getActualResourceName();
+                    	String name_for_url = resource.getResourceID();
 						try {
-							name_for_url = URLEncoder.encode(resource.getActualResourceName(), Charset.defaultCharset().name());
+							name_for_url = URLEncoder.encode(resource.getResourceID(), Charset.defaultCharset().name());
 						} catch (UnsupportedEncodingException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -131,37 +128,37 @@ public class ResourceWebHandler {
 
     public String getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myNames = myDataSource.getAllStructureDefinitionNames(namePart);
+        List<String> myResourceIDs = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
         StringBuilder sb = new StringBuilder();
         
-        for(String name : myNames) {
-            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(name).append('>').append(name).append("</a>");
+        for(String id : myResourceIDs) {
+            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(id).append('>').append(id).append("</a>");
             sb.append("<br />");
         }
         return sb.toString();
     }
         
-    public StructureDefinition getSDByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getSDByName(String name)");
-        StructureDefinition sd = myDataSource.getSingleStructureDefinitionByName(name);
+    public StructureDefinition getSDByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getSDByID(String id)");
+        StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
         return sd;
     }
 
-    public OperationDefinition getOperationByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getOperationByName(String name)");
-        OperationDefinition od = myDataSource.getSingleOperationDefinitionByName(name);
+    public OperationDefinition getOperationByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getOperationByID(String id)");
+        OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(id);
         return od;
     }
 
-    public ImplementationGuide getImplementationGuideByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByName(String name)");
-        ImplementationGuide ig = myDataSource.getSingleImplementationGuideByName(name);
+    public ImplementationGuide getImplementationGuideByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByID(String id)");
+        ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(id);
         return ig;
     }
     
-    public ValueSet getVSByName(String name) {
-        LOG.fine("Called: ProfileWebHandler.getVSByName(String name)");
-        ValueSet valSet = myDataSource.getSingleValueSetByName(name);
+    public ValueSet getVSByID(String id) {
+        LOG.fine("Called: ProfileWebHandler.getVSByID(String id)");
+        ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
         return valSet;
     }
 }

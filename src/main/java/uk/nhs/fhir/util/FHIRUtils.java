@@ -89,7 +89,7 @@ public class FHIRUtils {
         } catch (DataFormatException e) {
             e.printStackTrace();
         }
-        LOG.info("Resource loaded - size: " + resource.length());
+        LOG.info("Resource loaded - size: " + resource.length() + " from file: " + file.getName());
         return vSet;
     }
     

@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
+import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -121,8 +122,8 @@ public class ValueSetProvider implements IResourceProvider {
      */
     @Read()
     public ValueSet getValueSetById(@IdParam IdDt theId) {
-        String name = theId.getIdPart().toString();
-        ValueSet foundItem = myDataSource.getSingleValueSetByName(name);
+        String id = theId.getIdPart().toString();
+        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(id);
         return foundItem;
     }
     
@@ -140,9 +141,10 @@ public class ValueSetProvider implements IResourceProvider {
      *    This method returns a list of ValueSets where the name matches the supplied parameter.
      */
     @Search()
-    public List<ValueSet> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
-        List<ValueSet> results = new ArrayList<ValueSet>();
-        return results;
+    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
+    	LOG.info("Request for ValueSet objects matching name: " + theName);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.VALUESET, theName.getValue());
+        return foundList;
     }
     
     /**
@@ -161,16 +163,16 @@ public class ValueSetProvider implements IResourceProvider {
         List<ValueSet> results = new ArrayList<ValueSet>();
         ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
         
-        List<String> names = codeCache.findCode(theCode.getValue());
-        for(String theName : names) {
-            results.add(myDataSource.getSingleValueSetByName(theName));
+        List<String> ids = codeCache.findCode(theCode.getValue());
+        for(String theID : ids) {
+            results.add((ValueSet)myDataSource.getResourceByID(theID));
         }
         return results;
     }
     
     @Search
-    public List<ValueSet> getAllValueSets() {
-        List<ValueSet> results = myDataSource.getAllValueSets();
+    public List<IBaseResource> getAllValueSets() {
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(ResourceType.VALUESET);
         return results;
     }
 //</editor-fold>
