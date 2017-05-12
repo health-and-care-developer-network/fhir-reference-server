@@ -2,40 +2,50 @@ package uk.nhs.fhir.makehtml.html;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.util.Elements;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ValueSetTableFormatter {
+import javax.xml.parsers.ParserConfigurationException;
+
+public class ValueSetTableFormatter extends MetadataTableFormatter {
 
 	private static final String BLANK = "";
 
-	private final ValueSet source;
     private ConceptMap conceptMap = null;
-
-	public ValueSetTableFormatter(ValueSet source){
-		this.source = source;
-	}
 	
+	@Override
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		ValueSet valueSet = (ValueSet)source;
+		HTMLDocSection section = new HTMLDocSection();
+		
+		Element metadataPanel = getConceptDataTable(valueSet);
+		section.addBodyElement(metadataPanel);
+		
+		return section;
+	}
 
-
-	public Element getConceptDataTable() {
+	public Element getConceptDataTable(ValueSet source) {
 
 
 		int columns = 4;
         Boolean filterPresent = false;
-        conceptMap = getConceptMap();
+        conceptMap = getConceptMap(source);
 
         if (conceptMap != null) {
             columns = 5;
@@ -262,24 +272,23 @@ public class ValueSetTableFormatter {
         }
         return mapping;
     }
-	private ConceptMap getConceptMap()
+    
+	private ConceptMap getConceptMap(ValueSet source)
     {
         // Included ConceptMaps - this is coded so ConceptMap can be a separate resource
         ConceptMap conceptMap = null;
 
-        if (source.getContained().getContainedResources().size() > 0 )
+        for (IResource resource : source.getContained().getContainedResources())
         {
-            for (IResource resource :source.getContained().getContainedResources())
+            if (resource instanceof ConceptMap)
             {
-                if (resource instanceof ConceptMap)
-                {
-                    conceptMap = (ConceptMap) resource;
-
-                }
+                conceptMap = (ConceptMap) resource;
             }
         }
+            
         return conceptMap;
     }
+	
     private Element codeSystem(String displaySystem, Boolean internal, Boolean reference, String hint)
     {
         if (conceptMap == null) {
@@ -352,12 +361,6 @@ public class ValueSetTableFormatter {
         }
     }
 
-
-    private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig)
-    {
-        return labelledValueCell(label, value, colspan, alwaysBig, false, false,false,"");
-    }
-
     private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig, boolean alwaysBold, boolean reference)
     {
         return labelledValueCell(label, value, colspan, alwaysBig, alwaysBold, reference,false,"");
@@ -375,14 +378,6 @@ public class ValueSetTableFormatter {
 		}
 		
 		return cell(cellSpans, colspan);
-	}
-	
-	private Element cell(List<? extends Content> content, int colspan) {
-		return Elements.withAttributesAndChildren("td", 
-			Lists.newArrayList(
-				new Attribute("class", "fhir-metadata-cell"),
-				new Attribute("colspan", Integer.toString(colspan))),
-			content);
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
@@ -455,49 +450,5 @@ public class ValueSetTableFormatter {
                     new Attribute("class", fhirMetadataClass),
                     value);
 		}
-	}
-	
-	public static List<CSSStyleBlock> getStyles() {
-		List<CSSStyleBlock> styles = Lists.newArrayList();
-
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-cell"),
-				Lists.newArrayList(
-					new CSSRule("border", "1px solid #f0f0f0"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label", ".fhir-telecom-name"),
-					Lists.newArrayList(
-						new CSSRule("color", "#808080"),
-						new CSSRule("font-weight", "bold"),
-						new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label-empty"),
-					Lists.newArrayList(
-						new CSSRule("color", "#D0D0D0"),
-						new CSSRule("font-weight", "normal"))));
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value", ".fhir-telecom-value"),
-				Lists.newArrayList(
-					new CSSRule("color", "#000000"),
-					new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-value-smalltext"),
-					Lists.newArrayList(
-						new CSSRule("font-size", "10"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-block-title"),
-					Lists.newArrayList(
-							new CSSRule("color", "#808080"),
-							new CSSRule("font-weight", "bold"),
-							new CSSRule("text-decoration", "underline"),
-							new CSSRule("font-size", "13"))));
-		
-		return styles;
 	}
 }

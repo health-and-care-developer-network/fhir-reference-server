@@ -5,6 +5,8 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import org.junit.Test;
+
+import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.util.HTMLUtil;
@@ -42,8 +44,8 @@ public class TestStructureDefinition {
 			StructureDefinition structureDefinition = (StructureDefinition)parser.parseResource(reader);
 			new StructureDefinitionPreparer().prepare(structureDefinition, null);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
-			for (ResourceFormatter<StructureDefinition> formatter : ResourceFormatter.factoryForResource(structureDefinition)) {
-				doc.addSection(formatter.makeSectionHTML(structureDefinition));
+			for (FormattedOutputSpec formatter : ResourceFormatter.formattersForResource(structureDefinition, "this/path/isnt/used")) {
+				doc.addSection(formatter.getFormatter().makeSectionHTML(structureDefinition));
 			}
 			
 			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);

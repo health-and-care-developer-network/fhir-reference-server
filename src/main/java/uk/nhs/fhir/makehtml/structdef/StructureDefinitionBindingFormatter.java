@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -32,7 +33,7 @@ import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.util.Elements;
 
-public class StructureDefinitionBindingFormatter extends ResourceFormatter<StructureDefinition> {
+public class StructureDefinitionBindingFormatter extends ResourceFormatter {
 
 	public StructureDefinitionBindingFormatter() { this.resourceSectionType = ResourceSectionType.BINDING; }
 
@@ -44,8 +45,9 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
     Boolean foundBinding = false;
 
 	@Override
-	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
-
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		StructureDefinition structureDefinition = (StructureDefinition)source;
+		
 		HTMLDocSection section = new HTMLDocSection();
 
         Element colgroup = Elements.newElement("colgroup");
@@ -79,14 +81,10 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(source);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 
-
-        FhirTreeTableContent node = dataProvider.getSnapshotTreeData().getRoot();
-
-        for (FhirTreeTableContent content : node.getChildren()) {
-           // System.out.println(content.getName());
-            processResource(content);
+        for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
+            processNode(content);
         }
 
         addStyles(section);
@@ -103,7 +101,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
 		return section;
 	}
 
-	private void processResource(FhirTreeTableContent node)
+	private void processNode(FhirTreeTableContent node)
     {
 
         if (node.hasElement()) {
@@ -136,10 +134,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Struc
                 }
 
             }
-        }
-        // Use recursion to populate child elements
-        for (FhirTreeTableContent childNode : node.getChildren()
-             ) {  processResource(childNode);
         }
     }
 

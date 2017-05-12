@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
@@ -20,13 +21,14 @@ import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.util.Elements;
 
-public class ValueSetMetadataFormatter extends MetadataTableFormatter<ValueSet> {
+public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
 	@Override
-	public HTMLDocSection makeSectionHTML(ValueSet source) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		ValueSet valueSet = (ValueSet)source;
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(source);
+		Element metadataPanel = getMetadataTable(valueSet);
 		section.addBodyElement(metadataPanel);
 		
 		return section;

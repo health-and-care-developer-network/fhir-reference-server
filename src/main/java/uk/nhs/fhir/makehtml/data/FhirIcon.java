@@ -75,22 +75,20 @@ public enum FhirIcon {
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
 		List<Type> types = definition.getType();
 		
-		boolean foundExtension = false;
+		if (definition.getPath().endsWith("[x]")) {
+			return FhirIcon.CHOICE;
+		}
+		
 		if (!types.isEmpty()) {
 			for (Type type : types) {
 				String typeName = type.getCode();
 				if (typeName != null) {
 					
 					if (typeName.equals("Extension")) {
-						foundExtension = true;
-
 						/*
 						KGM 25/Apr/2017
 						*/
-                        Optional<FhirIcon> lookupExtension = lookupExtension(type, definition);
-						if (lookupExtension.isPresent()) {
-							return lookupExtension.get();
-						}
+                        return lookupExtension(type, definition);
                     } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 						
@@ -118,10 +116,6 @@ public enum FhirIcon {
 			return FhirIcon.SLICE;
 		}
 		
-		if (foundExtension) {
-			return FhirIcon.EXTENSION_COMPLEX;
-		}
-		
 		String path = definition.getPath();
 		if (!Strings.isNullOrEmpty(path)) {
 			
@@ -132,14 +126,14 @@ public enum FhirIcon {
 		return FhirIcon.ELEMENT;
 	}
 
-	private static Optional<FhirIcon> lookupExtension(Type type, ElementDefinitionDt definition)  {
+	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
 
 		FhirContext ctx = SharedFhirContext.get();
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {
 		    // Extension isn't profiled. So using base type and is simple
-			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+			return FhirIcon.EXTENSION_SIMPLE;
 		}
 
 		boolean hasPrimitiveExtension = true;
@@ -193,9 +187,9 @@ public enum FhirIcon {
 		}
 
 		if (hasPrimitiveExtension) {
-			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+			return FhirIcon.EXTENSION_SIMPLE;
 		} else {
-			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
+			return FhirIcon.EXTENSION_COMPLEX;
 		}
 	}
 

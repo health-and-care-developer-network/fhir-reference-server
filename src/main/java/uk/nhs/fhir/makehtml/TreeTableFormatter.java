@@ -3,7 +3,6 @@ package uk.nhs.fhir.makehtml;
 import java.util.List;
 import java.util.Set;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -21,7 +20,7 @@ import uk.nhs.fhir.makehtml.html.TablePNGGenerator;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.util.Elements;
 
-public abstract class TreeTableFormatter<T extends IBaseResource> extends ResourceFormatter<T> {
+public abstract class TreeTableFormatter extends ResourceFormatter {
 
 	TablePNGGenerator backgrounds = new TablePNGGenerator();
 	
