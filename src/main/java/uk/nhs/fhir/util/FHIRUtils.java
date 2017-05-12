@@ -23,6 +23,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.resource.Conformance;
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
@@ -61,36 +63,41 @@ public class FHIRUtils {
 
 
     /**
-     * Method to load a specified resource from the file system.
-     * 
-     * @param filename Filename we're asking for.
-     * @return A resource (assuming it was found), else null.
-     */
-    public static IBaseResource loadResourceFromFile(String filename) {
-        return loadResourceFromFile(new File(valueSetPath + "/" + filename));
-    }
-
-    /**
      * Method to load a fhir resource from a file.
      * 
      * @param file File object pointing to the file we want to load
      * @return A resource object
      */
     public static IBaseResource loadResourceFromFile(final File file) {
-        String resource = FileLoader.loadFile(file);
-        IBaseResource vSet = null;
+        String resourceFile = FileLoader.loadFile(file);
+        IBaseResource resource = null;
         try {
-            vSet = ctx.newXmlParser().parseResource(resource);
-            // Add an ID using the filename as the ID
+            resource = ctx.newXmlParser().parseResource(resourceFile);
+            String url = null;
+
+            // To get the URL we need to cast this to a concrete type
+            if (resource instanceof StructureDefinition) {
+            	url = ((StructureDefinition)resource).getUrl();
+            } else if (resource instanceof ValueSet) {
+            	url = ((ValueSet)resource).getUrl();
+            } else if (resource instanceof OperationDefinition) {
+            	url = ((OperationDefinition)resource).getUrl();
+            } else if (resource instanceof Conformance) {
+            	url = ((Conformance)resource).getUrl();
+            }
+            
+            // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());
-            vSet.setId(id);
-        } catch (ConfigurationException e) {
-            e.printStackTrace();
-        } catch (DataFormatException e) {
+            if (url != null) {
+            	id = getResourceIDFromURL(url, id);
+            }
+            resource.setId(id);
+            
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.info("Resource loaded - size: " + resource.length() + " from file: " + file.getName());
-        return vSet;
+        LOG.info("Resource loaded - size: " + resourceFile.length() + " from file: " + file.getName());
+        return resource;
     }
     
     public static boolean isValueSetSNOMED(ValueSet vs) {
@@ -107,6 +114,17 @@ public class FHIRUtils {
     		}
     	}
     	return false;
+    }
+    
+    public static String getResourceIDFromURL(String url, String def) {
+    	// Find the actual name of the resource from the URL
+        int idx = url.lastIndexOf('/');
+        if (idx > -1) {
+        	return url.substring(idx+1);
+        } else {
+        	// Can't find a real name in the URL!
+        	return def;
+        }
     }
 
 }
