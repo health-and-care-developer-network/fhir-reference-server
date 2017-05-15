@@ -21,7 +21,10 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -33,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.VersionedFilePreprocessor;
 import uk.nhs.fhir.resourcehandlers.*;
 
 import uk.nhs.fhir.util.FileLoader;
@@ -71,6 +75,11 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().startsWith("/images/")) {
         	// Image files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
+        } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
+	    	response.setStatus(200);
+			response.setContentType("text/plain");
+			PrintWriter outputStream = response.getWriter();
+	        outputStream.write(VersionedFilePreprocessor.getProfileLoadMessages());
         } else {
             super.doGet(request, response);
         }

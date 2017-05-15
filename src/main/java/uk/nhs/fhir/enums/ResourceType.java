@@ -46,6 +46,10 @@ public enum ResourceType {
 		return this.filesystemPath;
 	}
 	
+	public String getVersionedFilesystemPath() {
+		return this.filesystemPath + "/versioned";
+	}
+	
     public static ResourceType getTypeFromRequest(RequestDetails theRequestDetails) {
     	
     	String typeInRequest = theRequestDetails.getResourceName();

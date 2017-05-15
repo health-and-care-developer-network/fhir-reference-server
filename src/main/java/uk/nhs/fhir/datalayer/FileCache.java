@@ -23,6 +23,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -144,6 +146,7 @@ public class FileCache {
     
     private synchronized static void updateCache() {
         if(updateRequired()) {
+        	VersionedFilePreprocessor.clearProfileLoadMessages();
             lastUpdated = System.currentTimeMillis();
             LOG.fine("Updating cache from filesystem");
             
@@ -167,6 +170,14 @@ public class FileCache {
     }
     
     private static ArrayList<ResourceEntity> cacheFHIRResources(ResourceType resourceType){
+    	
+    	// Call pre-processor to copy files into the versioned directory
+    	try {
+    		VersionedFilePreprocessor.copyFHIRResourcesIntoVersionedDirectory(resourceType);
+    	} catch (IOException e) {
+    		LOG.severe("Unable to pre-process files into versioned directory! - error: " + e.getMessage());
+    	}
+    	
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
         String path = resourceType.getFilesystemPath();
         File folder = new File(path);

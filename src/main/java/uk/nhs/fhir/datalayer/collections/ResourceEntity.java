@@ -96,10 +96,10 @@ public class ResourceEntity implements Comparable {
 	@Override
 	public int compareTo(Object arg0) {
 		ResourceEntity other = (ResourceEntity)arg0;
-		if (this.resourceName.equals(other.resourceName) && this.resourceType == other.resourceType) {
+		if (this.resourceID.equals(other.resourceID) && this.resourceType == other.resourceType) {
 			return 0;
 		} else {
-			return this.resourceName.compareTo(other.resourceName);
+			return this.resourceID.compareTo(other.resourceID);
 		}
 	}
 }
