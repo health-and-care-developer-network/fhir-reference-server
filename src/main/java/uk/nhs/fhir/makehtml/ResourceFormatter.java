@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionBindingFormatter;
+import uk.nhs.fhir.makehtml.structdef.StructureDefinitionDetailsFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionDifferentialFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionSnapshotFormatter;
@@ -30,30 +32,31 @@ public abstract class ResourceFormatter {
 	protected final FhirDocLinkFactory fhirDocLinkFactory = new FhirDocLinkFactory();
 	
 	public static List<FormattedOutputSpec> formattersForResource(IBaseResource resource, String baseOutputDirectory) {
+		// e.g. my_outputs/StructureDefinition
+		String outputDirectory = baseOutputDirectory + File.separator + resource.getClass().getSimpleName();
+		
 		if (resource instanceof OperationDefinition) {
 			return Lists.newArrayList(
-				new FormattedOutputSpec(resource, new OperationDefinitionFormatter(), baseOutputDirectory, "render"));
+				new FormattedOutputSpec(resource, new OperationDefinitionFormatter(), outputDirectory, "render.html"));
 		} else if (resource instanceof StructureDefinition) {
 			
 			ArrayList<FormattedOutputSpec> structureDefinitionFormatters = Lists.newArrayList(
-				new FormattedOutputSpec(resource, new StructureDefinitionMetadataFormatter(), baseOutputDirectory, "metadata"),
-				new FormattedOutputSpec(resource, new StructureDefinitionSnapshotFormatter(), baseOutputDirectory, "snapshot"),
-				new FormattedOutputSpec(resource, new StructureDefinitionBindingFormatter(), baseOutputDirectory, "bindings"));
+				new FormattedOutputSpec(resource, new StructureDefinitionMetadataFormatter(), outputDirectory, "metadata.html"),
+				new FormattedOutputSpec(resource, new StructureDefinitionSnapshotFormatter(), outputDirectory, "snapshot.html"),
+				new FormattedOutputSpec(resource, new StructureDefinitionBindingFormatter(), outputDirectory, "bindings.html"),
+				new FormattedOutputSpec(resource, new StructureDefinitionDetailsFormatter(), outputDirectory, "details.html"));
 			
-
 			StructureDefinition sd = (StructureDefinition)resource;
 			if (!sd.getConstrainedType().equals("Extension")) {
 				structureDefinitionFormatters.add(
-					new FormattedOutputSpec(resource, new StructureDefinitionDifferentialFormatter(), baseOutputDirectory, "differential"));
+					new FormattedOutputSpec(resource, new StructureDefinitionDifferentialFormatter(), outputDirectory, "differential.html"));
 			}
 
 			return structureDefinitionFormatters;
 			
-			//return Lists.newArrayList((ResourceFormatter<T>) new StructureDefinitionProfileFormatter());
-			
 		} else if (resource instanceof ValueSet) {
 			return Lists.newArrayList(
-				new FormattedOutputSpec(resource, new ValueSetFormatter(), baseOutputDirectory, "render"));
+				new FormattedOutputSpec(resource, new ValueSetFormatter(), outputDirectory, "render.html"));
 		}
 
 		return null;

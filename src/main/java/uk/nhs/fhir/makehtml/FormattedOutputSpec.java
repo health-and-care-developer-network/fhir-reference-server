@@ -14,18 +14,18 @@ import uk.nhs.fhir.util.SectionedHTMLDoc;
 public class FormattedOutputSpec {
 	private final IBaseResource resource;
 	private final ResourceFormatter formatter;
-	private final String baseOutputDirectory;
-	private final String type; // used to generate subdirectory and file extension
+	private final String typedOutputDirectory;
+	private final String filename; // used to generate file name
 	
-	public FormattedOutputSpec(IBaseResource resource, ResourceFormatter formatter, String baseOutputDirectory, String type) {
+	public FormattedOutputSpec(IBaseResource resource, ResourceFormatter formatter, String outputDirectory, String filename) {
 		this.resource = resource;
 		this.formatter = formatter;
-		this.baseOutputDirectory = baseOutputDirectory;
-		this.type = type;
+		this.typedOutputDirectory = outputDirectory;
+		this.filename = filename;
 	}
 
 	public void formatAndSave(String inputPath) throws ParserConfigurationException, IOException {
-		ensureOutputDirectoryExists();
+		ensureOutputDirectoryExists(inputPath);
 		String outputPath = getOutputPath(inputPath);
 		
 		HTMLDocSection sectionHTML = formatter.makeSectionHTML(resource);
@@ -43,23 +43,18 @@ public class FormattedOutputSpec {
 			throw new IllegalStateException("Failed to write file " + outputPath);
 		}
 	}
+
+	public String getOutputDirectory(String inputPath) {
+		String inputFileName = inputPath.substring(inputPath.lastIndexOf(File.separatorChar) + 1, inputPath.lastIndexOf(".xml"));
+		return typedOutputDirectory + File.separator + inputFileName;
+	}
 	
-	private String getOutputDirectory() {
-		return baseOutputDirectory + File.separator + getResourceName() + File.separator + type;
-	}
-
 	public String getOutputPath(String inputPath) {
-		String inputFileName = inputPath.substring(inputPath.lastIndexOf(File.separatorChar) + 1);
-		String outputFileName = inputFileName.replace(".xml", "." + type + ".html");
-		return getOutputDirectory() + File.separator + outputFileName;
+		return getOutputDirectory(inputPath) + File.separator + filename;
 	}
 
-	private String getResourceName() {
-		return resource.getClass().getSimpleName();
-	}
-
-	private void ensureOutputDirectoryExists() {
-		File directory = new File(getOutputDirectory());
+	private void ensureOutputDirectoryExists(String inputPath) {
+		File directory = new File(getOutputDirectory(inputPath));
 		if (!directory.exists()) {
 			directory.mkdirs();
 		}
