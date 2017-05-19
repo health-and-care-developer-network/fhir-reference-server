@@ -14,10 +14,12 @@ public class ResourceEntity implements Comparable {
 	private String baseType = null;
 	private String displayGroup = null;
 	private boolean example = false;
+	private VersionNumber versionNo = null;
+	private String status = null;
 	
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
-							String resourceID) {
+							String resourceID, VersionNumber versionNo, String status) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -26,6 +28,8 @@ public class ResourceEntity implements Comparable {
 		this.displayGroup = displayGroup;
 		this.example = example;
 		this.resourceID = resourceID;
+		this.versionNo = versionNo;
+		this.status = status;
 	}
 	
 	public String getResourceName() {
@@ -92,14 +96,38 @@ public class ResourceEntity implements Comparable {
 	public void setResourceID(String resourceID) {
 		this.resourceID = resourceID;
 	}
+	
+	public VersionNumber getVersionNo() {
+		return versionNo;
+	}
 
+	public void setVersionNo(VersionNumber versionNo) {
+		this.versionNo = versionNo;
+	}
+
+	/**
+	 * Allow resources to be sorted by name
+	 */
 	@Override
 	public int compareTo(Object arg0) {
 		ResourceEntity other = (ResourceEntity)arg0;
-		if (this.resourceID.equals(other.resourceID) && this.resourceType == other.resourceType) {
+		if (this.resourceName.equals(other.resourceName) && this.resourceType == other.resourceType) {
 			return 0;
 		} else {
-			return this.resourceID.compareTo(other.resourceID);
+			return this.resourceName.compareTo(other.resourceName);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "      ResourceEntity [ID=" + resourceID + ", version=" + versionNo + "]";
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

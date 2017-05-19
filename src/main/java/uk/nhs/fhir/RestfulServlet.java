@@ -15,31 +15,33 @@
  */
 package uk.nhs.fhir;
 
-import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.RestfulServer;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.RestfulServer;
+import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.VersionedFilePreprocessor;
-import uk.nhs.fhir.resourcehandlers.*;
-
-import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.resourcehandlers.BundleProvider;
+import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
+import uk.nhs.fhir.resourcehandlers.ImplementationGuideProvider;
+import uk.nhs.fhir.resourcehandlers.OperationDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
+import uk.nhs.fhir.resourcehandlers.PatientProvider;
+import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.ValueSetProvider;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.util.ServletStreamRawFile;
 
@@ -79,7 +81,7 @@ public class RestfulServlet extends RestfulServer {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
 			PrintWriter outputStream = response.getWriter();
-	        outputStream.write(VersionedFilePreprocessor.getProfileLoadMessages());
+	        outputStream.write(DataLoaderMessages.getProfileLoadMessages());
         } else {
             super.doGet(request, response);
         }

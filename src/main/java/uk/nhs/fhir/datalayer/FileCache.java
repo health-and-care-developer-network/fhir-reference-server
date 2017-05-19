@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir.datalayer;
 
+import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
@@ -27,19 +28,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -52,7 +55,7 @@ public class FileCache {
     private static final Logger LOG = Logger.getLogger(FileCache.class.getName());
 
     // Singleton object to act as a cache of the files in the profiles and valueset directories
-    private static List<ResourceEntity> resourceList = null;
+    private static List<ResourceEntityWithMultipleVersions> resourceList = null;
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
@@ -68,13 +71,15 @@ public class FileCache {
         if(updateRequired()) {
             updateCache();
         }
-        ArrayList<String> names = new ArrayList<String>();
-        for(ResourceEntity entry : resourceList) {
-        	if (entry.getResourceType() == resourceType)
-        		names.add(entry.getResourceName());
+        HashSet<String> names = new HashSet<String>();
+        for(ResourceEntityWithMultipleVersions entry : resourceList) {
+        	if (entry.getLatest().getResourceType() == resourceType)
+        		if (!names.contains(entry.getLatest().getResourceName()))
+        			names.add(entry.getLatest().getResourceName());
         }
-        return names;
-    }    
+        ArrayList<String> nameList = new ArrayList(names);
+        return nameList;
+    }
     
     /**
      * Return resource list grouped into sensible groups
@@ -89,18 +94,18 @@ public class FileCache {
         LOG.info("Creating HashMap");
         HashMap<String, List<ResourceEntity>> result = new HashMap<String, List<ResourceEntity>>();
         try {
-            for(ResourceEntity entry : resourceList) {
-            	if (entry.getResourceType() == resourceType) {
-	            	boolean isExtension = entry.isExtension();
+            for(ResourceEntityWithMultipleVersions entry : resourceList) {
+            	if (entry.getLatest().getResourceType() == resourceType) {
+	            	boolean isExtension = entry.getLatest().isExtension();
 	                //TODO: Show extensions differently?
-	                String group = entry.getDisplayGroup();
-	                String name = entry.getResourceName();
+	                String group = entry.getLatest().getDisplayGroup();
+	                String name = entry.getLatest().getResourceName();
 	                if(result.containsKey(group)) {
 	                    List<ResourceEntity> resultEntry = result.get(group);
-	                    resultEntry.add(entry);
+	                    resultEntry.add(entry.getLatest());
 	                } else {
 	                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
-	                    resultEntry.add(entry);
+	                    resultEntry.add(entry.getLatest());
 	                    result.put(group, resultEntry);
 	                }
             	}
@@ -115,7 +120,7 @@ public class FileCache {
     
     
     /**
-     * Method to get all of the ValueSets
+     * Method to get all of the resources of this type (latest versions)
      * 
      * @return 
      */
@@ -125,9 +130,9 @@ public class FileCache {
         }
         // Load each resource file and put them in a list to return
         ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
-        for (ResourceEntity entry : resourceList) {
-        	if (entry.getResourceType() == resourceType) {
-        		IBaseResource vs = FHIRUtils.loadResourceFromFile(entry.getResourceFile());
+        for (ResourceEntityWithMultipleVersions entry : resourceList) {
+        	if (entry.getLatest().getResourceType() == resourceType) {
+        		IBaseResource vs = FHIRUtils.loadResourceFromFile(entry.getLatest().getResourceFile());
         		allFiles.add(vs);
         	}
         }
@@ -146,30 +151,29 @@ public class FileCache {
     
     private synchronized static void updateCache() {
         if(updateRequired()) {
-        	VersionedFilePreprocessor.clearProfileLoadMessages();
+        	DataLoaderMessages.clearProfileLoadMessages();
             lastUpdated = System.currentTimeMillis();
             LOG.fine("Updating cache from filesystem");
             
             // Load StructureDefinitions
-            ArrayList<ResourceEntity> newList = cacheFHIRResources(STRUCTUREDEFINITION);
+            ArrayList<ResourceEntityWithMultipleVersions> newList = cacheFHIRResources(STRUCTUREDEFINITION);
             
             // Add ValueSets
-            newList.addAll(cacheFHIRResources(VALUESET));
+            //newList.addAll(cacheFHIRResources(VALUESET));
             
             // Add operations
-            newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
+            //newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
 
             // Add ImplementationGuides
-            newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
+            //newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
             
             // Swap out for our new list
             resourceList = newList;
-            
-            //printCacheContent();
+            printCacheContent();
         }
     }
     
-    private static ArrayList<ResourceEntity> cacheFHIRResources(ResourceType resourceType){
+    private static ArrayList<ResourceEntityWithMultipleVersions> cacheFHIRResources(ResourceType resourceType){
     	
     	// Call pre-processor to copy files into the versioned directory
     	try {
@@ -178,8 +182,12 @@ public class FileCache {
     		LOG.severe("Unable to pre-process files into versioned directory! - error: " + e.getMessage());
     	}
     	
-        ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
-        String path = resourceType.getFilesystemPath();
+    	LOG.info("Started loading resources into cache");
+		addMessage("Started loading " + resourceType + " resources into cache");
+    	
+        // Now, read the resources from the versioned path into our cache
+    	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<ResourceEntityWithMultipleVersions>();
+        String path = resourceType.getVersionedFilesystemPath();
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -193,11 +201,13 @@ public class FileCache {
 	                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
 	                
 	                String name = null;
-	                String actualName = null;
+	                String resourceID = null;
 	                boolean extension = false;
 	                String baseType = "Other";
 	                String displayGroup = null;
 	                boolean example = false;
+	                VersionNumber versionNo = null;
+	                String status = null;
 	                
 	                try {
 		                if (resourceType == STRUCTUREDEFINITION) {
@@ -205,52 +215,86 @@ public class FileCache {
 		                	name = profile.getName();
 		                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
 		                    baseType = profile.getConstrainedType();
-		                    actualName = getResourceIDFromURL(profile.getUrl(), name);
+		                    resourceID = getResourceIDFromURL(profile.getUrl(), name);
 		                    displayGroup = baseType;
+		                    versionNo = new VersionNumber(profile.getVersion());
+		                    status = profile.getStatus();
 		                } else if (resourceType == VALUESET) {
 		                	displayGroup = "Code List";
 		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = profile.getName();
-		                	actualName = getResourceIDFromURL(profile.getUrl(), name);
+		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
 		                	if (FHIRUtils.isValueSetSNOMED(profile)) {
 		                		displayGroup = "SNOMED CT Code List";
 		                	}
+		                	versionNo = new VersionNumber(profile.getVersion());
+		                	status = profile.getStatus();
 		                } else if (resourceType == OPERATIONDEFINITION) {
 		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = operation.getName();
-		                    actualName = getResourceIDFromURL(operation.getUrl(), name);
+		                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
 		                    displayGroup = "Operations";
+		                    versionNo = new VersionNumber(operation.getVersion());
+		                    status = operation.getStatus();
 		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
 		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = guide.getName();
-		                    actualName = getResourceIDFromURL(guide.getUrl(), name);
+		                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
 		                    displayGroup = "Implementation Guides";
+		                    versionNo = new VersionNumber(guide.getVersion());
+		                    status = guide.getStatus();
 		                }
-		                newFileList.add(new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-		                										displayGroup, example, actualName));
+		                
+		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
+								displayGroup, example, resourceID, versionNo, status);
+		                
+		                addToResourceList(newFileList,newEntity);
+		                
+		                addMessage("  - Loading " + resourceType + " resource with ID: " + resourceID + " and version: " + versionNo);
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
+	                	addMessage("[!] Error loading " + resourceType + " resource from file : " + thisFile.getAbsolutePath() + " message: " + ex.getMessage());
 	                }
 	            }
 	        }
         }
         
         // Sort our collection into alpha order by resource name
-        Collections.sort(newFileList);
-        
+        //Collections.sort(newFileList);
+        LOG.fine("Finished reading resources into cache");
         return newFileList;
+    }
+    
+    
+    private static void addToResourceList(ArrayList<ResourceEntityWithMultipleVersions> list,
+    										ResourceEntity entry) {
+    	boolean found = false;
+    	for (ResourceEntityWithMultipleVersions listItem : list) {
+    		if (listItem.getResourceID().equals(entry.getResourceID())) {
+    			// This is a new version of an existing resource - add the version
+    			listItem.add(entry);
+    			found = true;
+    			LOG.info("Added new version to resource: " + entry.getResourceID());
+    		}
+    	}
+		if (!found) {
+			// This is a new resource we haven't seen before
+			ResourceEntityWithMultipleVersions newEntry = new ResourceEntityWithMultipleVersions(entry);
+			list.add(newEntry);
+			LOG.info("Added new resource (first version found): " + entry.getResourceID());
+		}
     }
     
     public static ResourceEntity getSingleResourceByID(String id) {
         if(updateRequired()) {
             updateCache();
         }
-    	for (ResourceEntity entry : resourceList) {
+    	for (ResourceEntityWithMultipleVersions entry : resourceList) {
     		/*if (entry.getResourceName().equals(id) || entry.getResourceID().equals(id)) {
     			return entry;
     		}*/
     		if (entry.getResourceID().equals(id)) {
-    			return entry;
+    			return entry.getLatest();
     		}
     	}
     	return null;
@@ -260,9 +304,9 @@ public class FileCache {
         if(updateRequired()) {
             updateCache();
         }
-    	for (ResourceEntity entry : resourceList) {
+    	for (ResourceEntityWithMultipleVersions entry : resourceList) {
     		if (entry.getResourceName().equals(name)) {
-    			return entry;
+    			return entry.getLatest();
     		}
     	}
     	return null;
@@ -272,15 +316,21 @@ public class FileCache {
 		if(updateRequired()) {
             updateCache();
         }
-		return resourceList;
+		
+		List<ResourceEntity> latestResourcesList = new ArrayList<ResourceEntity>();
+		for (ResourceEntityWithMultipleVersions item : resourceList) {
+			latestResourcesList.add(item.getLatest());
+		}
+		return latestResourcesList;
 	}
     
-    /*
     private static void printCacheContent() {
+    	addMessage(" ===  ===  ===   Cache Contents   === === ===");
     	LOG.info("Cache loaded - entries:");
-    	for (ResourceEntity entry : resourceList) {
-    		LOG.info("  -> " + entry.getResourceName() + " : " + entry.getResourceType().name());
+    	for (ResourceEntityWithMultipleVersions entry : resourceList) {
+    		LOG.info("  -> " + entry);
+    		addMessage(entry.toString());
     	}
-    }*/
-
+    	addMessage(" ===  ===  ===  End Cache Contents === === ===");
+    }
 }

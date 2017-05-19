@@ -5,6 +5,7 @@ import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -31,13 +32,14 @@ public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = Logger.getLogger(VersionedFilePreprocessor.class.getName());
 	private static String fileExtension = PropertyReader.getProperty("fileExtension");
-	private static ArrayList<String> profileLoadMessages = new ArrayList<String>(); 
+	
 
 	protected static void copyFHIRResourcesIntoVersionedDirectory(ResourceType resourceType) throws IOException {
 		
 		//profileLoadMessages.clear();
-		profileLoadMessages.add("--------------------------------------------------------------------------------------");
-		profileLoadMessages.add("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
+		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server");
+		addMessage("--------------------------------------------------------------------------------------");
+		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 		
 		// Check the versioned directory exists, and create it if not
 		String versioned_path = resourceType.getVersionedFilesystemPath();
@@ -89,39 +91,28 @@ public class VersionedFilePreprocessor {
 	                	ex.printStackTrace();
 	                }
 	                
-	                if (!versionNo.isValid()) {
-	                	profileLoadMessages.add("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
-	                }
-	                if (resourceID == null) {
-	                	profileLoadMessages.add("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - No resource ID provided in the URL");
-	                }
-	                
-	                // Now, try to build a new versioned filename and copy the file to it
-                    if (versionNo.isValid() && resourceID != null) {
-                    	String newFilename = resourceID + "-versioned-" + versionNo;
+	                if (versionNo == null) {
+	                	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
+	                	LOG.severe("Unable to process file as it is has an invalid version: " + thisFile.getName());
+	                } else if (!versionNo.isValid()) {
+	                	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
+	                	LOG.severe("Unable to process file as it is has an invalid version: " + thisFile.getName());
+	                } else if (resourceID == null) {
+	                	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - No resource ID provided in the URL");
+	                	LOG.severe("Unable to process file as it is has an invalid resource ID: " + thisFile.getName());
+	                } else {
+		                // Now, try to build a new versioned filename and copy the file to it
+                    	String newFilename = resourceID + "-versioned-" + versionNo + ".xml";
                     	LOG.info("Copying new profile into versioned directory with new filename: " + newFilename);
-                    	profileLoadMessages.add("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
+                    	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
                     	FileUtils.copyFile(thisFile, new File(versioned_path + "/" + newFilename));
-                    } else {
-                    	LOG.severe("Unable to process file as it is has an invalid ID or version: " + thisFile.getName());
-                    }
+	                }
 	            }
 	        }
         }
         
-        profileLoadMessages.add("Finished loading files from disk.");
-        profileLoadMessages.add("--------------------------------------------------------------------------------------");
+        addMessage("Finished pre-processing " + resourceType + " files from disk.");
+        addMessage("--------------------------------------------------------------------------------------");
     }
 
-	public static void clearProfileLoadMessages() {
-		profileLoadMessages.clear();
-	}
-	
-	public static String getProfileLoadMessages() {
-		String messages = "Messages from profile loader:\n\n";
-		for (String message : profileLoadMessages) {
-			messages = messages + message + "\n";
-		}
-		return messages;
-	}
 }
