@@ -34,4 +34,12 @@ public class ConstraintInfo {
 		return requirements;
 	}
 
+	public String getXPath() {
+		return xpath;
+	}
+
+	public String getSeverity() {
+		return severity;
+	}
+
 }

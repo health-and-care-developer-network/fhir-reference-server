@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 
@@ -20,6 +21,7 @@ import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
+import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
@@ -78,6 +80,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			addListDataIfPresent(tableContent, "Alternate Names", fhirTreeNode.getAliases());
 			addResourceFlags(tableContent, fhirTreeNode.getResourceFlags());
 			addDataIfPresent(tableContent, "Comments", fhirTreeNode.getComments());
+			addConstraints(tableContent, fhirTreeNode.getConstraints());
 		}
 		
 		Element table = 
@@ -88,6 +91,34 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirPanel panel = new FhirPanel("Details", table);
 		
 		return panel.makePanel();
+	}
+
+	private void addConstraints(List<Element> tableContent, List<ConstraintInfo> constraints) {
+		if (!constraints.isEmpty()) {
+			Element labelCell = dataCell("Invariants", "fhir-details-data-cell");
+			
+			List<Content> constraintInfos = Lists.newArrayList();
+			for (ConstraintInfo constraint : constraints) {
+				if (!constraintInfos.isEmpty()) {
+					constraintInfos.add(Elements.newElement("br"));
+				}
+				constraintInfos.add(Elements.withText("b", constraint.getKey() + ": "));
+				String constraintContent = constraint.getDescription();
+				if (constraint.getRequirements().isPresent()) {
+					constraintContent += ". " + constraint.getRequirements().get();
+				}
+				constraintContent += " (xpath: " + constraint.getXPath() + ")";
+				constraintContent += " severity: " + constraint.getSeverity();
+				constraintInfos.add(new Text(constraintContent));
+			}
+			
+			tableContent.add(
+				getDataRow(
+					labelCell, 
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", "fhir-details-data-cell"), 
+						constraintInfos)));
+		}
 	}
 
 	private void addBindingRowIfPresent(List<Element> tableContent, Optional<BindingInfo> binding) {
