@@ -28,6 +28,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<ElementDefinitionDt> element = Optional.empty();
 	private Optional<String> definition = Optional.empty();
 	private Optional<String> requirements = Optional.empty();
+	private Optional<String> comments = Optional.empty();
+	private Optional<List<String>> aliases = Optional.empty();
 
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -334,10 +336,27 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 
 	public Optional<String> getRequirements() {
-		return requirements ;
+		return requirements;
 	}
 
 	public void setRequirements(String requirements) {
 		this.requirements = Optional.of(requirements);
 	}
+
+	public Optional<String> getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = Optional.of(comments);
+	}
+
+	public Optional<List<String>> getAliases() {
+		return aliases;
+	}
+
+	public void setAliases(List<String> aliases) {
+		this.aliases = Optional.of(aliases);
+	}
+	
 }

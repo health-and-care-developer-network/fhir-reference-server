@@ -74,7 +74,9 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			List<LinkData> typeLinks = fhirTreeNode.getTypeLinks();
 			tableContent.add(getLinkRow("Type", typeLinks));
 			addDataIfPresent(tableContent, "Requirements", fhirTreeNode.getRequirements());
+			addListDataIfPresent(tableContent, "Alternate Names", fhirTreeNode.getAliases());
 			addResourceFlags(tableContent, fhirTreeNode.getResourceFlags());
+			addDataIfPresent(tableContent, "Comments", fhirTreeNode.getComments());
 		}
 		
 		Element table = 
@@ -85,6 +87,12 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirPanel panel = new FhirPanel("Details", table);
 		
 		return panel.makePanel();
+	}
+
+	private void addListDataIfPresent(List<Element> tableContent, String label, Optional<List<String>> listData) {
+		if (listData.isPresent()) {
+			addData(tableContent, label, String.join("; ", listData.get()));
+		}
 	}
 
 	private void addResourceFlags(List<Element> tableContent, ResourceFlags resourceFlags) {

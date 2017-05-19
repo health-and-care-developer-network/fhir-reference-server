@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -16,6 +17,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
@@ -127,6 +129,17 @@ public class FhirTreeNodeBuilder {
 		String requirements = elementDefinition.getRequirements();
 		if (!Strings.isNullOrEmpty(requirements)) {
 			node.setRequirements(requirements);
+		}
+		
+		String comments = elementDefinition.getComments();
+		if (!Strings.isNullOrEmpty(comments)) {
+			node.setComments(comments);
+		}
+		
+		List<StringDt> alias = elementDefinition.getAlias();
+		if (!alias.isEmpty()) {
+			List<String> aliases = alias.stream().map(stringDt -> stringDt.getValue()).collect(Collectors.toList());
+			node.setAliases(aliases);
 		}
 		
 		return node;
