@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
+import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.DummyFhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
@@ -216,6 +217,10 @@ public class FhirTreeTable {
 	
 	private List<ResourceInfo> getNodeResourceInfos(FhirTreeTableContent node) {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
+		
+		for (ConstraintInfo constraint : node.getConstraints()) {
+			resourceInfos.add(new ResourceInfo(constraint.getKey(), constraint.getDescription(), ResourceInfoType.CONSTRAINT));
+		}
 		
 		// slicing
 		if (node.hasSlicingInfo()) {

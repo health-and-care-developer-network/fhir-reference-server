@@ -119,6 +119,7 @@ public class ValueWithInfoCell extends TableCell {
 		switch (type) {
 		case SLICING:
 		case EXTENSION_URL:
+		case CONSTRAINT:
 			return true;
 		default:
 			return false;

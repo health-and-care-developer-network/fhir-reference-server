@@ -19,6 +19,7 @@ import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
+import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
@@ -29,6 +30,7 @@ import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 
@@ -70,9 +72,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			
 			addDataIfPresent(tableContent, "Definition", fhirTreeNode.getDefinition());
 			addData(tableContent, "Cardinality", fhirTreeNode.getCardinality().toString());
-			
-			List<LinkData> typeLinks = fhirTreeNode.getTypeLinks();
-			tableContent.add(getLinkRow("Type", typeLinks));
+			addBindingRowIfPresent(tableContent, fhirTreeNode.getBinding());
+			tableContent.add(getLinkRow("Type", fhirTreeNode.getTypeLinks()));
 			addDataIfPresent(tableContent, "Requirements", fhirTreeNode.getRequirements());
 			addListDataIfPresent(tableContent, "Alternate Names", fhirTreeNode.getAliases());
 			addResourceFlags(tableContent, fhirTreeNode.getResourceFlags());
@@ -87,6 +88,36 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirPanel panel = new FhirPanel("Details", table);
 		
 		return panel.makePanel();
+	}
+
+	private void addBindingRowIfPresent(List<Element> tableContent, Optional<BindingInfo> binding) {
+		if (binding.isPresent()) {
+			BindingInfo info = binding.get();
+
+			String bindingInfo = "";
+			
+			boolean hasUrl = info.getUrl().isPresent();
+			boolean hasDesc = info.getDescription().isPresent();
+			
+			if (hasUrl) {
+				String fullUrl = info.getUrl().get().toString();
+				String hyphenatedUrlName = fullUrl.substring(fullUrl.lastIndexOf('/') + 1);
+				String urlName = StringUtil.hyphenatedToPascalCase(hyphenatedUrlName);
+				bindingInfo += urlName;
+			}
+			
+			if (hasUrl && hasDesc) {
+				bindingInfo += ": ";
+			}
+			
+			if (hasDesc) {
+				bindingInfo += info.getDescription().get();
+			}
+			
+			bindingInfo += " (" + info.getStrength() + ")";
+			
+			addData(tableContent, "Binding", bindingInfo);
+		}
 	}
 
 	private void addListDataIfPresent(List<Element> tableContent, String label, Optional<List<String>> listData) {

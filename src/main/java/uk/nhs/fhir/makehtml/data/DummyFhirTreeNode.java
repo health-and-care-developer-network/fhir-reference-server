@@ -87,6 +87,10 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public boolean useBackupTypeLinks() {
 		return true;
 	}
+	
+	public List<ConstraintInfo> getConstraints() {
+		return Lists.newArrayList();
+	}
 
 	@Override
 	public void setFhirIcon(FhirIcon icon) {

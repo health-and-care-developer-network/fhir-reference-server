@@ -17,7 +17,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	//private final FhirCardinality cardinality;
 	private final List<LinkData> typeLinks;
 	private final String information;
-	private final List<ResourceInfo> constraints;
+	private final List<ConstraintInfo> constraints;
 	private final String path;
 
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
@@ -45,7 +45,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			//FhirCardinality cardinality,
 			List<LinkData> typeLinks,
 			String information,
-			List<ResourceInfo> constraints,
+			List<ConstraintInfo> constraints,
 			String path) {
 		this.icon = icon;
 		this.name = name;
@@ -68,7 +68,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			//FhirCardinality cardinality,
 			List<LinkData> typeLinks,
 			String information,
-			List<ResourceInfo> constraints,
+			List<ConstraintInfo> constraints,
 			String path,
 			ElementDefinitionDt element ) {
 		this.icon = icon;
@@ -214,6 +214,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public String getInformation() {
 		return information;
 	}
+	
+	public List<ConstraintInfo> getConstraints() {
+		return constraints;
+	}
 
 	public void addChild(int index, FhirTreeTableContent child) {
 		children.add(index, child);
@@ -243,10 +247,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	public boolean isRemovedByProfile() {
 		return max.equals(Optional.of("0"));
-	}
-
-	public List<ResourceInfo> getConstraints() {
-		return constraints;
 	}
 
 	public String getPath() {

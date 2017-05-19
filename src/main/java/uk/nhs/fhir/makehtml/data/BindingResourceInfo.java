@@ -13,5 +13,4 @@ public class BindingResourceInfo extends ResourceInfo {
 		super("Binding", description, url, ResourceInfoType.BINDING);
 		addExtraTag("Strength: " + strength);
 	}
-
 }
