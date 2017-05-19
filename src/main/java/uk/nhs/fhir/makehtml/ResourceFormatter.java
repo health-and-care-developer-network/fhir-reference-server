@@ -15,6 +15,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionBindingFormatter;
+import uk.nhs.fhir.makehtml.structdef.StructureDefinitionDetailsFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionDifferentialFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.structdef.StructureDefinitionSnapshotFormatter;
@@ -38,9 +39,9 @@ public abstract class ResourceFormatter {
 			ArrayList<FormattedOutputSpec> structureDefinitionFormatters = Lists.newArrayList(
 				new FormattedOutputSpec(resource, new StructureDefinitionMetadataFormatter(), baseOutputDirectory, "metadata"),
 				new FormattedOutputSpec(resource, new StructureDefinitionSnapshotFormatter(), baseOutputDirectory, "snapshot"),
-				new FormattedOutputSpec(resource, new StructureDefinitionBindingFormatter(), baseOutputDirectory, "bindings"));
+				new FormattedOutputSpec(resource, new StructureDefinitionBindingFormatter(), baseOutputDirectory, "bindings"),
+				new FormattedOutputSpec(resource, new StructureDefinitionDetailsFormatter(), baseOutputDirectory, "details"));
 			
-
 			StructureDefinition sd = (StructureDefinition)resource;
 			if (!sd.getConstrainedType().equals("Extension")) {
 				structureDefinitionFormatters.add(

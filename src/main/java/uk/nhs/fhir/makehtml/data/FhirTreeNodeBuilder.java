@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.context.FhirDataTypes;
@@ -65,6 +66,11 @@ public class FhirTreeNodeBuilder {
 
 			elementDefinition);
 
+		String definition = elementDefinition.getDefinition();
+		if (!Strings.isNullOrEmpty(definition)) {
+			node.setDefinition(Optional.of(definition));
+		}
+		
 		Slicing slicing = elementDefinition.getSlicing();
 		if (!slicing.isEmpty()) {
 			node.setSlicingInfo(new SlicingInfo(slicing));
@@ -116,6 +122,11 @@ public class FhirTreeNodeBuilder {
 			String strength = binding.getStrength();
 			
 			node.setBinding(new BindingInfo(description, url, strength));
+		}
+		
+		String requirements = elementDefinition.getRequirements();
+		if (!Strings.isNullOrEmpty(requirements)) {
+			node.setRequirements(requirements);
 		}
 		
 		return node;

@@ -22,7 +22,11 @@ public class CSSStyleSection {
 	}
 	
 	public void addStylesSection(CSSStyleSection styles) {
-		for (CSSStyleBlock block : styles.getBlocks()) {
+		addStyles(styles.getBlocks());
+	}
+	
+	public void addStyles(List<CSSStyleBlock> styles) {
+		for (CSSStyleBlock block : styles) {
 			addBlock(block);
 		}
 	}

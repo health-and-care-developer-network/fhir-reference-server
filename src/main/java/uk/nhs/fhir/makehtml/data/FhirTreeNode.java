@@ -26,6 +26,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
 	private Optional<ElementDefinitionDt> element = Optional.empty();
+	private Optional<String> definition = Optional.empty();
+	private Optional<String> requirements = Optional.empty();
 
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -78,6 +80,17 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.constraints = constraints;
 		this.path = path;
 		this.element = Optional.ofNullable(element);
+	}
+	
+	/**
+	 * Detailed description
+	 */
+	public Optional<String> getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(Optional<String> definition) {
+		this.definition = definition;
 	}
 
 	@Override
@@ -320,4 +333,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.element = Optional.ofNullable(exampleValue);
 	}
 
+	public Optional<String> getRequirements() {
+		return requirements ;
+	}
+
+	public void setRequirements(String requirements) {
+		this.requirements = Optional.of(requirements);
+	}
 }

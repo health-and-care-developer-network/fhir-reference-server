@@ -29,6 +29,7 @@ import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
+import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -41,6 +42,10 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		
 		Element metadataPanel = getMetadataTable(structureDefinition);
 		section.addBodyElement(metadataPanel);
+		
+		getStyles().forEach(section::addStyle);
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
 		
 		return section;
 	}

@@ -38,14 +38,26 @@ public class ResourceFlags {
 	public void addSummaryFlag() {
 		flags.add(ResourceFlag.SUMMARY);
 	}
+	public boolean isSummary() {
+		return flags.contains(ResourceFlag.SUMMARY);
+	}
 	public void addModifierFlag() {
 		flags.add(ResourceFlag.MODIFIER);
+	}
+	public boolean isModifier() {
+		return flags.contains(ResourceFlag.MODIFIER);
 	}
 	public void addMustSupportFlag() {
 		flags.add(ResourceFlag.MUSTSUPPORT);
 	}
+	public boolean isMustSupport() {
+		return flags.contains(ResourceFlag.MUSTSUPPORT);
+	}
 	public void addConstrainedFlag() {
 		flags.add(ResourceFlag.CONSTRAINED);
+	}
+	public boolean isConstrained() {
+		return flags.contains(ResourceFlag.CONSTRAINED);
 	}
 	
 	@Override

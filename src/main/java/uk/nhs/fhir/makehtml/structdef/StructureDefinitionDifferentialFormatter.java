@@ -33,6 +33,8 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);
 		
+		addStyles(section);
+		differentialTreeData.getStyles().forEach(section::addStyle);
 		section.addBodyElement(new FhirPanel(differentialHtmlTable).makePanel());
 		
 		return section;
