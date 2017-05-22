@@ -43,6 +43,10 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData() {
+		return getDifferentialTreeData(getSnapshotTreeData());
+	}
+	
+	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
 		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder(new FhirTreeNodeBuilder());
 		
 		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
@@ -53,8 +57,7 @@ public class StructureDefinitionTreeDataProvider {
 		FhirTreeData differentialTree = fhirTreeBuilder.getTree();
 		//differentialTree.dumpTreeStructure();
 		
-		FhirTreeData snapshotTreeData = getSnapshotTreeData();
-		addBackupNodes(differentialTree, snapshotTreeData);
+		addBackupNodes(differentialTree, backupTreeData);
 		
 		return differentialTree;
 	}

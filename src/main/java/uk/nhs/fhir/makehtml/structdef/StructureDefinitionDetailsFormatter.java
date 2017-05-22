@@ -3,6 +3,7 @@ package uk.nhs.fhir.makehtml.structdef;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -55,6 +56,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 	private Element getDetailsPanel(StructureDefinition structureDefinition) {
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
+		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
 		Set<String> nodeKeys = Sets.newHashSet();
 
@@ -80,7 +82,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			addListDataIfPresent(tableContent, "Alternate Names", fhirTreeNode.getAliases());
 			addResourceFlags(tableContent, fhirTreeNode.getResourceFlags());
 			addDataIfPresent(tableContent, "Comments", fhirTreeNode.getComments());
-			addConstraints(tableContent, fhirTreeNode.getConstraints());
+			addConstraints(tableContent, fhirTreeNode, differentialTreeData);
 		}
 		
 		Element table = 
@@ -93,15 +95,80 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		return panel.makePanel();
 	}
 
-	private void addConstraints(List<Element> tableContent, List<ConstraintInfo> constraints) {
+	private void addConstraints(List<Element> tableContent, FhirTreeNode node, FhirTreeData differentialTreeData) {
+		
+		List<ConstraintInfo> constraints = node.getConstraints();
+		
+		//validate for duplicate keys
+		for (int i=0; i<constraints.size(); i++) {
+			ConstraintInfo constraint1 = constraints.get(i);
+			for (int j=i+1; j<constraints.size(); j++) {
+				ConstraintInfo constraint2 = constraints.get(j);
+				if (constraint1.getKey().equals(constraint2.getKey())) {
+					String warning = "Node with constraints with duplicate key: '" + constraint1.getKey() + "'";
+					if (NewMain.STRICT) {
+						throw new IllegalStateException(warning);
+					} else {
+						System.out.println("***" + warning + "***");
+					}
+				}
+			}
+		}
+		
 		if (!constraints.isEmpty()) {
 			Element labelCell = dataCell("Invariants", "fhir-details-data-cell");
+
+			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
+			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
+			splitConstraints(node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
 			List<Content> constraintInfos = Lists.newArrayList();
-			for (ConstraintInfo constraint : constraints) {
-				if (!constraintInfos.isEmpty()) {
-					constraintInfos.add(Elements.newElement("br"));
+			addConstraintInfos(constraintInfos, profileConstraints, "Defined on this element");
+			addConstraintInfos(constraintInfos, inheritedConstraints, "Affect this element");
+			
+			tableContent.add(
+				getDataRow(
+					labelCell, 
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", "fhir-details-data-cell"), 
+						constraintInfos)));
+		}
+	}
+
+	private void splitConstraints(FhirTreeNode node, FhirTreeData differentialTreeData,
+			List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
+		
+		Optional<FhirTreeTableContent> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
+			.filter(differentialNode -> differentialNode.getBackupNode().get().equals(node))
+			.findFirst();
+		
+		if (matchingDifferentialNode.isPresent()) {
+			List<ConstraintInfo> differentialConstraints = matchingDifferentialNode.get().getConstraints();
+			
+			for (ConstraintInfo constraint : node.getConstraints()) {
+				if (differentialConstraints.stream()
+						.anyMatch(diffConstraint -> diffConstraint.getKey().equals(constraint.getKey()))) {
+					profileConstraints.add(constraint);
+				} else {
+					inheritedConstraints.add(constraint);
 				}
+			}
+		} else {
+			// If not in the differential, it hasn't changed. Any constraints must be inherited.
+			inheritedConstraints.addAll(node.getConstraints());
+		}
+	}
+
+	private void addConstraintInfos(List<Content> constraintInfos, List<ConstraintInfo> profileConstraints, String label) {
+		if (!profileConstraints.isEmpty()) {
+			if (!constraintInfos.isEmpty()) {
+				constraintInfos.add(Elements.newElement("br"));
+			}
+			constraintInfos.add(Elements.withText("b", label));
+			
+			for (ConstraintInfo constraint : profileConstraints) {
+				constraintInfos.add(Elements.newElement("br"));
+				
 				constraintInfos.add(Elements.withText("b", constraint.getKey() + ": "));
 				String constraintContent = constraint.getDescription();
 				if (constraint.getRequirements().isPresent()) {
@@ -111,13 +178,6 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 				constraintContent += " severity: " + constraint.getSeverity();
 				constraintInfos.add(new Text(constraintContent));
 			}
-			
-			tableContent.add(
-				getDataRow(
-					labelCell, 
-					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", "fhir-details-data-cell"), 
-						constraintInfos)));
 		}
 	}
 
