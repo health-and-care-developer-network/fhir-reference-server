@@ -19,6 +19,7 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -63,17 +64,30 @@ public class FilesystemIF implements Datasource {
     }
 
     /**
-     * Gets a specific one
+     * Gets a specific one, optionally also with a specific version
+     * @param id
+     * @return 
+     */
+    public IBaseResource getResourceByID(IdDt theId) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(theId);
+    	if (entry != null) {
+	    	File path = entry.getResourceFile();
+	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
+	        
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
+	        return foundResource;
+    	} else {
+    		return null;
+    	}
+    }
+
+    /**
+     * Gets a specific one, with no version specified (i.e. get the latest)
      * @param id
      * @return 
      */
     public IBaseResource getResourceByID(String id) {
-    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting Resource with id=" + id + " looking for file: " + path.getAbsolutePath());
-        
-    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
-        return foundResource;
+    	return getResourceByID(new IdDt(id));
     }
     
     /**
@@ -184,91 +198,5 @@ public class FilesystemIF implements Datasource {
         }
         LOG.info("Returning matches");
         return matches;
-    }
-
-    /**
-     * Gets a specific ValueSet specified by id.
-     * 
-     * @param id
-     * @return 
-     */
-    public ValueSet getSingleValueSetByID(String id) {
-    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting ValueSet with id=" + id + " looking for file: " + path.getAbsolutePath());
-        
-    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
-        return foundValSet;
-    }
-
-    /**
-     * Gets a specific ValueSet specified by name.
-     * 
-     * @param name
-     * @return 
-     */
-    public ValueSet getSingleValueSetByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + path.getAbsolutePath());
-        
-    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
-        return foundValSet;
-    }
-    
-    /**
-     * This is the method to do a search based on name, ie to find where
-     * name:contains=[parameter]
-     * 
-     * @param theNamePart
-     * @return a List of matched ValueSet objects
-     */
-    public List<ValueSet> getValueSetMatchByName(String theNamePart) {
-        LOG.info("Getting ValueSets with name=" + theNamePart);
-        List<ValueSet> list = new ArrayList<ValueSet>();
-        List<String> matchingNames = getAllMatchedValueSetNames(theNamePart);
-
-        for(String name : matchingNames) {
-            list.add(getSingleValueSetByName(name));
-        }
-        return list;
-    }
-
-    /**
-     * This is the method to search by name, e.g. name:contains=Patient
-     * 
-     * @param theNamePart
-     * @return 
-     */
-    public List<String> getAllMatchedValueSetNames(String theNamePart) {
-        LOG.info("Getting all ValueSet Names containing: " + theNamePart + " in their name");
-        
-        LOG.info("Getting full list of ValueSets first");
-        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
-        
-        LOG.info("Now filtering the list to those matching our criteria");
-        ArrayList<String> matches = new ArrayList<String>();
-        
-        String pattern = "(.*)" + theNamePart + "(.*)";
-        
-        for (String valSetName : valSetList) {
-        	// Create a Pattern object
-            Pattern r = Pattern.compile(pattern);
-
-            // Now create matcher object.
-            Matcher m = r.matcher(valSetName);
-            if (m.find()) {
-               matches.add(valSetName);
-            }
-        }
-        LOG.info("Returning matches");
-        return matches;
-    }
-
-    public List<String> getAllValueSetNames() {
-        LOG.info("Getting all ValueSet Names");
-        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
-        
-        return valSetList;
     }
 }

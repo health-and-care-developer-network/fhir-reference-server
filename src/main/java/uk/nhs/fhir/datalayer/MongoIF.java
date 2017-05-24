@@ -35,6 +35,7 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
@@ -79,6 +80,17 @@ public class MongoIF implements Datasource {
 	 */
     @Override
 	public IBaseResource getResourceByID(String id) {
+        LOG.info("Getting Resource with id=" + id);
+        BasicDBObject query = new BasicDBObject("id", id);
+        DBObject found = profiles.findOne(query);
+        IBaseResource foundDocRef = (IBaseResource) ctx.newJsonParser().parseResource(found.toString());
+        return foundDocRef;
+    }
+    
+    @Override
+	public IBaseResource getResourceByID(IdDt theId) {
+    	String id = theId.getIdPart();
+    	// No support for versioning in this implementation yet.
         LOG.info("Getting Resource with id=" + id);
         BasicDBObject query = new BasicDBObject("id", id);
         DBObject found = profiles.findOne(query);

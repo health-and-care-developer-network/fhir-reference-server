@@ -1,8 +1,11 @@
 package uk.nhs.fhir.datalayer.collections;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class ResourceEntityWithMultipleVersions implements Comparable {
+	
+	private static final Logger LOG = Logger.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
 	HashMap<VersionNumber,ResourceEntity> versionList = new HashMap<VersionNumber,ResourceEntity>();
 	VersionNumber latest = null;
@@ -32,7 +35,16 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 	}
 	
 	public ResourceEntity getSpecificVersion(VersionNumber version) {
-		return versionList.get(version);
+		if (versionList.containsKey(version)) {
+			LOG.info("Found requested version - returning");
+			return versionList.get(version);
+		} else {
+			LOG.warning("Could not find requested version - asked for version:"+version+" - versions we have are:");
+			for (VersionNumber v : versionList.keySet()) {
+				LOG.warning(" - version:"+v.toString());
+			}
+			return null;
+		}
 	}
 	
 	private VersionNumber largestVersion(VersionNumber previousLatest, VersionNumber newVersion) {

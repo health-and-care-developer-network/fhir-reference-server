@@ -79,7 +79,7 @@ public class PlainContent extends CORSInterceptor {
         LOG.info("Resource type: " + resourceType.toString());
         
         // First, check if this is a request for a markdown or text file from the ImplementationGuide directory..
-        if (operation == READ && resourceType == IMPLEMENTATIONGUIDE) {
+        if ((operation == READ || operation == VREAD) && resourceType == IMPLEMENTATIONGUIDE) {
         	String resourceName = theRequestDetails.getId().getIdPart();
         	if (resourceName.endsWith(".md") || resourceName.endsWith(".txt")) {
         		streamFileDirectly(theResponse, resourceName);
@@ -111,7 +111,7 @@ public class PlainContent extends CORSInterceptor {
         boolean showList = true;
         
         if (operation != null) {
-        	if (operation == READ) {
+        	if (operation == READ || operation == VREAD) {
 	        	if (mimeType == XML || mimeType == JSON) {
 	        		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
 	        		showList = false;

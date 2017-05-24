@@ -38,6 +38,7 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -285,16 +286,22 @@ public class FileCache {
 		}
     }
     
-    public static ResourceEntity getSingleResourceByID(String id) {
+    public static ResourceEntity getSingleResourceByID(IdDt theId) {
         if(updateRequired()) {
             updateCache();
         }
+        
     	for (ResourceEntityWithMultipleVersions entry : resourceList) {
-    		/*if (entry.getResourceName().equals(id) || entry.getResourceID().equals(id)) {
-    			return entry;
-    		}*/
-    		if (entry.getResourceID().equals(id)) {
-    			return entry.getLatest();
+    		if (entry.getResourceID().equals(theId.getIdPart())) {
+    			if (theId.hasVersionIdPart()) {
+    				// Get a specific version
+    				VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    				LOG.info("Getting versioned resource with ID="+theId.getIdPart() + " and version="+version);
+    				return entry.getSpecificVersion(version);
+    			} else {
+    				// Get the latest
+    				return entry.getLatest();
+    			}
     		}
     	}
     	return null;

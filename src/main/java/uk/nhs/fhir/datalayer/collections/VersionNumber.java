@@ -105,4 +105,35 @@ public class VersionNumber implements Comparable<VersionNumber> {
 			versionString = versionString + '.' + patch;
 		return versionString;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + major;
+		result = prime * result + minor;
+		result = prime * result + patch;
+		result = prime * result + (valid ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		VersionNumber other = (VersionNumber) obj;
+		if (major != other.major)
+			return false;
+		if (minor != other.minor)
+			return false;
+		if (patch != other.patch)
+			return false;
+		if (valid != other.valid)
+			return false;
+		return true;
+	}
 }

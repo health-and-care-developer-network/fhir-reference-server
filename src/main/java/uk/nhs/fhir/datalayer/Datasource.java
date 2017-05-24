@@ -24,19 +24,29 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 
 public interface Datasource {
 
     /**
-     * Gets a specific one
+     * Gets a specific one, optionally also with a specific version
      *
-     * @param name
+     * @param id
+     * @return
+     */
+	IBaseResource getResourceByID(IdDt theId);
+	
+    /**
+     * Gets a specific one, with no version specified (i.e. get the latest)
+     *
+     * @param id
      * @return
      */
 	IBaseResource getResourceByID(String id);
-    
+	    
     /**
      * This is the method to do a search based on name, ie to find where
      * name:contains=[parameter]
