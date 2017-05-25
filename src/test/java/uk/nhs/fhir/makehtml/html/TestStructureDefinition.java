@@ -7,6 +7,7 @@ import ca.uhn.fhir.parser.IParser;
 import org.junit.Test;
 
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.util.HTMLUtil;
@@ -45,7 +46,10 @@ public class TestStructureDefinition {
 			new StructureDefinitionPreparer().prepare(structureDefinition, null);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
 			for (FormattedOutputSpec formatter : ResourceFormatter.formattersForResource(structureDefinition, "this/path/isnt/used")) {
-				doc.addSection(formatter.getFormatter().makeSectionHTML(structureDefinition));
+				HTMLDocSection sectionHTML = formatter.getFormatter().makeSectionHTML(structureDefinition);
+				if (sectionHTML != null) {
+					doc.addSection(sectionHTML);
+				}
 			}
 			
 			Files.write(Paths.get(testOutputPath), HTMLUtil.docToString(doc.getHTML(), true, false).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
