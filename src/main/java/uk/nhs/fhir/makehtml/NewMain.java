@@ -62,10 +62,17 @@ public class NewMain {
             }
 
             String resourcesPath = args[0];
-            if (!resourcesPath.endsWith("/")) {
-            	resourcesPath += "/";
+            if (!resourcesPath.endsWith(File.separator)) {
+            	resourcesPath += File.separator;
             }
             FhirIcon.setSuppliedResourcesFolderPath(resourcesPath);
+            
+            if (!inputDir.endsWith(File.separator)) {
+            	inputDir += File.separator;
+            }
+            if (!outputDir.endsWith(File.separator)) {
+            	outputDir += File.separator;
+            }
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
             

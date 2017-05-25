@@ -23,6 +23,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
@@ -76,6 +77,22 @@ public class FhirTreeNodeBuilder {
 			String xpath = constraint.getXpath();
 			
 			constraints.add(new ConstraintInfo(key, description, severity, requirements, xpath));
+		}
+
+		//validate for duplicate keys
+		for (int i=0; i<constraints.size(); i++) {
+			ConstraintInfo constraint1 = constraints.get(i);
+			for (int j=i+1; j<constraints.size(); j++) {
+				ConstraintInfo constraint2 = constraints.get(j);
+				if (constraint1.getKey().equals(constraint2.getKey())) {
+					String warning = "Node with constraints with duplicate key: '" + constraint1.getKey() + "'";
+					if (NewMain.STRICT) {
+						throw new IllegalStateException(warning);
+					} else {
+						System.out.println("***" + warning + "***");
+					}
+				}
+			}
 		}
 		
 		String path = elementDefinition.getPath();

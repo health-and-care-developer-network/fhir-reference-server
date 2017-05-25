@@ -41,17 +41,27 @@ public class FileProcessor {
 		    IBaseResource resource = parseFile(thisFile);
 
 		    // Persist a copy of the xml file with a rendered version embedded in the text section
-		    String outputDirectory = resource.getClass().getSimpleName();
-		    new File(outputDirectory).mkdirs();
-			String outFilePath = outPath + separatorChar + outputDirectory + separatorChar + thisFile.getName();
+		    String outputDirectoryName = resource.getClass().getSimpleName();
+		    String outDirPath = outPath + outputDirectoryName; 
+			new File(outDirPath).mkdirs();
+			
+			String outFilePath = outDirPath + separatorChar + thisFile.getName();
 			System.out.println("Generating " + outFilePath);
 		    ResourceTextSectionInserter textSectionInserter = new ResourceTextSectionInserter(resourceBuilder);
 		    textSectionInserter.augmentResource(resource, inFilePath, outFilePath, newBaseURL);
 		    
-		    List<FormattedOutputSpec> formatters = ResourceFormatter.formattersForResource(resource, outPath + separatorChar);
+		    List<FormattedOutputSpec> formatters = ResourceFormatter.formattersForResource(resource, outPath);
 		    for (FormattedOutputSpec formatter : formatters) {
-				System.out.println("Generating " + formatter.getOutputPath(inFilePath));
-		    	formatter.formatAndSave(inFilePath);
+		    	try {
+					System.out.println("Generating " + formatter.getOutputPath(inFilePath));
+			    	formatter.formatAndSave(inFilePath);
+		    	} catch (SkipRenderGenerationException e) {
+		    		if (NewMain.STRICT) {
+		    			throw e;
+		    		} else {
+		    			e.printStackTrace();
+		    		}
+		    	}
 		    }
 		}
 	}

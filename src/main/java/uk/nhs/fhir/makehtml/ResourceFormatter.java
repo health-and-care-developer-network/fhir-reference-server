@@ -33,7 +33,7 @@ public abstract class ResourceFormatter {
 	
 	public static List<FormattedOutputSpec> formattersForResource(IBaseResource resource, String baseOutputDirectory) {
 		// e.g. my_outputs/StructureDefinition
-		String outputDirectory = baseOutputDirectory + File.separator + resource.getClass().getSimpleName();
+		String outputDirectory = baseOutputDirectory + resource.getClass().getSimpleName() + File.separator;
 		
 		if (resource instanceof OperationDefinition) {
 			return Lists.newArrayList(

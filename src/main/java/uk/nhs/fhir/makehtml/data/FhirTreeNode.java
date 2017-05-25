@@ -1,12 +1,13 @@
 package uk.nhs.fhir.makehtml.data;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import uk.nhs.fhir.makehtml.NewMain;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import uk.nhs.fhir.makehtml.NewMain;
 
 public class FhirTreeNode implements FhirTreeTableContent {
 	private FhirIcon icon;
@@ -22,6 +23,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
 	private Optional<String> fixedValue = Optional.empty();
+	private Optional<String> fixedUri = Optional.empty();
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
@@ -29,7 +31,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> definition = Optional.empty();
 	private Optional<String> requirements = Optional.empty();
 	private Optional<String> comments = Optional.empty();
-	private Optional<List<String>> aliases = Optional.empty();
+	private List<String> aliases = Lists.newArrayList();
 
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -269,7 +271,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public void setFixedValue(String fixedValue) {
 		this.fixedValue = Optional.of(fixedValue);
 	}
-
+	
 	public boolean hasExample() {
 		return example.isPresent();
 	}
@@ -351,12 +353,12 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.comments = Optional.of(comments);
 	}
 
-	public Optional<List<String>> getAliases() {
+	public List<String> getAliases() {
 		return aliases;
 	}
 
 	public void setAliases(List<String> aliases) {
-		this.aliases = Optional.of(aliases);
+		this.aliases = aliases;
 	}
 	
 }

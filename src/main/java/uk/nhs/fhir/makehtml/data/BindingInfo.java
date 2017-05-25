@@ -59,4 +59,22 @@ public class BindingInfo {
 		
 		return new BindingInfo(resolvedDescription, resolvedUrl, resolvedStrength);
 	}
+	
+	public int hashCode() {
+		return description.hashCode() + url.hashCode() + strength.hashCode();
+	}
+	
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof BindingInfo)) {
+			return false;
+		}
+		
+		BindingInfo otherBindingInfo = (BindingInfo)other;
+		return description.equals(otherBindingInfo.getDescription())
+			&& url.equals(otherBindingInfo.getUrl())
+			&& strength.equals(otherBindingInfo.getStrength());
+	}
 }

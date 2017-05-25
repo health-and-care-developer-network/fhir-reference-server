@@ -78,4 +78,27 @@ public class ResourceFlags {
 	public Set<ResourceFlag> getFlags() {
 		return flags;
 	}
+	
+	public int hashCode() {
+		return (isSummary() ? 0 : 1 << 0)
+			| (isModifier() ? 0 : 1 << 1)
+			| (isConstrained() ? 0 : 1 << 2)
+			| (isMustSupport() ? 0 : 1 << 3);
+	}
+	
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof ResourceFlags)) {
+			return false;
+		}
+		
+		ResourceFlags otherResourceFlags = (ResourceFlags)other;
+		
+		return isSummary() == otherResourceFlags.isSummary()
+			&& isModifier() == otherResourceFlags.isModifier()
+			&& isConstrained() == otherResourceFlags.isConstrained()
+			&& isMustSupport() == otherResourceFlags.isMustSupport();
+	}
 }

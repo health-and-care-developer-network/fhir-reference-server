@@ -1,25 +1,24 @@
 package uk.nhs.fhir.makehtml.structdef;
 
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
-import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
@@ -33,7 +32,6 @@ import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.util.Elements;
-import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 
@@ -58,31 +56,41 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
-		Set<String> nodeKeys = Sets.newHashSet();
-
-		List<Element> tableContent = Lists.newArrayList();
+		snapshotTreeData.stripRemovedElements();
+		
+		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();
 		
 		for (FhirTreeTableContent node : snapshotTreeData) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
+			
 			String key = getNodeKey(fhirTreeNode);
+			Optional<String> definition = fhirTreeNode.getDefinition();
+			String cardinality = fhirTreeNode.getCardinality().toString();
+			Optional<BindingInfo> binding = fhirTreeNode.getBinding();
+			List<LinkData> typeLinks = fhirTreeNode.getTypeLinks();
+			Optional<String> requirements = fhirTreeNode.getRequirements();
+			List<String> aliases = fhirTreeNode.getAliases();
+			ResourceFlags resourceFlags = fhirTreeNode.getResourceFlags();
+			Optional<String> comments = fhirTreeNode.getComments();
 			
-			if (!nodeKeys.contains(key)) {
-				nodeKeys.add(key);
-			} else if (NewMain.STRICT) {
-				throw new IllegalStateException("Identical keys for 2 nodes (" + key + "). Add validation to check they have identical details");
+			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
+			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
+			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
+			
+			StructureDefinitionDetails detail = new StructureDefinitionDetails(key, definition, cardinality, binding, typeLinks,
+				requirements, aliases, resourceFlags, comments, inheritedConstraints, profileConstraints);
+
+			if (!details.containsKey(key)) {
+				details.put(key, detail);
+			} else {
+				StructureDefinitionDetails existingDetails = details.get(key);
+				assertDetailsEqual(key, detail, existingDetails);
 			}
-			
-			tableContent.add(getHeaderRow(key));
-			
-			addDataIfPresent(tableContent, "Definition", fhirTreeNode.getDefinition());
-			addData(tableContent, "Cardinality", fhirTreeNode.getCardinality().toString());
-			addBindingRowIfPresent(tableContent, fhirTreeNode.getBinding());
-			tableContent.add(getLinkRow("Type", fhirTreeNode.getTypeLinks()));
-			addDataIfPresent(tableContent, "Requirements", fhirTreeNode.getRequirements());
-			addListDataIfPresent(tableContent, "Alternate Names", fhirTreeNode.getAliases());
-			addResourceFlags(tableContent, fhirTreeNode.getResourceFlags());
-			addDataIfPresent(tableContent, "Comments", fhirTreeNode.getComments());
-			addConstraints(tableContent, fhirTreeNode, differentialTreeData);
+		}
+		
+		List<Element> tableContent = Lists.newArrayList();
+		for (StructureDefinitionDetails detail : details.values()) {
+			detail.addContent(tableContent);
 		}
 		
 		Element table = 
@@ -95,43 +103,37 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		return panel.makePanel();
 	}
 
-	private void addConstraints(List<Element> tableContent, FhirTreeNode node, FhirTreeData differentialTreeData) {
-		
-		List<ConstraintInfo> constraints = node.getConstraints();
-		
-		//validate for duplicate keys
-		for (int i=0; i<constraints.size(); i++) {
-			ConstraintInfo constraint1 = constraints.get(i);
-			for (int j=i+1; j<constraints.size(); j++) {
-				ConstraintInfo constraint2 = constraints.get(j);
-				if (constraint1.getKey().equals(constraint2.getKey())) {
-					String warning = "Node with constraints with duplicate key: '" + constraint1.getKey() + "'";
-					if (NewMain.STRICT) {
-						throw new IllegalStateException(warning);
-					} else {
-						System.out.println("***" + warning + "***");
-					}
-				}
-			}
+	void assertDetailsEqual(String key, StructureDefinitionDetails detail,
+			StructureDefinitionDetails existingDetails) {
+		if (!existingDetails.getDefinition().equals(detail.getDefinition())) {
+			throw new IllegalStateException("Same key, different definition (" + key + ").");
 		}
-		
-		if (!constraints.isEmpty()) {
-			Element labelCell = dataCell("Invariants", "fhir-details-data-cell");
-
-			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
-			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
-			splitConstraints(node, differentialTreeData, inheritedConstraints, profileConstraints);
-			
-			List<Content> constraintInfos = Lists.newArrayList();
-			addConstraintInfos(constraintInfos, profileConstraints, "Defined on this element");
-			addConstraintInfos(constraintInfos, inheritedConstraints, "Affect this element");
-			
-			tableContent.add(
-				getDataRow(
-					labelCell, 
-					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", "fhir-details-data-cell"), 
-						constraintInfos)));
+		if (!existingDetails.getCardinality().equals(detail.getCardinality())) {
+			throw new IllegalStateException("Same key, different cardinality (" + key + ").");
+		}
+		if (!existingDetails.getBindingInfo().equals(detail.getBindingInfo())) {
+			throw new IllegalStateException("Same key, different binding info (" + key + ").");
+		}
+		if (!existingDetails.getTypeLinks().stream().allMatch(link -> detail.getTypeLinks().contains(link))) {
+			throw new IllegalStateException("Same key, different types info (" + key + ").");
+		}
+		if (!existingDetails.getRequirements().equals(detail.getRequirements())) {
+			throw new IllegalStateException("Same key, different requirements info (" + key + ").");
+		}
+		if (!existingDetails.getAliases().stream().allMatch(alias -> detail.getAliases().contains(alias))) {
+			throw new IllegalStateException("Same key, different alias info (" + key + ").");
+		}
+		if (!existingDetails.getResourceFlags().equals(detail.getResourceFlags())) {
+			throw new IllegalStateException("Same key, different resource flags info (" + key + ").");
+		}
+		if (!existingDetails.getComments().equals(detail.getComments())) {
+			throw new IllegalStateException("Same key, different comments info (" + key + ").");
+		}
+		if (!existingDetails.getInheritedConstraints().stream().allMatch(constraint -> detail.getInheritedConstraints().contains(constraint))) {
+			throw new IllegalStateException("Same key, different inherited constraints info (" + key + ").");
+		}
+		if (!existingDetails.getProfileConstraints().stream().allMatch(constraint -> detail.getProfileConstraints().contains(constraint))) {
+			throw new IllegalStateException("Same key, different profile constraints info (" + key + ").");
 		}
 	}
 
@@ -158,145 +160,43 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			inheritedConstraints.addAll(node.getConstraints());
 		}
 	}
-
-	private void addConstraintInfos(List<Content> constraintInfos, List<ConstraintInfo> profileConstraints, String label) {
-		if (!profileConstraints.isEmpty()) {
-			if (!constraintInfos.isEmpty()) {
-				constraintInfos.add(Elements.newElement("br"));
-			}
-			constraintInfos.add(Elements.withText("b", label));
-			
-			for (ConstraintInfo constraint : profileConstraints) {
-				constraintInfos.add(Elements.newElement("br"));
-				
-				constraintInfos.add(Elements.withText("b", constraint.getKey() + ": "));
-				String constraintContent = constraint.getDescription();
-				if (constraint.getRequirements().isPresent()) {
-					constraintContent += ". " + constraint.getRequirements().get();
-				}
-				constraintContent += " (xpath: " + constraint.getXPath() + ")";
-				constraintContent += " severity: " + constraint.getSeverity();
-				constraintInfos.add(new Text(constraintContent));
-			}
-		}
-	}
-
-	private void addBindingRowIfPresent(List<Element> tableContent, Optional<BindingInfo> binding) {
-		if (binding.isPresent()) {
-			BindingInfo info = binding.get();
-
-			String bindingInfo = "";
-			
-			boolean hasUrl = info.getUrl().isPresent();
-			boolean hasDesc = info.getDescription().isPresent();
-			
-			if (hasUrl) {
-				String fullUrl = info.getUrl().get().toString();
-				String hyphenatedUrlName = fullUrl.substring(fullUrl.lastIndexOf('/') + 1);
-				String urlName = StringUtil.hyphenatedToPascalCase(hyphenatedUrlName);
-				bindingInfo += urlName;
-			}
-			
-			if (hasUrl && hasDesc) {
-				bindingInfo += ": ";
-			}
-			
-			if (hasDesc) {
-				bindingInfo += info.getDescription().get();
-			}
-			
-			bindingInfo += " (" + info.getStrength() + ")";
-			
-			addData(tableContent, "Binding", bindingInfo);
-		}
-	}
-
-	private void addListDataIfPresent(List<Element> tableContent, String label, Optional<List<String>> listData) {
-		if (listData.isPresent()) {
-			addData(tableContent, label, String.join("; ", listData.get()));
-		}
-	}
-
-	private void addResourceFlags(List<Element> tableContent, ResourceFlags resourceFlags) {
-		addDataIfTrue(tableContent, "Summary", resourceFlags.isSummary());
-		addDataIfTrue(tableContent, "Modifier", resourceFlags.isModifier());
-		//addDataIfTrue(tableContent, "Is Constrained", resourceFlags.isConstrained());
-		addDataIfTrue(tableContent, "Must-Support", resourceFlags.isMustSupport());
-	}
-
-	private void addDataIfTrue(List<Element> tableContent, String label, boolean condition) {
-		if (condition) {
-			addData(tableContent, label, "True");
-		}
-	}
-
-	private void addDataIfPresent(List<Element> tableContent, String label, Optional<String> content) {
-		if (content.isPresent()) {
-			addData(tableContent, label, content.get());
-		}
-	}
-
-	private void addData(List<Element> tableContent, String label, String content) {
-		tableContent.add(simpleStringDataRow(label, content)); 
-	}
-
-	private Element getHeaderRow(String header) {
-		return Elements.withAttributeAndChild("tr", 
-			new Attribute("class", "fhir-details-header-row"), 
-			Elements.withAttributesAndChildren("td",
-				Lists.newArrayList(
-					new Attribute("class", "fhir-details-header-cell"), 
-					new Attribute("colspan", "2")), 
-				Lists.newArrayList(
-					Elements.withAttribute("a", 
-						new Attribute("name", header)),
-					new Text(header))));
-	}
-	
-	private Element simpleStringDataRow(String title, String content) {
-		
-		Element labelCell = dataCell(title, "fhir-details-data-cell");
-		Element dataCell = dataCell(content, "fhir-details-data-cell");
-		
-		return getDataRow(labelCell, dataCell);
-	}
-	
-	private Element getDataRow(Element labelCell, Element dataCell) {
-		return Elements.withAttributeAndChildren("tr", 
-			new Attribute("class", "fhir-details-data-row"),
-				Lists.newArrayList(
-					labelCell,
-					dataCell));
-	}
-	
-	private Element dataCell(String content, String classString) {
-		return Elements.withAttributeAndText("td",
-			new Attribute("class", classString),
-			content);
-	}
-	
-	private Element getLinkRow(String title, List<LinkData> linkDatas) {
-		return Elements.withAttributeAndChildren("tr", 
-			new Attribute("class", "fhir-details-data-row"),
-				Lists.newArrayList(
-					dataCell(title, "fhir-details-data-cell"),
-					linkCell(linkDatas)));
-	}
-	
-	private Element linkCell(List<LinkData> linkDatas) {
-		return new LinkCell(linkDatas, Sets.newHashSet("fhir-details-data-cell"), Sets.newHashSet(), false, false).makeCell();
-	}
 	
 	private String getNodeKey(FhirTreeNode node) {
-		String key = node.getPath();
+		
+		Deque<String> ancestorKeys = new LinkedList<>();
+		
+		FhirTreeNode ancestor = node;
+		while (true) {
+			ancestorKeys.addFirst(getKeySegment(ancestor));
+			
+			ancestor = (FhirTreeNode)ancestor.getParent();
+			
+			if (ancestor == null) {
+				break;
+			}
+		}
+		
+		String key = String.join(".", ancestorKeys);
+		
+		/*Optional<String> fixed = node.getFixedValue();
+		if (fixed.isPresent() 
+		  && !fixed.get().isEmpty()) {
+			key += ":" + fixed.get();
+		}*/
+		
+		return key;
+	}
+
+	String getKeySegment(FhirTreeNode node) {
+		String nodeKey = node.getPathName();
 		
 		Optional<String> name = node.getName();
 		if (name.isPresent()
 		  && !name.get().isEmpty()) {
-			key += ":" + name.get();
+			nodeKey += ":" + name.get();
 		}
 		
-		return key;
+		return nodeKey;
 	}
 	
 	public static List<CSSStyleBlock> getStyles() {

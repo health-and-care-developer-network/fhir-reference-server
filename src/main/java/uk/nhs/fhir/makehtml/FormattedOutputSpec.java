@@ -46,11 +46,11 @@ public class FormattedOutputSpec {
 
 	public String getOutputDirectory(String inputPath) {
 		String inputFileName = inputPath.substring(inputPath.lastIndexOf(File.separatorChar) + 1, inputPath.lastIndexOf(".xml"));
-		return typedOutputDirectory + File.separator + inputFileName;
+		return typedOutputDirectory + inputFileName + File.separator;
 	}
 	
 	public String getOutputPath(String inputPath) {
-		return getOutputDirectory(inputPath) + File.separator + filename;
+		return getOutputDirectory(inputPath) + filename;
 	}
 
 	private void ensureOutputDirectoryExists(String inputPath) {

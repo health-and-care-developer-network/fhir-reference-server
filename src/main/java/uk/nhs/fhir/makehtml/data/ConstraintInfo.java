@@ -42,4 +42,30 @@ public class ConstraintInfo {
 		return severity;
 	}
 
+	@Override
+	public int hashCode() {
+		return key.hashCode()
+			+ description.hashCode()
+			+ requirements.hashCode()
+			+ xpath.hashCode()
+			+ severity.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof ConstraintInfo)) {
+			return false;
+		}
+		
+		ConstraintInfo otherConstraintInfo = (ConstraintInfo)other;
+		
+		return key.equals(otherConstraintInfo.getKey())
+			&& description.equals(otherConstraintInfo.getDescription())
+			&& requirements.equals(otherConstraintInfo.getRequirements())
+			&& xpath.equals(otherConstraintInfo.getXPath())
+			&& severity.equals(otherConstraintInfo.getSeverity());
+	}
 }
