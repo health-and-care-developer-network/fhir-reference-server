@@ -161,7 +161,7 @@ public enum FhirIcon {
 					}
 				}
 				
-				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml")) {
+				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
 					System.out.println("FIXING PATH FOR " + fileName);
 					fileName = "Extension-CareConnect-NhsCommunication-1.xml";
 					file = new File(suppliedResourcesFolderPath + fileName);
