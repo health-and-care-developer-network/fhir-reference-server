@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.html;
+package uk.nhs.fhir.makehtml.structdef;
 
 import java.util.Date;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -26,17 +27,25 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
+import uk.nhs.fhir.makehtml.html.FhirPanel;
+import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
+import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
-public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter<StructureDefinition> {
+public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter {
 
 	@Override
-	public HTMLDocSection makeSectionHTML(StructureDefinition source) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		StructureDefinition structureDefinition = (StructureDefinition)source;
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(source);
+		Element metadataPanel = getMetadataTable(structureDefinition);
 		section.addBodyElement(metadataPanel);
+		
+		getStyles().forEach(section::addStyle);
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
 		
 		return section;
 	}

@@ -40,6 +40,6 @@ public class SimpleLinkData implements LinkData {
 	
 	@Override
 	public int hashCode() {
-		return (url.hashCode() * 13) | text.hashCode();
+		return url.hashCode() + text.hashCode();
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
@@ -14,6 +15,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
+import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -22,20 +24,23 @@ import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
-public class OperationDefinitionFormatter extends ResourceFormatter<OperationDefinition> {
-	
+public class OperationDefinitionFormatter extends ResourceFormatter {
+
+	public OperationDefinitionFormatter() { this.resourceSectionType = ResourceSectionType.TREEVIEW;  }
+
 	@Override
-	public HTMLDocSection makeSectionHTML(OperationDefinition source) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		OperationDefinition operationDefinition = (OperationDefinition)source;
 		
 		List<Parameter> inputParameters = Lists.newArrayList();
 		List<Parameter> outputParameters = Lists.newArrayList();
-		populateParameters(source, inputParameters, outputParameters);
+		populateParameters(operationDefinition, inputParameters, outputParameters);
 		
 		Element renderedOperationDefinition =
 			Elements.withAttributeAndChildren("div",
 				new Attribute("id", "fhir-ref-operation-definition-structure"),
 				Lists.newArrayList(
-					buildMetaDataPanel(source),
+					buildMetaDataPanel(operationDefinition),
 					buildParameterPanel("Input Parameters", inputParameters, fhirDocLinkFactory),
 					buildParameterPanel("Output Parameters", outputParameters, fhirDocLinkFactory)));
 		

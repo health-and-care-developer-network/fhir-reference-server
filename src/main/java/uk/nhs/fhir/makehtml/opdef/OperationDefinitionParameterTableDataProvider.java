@@ -1,18 +1,11 @@
 package uk.nhs.fhir.makehtml.opdef;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang3.NotImplementedException;
-
-import com.google.common.collect.Lists;
-
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.ParameterBinding;
 import ca.uhn.fhir.model.primitive.CodeDt;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.NotImplementedException;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
@@ -20,6 +13,13 @@ import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.TableTitle;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+
+// KGM 8/May/2017 Altered meta table column to % widths
 
 public class OperationDefinitionParameterTableDataProvider {
 
@@ -32,11 +32,13 @@ public class OperationDefinitionParameterTableDataProvider {
 	}
 
 	public List<TableTitle> getColumns() {
+
+		// KGM 8/May/2017 Altered meta table column to % widths
 		return Lists.newArrayList(
-			new TableTitle("Name", "The logical name of the element", "200px"),
-			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "100px"),
-			new TableTitle("Type", "Reference to the type of the element", "150px"),
-			new TableTitle("Value", "Additional information about the element", "500px")
+			new TableTitle("Name", "The logical name of the element", "20%"),
+			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "10%"),
+			new TableTitle("Type", "Reference to the type of the element", "20%x"),
+			new TableTitle("Value", "Additional information about the element", "50%")
 		);
 	}
 

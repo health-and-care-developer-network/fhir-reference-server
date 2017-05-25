@@ -70,4 +70,22 @@ public class StringUtil {
 			System.out.println(desc + ": " + s.get());
 		}
 	}
+	
+	public static String hyphenatedToPascalCase(String hyphenated) {
+		String[] split = hyphenated.split("-");
+		StringBuilder pascalCase = new StringBuilder();
+		for (String tok : split) {
+			pascalCase.append(capitaliseFirst(tok));
+		}
+		
+		return pascalCase.toString();
+	}
+
+	private static String capitaliseFirst(String tok) {
+		if (tok.isEmpty()) {
+			return tok;
+		} else {
+			return Character.toUpperCase(tok.charAt(0)) + tok.substring(1);
+		}
+	}
 }

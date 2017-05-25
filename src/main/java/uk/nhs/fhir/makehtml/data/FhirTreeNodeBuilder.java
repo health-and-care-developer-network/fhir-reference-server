@@ -4,19 +4,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
@@ -38,7 +45,6 @@ public class FhirTreeNodeBuilder {
 		
 		Integer min = elementDefinition.getMin();
 		String max = elementDefinition.getMax();
-		//FhirCardinality cardinality = new FhirCardinality(elementDefinition);
 		
 		FhirIcon icon = FhirIcon.forElementDefinition(elementDefinition);
 		
@@ -47,22 +53,69 @@ public class FhirTreeNodeBuilder {
 			shortDescription = "";
 		}
 		
-		List<ResourceInfo> resourceInfos = Lists.newArrayList();
+		List<IdDt> condition = elementDefinition.getCondition();
+		Set<String> conditionIds = Sets.newHashSet();
+		condition.forEach(idDt -> conditionIds.add(idDt.toString()));
+		
+		List<ConstraintInfo> constraints = Lists.newArrayList();
+		for (Constraint constraint : elementDefinition.getConstraint()) {
+			String key = constraint.getKey();
+			if (!conditionIds.contains(key)) {
+				String errorMessage = "***Constraint " + key + " doesn't have an associated condition pointing at it***";
+				/*if (NewMain.STRICT) {
+					throw new IllegalStateException(errorMessage);
+				} else {
+					System.out.println(errorMessage);
+				}*/
+				System.out.println(errorMessage);
+			}
 			
+			String description = constraint.getHuman();
+			String severity = constraint.getSeverity();
+			String requirementsString = constraint.getRequirements();
+			Optional<String> requirements = Strings.isNullOrEmpty(requirementsString) ? Optional.empty() : Optional.of(requirementsString);
+			String xpath = constraint.getXpath();
+			
+			constraints.add(new ConstraintInfo(key, description, severity, requirements, xpath));
+		}
+
+		//validate for duplicate keys
+		for (int i=0; i<constraints.size(); i++) {
+			ConstraintInfo constraint1 = constraints.get(i);
+			for (int j=i+1; j<constraints.size(); j++) {
+				ConstraintInfo constraint2 = constraints.get(j);
+				if (constraint1.getKey().equals(constraint2.getKey())) {
+					String warning = "Node with constraints with duplicate key: '" + constraint1.getKey() + "'";
+					if (NewMain.STRICT) {
+						throw new IllegalStateException(warning);
+					} else {
+						System.out.println("***" + warning + "***");
+					}
+				}
+			}
+		}
+		
 		String path = elementDefinition.getPath();
-			
+
+		// KGM Added Element 9/May/2017
 		FhirTreeNode node = new FhirTreeNode(
 			icon,
 			name,
 			flags,
 			min,
 			max,
-			//cardinality,
 			typeLinks, 
 			shortDescription,
-			resourceInfos,
-			path);
+			constraints,
+			path,
 
+			elementDefinition);
+
+		String definition = elementDefinition.getDefinition();
+		if (!Strings.isNullOrEmpty(definition)) {
+			node.setDefinition(Optional.of(definition));
+		}
+		
 		Slicing slicing = elementDefinition.getSlicing();
 		if (!slicing.isEmpty()) {
 			node.setSlicingInfo(new SlicingInfo(slicing));
@@ -114,6 +167,22 @@ public class FhirTreeNodeBuilder {
 			String strength = binding.getStrength();
 			
 			node.setBinding(new BindingInfo(description, url, strength));
+		}
+		
+		String requirements = elementDefinition.getRequirements();
+		if (!Strings.isNullOrEmpty(requirements)) {
+			node.setRequirements(requirements);
+		}
+		
+		String comments = elementDefinition.getComments();
+		if (!Strings.isNullOrEmpty(comments)) {
+			node.setComments(comments);
+		}
+		
+		List<StringDt> alias = elementDefinition.getAlias();
+		if (!alias.isEmpty()) {
+			List<String> aliases = alias.stream().map(stringDt -> stringDt.getValue()).collect(Collectors.toList());
+			node.setAliases(aliases);
 		}
 		
 		return node;

@@ -45,24 +45,23 @@ public class FileWriter {
      */
     public static boolean writeFile(File file, byte[] data) {
         boolean success = false;
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
-        try {
-            fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
+        try (
+        	FileOutputStream fos = new FileOutputStream(file);
+        	BufferedOutputStream bos = new BufferedOutputStream(fos);
+        	) {
+        	
             for (int n=0; n<data.length; n++) {
                 bos.write(data[n]);
             }
+            
             bos.flush();
             success = true;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(FileWriter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try { if (bos != null) bos.close(); } catch (IOException ex) {}
-            try { if (fos != null) fos.close(); } catch (IOException ex) {}
         }
+        
         return success;
     }
     

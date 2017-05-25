@@ -3,7 +3,6 @@ package uk.nhs.fhir.makehtml.html;
 import java.util.List;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -15,7 +14,7 @@ import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.util.Elements;
 
-public abstract class MetadataTableFormatter<T extends IBaseResource> extends ResourceFormatter<T> {
+public abstract class MetadataTableFormatter extends ResourceFormatter {
 	
 	protected static final String BLANK = "";
 	

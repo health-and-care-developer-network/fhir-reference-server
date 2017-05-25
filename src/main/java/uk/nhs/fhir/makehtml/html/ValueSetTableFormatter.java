@@ -2,47 +2,121 @@ package uk.nhs.fhir.makehtml.html;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.util.Elements;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ValueSetTableFormatter {
+import javax.xml.parsers.ParserConfigurationException;
+
+public class ValueSetTableFormatter extends MetadataTableFormatter {
 
 	private static final String BLANK = "";
 
-	private final ValueSet source;
     private ConceptMap conceptMap = null;
-
-	public ValueSetTableFormatter(ValueSet source){
-		this.source = source;
-	}
 	
+	@Override
+	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
+		ValueSet valueSet = (ValueSet)source;
+		HTMLDocSection section = new HTMLDocSection();
+		
+		Element metadataPanel = getConceptDataTable(valueSet);
+		section.addBodyElement(metadataPanel);
+		
+		return section;
+	}
+
+	public Element getConceptDataTable(ValueSet source) {
 
 
-	public Element getConceptDataTable() {
-
-
-		Element colgroup = Elements.newElement("colgroup");
 		int columns = 4;
-
-        conceptMap = getConceptMap();
+        Boolean filterPresent = false;
+        conceptMap = getConceptMap(source);
 
         if (conceptMap != null) {
             columns = 5;
         }
+        for (ValueSet.ComposeInclude include: source.getCompose().getInclude()) {
+            if (include.getFilter().size() > 0) filterPresent = true;
+        }
+
+        Element colgroup = Elements.newElement("colgroup");
 
         Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
+
+        int percentPerColumn = 100/columns;
+
+        // Display when ConceptMap present
+        if (columns == 5) {
+            percentPerColumn = 10;
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+
+        }
+        else if (!filterPresent && columns == 4)
+        {
+            // Basic list of codes
+
+            percentPerColumn = 10;
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
+            colgroup.addContent(
+                    Elements.withAttributes("col",
+                            Lists.newArrayList(
+                                    new Attribute("width", Integer.toString(4 * percentPerColumn) + "%"))));
+        } else {
+            for (int i = 0; i < columns; i++) {
+                colgroup.addContent(
+                        Elements.withAttributes("col",
+                                Lists.newArrayList(
+                                        new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
+            }
+        }
+
+
+
 
         List<Element> tableContent = Lists.newArrayList(colgroup);
          /*
@@ -62,7 +136,7 @@ public class ValueSetTableFormatter {
             String displayDefinition = (definition!=null && definition.isPresent()) ? definition.get() : BLANK;
             if (first) {
                 tableContent.add(codeHeader(true));
-                tableContent.add(codeSystem(displaySystem,true, "Inline code system"));
+                tableContent.add(codeSystem(displaySystem,true, false, "Inline code system"));
             }
             tableContent.add(
                         codeContent(concept.getCode(), displayDisplay, displayDefinition, getConceptMapping(concept.getCode())));
@@ -104,7 +178,7 @@ public class ValueSetTableFormatter {
                     String displayVersion = (version != null && version.isPresent() ) ? version.get() : BLANK;
                     tableContent.add(codeHeader(false));
                     tableContent.add(
-                            codeSystem( include.getSystem() ,false, "External Code System"));
+                            codeSystem( include.getSystem() ,false, true, "External Code System"));
                     first = false;
                 }
 
@@ -129,7 +203,7 @@ public class ValueSetTableFormatter {
                     first = false;
                 }
                 if (composeFirst && include.getSystem() != null) {
-                    tableContent.add(codeSystem( include.getSystem(), false, "External Code System"));
+                    tableContent.add(codeSystem( include.getSystem(), false, true,"External Code System"));
                     composeFirst = false;
                 }
 
@@ -198,29 +272,28 @@ public class ValueSetTableFormatter {
         }
         return mapping;
     }
-	private ConceptMap getConceptMap()
+    
+	private ConceptMap getConceptMap(ValueSet source)
     {
         // Included ConceptMaps - this is coded so ConceptMap can be a separate resource
         ConceptMap conceptMap = null;
 
-        if (source.getContained().getContainedResources().size() > 0 )
+        for (IResource resource : source.getContained().getContainedResources())
         {
-            for (IResource resource :source.getContained().getContainedResources())
+            if (resource instanceof ConceptMap)
             {
-                if (resource instanceof ConceptMap)
-                {
-                    conceptMap = (ConceptMap) resource;
-
-                }
+                conceptMap = (ConceptMap) resource;
             }
         }
+            
         return conceptMap;
     }
-    private Element codeSystem(String displaySystem, Boolean internal, String hint)
+	
+    private Element codeSystem(String displaySystem, Boolean internal, Boolean reference, String hint)
     {
         if (conceptMap == null) {
             return Elements.withChildren("tr",
-                    labelledValueCell(BLANK, displaySystem, 1, true, false, false, internal, hint),
+                    labelledValueCell(BLANK, displaySystem, 1, true, false, reference, internal, hint),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true));
@@ -228,7 +301,7 @@ public class ValueSetTableFormatter {
         else
         {
             return Elements.withChildren("tr",
-                    labelledValueCell(BLANK, displaySystem, 1, true, false, false, internal, hint),
+                    labelledValueCell(BLANK, displaySystem, 1, true, false, reference, internal, hint),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
                     labelledValueCell(BLANK, BLANK, 1, true),
@@ -288,12 +361,6 @@ public class ValueSetTableFormatter {
         }
     }
 
-
-    private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig)
-    {
-        return labelledValueCell(label, value, colspan, alwaysBig, false, false,false,"");
-    }
-
     private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig, boolean alwaysBold, boolean reference)
     {
         return labelledValueCell(label, value, colspan, alwaysBig, alwaysBold, reference,false,"");
@@ -311,14 +378,6 @@ public class ValueSetTableFormatter {
 		}
 		
 		return cell(cellSpans, colspan);
-	}
-	
-	private Element cell(List<? extends Content> content, int colspan) {
-		return Elements.withAttributesAndChildren("td", 
-			Lists.newArrayList(
-				new Attribute("class", "fhir-metadata-cell"),
-				new Attribute("colspan", Integer.toString(colspan))),
-			content);
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
@@ -353,7 +412,7 @@ public class ValueSetTableFormatter {
                         Elements.withAttributesAndChildren("a",
                                 Lists.newArrayList(
                                         new Attribute("class", "fhir-link"),
-                                        new Attribute("href", value),
+                                        new Attribute("href", Dstu2Fix.dstu2links(value)),
                                          new Attribute("title", hint)),
                                 Lists.newArrayList(
                                         new Text(value),
@@ -370,69 +429,26 @@ public class ValueSetTableFormatter {
 
                                     Lists.newArrayList(
                                             new Attribute("class", "fhir-link"),
-                                            new Attribute("href", value),
+                                            new Attribute("href", Dstu2Fix.dstu2links(value)),
                                             new Attribute("title", hint)),
-                                    value),
-                                new Text(" (internal)")));
+                                    value)
+                        //        ,new Text(" (internal)") // Removed internal, using icon for external instead
+                        ));
             } else {
                 return Elements.withAttributeAndChild("span",
                         new Attribute("class", fhirMetadataClass),
                         Elements.withAttributesAndText("a",
                                 Lists.newArrayList(
                                         new Attribute("class", "fhir-link"),
-                                        new Attribute("href", value),
+                                        new Attribute("href", Dstu2Fix.dstu2links(value)),
                                         new Attribute("title", hint)),
                                 value));
             }
 			
 		} else {
-			return Elements.withAttributeAndText("span", 
-				new Attribute("class", fhirMetadataClass), 
-				value);
+			return Elements.withAttributeAndText("span",
+                    new Attribute("class", fhirMetadataClass),
+                    value);
 		}
-	}
-	
-	public static List<CSSStyleBlock> getStyles() {
-		List<CSSStyleBlock> styles = Lists.newArrayList();
-
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-cell"),
-				Lists.newArrayList(
-					new CSSRule("border", "1px solid #f0f0f0"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label", ".fhir-telecom-name"),
-					Lists.newArrayList(
-						new CSSRule("color", "#808080"),
-						new CSSRule("font-weight", "bold"),
-						new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label-empty"),
-					Lists.newArrayList(
-						new CSSRule("color", "#D0D0D0"),
-						new CSSRule("font-weight", "normal"))));
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value", ".fhir-telecom-value"),
-				Lists.newArrayList(
-					new CSSRule("color", "#000000"),
-					new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-value-smalltext"),
-					Lists.newArrayList(
-						new CSSRule("font-size", "10"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-block-title"),
-					Lists.newArrayList(
-							new CSSRule("color", "#808080"),
-							new CSSRule("font-weight", "bold"),
-							new CSSRule("text-decoration", "underline"),
-							new CSSRule("font-size", "13"))));
-		
-		return styles;
 	}
 }

@@ -1,10 +1,11 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.util.List;
-import java.util.Optional;
-
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
+import java.util.List;
+import java.util.Optional;
 
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
@@ -14,7 +15,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	private final String path;
 	
 	public DummyFhirTreeNode(FhirTreeTableContent parent, String path) {
-		Preconditions.checkNotNull(parent);
+		//Preconditions.checkNotNull(parent);
 		Preconditions.checkNotNull(path);
 		
 		this.parent = parent;
@@ -85,6 +86,10 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public boolean useBackupTypeLinks() {
 		return true;
+	}
+	
+	public List<ConstraintInfo> getConstraints() {
+		return Lists.newArrayList();
 	}
 
 	@Override
@@ -160,6 +165,13 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public boolean hasBinding() {
 		return false;
 	}
+
+	// KGM 9/May/2017
+	@Override
+	public boolean hasElement() { return false; }
+
+	@Override
+	public Optional<ElementDefinitionDt> getElement() { return Optional.empty(); }
 
 	@Override
 	public Optional<BindingInfo> getBinding() {

@@ -44,6 +44,10 @@ public class Elements {
 	public static Element withChildren(String name, List<? extends Content> children) {
         return withAttributesAndChildren(name, Lists.newArrayList(), children);
     }
+
+	public static Element withAttribute(String name, Attribute attribute) {
+		return withAttributes(name, Lists.newArrayList(attribute));
+	}
 	
 	public static Element withAttributes(String name, List<Attribute> attributes) {
 		return withAttributesAndChildren(name, attributes, Lists.<Content>newArrayList());

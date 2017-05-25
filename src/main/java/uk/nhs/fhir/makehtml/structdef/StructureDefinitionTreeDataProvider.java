@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.makehtml.structdef;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
+import uk.nhs.fhir.makehtml.SkipRenderGenerationException;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
@@ -43,6 +44,10 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData() {
+		return getDifferentialTreeData(getSnapshotTreeData());
+	}
+	
+	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
 		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder(new FhirTreeNodeBuilder());
 		
 		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
@@ -53,8 +58,7 @@ public class StructureDefinitionTreeDataProvider {
 		FhirTreeData differentialTree = fhirTreeBuilder.getTree();
 		//differentialTree.dumpTreeStructure();
 		
-		FhirTreeData snapshotTreeData = getSnapshotTreeData();
-		addBackupNodes(differentialTree, snapshotTreeData);
+		addBackupNodes(differentialTree, backupTreeData);
 		
 		return differentialTree;
 	}
@@ -73,7 +77,7 @@ public class StructureDefinitionTreeDataProvider {
 	 */
 	private FhirTreeNode findBackupNode(FhirTreeTableContent differentialNode, FhirTreeData snapshotTreeData) {
 		
-		FhirTreeNode searchRoot = snapshotTreeData.getRoot();
+		FhirTreeNode searchRoot = (FhirTreeNode) snapshotTreeData.getRoot();
 		if (hasSlicedParent(differentialNode)) {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}
@@ -88,7 +92,12 @@ public class StructureDefinitionTreeDataProvider {
 			} else {
 				SlicingInfo slicingInfo = matchingNodes.get(0).getSlicingInfo().get();
 				
-				filterMatchesOnSlicingInfo(differentialNode, matchingNodes);
+				removeSlicingInfoMatches(differentialNode, matchingNodes);
+				matchingNodes = filterOnNameIfPresent(differentialNode, matchingNodes);
+				
+				if (matchingNodes.size() == 1) {
+					return matchingNodes.get(0);
+				}
 				
 				if (differentialNode instanceof FhirTreeNode) {
 					return matchOnNameOrDiscriminatorPaths((FhirTreeNode)differentialNode, matchingNodes, slicingInfo);
@@ -96,14 +105,26 @@ public class StructureDefinitionTreeDataProvider {
 					throw new IllegalStateException("Multiple matches for dummy node " + differentialNode.getPath());
 				}
 			}
+		} else if (differentialNode.getPath().equals("Extension.extension")) {
+			// didn't have slicing, try matching on name anyway
+			matchingNodes = filterOnNameIfPresent(differentialNode, matchingNodes);
+			if (matchingNodes.size() == 1) {
+				return matchingNodes.get(0);
+			} else if (matchingNodes.size() > 1) {
+				throw new IllegalStateException("Couldn't differentiate Extension.extension nodes on name fields. "
+				  + matchingNodes.size() + " matches.");
+			} else {
+				throw new IllegalStateException("No Extension.extension nodes matched for name "
+				  + ((FhirTreeNode)differentialNode).getName().get() + ".");
+			}
 		} else if (matchingNodes.size() == 0) {
-			throw new IllegalStateException("No nodes matched for differential element path " + differentialNode.getPath());
+			throw new SkipRenderGenerationException("No nodes matched for differential element path " + differentialNode.getPath());
 		} else {
 			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + differentialNode.getPath() + ", but first wasn't a slicing node");
 		}
 	}
 
-	void filterMatchesOnSlicingInfo(FhirTreeTableContent differentialNode, List<FhirTreeNode> matchingNodes) {
+	void removeSlicingInfoMatches(FhirTreeTableContent differentialNode, List<FhirTreeNode> matchingNodes) {
 		for (int i=matchingNodes.size()-1; i>=0; i--) {
 			FhirTreeNode matchingNode = matchingNodes.get(i);
 			if (differentialNode.hasSlicingInfo() != matchingNode.hasSlicingInfo()) {
@@ -167,36 +188,42 @@ public class StructureDefinitionTreeDataProvider {
 		return matchingNodes;
 	}
 
+	private List<FhirTreeNode> filterOnNameIfPresent(FhirTreeTableContent element, List<FhirTreeNode> toFilter) {
+		if (element instanceof FhirTreeNode 
+		  && ((FhirTreeNode)element).getName().isPresent()
+		  && !((FhirTreeNode)element).getName().get().isEmpty()) {
+			FhirTreeNode fhirTreeNode = (FhirTreeNode)element;
+			String name = fhirTreeNode.getName().get();
+			
+			List<FhirTreeNode> nameMatches = Lists.newArrayList();
+			
+			for (FhirTreeNode node : toFilter) {
+				if (node.getName().isPresent()
+				  && node.getName().get().equals(name)) {
+					nameMatches.add(node);
+				}
+			}
+			
+			if (nameMatches.size() == 1) {
+				return nameMatches;
+			} else if (nameMatches.size() == 0) {
+				throw new IllegalStateException("No snapshot nodes matched path " + fhirTreeNode.getPath() + " and name " + name);
+			} else {
+				throw new IllegalStateException("Multiple (" + nameMatches.size() + ") snapshot nodes matched"
+					+ " path " + fhirTreeNode.getPath() + " and name " + name);
+			}
+		} else {
+			// no name to filter on
+			return toFilter;
+		}
+	}
+	
 	/**
 	 * Finds a matching node for a sliced element based on name or (failing that) on slicing discriminators.
 	 */
 	private FhirTreeNode matchOnNameOrDiscriminatorPaths(FhirTreeNode element, List<FhirTreeNode> pathMatches, SlicingInfo slicingInfo) {
 		Set<String> discriminatorPaths = slicingInfo.getDiscriminatorPaths();
 		
-		if (element.getName().isPresent()
-		  && !element.getName().get().isEmpty()) {
-			String name = element.getName().get();
-			
-			List<FhirTreeNode> nameMatches = Lists.newArrayList();
-			
-			for (FhirTreeNode pathMatch : pathMatches) {
-				if (pathMatch.getName().isPresent()
-				  && pathMatch.getName().get().equals(name)) {
-					nameMatches.add(pathMatch);
-				}
-			}
-			
-			if (nameMatches.size() > 0) {
-				if (nameMatches.size() == 1) {
-					return nameMatches.get(0);
-				} else {
-					throw new IllegalStateException("Multiple (" + nameMatches.size() + ") snapshot nodes matched"
-						+ " path " + element.getPath() + " and name " + name);
-				}
-			}
-		}
-		
-
 		// nodes which match on discriminator (as well as path)
 		List<FhirTreeNode> discriminatorMatches = Lists.newArrayList();
 		

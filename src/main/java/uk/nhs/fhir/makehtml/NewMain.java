@@ -20,6 +20,7 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
@@ -44,27 +45,33 @@ public class NewMain {
     	this.newBaseURL = newBaseURL;
     }
 
-    private static String[] savedArgs;
-    public static String[] getArgs() {
-        return savedArgs;
-    }
-
     /**
      * Main entry point.
      *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        savedArgs= args;
-
+        
     	if((args.length == 2) || (args.length == 3)) {
-            String inputDir = args[0];
+			String inputDir = args[0];
             String outputDir = args[1];
             String newBaseURL = null;
             if (args.length == 3) {
             	LOG.log(Level.INFO, "Using new base URL: " + newBaseURL);
             	newBaseURL = args[2];
+            }
+
+            String resourcesPath = args[0];
+            if (!resourcesPath.endsWith(File.separator)) {
+            	resourcesPath += File.separator;
+            }
+            FhirIcon.setSuppliedResourcesFolderPath(resourcesPath);
+            
+            if (!inputDir.endsWith(File.separator)) {
+            	inputDir += File.separator;
+            }
+            if (!outputDir.endsWith(File.separator)) {
+            	outputDir += File.separator;
             }
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
