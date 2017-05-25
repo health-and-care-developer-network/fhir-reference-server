@@ -23,15 +23,34 @@ h2.resourceType {
     color: #ce5c00;
     padding: 15px;
 }
+
+.metadataSection {
+	border: thin solid #d4d2d2;
+}
+
+.clearPara {
+	clear: both;
+}
+
 .resourceSummary {
-    border: thin solid #d4d2d2;
+    float: left;
     padding: 5px;
     font-size: 0.8em;
+    width: 80%;
 }
+
+.resourceVersions {
+	float: left;
+    padding: 5px;
+    font-size: 0.8em;
+    width: 17%;
+}
+
 .treeView, .operationTable, .guideContent {
     border: thin solid #d4d2d2;
     padding: 5px;
     margin-top: 5px;
+    clear: both;
 }
 
 .renderedValueSet {

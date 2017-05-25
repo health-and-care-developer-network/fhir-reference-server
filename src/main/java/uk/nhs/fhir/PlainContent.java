@@ -22,6 +22,7 @@ import static uk.nhs.fhir.enums.ResourceType.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
@@ -38,8 +40,12 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
@@ -181,7 +187,7 @@ public class PlainContent extends CORSInterceptor {
     
     private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
-        String resourceID = theRequestDetails.getId().getIdPart();
+        IdDt resourceID = (IdDt)theRequestDetails.getId();
         content.append(getResourceContent(resourceID, mimeType, resourceType));
         content.append("</div>");
     }
@@ -207,12 +213,15 @@ public class PlainContent extends CORSInterceptor {
      */
     private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
+    	
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
+    	
         content.append(GenerateIntroSection());
 
-        String resourceID = theRequestDetails.getId().getIdPart();
+        IdDt resourceID = (IdDt)theRequestDetails.getId();
 
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(DescribeStructureDefinition(resourceID));
+            content.append(DescribeStructureDefinition(resourceID, baseURL));
         }
         if (resourceType == VALUESET) {
             content.append(DescribeValueSet(resourceID));
@@ -230,7 +239,7 @@ public class PlainContent extends CORSInterceptor {
         
     }
     
-    private String getResourceContent(String resourceID, MimeType mimeType, ResourceType resourceType) {
+    private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
     	
     	IBaseResource resource = null;
     	
@@ -264,7 +273,7 @@ public class PlainContent extends CORSInterceptor {
         }
     }
     
-    private String getResourceAsXML(IBaseResource resource, String resourceID) {
+    private String getResourceAsXML(IBaseResource resource, IdDt resourceID) {
         // Serialise it to XML
         FhirContext ctx = FhirContext.forDstu2();
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
@@ -281,7 +290,7 @@ public class PlainContent extends CORSInterceptor {
         return out.toString();
     }
     
-    private String getResourceAsJSON(IBaseResource resource, String resourceID) {
+    private String getResourceAsJSON(IBaseResource resource, IdDt resourceID) {
         // Serialise it to JSON
         FhirContext ctx = FhirContext.forDstu2();
         String serialised = ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
@@ -297,6 +306,44 @@ public class PlainContent extends CORSInterceptor {
         out.append("</pre></div>");
         return out.toString();
     }
+    
+    private void addVersionsBox(StringBuilder content, IdDt resourceID, String baseURL, VersionNumber activeVersion) {
+    	
+    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
+    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
+    	
+    	content.append("<div class='resourceVersions'>");
+    	content.append("<h3>Version History</h3>");
+        content.append("<ul>");
+        
+        for (VersionNumber version : list.keySet()) {
+        	ResourceEntity entry = list.get(version);
+        	
+        	if (entry.getVersionNo().equals(activeVersion)) {
+        		content.append("<b>");
+        	}
+        	
+        	content.append("<li><a href='").append(makeResourceURL(entry, baseURL)).append("'>");
+        	content.append("Version: ").append(version);
+        	content.append("</a>");
+        	content.append(" <span class='versionStatusLabel'>").append(entry.getStatus()).append("</span>");
+        	content.append("</li>");
+        	
+        	if (entry.getVersionNo().equals(activeVersion)) {
+        		content.append("</b>");
+        	}
+        }
+        
+        content.append("</div>");
+    }
+    
+    private String makeResourceURL(ResourceEntity resource, String baseURL) {
+    	StringBuilder url = new StringBuilder();
+    	url.append(baseURL).append("/").append(resource.getResourceType().getHAPIName());
+    	url.append("/").append(resource.getResourceID());
+    	url.append("/_history/").append(resource.getVersionNo());
+    	return url.toString();
+    }
 
     /**
      * Code in here to create the HTML response to a request for a
@@ -305,11 +352,12 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeStructureDefinition(String resourceID) {
+    private String DescribeStructureDefinition(IdDt resourceID, String baseURL) {
         StringBuilder content = new StringBuilder();
         StructureDefinition sd;
         sd = myWebHandler.getSDByID(resourceID);
         content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
+        content.append("<div class='metadataSection'>");
         content.append("<div class='resourceSummary'>");
         content.append("<ul>");
         content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
@@ -325,6 +373,14 @@ public class PlainContent extends CORSInterceptor {
         content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
         		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
         content.append("</div>");
+        
+        // Add a box with the versions of this resource
+        VersionNumber activeVersion = new VersionNumber(sd.getVersion());
+        addVersionsBox(content, resourceID, baseURL, activeVersion);
+        
+        content.append("<p class='clearPara'></p></div>");
+        
+        // Now, add the tree view
         String textSection = sd.getText().getDivAsString();
         if (textSection != null) {
 	        content.append("<div class='treeView'>");
@@ -342,7 +398,7 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeOperationDefinition(String resourceID) {
+    private String DescribeOperationDefinition(IdDt resourceID) {
         StringBuilder content = new StringBuilder();
         OperationDefinition od;
         od = myWebHandler.getOperationByID(resourceID);
@@ -378,7 +434,7 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeImplementationGuide(String resourceID) {
+    private String DescribeImplementationGuide(IdDt resourceID) {
         StringBuilder content = new StringBuilder();
         ImplementationGuide od;
         od = myWebHandler.getImplementationGuideByID(resourceID);
@@ -414,7 +470,7 @@ public class PlainContent extends CORSInterceptor {
      *
      * @return
      */
-    private String DescribeValueSet(String resourceID) {
+    private String DescribeValueSet(IdDt resourceID) {
         StringBuilder content = new StringBuilder();
         ValueSet valSet;
         valSet = myWebHandler.getVSByID(resourceID);

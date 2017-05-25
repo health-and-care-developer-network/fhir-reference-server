@@ -106,6 +106,7 @@ public class VersionedFilePreprocessor {
                     	LOG.info("Copying new profile into versioned directory with new filename: " + newFilename);
                     	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
                     	FileUtils.copyFile(thisFile, new File(versioned_path + "/" + newFilename));
+                    	//FileUtils.moveFile(thisFile, new File(versioned_path + "/" + newFilename));
 	                }
 	            }
 	        }

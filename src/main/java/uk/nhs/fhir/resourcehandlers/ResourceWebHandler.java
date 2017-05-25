@@ -19,8 +19,10 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -62,11 +64,11 @@ public class ResourceWebHandler {
         myDataSource = dataSource;
         startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
         endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
-        LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
+        LOG.fine("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
     /*public String getAllStructureDefinitionNames(String resourceType) {
-        LOG.fine("Called: ProfileWebHandler.getAllNames()");
+        LOG.fine("Called: ResourceWebHandler.getAllNames()");
         List<String> myNames = myDataSource.getAllResourceNames(ResourceType.STRUCTUREDEFINITION);
         StringBuilder sb = new StringBuilder();
         
@@ -78,7 +80,7 @@ public class ResourceWebHandler {
     }*/
     
     public String getAGroupedListOfResources(ResourceType resourceType) {
-        LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
+        LOG.fine("Called: ResourceWebHandler.getAlGroupedNames()");
         StringBuilder sb = new StringBuilder();
         
         if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
@@ -127,7 +129,7 @@ public class ResourceWebHandler {
     }
 
     public String getAllNames(ResourceType resourceType, String namePart) {
-        LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
+        LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
         List<String> myResourceIDs = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
         StringBuilder sb = new StringBuilder();
         
@@ -137,27 +139,32 @@ public class ResourceWebHandler {
         }
         return sb.toString();
     }
-        
-    public StructureDefinition getSDByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getSDByID(String id)");
+    
+    public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getVersionsForID(IdDt id)");
+        return myDataSource.getVersionsByID(id);
+    }
+    
+    public StructureDefinition getSDByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getSDByID(String id)");
         StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
         return sd;
     }
 
-    public OperationDefinition getOperationByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getOperationByID(String id)");
+    public OperationDefinition getOperationByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getOperationByID(String id)");
         OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(id);
         return od;
     }
 
-    public ImplementationGuide getImplementationGuideByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByID(String id)");
+    public ImplementationGuide getImplementationGuideByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getImplementationGuideByID(String id)");
         ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(id);
         return ig;
     }
     
-    public ValueSet getVSByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getVSByID(String id)");
+    public ValueSet getVSByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getVSByID(String id)");
         ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
         return valSet;
     }

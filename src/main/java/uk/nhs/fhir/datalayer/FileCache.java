@@ -209,6 +209,7 @@ public class FileCache {
 	                boolean example = false;
 	                VersionNumber versionNo = null;
 	                String status = null;
+	                String url = null;
 	                
 	                try {
 		                if (resourceType == STRUCTUREDEFINITION) {
@@ -216,7 +217,8 @@ public class FileCache {
 		                	name = profile.getName();
 		                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
 		                    baseType = profile.getConstrainedType();
-		                    resourceID = getResourceIDFromURL(profile.getUrl(), name);
+		                    url = profile.getUrl();
+		                    resourceID = getResourceIDFromURL(url, name);
 		                    displayGroup = baseType;
 		                    versionNo = new VersionNumber(profile.getVersion());
 		                    status = profile.getStatus();
@@ -224,7 +226,8 @@ public class FileCache {
 		                	displayGroup = "Code List";
 		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = profile.getName();
-		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+		                	url = profile.getUrl();
+		                	resourceID = getResourceIDFromURL(url, name);
 		                	if (FHIRUtils.isValueSetSNOMED(profile)) {
 		                		displayGroup = "SNOMED CT Code List";
 		                	}
@@ -233,21 +236,23 @@ public class FileCache {
 		                } else if (resourceType == OPERATIONDEFINITION) {
 		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = operation.getName();
-		                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
+		                	url = operation.getUrl();
+		                    resourceID = getResourceIDFromURL(url, name);
 		                    displayGroup = "Operations";
 		                    versionNo = new VersionNumber(operation.getVersion());
 		                    status = operation.getStatus();
 		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
 		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = guide.getName();
-		                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
+		                	url = guide.getUrl();
+		                    resourceID = getResourceIDFromURL(url, name);
 		                    displayGroup = "Implementation Guides";
 		                    versionNo = new VersionNumber(guide.getVersion());
 		                    status = guide.getStatus();
 		                }
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-								displayGroup, example, resourceID, versionNo, status);
+								displayGroup, example, resourceID, versionNo, status, url);
 		                
 		                addToResourceList(newFileList,newEntity);
 		                
@@ -302,6 +307,19 @@ public class FileCache {
     				// Get the latest
     				return entry.getLatest();
     			}
+    		}
+    	}
+    	return null;
+    }
+    
+    public static ResourceEntityWithMultipleVersions getversionsByID(IdDt theId) {
+        if(updateRequired()) {
+            updateCache();
+        }
+        
+    	for (ResourceEntityWithMultipleVersions entry : resourceList) {
+    		if (entry.getResourceID().equals(theId.getIdPart())) {
+    			return entry;
     		}
     	}
     	return null;

@@ -98,9 +98,7 @@ public class VersionNumber implements Comparable<VersionNumber> {
 
 	@Override
 	public String toString() {
-		String versionString = String.valueOf(major);
-		if (minor > 0)
-			versionString = versionString + '.' + minor;
+		String versionString = major + "." + minor;
 		if (patch > 0)
 			versionString = versionString + '.' + patch;
 		return versionString;

@@ -26,6 +26,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 
@@ -38,6 +39,13 @@ public interface Datasource {
      * @return
      */
 	IBaseResource getResourceByID(IdDt theId);
+	
+	/**
+	 * Gets the metadata about the resource and versions held
+	 * @param theId
+	 * @return
+	 */
+	ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId);
 	
     /**
      * Gets a specific one, with no version specified (i.e. get the latest)

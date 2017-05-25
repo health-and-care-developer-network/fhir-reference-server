@@ -85,4 +85,8 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 		}
 		return result;
 	}
+
+	public HashMap<VersionNumber, ResourceEntity> getVersionList() {
+		return versionList;
+	}
 }
