@@ -50,7 +50,8 @@ public class ConceptMapTableFormatter {
 				tableContent.add(
 						Elements.withChildren("tr",
 								labelledValueCell(BLANK, element.getCode(), 1, true, true),
-								labelledHttpCell("https://www.hl7.org/fhir/codesystem-concept-map-equivalence.html#concept-map-equivalence-equivalent", target.getEquivalence(),  1, true, false),
+								// STU3 url labelledHttpCell("https://www.hl7.org/fhir/codesystem-concept-map-equivalence.html#concept-map-equivalence-equivalent", target.getEquivalence(),  1, true, false),
+								labelledHttpCell("http://hl7.org/fhir/DSTU2/valueset-concept-map-equivalence.html", target.getEquivalence(),  1, true, false),
 								labelledValueCell(BLANK, target.getCode(), 1, true),
 								labelledValueCell(BLANK, displayComments, 1, true)));
 			}

@@ -11,8 +11,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
+import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.DummyFhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
@@ -59,7 +61,7 @@ public class FhirTreeTable {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
 		if (!showRemoved) {
-			stripRemovedElements(data.getRoot());
+			data.stripRemovedElements();
 		}
 		
 		if (dropExtensionSlicingNodes) {
@@ -135,24 +137,6 @@ public class FhirTreeTable {
 		}
 	}
 
-	/**
-	 * Remove all nodes that have cardinality max = 0 (and their children)
-	 */
-	private void stripRemovedElements(FhirTreeTableContent node) {
-		List<? extends FhirTreeTableContent> children = node.getChildren();
-		
-		for (int i=children.size()-1; i>=0; i--) {
-			
-			FhirTreeTableContent child = children.get(i);
-			
-			if (child.isRemovedByProfile()) {
-				children.remove(i);
-			} else {
-				stripRemovedElements(child);
-			}
-		}
-	}
-
 	private void addNodeRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
 		
 		List<? extends FhirTreeTableContent> children = node.getChildren();
@@ -202,6 +186,11 @@ public class FhirTreeTable {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		List<LinkData> typeLinks = nodeToAdd.getTypeLinks();
+		if (NewMain.STRICT && typeLinks.isEmpty()) {
+			throw new IllegalStateException("No type links available for " + nodeToAdd.getPath());
+		} else {
+			System.out.println("No type links available for " + nodeToAdd.getPath());
+		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
 		
@@ -216,6 +205,10 @@ public class FhirTreeTable {
 	
 	private List<ResourceInfo> getNodeResourceInfos(FhirTreeTableContent node) {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
+		
+		for (ConstraintInfo constraint : node.getConstraints()) {
+			resourceInfos.add(new ResourceInfo(constraint.getKey(), constraint.getDescription(), ResourceInfoType.CONSTRAINT));
+		}
 		
 		// slicing
 		if (node.hasSlicingInfo()) {
@@ -252,8 +245,14 @@ public class FhirTreeTable {
 			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
+		if (node.hasDefaultValue()
+		  && node.isFixedValue()) {
+			throw new IllegalStateException("Found and example");
+		}
+		
 		// Default Value
-		if (node.hasDefaultValue()) {
+		if (node.hasDefaultValue()
+		  && !node.isFixedValue()) {
 			resourceInfos.add(makeResourceInfoWithMaybeUrl("Default Value", node.getDefaultValue().get(), ResourceInfoType.DEFAULT_VALUE));
 		}
 		
@@ -272,7 +271,11 @@ public class FhirTreeTable {
 				}
 			}
 			
-			resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
+				throw new IllegalStateException("Stand-in description being displayed - expected this to have been removed by cardinality in profile");
+			} else {
+				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
+			}
 		}
 		
 		// Extensions

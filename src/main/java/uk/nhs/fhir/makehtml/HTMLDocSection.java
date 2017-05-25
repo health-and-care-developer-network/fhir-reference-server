@@ -21,6 +21,10 @@ public class HTMLDocSection {
 		bodyElements.add(bodyElement);
 	}
 	
+	public void addStyles(List<CSSStyleBlock> styleBlocks) {
+		styles.addStyles(styleBlocks);
+	}
+	
 	public void addStyle(CSSStyleBlock style) {
 		styles.addBlock(style);
 	}

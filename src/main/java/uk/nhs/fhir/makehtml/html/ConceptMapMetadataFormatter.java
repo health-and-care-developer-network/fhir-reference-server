@@ -152,6 +152,17 @@ public class ConceptMapMetadataFormatter {
 			new Attribute("class", cssClass), 
 			label);
 	}
+
+	/*
+	private String dstu2link(String value)
+	{
+		if (value.equals("https://www.hl7.org/fhir/codesystem-concept-map-equivalence.html#concept-map-equivalence-equivalent")) {
+			value = "http://hl7.org/fhir/DSTU2/valueset-concept-map-equivalence.html";
+		}
+		return value;
+	}
+
+	*/
 	
 	private Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
@@ -160,12 +171,12 @@ public class ConceptMapMetadataFormatter {
 		if (!largeText) fhirMetadataClass += " fhir-metadata-value-smalltext";
 		
 		if (url) {
-			return Elements.withAttributeAndChild("span", 
-				new Attribute("class", fhirMetadataClass), 
-				Elements.withAttributesAndText("a", 
+			return Elements.withAttributeAndChild("span",
+				new Attribute("class", fhirMetadataClass),
+				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"), 
-						new Attribute("href", value)), 
+						new Attribute("class", "fhir-link"),
+						new Attribute("href", value)),
 				value));
 			
 		} else {
