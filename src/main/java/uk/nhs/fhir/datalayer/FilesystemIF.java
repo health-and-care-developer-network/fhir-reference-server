@@ -22,6 +22,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
@@ -80,6 +81,16 @@ public class FilesystemIF implements Datasource {
     	} else {
     		return null;
     	}
+    }
+    
+    public ResourceEntity getResourceEntityByID(IdDt theId) {
+    	if (theId.hasVersionIdPart()) {
+    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    		return FileCache.getversionsByID(theId).getSpecificVersion(version);
+    	} else {
+    		return FileCache.getversionsByID(theId).getLatest();
+    	}
+    	
     }
     
     public ResourceEntityWithMultipleVersions getVersionsByID(IdDt id) {

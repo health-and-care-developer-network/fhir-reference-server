@@ -133,9 +133,9 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
 		<div class="breadcrumbs">
 	<div class="wrapper">
 		<ul><li>	You are here: &nbsp;
-<span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="http://developer.nhs.uk/" rel="v:url" property="v:title">Home</a>  <span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>    <li><span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="http://developer.nhs.uk/apis/" rel="v:url" property="v:title">APIs</a>  <span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>     <li><span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="/" rel="v:url" property="v:title">FHIR Reference Server</a>  <span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>      <li> <strong class="breadcrumb_last">Valuesets</strong></span></span></li></ul>	</div><!--end wrapper-->
+<span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="http://developer.nhs.uk/" rel="v:url" property="v:title">Home</a>  <span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>    <li><span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="http://developer.nhs.uk//apis/" rel="v:url" property="v:title">APIs</a>  <span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>     <li> <strong class="breadcrumb_last">FHIR Reference Server</strong></span></span></li></ul>	</div><!--end wrapper-->
 </div><!--end breadcrumbs-->
-<div id="api_list"><div class="wrapper cf container">{{PAGE-CONTENT}}<div><div>&nbsp;</div>
+<div id="api_list"><div class="wrapper cf container">$page-content<div><div>&nbsp;</div>
 		</div><!-- end api list -->
 	</div><!--end main_content-->
 </div><!-- end main -->
@@ -183,5 +183,6 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
                 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
         </script>
+        <script src="/js/jquery-ui/jquery-ui.js"></script><script>$( "#tabs" ).tabs();</script>
 	</body>
 </html>

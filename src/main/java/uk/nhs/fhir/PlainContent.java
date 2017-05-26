@@ -15,13 +15,22 @@
  */
 package uk.nhs.fhir;
 
-import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.*;
-import static uk.nhs.fhir.enums.ClientType.*;
-import static uk.nhs.fhir.enums.MimeType.*;
-import static uk.nhs.fhir.enums.ResourceType.*;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.READ;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.VREAD;
+import static uk.nhs.fhir.enums.ClientType.BROWSER;
+import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
+import static uk.nhs.fhir.enums.MimeType.JSON;
+import static uk.nhs.fhir.enums.MimeType.XML;
+import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
+import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
+import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.VALUESET;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,9 +38,11 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
@@ -69,6 +80,7 @@ public class PlainContent extends CORSInterceptor {
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         templateHelper = new PageTemplateHelper();
+        Velocity.init(PropertyReader.getProperties());
     }
     
     @Override
@@ -134,6 +146,8 @@ public class PlainContent extends CORSInterceptor {
         	renderListOfResources(theRequestDetails, content, resourceType);
         }
 
+        System.out.println(content);
+        
         templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
         
         return false;
@@ -213,15 +227,14 @@ public class PlainContent extends CORSInterceptor {
      */
     private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
+    	VelocityContext context = new VelocityContext();
     	
     	String baseURL = theRequestDetails.getServerBaseForRequest();
-    	
-        content.append(GenerateIntroSection());
 
         IdDt resourceID = (IdDt)theRequestDetails.getId();
-
+        
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(DescribeStructureDefinition(resourceID, baseURL));
+            content.append(DescribeStructureDefinition(resourceID, baseURL, context));
         }
         if (resourceType == VALUESET) {
             content.append(DescribeValueSet(resourceID));
@@ -232,11 +245,6 @@ public class PlainContent extends CORSInterceptor {
         if (resourceType == IMPLEMENTATIONGUIDE) {
         	content.append(DescribeImplementationGuide(resourceID));
         }
-        
-        //content.append(GetXMLContent(resourceName));
-        
-        content.append("</div>");
-        
     }
     
     private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
@@ -307,44 +315,11 @@ public class PlainContent extends CORSInterceptor {
         return out.toString();
     }
     
-    private void addVersionsBox(StringBuilder content, IdDt resourceID, String baseURL, VersionNumber activeVersion) {
-    	
-    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
-    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
-    	
-    	content.append("<div class='resourceVersions'>");
-    	content.append("<h3>Version History</h3>");
-        content.append("<ul>");
-        
-        for (VersionNumber version : list.keySet()) {
-        	ResourceEntity entry = list.get(version);
-        	
-        	if (entry.getVersionNo().equals(activeVersion)) {
-        		content.append("<b>");
-        	}
-        	
-        	content.append("<li><a href='").append(makeResourceURL(entry, baseURL)).append("'>");
-        	content.append("Version: ").append(version);
-        	content.append("</a>");
-        	content.append(" <span class='versionStatusLabel'>").append(entry.getStatus()).append("</span>");
-        	content.append("</li>");
-        	
-        	if (entry.getVersionNo().equals(activeVersion)) {
-        		content.append("</b>");
-        	}
-        }
-        
-        content.append("</div>");
+    private String makeResourceURL(IdDt resourceID, String baseURL) {
+    	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
+    	return entity.getVersionedUrl(baseURL);
     }
     
-    private String makeResourceURL(ResourceEntity resource, String baseURL) {
-    	StringBuilder url = new StringBuilder();
-    	url.append(baseURL).append("/").append(resource.getResourceType().getHAPIName());
-    	url.append("/").append(resource.getResourceID());
-    	url.append("/_history/").append(resource.getVersionNo());
-    	return url.toString();
-    }
-
     /**
      * Code in here to create the HTML response to a request for a
      * StructureDefinition we hold.
@@ -352,45 +327,35 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeStructureDefinition(IdDt resourceID, String baseURL) {
-        StringBuilder content = new StringBuilder();
-        StructureDefinition sd;
-        sd = myWebHandler.getSDByID(resourceID);
-        content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
-        content.append("<div class='metadataSection'>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
-        content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(sd.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        
-        // Add a box with the versions of this resource
-        VersionNumber activeVersion = new VersionNumber(sd.getVersion());
-        addVersionsBox(content, resourceID, baseURL, activeVersion);
-        
-        content.append("<p class='clearPara'></p></div>");
-        
-        // Now, add the tree view
-        String textSection = sd.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='treeView'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
+    private String DescribeStructureDefinition(IdDt resourceID, String baseURL, VelocityContext context) {
+    	StructureDefinition sd = myWebHandler.getSDByID(resourceID);
+    	Template template = null;
+    	try {
+    	  template = Velocity.getTemplate("/velocity-templates/resource.vm");
+    	} catch( Exception e ) {
+    		e.printStackTrace();
+    	}
+    	
+    	// Values to insert into template
+    	context.put( "resource", sd );
+    	context.put( "type", "StructureDefinition" );
+    	context.put( "baseURL", baseURL );
+    	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	
+    	// List of versions
+    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
+    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
+    	context.put( "versions", list );
+    	
+    	// Tree view
+    	String textSection = sd.getText().getDivAsString();
+    	context.put( "treeView", textSection );
+    	
+    	StringWriter sw = new StringWriter();
+    	template.merge( context, sw );
+    	return sw.toString();
     }
-
-
+    
     /**
      * Code in here to create the HTML response to a request for a
      * StructureDefinition we hold.
@@ -505,7 +470,7 @@ public class PlainContent extends CORSInterceptor {
         }
         return content.toString();
     }
-
+    
     /**
      * Code called to render a list of resources. for example in response to a
      * url like http://host/fhir/StructureDefinition

@@ -74,8 +74,8 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().endsWith("favicon.ico")) {
         	// favicon.ico
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
-        } else if (request.getRequestURI().startsWith("/images/")) {
-        	// Image files
+        } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
+        	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);

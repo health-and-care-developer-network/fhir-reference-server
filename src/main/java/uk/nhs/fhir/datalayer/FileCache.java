@@ -252,7 +252,7 @@ public class FileCache {
 		                }
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-								displayGroup, example, resourceID, versionNo, status, url);
+								displayGroup, example, resourceID, versionNo, status);
 		                
 		                addToResourceList(newFileList,newEntity);
 		                

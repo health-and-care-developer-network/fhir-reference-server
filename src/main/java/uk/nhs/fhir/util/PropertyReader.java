@@ -78,4 +78,8 @@ public class PropertyReader implements GlobalConstants {
 			return null;
     }
 
+	public static Properties getProperties() {
+		return defaultProperties;
+	}
+
 }

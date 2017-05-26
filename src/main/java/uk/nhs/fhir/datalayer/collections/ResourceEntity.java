@@ -16,13 +16,10 @@ public class ResourceEntity implements Comparable {
 	private boolean example = false;
 	private VersionNumber versionNo = null;
 	private String status = null;
-	private String url = null;
-	private String versionedUrl = null;
 	
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
-							String resourceID, VersionNumber versionNo, String status,
-							String url) {
+							String resourceID, VersionNumber versionNo, String status) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -33,8 +30,6 @@ public class ResourceEntity implements Comparable {
 		this.resourceID = resourceID;
 		this.versionNo = versionNo;
 		this.status = status;
-		this.url = url;
-		this.versionedUrl = url + "/_history/" + versionNo;
 	}
 	
 	public String getResourceName() {
@@ -136,19 +131,12 @@ public class ResourceEntity implements Comparable {
 		this.status = status;
 	}
 
-	public String getVersionedUrl() {
-		return versionedUrl;
-	}
-
-	public void setVersionedUrl(String versionedUrl) {
-		this.versionedUrl = versionedUrl;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
+	public String getVersionedUrl(String baseURL) {
+		StringBuilder url = new StringBuilder();
+    	url.append(baseURL).append("/");
+    	url.append(getResourceType().getHAPIName());
+    	url.append("/").append(getResourceID());
+    	url.append("/_history/").append(getVersionNo());
+    	return url.toString();
 	}
 }

@@ -39,6 +39,14 @@ public interface Datasource {
      * @return
      */
 	IBaseResource getResourceByID(IdDt theId);
+
+    /**
+     * Gets resource metadata for a specific ID and version
+     *
+     * @param id
+     * @return
+     */
+	ResourceEntity getResourceEntityByID(IdDt theId);
 	
 	/**
 	 * Gets the metadata about the resource and versions held

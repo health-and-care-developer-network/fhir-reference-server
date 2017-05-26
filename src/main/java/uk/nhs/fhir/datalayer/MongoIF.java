@@ -236,4 +236,9 @@ public class MongoIF implements Datasource {
 	public ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public ResourceEntity getResourceEntityByID(IdDt theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

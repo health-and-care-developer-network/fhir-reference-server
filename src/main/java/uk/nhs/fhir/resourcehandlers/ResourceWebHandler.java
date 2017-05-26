@@ -145,6 +145,11 @@ public class ResourceWebHandler {
         return myDataSource.getVersionsByID(id);
     }
     
+    public ResourceEntity getResourceEntityByID(IdDt theId) {
+        LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
+        return myDataSource.getResourceEntityByID(theId);
+    }
+    
     public StructureDefinition getSDByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getSDByID(String id)");
         StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
