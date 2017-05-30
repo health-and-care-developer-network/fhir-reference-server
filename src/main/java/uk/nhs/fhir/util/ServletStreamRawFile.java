@@ -25,17 +25,10 @@ public class ServletStreamRawFile {
 	    	response.setStatus(200);
 			
 			if (mimeType == null) {
-				// Try to "guess" the right mime type
-				try {
-					// First try using Java 7's probeContentType method (doesn't work in a jar file)
-					Path path;
-					path = Paths.get(ServletStreamRawFile.class.getResource(filename).toURI());
-					mimeType = Files.probeContentType(path);
-					LOG.info("Detected mimeType using probeContentType: " + mimeType);
-				} catch (Exception e) {
-					LOG.info("Error when attempting to detect mimeType using probeContentType: " + e.getMessage());
-				}
-				if (mimeType == null) {
+				if (filename.endsWith(".js")) {
+					mimeType = "application/javascript";
+					LOG.info("Using Javascript mimeType: " + mimeType);
+				} else {
 					// Now, try to guess from the file extension
 					mimeType = URLConnection.guessContentTypeFromName(filename);
 					LOG.info("Detected mimeType using guessContentTypeFromName: " + mimeType);
@@ -43,7 +36,6 @@ public class ServletStreamRawFile {
 			}
 			
 			response.setContentType(mimeType);
-	        
 			
 			PrintWriter outputStream = response.getWriter();
 	        InputStream is = ServletStreamRawFile.class.getResourceAsStream(filename);
