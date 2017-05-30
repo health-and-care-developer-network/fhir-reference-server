@@ -9,7 +9,7 @@ NEW_URL="developer.nhs.uk"
 
 if [ -z $DN_URL ]
 then
-  echo "Usage: update.sh developer_network_url root_domain    - for example ./update.sh http://developer.nhs.uk/apis/ developer.nhs.uk"
+  echo "Usage: update.sh developer_network_url root_domain    - for example ./update.sh https://developer.nhs.uk/apis/ developer.nhs.uk"
 else
   wget --convert-links --output-document=devnet.html $DN_URL  # Download page
 
@@ -32,7 +32,7 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
   sed -i '/<div id="api_list">/c\<div id="api_list"><div class="wrapper cf container">$page-content<div><div>&nbsp;<\/div>' devnet.html
 
   # Add jquery ui tabs initialisation
-  sed -i '/<\/body>/i\        <script src="\/js\/jquery-ui\/jquery-ui.js"></script><script>$( "#tabs" ).tabs();<\/script>' devnet.html
+  sed -i '/<\/body>/i\        <script src="\/js\/jquery-ui\/jquery-ui.js"></script><script src="\/js\/site-functions.js"></script>' devnet.html
 
   # Copy this to be our index page template
   cp devnet.html index.vm

@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
@@ -41,10 +42,13 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -160,13 +164,13 @@ public class FileCache {
             ArrayList<ResourceEntityWithMultipleVersions> newList = cacheFHIRResources(STRUCTUREDEFINITION);
             
             // Add ValueSets
-            //newList.addAll(cacheFHIRResources(VALUESET));
+            newList.addAll(cacheFHIRResources(VALUESET));
             
             // Add operations
-            //newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
+            newList.addAll(cacheFHIRResources(OPERATIONDEFINITION));
 
             // Add ImplementationGuides
-            //newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
+            newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
             
             // Swap out for our new list
             resourceList = newList;
@@ -251,8 +255,10 @@ public class FileCache {
 		                    status = guide.getStatus();
 		                }
 		                
+		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
+		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-								displayGroup, example, resourceID, versionNo, status);
+								displayGroup, example, resourceID, versionNo, status, artefacts);
 		                
 		                addToResourceList(newFileList,newEntity);
 		                
@@ -270,6 +276,32 @@ public class FileCache {
         LOG.fine("Finished reading resources into cache");
         return newFileList;
     }
+    
+    private static ArrayList<SupportingArtefact> processSupportingArtefacts(File resourceFile, ResourceType resourceType) {
+    	ArrayList<SupportingArtefact> artefacts = new ArrayList<SupportingArtefact>();
+		
+		String resourceFilename = FileLoader.removeFileExtension(resourceFile.getName());
+		File dir = new File(resourceFile.getParent());
+		File artefactDir = new File(dir.getAbsolutePath() + "/" + resourceFilename);
+		LOG.info("Lookging for artefacts in directory:" + artefactDir.getAbsolutePath());
+		
+		if(artefactDir.exists() && artefactDir.isDirectory()) { 
+			// Now, loop through and find any artefact files
+            File[] fileList = artefactDir.listFiles();
+            if (fileList != null) {
+    	        for (File thisFile : fileList) {
+    	        	// Add this to our list of artefacts (if we can identify what it is!
+    	        	ArtefactType type = ArtefactType.getFromFilename(resourceType, thisFile.getName());
+    	        	if (type != null) {
+    	        		SupportingArtefact artefact = new SupportingArtefact(thisFile, type); 
+    	        		artefacts.add(artefact);
+    	        	}
+    	        }
+            }
+		}
+		return artefacts;
+	}
+    
     
     
     private static void addToResourceList(ArrayList<ResourceEntityWithMultipleVersions> list,

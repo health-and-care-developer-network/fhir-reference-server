@@ -43,6 +43,7 @@ import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.ValueSetProvider;
 import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.ServletStreamArtefact;
 import uk.nhs.fhir.util.ServletStreamRawFile;
 
 /**
@@ -77,6 +78,8 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
+        } else if (request.getRequestURI().startsWith("/artefact")) {
+        	ServletStreamArtefact.streamArtefact(request, response, dataSource);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");

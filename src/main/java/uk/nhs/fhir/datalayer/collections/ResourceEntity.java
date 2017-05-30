@@ -1,10 +1,11 @@
 package uk.nhs.fhir.datalayer.collections;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import uk.nhs.fhir.enums.ResourceType;
 
-public class ResourceEntity implements Comparable {
+public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String resourceName = null;
 	private String resourceID = null;
 	private File resourceFile = null;
@@ -16,10 +17,12 @@ public class ResourceEntity implements Comparable {
 	private boolean example = false;
 	private VersionNumber versionNo = null;
 	private String status = null;
+	ArrayList<SupportingArtefact> artefacts = null;
 	
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
-							String resourceID, VersionNumber versionNo, String status) {
+							String resourceID, VersionNumber versionNo, String status,
+							ArrayList<SupportingArtefact> artefacts) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -30,6 +33,7 @@ public class ResourceEntity implements Comparable {
 		this.resourceID = resourceID;
 		this.versionNo = versionNo;
 		this.status = status;
+		this.artefacts = artefacts;
 	}
 	
 	public String getResourceName() {
@@ -109,8 +113,7 @@ public class ResourceEntity implements Comparable {
 	 * Allow resources to be sorted by name
 	 */
 	@Override
-	public int compareTo(Object arg0) {
-		ResourceEntity other = (ResourceEntity)arg0;
+	public int compareTo(ResourceEntity other) {
 		if (this.resourceName.equals(other.resourceName) && this.resourceType == other.resourceType) {
 			return 0;
 		} else {
@@ -120,7 +123,11 @@ public class ResourceEntity implements Comparable {
 
 	@Override
 	public String toString() {
-		return "      ResourceEntity [ID=" + resourceID + ", version=" + versionNo + "]";
+		int artefactCount = 0;
+		if (artefacts != null) {
+			artefactCount = artefacts.size();			
+		}
+		return "      ResourceEntity [ID=" + resourceID + ", version=" + versionNo + ", artefacts=" + artefactCount + "]";
 	}
 
 	public String getStatus() {
@@ -138,5 +145,13 @@ public class ResourceEntity implements Comparable {
     	url.append("/").append(getResourceID());
     	url.append("/_history/").append(getVersionNo());
     	return url.toString();
+	}
+
+	public ArrayList<SupportingArtefact> getArtefacts() {
+		return artefacts;
+	}
+
+	public void setArtefacts(ArrayList<SupportingArtefact> artefacts) {
+		this.artefacts = artefacts;
 	}
 }

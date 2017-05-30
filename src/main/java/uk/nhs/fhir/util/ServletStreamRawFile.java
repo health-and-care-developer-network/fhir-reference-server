@@ -19,7 +19,7 @@ public class ServletStreamRawFile {
 	private static final Logger LOG = Logger.getLogger(ServletStreamRawFile.class.getName());
 	
 	public static void streamRawFileFromClasspath(HttpServletResponse response, String mimeType, String filename) throws IOException {
-    	System.out.println("Streaming raw file from classpath: " + filename);
+    	//LOG.info("Streaming raw file from classpath: " + filename);
 
     	try {
 	    	response.setStatus(200);

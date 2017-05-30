@@ -45,6 +45,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
@@ -146,8 +147,6 @@ public class PlainContent extends CORSInterceptor {
         	renderListOfResources(theRequestDetails, content, resourceType);
         }
 
-        System.out.println(content);
-        
         templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
         
         return false;
@@ -234,16 +233,16 @@ public class PlainContent extends CORSInterceptor {
         IdDt resourceID = (IdDt)theRequestDetails.getId();
         
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(DescribeStructureDefinition(resourceID, baseURL, context));
+            content.append(describeResource(resourceID, baseURL, context, "Tree View", resourceType));
         }
         if (resourceType == VALUESET) {
-            content.append(DescribeValueSet(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));
         }
         if (resourceType == OPERATIONDEFINITION) {
-        	content.append(DescribeOperationDefinition(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Operation Description", resourceType));
         }
         if (resourceType == IMPLEMENTATIONGUIDE) {
-        	content.append(DescribeImplementationGuide(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
     }
     
@@ -327,8 +326,9 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeStructureDefinition(IdDt resourceID, String baseURL, VelocityContext context) {
-    	StructureDefinition sd = myWebHandler.getSDByID(resourceID);
+    private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    	IResource sd = myWebHandler.getResourceByID(resourceID);
+    	
     	Template template = null;
     	try {
     	  template = Velocity.getTemplate("/velocity-templates/resource.vm");
@@ -338,14 +338,19 @@ public class PlainContent extends CORSInterceptor {
     	
     	// Values to insert into template
     	context.put( "resource", sd );
-    	context.put( "type", "StructureDefinition" );
+    	context.put( "type", resourceType );
     	context.put( "baseURL", baseURL );
+    	context.put( "firstTabName", firstTabName );
     	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
     	
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
     	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
     	context.put( "versions", list );
+    	
+    	// Resource metadata
+    	ResourceEntity metadata = myWebHandler.getResourceEntityByID(resourceID);
+    	context.put( "metadata", metadata );
     	
     	// Tree view
     	String textSection = sd.getText().getDivAsString();
@@ -354,121 +359,6 @@ public class PlainContent extends CORSInterceptor {
     	StringWriter sw = new StringWriter();
     	template.merge( context, sw );
     	return sw.toString();
-    }
-    
-    /**
-     * Code in here to create the HTML response to a request for a
-     * StructureDefinition we hold.
-     *
-     * @param resourceID Name of the SD we need to describe.
-     * @return
-     */
-    private String DescribeOperationDefinition(IdDt resourceID) {
-        StringBuilder content = new StringBuilder();
-        OperationDefinition od;
-        od = myWebHandler.getOperationByID(resourceID);
-        content.append("<h2 class='resourceType'>" + od.getName() + " (OperationDefinition)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
-        content.append("<li>Requirements: " + printIfNotNull(od.getRequirements()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        String textSection = od.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='operationTable'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
-    }
-    
-    /**
-     * Code in here to create the HTML response to a request for a
-     * StructureDefinition we hold.
-     *
-     * @param resourceID Name of the SD we need to describe.
-     * @return
-     */
-    private String DescribeImplementationGuide(IdDt resourceID) {
-        StringBuilder content = new StringBuilder();
-        ImplementationGuide od;
-        od = myWebHandler.getImplementationGuideByID(resourceID);
-        content.append("<h2 class='resourceType'>" + od.getName() + " (ImplementationGuide)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ImplementationGuide: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        String textSection = od.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='guideContent'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
-    }
-    
-    
-    /**
-     * Code to generate a HTML view of the named ValueSet
-     *
-     * @param resourceID Named resource we need to describe.
-     *
-     * @return
-     */
-    private String DescribeValueSet(IdDt resourceID) {
-        StringBuilder content = new StringBuilder();
-        ValueSet valSet;
-        valSet = myWebHandler.getVSByID(resourceID);
-        String textSection = valSet.getText().getDivAsString();
-        
-        
-        content.append("<h2 class='resourceType'>" + valSet.getName() + " (ValueSet)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        if (textSection == null) {
-        	// Only output summary fields if there is nothing in the text section as these are duplicated in there..
-	        content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
-	        content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
-	        content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
-	        content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
-	        content.append("<li id='description'>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
-	        content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
-	        content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
-	        content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
-	        content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
-        }
-        // These ones aren't in the test section, so output them in all cases
-        content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ValueSet: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        
-        if (textSection != null) {
-	        content.append("<div class='treeView'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
     }
     
     /**

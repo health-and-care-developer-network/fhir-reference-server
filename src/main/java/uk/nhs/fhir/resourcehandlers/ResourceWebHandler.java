@@ -15,6 +15,7 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
@@ -148,6 +149,12 @@ public class ResourceWebHandler {
     public ResourceEntity getResourceEntityByID(IdDt theId) {
         LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
         return myDataSource.getResourceEntityByID(theId);
+    }
+    
+    public IResource getResourceByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
+        IResource resource = (IResource)myDataSource.getResourceByID(id);
+        return resource;
     }
     
     public StructureDefinition getSDByID(IdDt id) {

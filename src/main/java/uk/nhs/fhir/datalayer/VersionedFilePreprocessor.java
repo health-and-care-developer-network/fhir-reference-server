@@ -22,10 +22,13 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
 public class VersionedFilePreprocessor {
@@ -105,8 +108,11 @@ public class VersionedFilePreprocessor {
                     	String newFilename = resourceID + "-versioned-" + versionNo + ".xml";
                     	LOG.info("Copying new profile into versioned directory with new filename: " + newFilename);
                     	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
-                    	FileUtils.copyFile(thisFile, new File(versioned_path + "/" + newFilename));
-                    	//FileUtils.moveFile(thisFile, new File(versioned_path + "/" + newFilename));
+                    	File newFile = new File(versioned_path + "/" + newFilename);
+                    	FileUtils.copyFile(thisFile, newFile);
+                    	
+                    	// And also copy other resources (diffs, details, bindings, etc).
+                    	copyOtherResources(thisFile, newFile);
 	                }
 	            }
 	        }
@@ -115,5 +121,43 @@ public class VersionedFilePreprocessor {
         addMessage("Finished pre-processing " + resourceType + " files from disk.");
         addMessage("--------------------------------------------------------------------------------------");
     }
+	
+	/**
+	 * If the FHIR resoutce also has other generated resources (e.g. details view, diff, bindings, etc.) then also
+	 * copy those into the relevant versioned directory along with our resource
+	 * 
+	 * @param oldFile Original filename
+	 * @param newFile New filename of resource
+	 */
+	protected static void copyOtherResources(File oldFile, File newFile) {
+		
+		String oldDir = oldFile.getParent();
+		String oldName = FileLoader.removeFileExtension(oldFile.getName());
+		File resourceDir = new File(oldDir + "/" + oldName);
+		//System.out.println(resourceDir.getAbsolutePath());
+		
+		String newDir = newFile.getParent();
+		String newName = FileLoader.removeFileExtension(newFile.getName());
+		File targetDir = new File(newDir + "/" + newName);
+		//System.out.println(targetDir.getAbsolutePath());
+		
+		if(resourceDir.exists() && resourceDir.isDirectory()) { 
+			try {
+				// Create target dir
+				FileUtils.forceMkdir(targetDir);
+				
+				// Now, loop through and copy any files into the target directory
+	            File[] fileList = resourceDir.listFiles();
+	            if (fileList != null) {
+	    	        for (File thisFile : fileList) {
+	    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);
+	    	        }
+	            }
+			} catch (IOException e) {
+				LOG.severe("Unable to copy supporting resources!");
+				e.printStackTrace();
+			}
+		}
+	}
 
 }
