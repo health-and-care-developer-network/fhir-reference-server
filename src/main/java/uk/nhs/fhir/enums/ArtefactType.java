@@ -11,10 +11,10 @@ import ca.uhn.fhir.rest.method.RequestDetails;
  */
 public enum ArtefactType {
 	
-	METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata"),
+	//METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata"),
 	//SNAPSHOT("snapshot.html", ResourceType.STRUCTUREDEFINITION, "Snapshot"),
 	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings"),
-	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Details"),
+	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions"),
 	DIFFERENTIAL("differential.html", ResourceType.STRUCTUREDEFINITION, "Differential"),
 	
 	//OPERATION_RENDER("render.html", ResourceType.OPERATIONDEFINITION, "Details"),

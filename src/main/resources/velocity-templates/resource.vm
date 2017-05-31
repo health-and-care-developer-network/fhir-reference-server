@@ -48,7 +48,7 @@
 		<div id="tabs-1" class='treeView'>$!treeView</div>
 		#foreach( $artefact in $metadata.getArtefacts() )
 			#set ($index = $foreach.index + 2)
-			<div id="tabs-$index">$artefact.getArtefactType().getDisplayName()</div>
+			<div id="tabs-$index">Loading...</div>
 		#end
 	</div>
 </div>

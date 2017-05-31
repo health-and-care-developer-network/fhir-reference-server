@@ -238,7 +238,7 @@ public class PlainContent extends CORSInterceptor {
         IdDt resourceID = (IdDt)theRequestDetails.getId();
         
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(describeResource(resourceID, baseURL, context, "Tree View", resourceType));
+            content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
         }
         if (resourceType == VALUESET) {
         	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));

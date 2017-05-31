@@ -19,7 +19,7 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
 
 
   # Add custom styles
-  sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link rel="stylesheet" href="\/style.css"\/><link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet">' devnet.html
+  sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet"><link rel="stylesheet" href="\/style.css"\/>' devnet.html
 
   # Update breadcrumbs
   #NEW_CRUMBS="<span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"http:\/\/$ROOT_URL\/\" rel=\"v:url\" property=\"v:title\">Home<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"></span></li>    <li><span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"http:\/\/$ROOT_URL\/\/apis\/\" rel=\"v:url\" property=\"v:title\">APIs<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"><\/span><\/li>     <li> <strong class=\"breadcrumb_last\">$ROOT_CRUMB<\/strong><\/span><\/span><\/li><\/ul>	<\/div><!--end wrapper-->"
