@@ -39,16 +39,17 @@
 	</div>
 	<div id="tabs">
 		<ul>
-			<li><a href="#tabs-1">$firstTabName</a></li>
+			<li><a href="#tabs-main">$firstTabName</a></li>
 			#foreach( $artefact in $metadata.getArtefacts() )
-				#set ($index = $foreach.index + 2)
-				<li><a href="#tabs-$index" onclick="loadTab('#tabs-$index', '$metadata.getResourceID()', '$metadata.getVersionNo()', '$artefact.getArtefactType().name()');">$artefact.getArtefactType().getDisplayName()</a></li>
+				#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
+				<li><a href="#tabs-$tabname" onclick="loadTab('#tabs-$tabname', '$metadata.getResourceID()', '$metadata.getVersionNo()', 
+								'$artefact.getArtefactType().name()');">$artefact.getArtefactType().getDisplayName()</a></li>
 			#end
 		</ul>
-		<div id="tabs-1" class='treeView'>$!treeView</div>
+		<div id="tabs-main" class='treeView'>$!treeView</div>
 		#foreach( $artefact in $metadata.getArtefacts() )
-			#set ($index = $foreach.index + 2)
-			<div id="tabs-$index">Loading...</div>
+			#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
+			<div id="tabs-$tabname">Loading...</div>
 		#end
 	</div>
 </div>

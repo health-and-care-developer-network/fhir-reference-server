@@ -64,6 +64,15 @@ public enum ArtefactType {
 	public String getFilename() {
 		return filename;
 	}
+	
+	public String getFilenameWithoutExtension() {
+		int idx = filename.indexOf('.');
+		if (idx == -1) {
+			return filename;
+		} else {
+			return filename.substring(0, idx);
+		}
+	}
 
 	public void setFilename(String filename) {
 		this.filename = filename;
