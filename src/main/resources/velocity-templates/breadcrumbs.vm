@@ -1,0 +1,34 @@
+			<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
+				<span typeof="v:Breadcrumb">
+					<a href="https://developer.nhs.uk/" rel="v:url" property="v:title">Home</a>
+					<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span></li>
+		<li>
+			<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
+				<span typeof="v:Breadcrumb">
+					<a href="https://developer.nhs.uk/apis/" rel="v:url" property="v:title">APIs</a>
+					<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
+		</li>
+		<li>
+			<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
+				<span typeof="v:Breadcrumb">
+					<a href="$baseURL" rel="v:url" property="v:title">FHIR Reference Server</a>
+					<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
+		</li>
+		
+		#if($resourceName)
+		<li>
+			<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
+				<span typeof="v:Breadcrumb">
+					<a href="$baseURL/$resourceType" rel="v:url" property="v:title">$resourceType</a>
+					<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
+		</li>
+		<li>
+			<strong class="breadcrumb_last">$resourceName</strong>
+		</li>
+		#else
+		<li>
+			<strong class="breadcrumb_last">$resourceType</strong>
+		</li>
+		#end
+	</ul>
+</div><!--end wrapper-->

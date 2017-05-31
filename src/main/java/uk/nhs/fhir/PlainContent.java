@@ -128,14 +128,15 @@ public class PlainContent extends CORSInterceptor {
         LOG.info("Format to return to browser: " + mimeType.toString());
         
         boolean showList = true;
+        String resourceName = null;
         
         if (operation != null) {
         	if (operation == READ || operation == VREAD) {
 	        	if (mimeType == XML || mimeType == JSON) {
-	        		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
+	        		resourceName = renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
 	        		showList = false;
 	        	} else {
-	        		renderSingleResource(theRequestDetails, content, resourceType);
+	        		resourceName = renderSingleResource(theRequestDetails, content, resourceType);
 	        		showList = false;
 	        	}
 	        }
@@ -147,7 +148,8 @@ public class PlainContent extends CORSInterceptor {
         	renderListOfResources(theRequestDetails, content, resourceType);
         }
 
-        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
+        String baseURL = theRequestDetails.getServerBaseForRequest();
+        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, resourceName, content, baseURL);
         
         return false;
     }
@@ -188,7 +190,8 @@ public class PlainContent extends CORSInterceptor {
 	    		StringBuffer content = new StringBuffer();
 	    		renderConformance(content, theResponseObject, mimeType);
 	    		LOG.info(content.toString());
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, content);
+	    		String baseURL = theRequestDetails.getServerBaseForRequest();
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, "Server Conformance Statement", content, baseURL);
 	    		return false;
     		}
         }
@@ -198,11 +201,13 @@ public class PlainContent extends CORSInterceptor {
 		return true;
 	}
     
-    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
+    private String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
         content.append(GenerateIntroSection());
         IdDt resourceID = (IdDt)theRequestDetails.getId();
         content.append(getResourceContent(resourceID, mimeType, resourceType));
         content.append("</div>");
+        // Return resource name (for breadcrumb)
+        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
     }
     
     private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
@@ -224,7 +229,7 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
+    private String renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
     	VelocityContext context = new VelocityContext();
     	
@@ -244,6 +249,9 @@ public class PlainContent extends CORSInterceptor {
         if (resourceType == IMPLEMENTATIONGUIDE) {
         	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
+        
+        // Return resource name (for breadcrumb)
+        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
     }
     
     private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
