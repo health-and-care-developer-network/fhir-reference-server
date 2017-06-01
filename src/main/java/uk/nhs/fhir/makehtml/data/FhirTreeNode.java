@@ -1,5 +1,7 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +25,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
 	private Optional<String> fixedValue = Optional.empty();
-	private Optional<String> fixedUri = Optional.empty();
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
@@ -205,6 +206,29 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 
 		return typeLinks;
+	}
+	
+	public String getNodeKey() {
+		Deque<String> ancestorKeys = new LinkedList<>();
+		
+		for (FhirTreeTableContent ancestor = this; ancestor != null; ancestor = ancestor.getParent()) {
+			ancestorKeys.addFirst(getKeySegment(ancestor));
+		}
+		
+		String key = String.join(".", ancestorKeys);
+		return key;
+	}
+
+	String getKeySegment(FhirTreeTableContent node) {
+		String nodeKey = node.getPathName();
+		
+		Optional<String> name = node.getName();
+		if (name.isPresent()
+		  && !name.get().isEmpty()) {
+			nodeKey += "(" + name.get() + ")";
+		}
+		
+		return nodeKey;
 	}
 
 	public boolean useBackupTypeLinks() {

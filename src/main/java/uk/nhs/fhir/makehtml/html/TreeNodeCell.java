@@ -7,6 +7,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.data.FhirIcon;
@@ -19,13 +20,21 @@ public class TreeNodeCell extends TableCell {
 	private final String name;
 	private final String backgroundClass;
 	private final boolean strikethrough;
+	private final String nodeKey;
 	
-	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough) {
+	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey) {
+		Preconditions.checkNotNull(name);
+		Preconditions.checkNotNull(fhirIcon);
+		Preconditions.checkNotNull(treeIcons);
+		Preconditions.checkNotNull(backgroundClass);
+		Preconditions.checkNotNull(nodeKey);
+		
 		this.name = name;
 		this.fhirIcon = fhirIcon;
 		this.treeIcons = treeIcons;
 		this.backgroundClass = backgroundClass;
 		this.strikethrough = strikethrough;
+		this.nodeKey = nodeKey;
 	}
 	
 	@Override
@@ -46,7 +55,12 @@ public class TreeNodeCell extends TableCell {
 		contents.add(
 			strikethrough
 				? Elements.withAttributeAndText("span", new Attribute("class", "fhir-text-strikethrough"), name)
-				: new Text(name));
+				: Elements.withAttributesAndChild(
+					"a",
+					Lists.newArrayList(
+						new Attribute("class", "fhir-link"),
+						new Attribute("href", "details.html#" + nodeKey)), 
+					new Text(name)));
 		
 		return Elements.withAttributeAndChildren("td", 
 			new Attribute("class", backgroundClass + " fhir-tree-icons"), 

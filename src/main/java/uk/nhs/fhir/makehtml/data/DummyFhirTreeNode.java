@@ -197,4 +197,14 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public String toString() {
 		return "{" + getPath() + "}";
 	}
+
+	@Override
+	public String getNodeKey() {
+		return backup.getNodeKey();
+	}
+
+	@Override
+	public Optional<String> getName() {
+		return backup.getName();
+	}
 }

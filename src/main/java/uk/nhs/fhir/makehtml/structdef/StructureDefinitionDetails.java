@@ -249,5 +249,43 @@ public class StructureDefinitionDetails {
 		return profileConstraints;
 	}
 
+	public void assertEqualTo(StructureDefinitionDetails detail) {
+
+		if (!getDefinition().equals(detail.getDefinition())) {
+			throw new IllegalStateException("Same key, different definition (" + key + ").");
+		}
+		if (!getCardinality().equals(detail.getCardinality())) {
+			throw new IllegalStateException("Same key, different cardinality (" + key + ").");
+		}
+		if (!getBindingInfo().equals(detail.getBindingInfo())) {
+			throw new IllegalStateException("Same key, different binding info (" + key + ").");
+		}
+		if (!getTypeLinks().stream().allMatch(link -> detail.getTypeLinks().contains(link))) {
+			throw new IllegalStateException("Same key, different types info (" + key + ").");
+		}
+		if (!getRequirements().equals(detail.getRequirements())) {
+			throw new IllegalStateException("Same key, different requirements info (" + key + ").");
+		}
+		if (!getAliases().stream().allMatch(alias -> detail.getAliases().contains(alias))) {
+			throw new IllegalStateException("Same key, different alias info (" + key + ").");
+		}
+		if (!getResourceFlags().equals(detail.getResourceFlags())) {
+			throw new IllegalStateException("Same key, different resource flags info (" + key + ").");
+		}
+		if (!getComments().equals(detail.getComments())) {
+			throw new IllegalStateException("Same key, different comments info (" + key + ").");
+		}
+		if (!getInheritedConstraints().stream().allMatch(constraint -> detail.getInheritedConstraints().contains(constraint))) {
+			throw new IllegalStateException("Same key, different inherited constraints info (" + key + ").");
+		}
+		if (!getProfileConstraints().stream().allMatch(constraint -> detail.getProfileConstraints().contains(constraint))) {
+			throw new IllegalStateException("Same key, different profile constraints info (" + key + ").");
+		}
+	}
+
+
+	void assertDetailsEqual(String key, StructureDefinitionDetails detail,
+			StructureDefinitionDetails existingDetails) {
+	}
 	
 }

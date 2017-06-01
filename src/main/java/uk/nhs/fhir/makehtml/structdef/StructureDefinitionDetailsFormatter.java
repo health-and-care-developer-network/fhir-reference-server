@@ -1,8 +1,6 @@
 package uk.nhs.fhir.makehtml.structdef;
 
-import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -63,7 +61,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		for (FhirTreeTableContent node : snapshotTreeData) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
 			
-			String key = getNodeKey(fhirTreeNode);
+			String key = fhirTreeNode.getNodeKey();
 			Optional<String> definition = fhirTreeNode.getDefinition();
 			String cardinality = fhirTreeNode.getCardinality().toString();
 			Optional<BindingInfo> binding = fhirTreeNode.getBinding();
@@ -84,7 +82,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 				details.put(key, detail);
 			} else {
 				StructureDefinitionDetails existingDetails = details.get(key);
-				assertDetailsEqual(key, detail, existingDetails);
+				existingDetails.assertEqualTo(detail);
 			}
 		}
 		
@@ -101,40 +99,6 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirPanel panel = new FhirPanel("Details", table);
 		
 		return panel.makePanel();
-	}
-
-	void assertDetailsEqual(String key, StructureDefinitionDetails detail,
-			StructureDefinitionDetails existingDetails) {
-		if (!existingDetails.getDefinition().equals(detail.getDefinition())) {
-			throw new IllegalStateException("Same key, different definition (" + key + ").");
-		}
-		if (!existingDetails.getCardinality().equals(detail.getCardinality())) {
-			throw new IllegalStateException("Same key, different cardinality (" + key + ").");
-		}
-		if (!existingDetails.getBindingInfo().equals(detail.getBindingInfo())) {
-			throw new IllegalStateException("Same key, different binding info (" + key + ").");
-		}
-		if (!existingDetails.getTypeLinks().stream().allMatch(link -> detail.getTypeLinks().contains(link))) {
-			throw new IllegalStateException("Same key, different types info (" + key + ").");
-		}
-		if (!existingDetails.getRequirements().equals(detail.getRequirements())) {
-			throw new IllegalStateException("Same key, different requirements info (" + key + ").");
-		}
-		if (!existingDetails.getAliases().stream().allMatch(alias -> detail.getAliases().contains(alias))) {
-			throw new IllegalStateException("Same key, different alias info (" + key + ").");
-		}
-		if (!existingDetails.getResourceFlags().equals(detail.getResourceFlags())) {
-			throw new IllegalStateException("Same key, different resource flags info (" + key + ").");
-		}
-		if (!existingDetails.getComments().equals(detail.getComments())) {
-			throw new IllegalStateException("Same key, different comments info (" + key + ").");
-		}
-		if (!existingDetails.getInheritedConstraints().stream().allMatch(constraint -> detail.getInheritedConstraints().contains(constraint))) {
-			throw new IllegalStateException("Same key, different inherited constraints info (" + key + ").");
-		}
-		if (!existingDetails.getProfileConstraints().stream().allMatch(constraint -> detail.getProfileConstraints().contains(constraint))) {
-			throw new IllegalStateException("Same key, different profile constraints info (" + key + ").");
-		}
 	}
 
 	private void splitConstraints(FhirTreeNode node, FhirTreeData differentialTreeData,
@@ -159,44 +123,6 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			// If not in the differential, it hasn't changed. Any constraints must be inherited.
 			inheritedConstraints.addAll(node.getConstraints());
 		}
-	}
-	
-	private String getNodeKey(FhirTreeNode node) {
-		
-		Deque<String> ancestorKeys = new LinkedList<>();
-		
-		FhirTreeNode ancestor = node;
-		while (true) {
-			ancestorKeys.addFirst(getKeySegment(ancestor));
-			
-			ancestor = (FhirTreeNode)ancestor.getParent();
-			
-			if (ancestor == null) {
-				break;
-			}
-		}
-		
-		String key = String.join(".", ancestorKeys);
-		
-		/*Optional<String> fixed = node.getFixedValue();
-		if (fixed.isPresent() 
-		  && !fixed.get().isEmpty()) {
-			key += ":" + fixed.get();
-		}*/
-		
-		return key;
-	}
-
-	String getKeySegment(FhirTreeNode node) {
-		String nodeKey = node.getPathName();
-		
-		Optional<String> name = node.getName();
-		if (name.isPresent()
-		  && !name.get().isEmpty()) {
-			nodeKey += ":" + name.get();
-		}
-		
-		return nodeKey;
 	}
 	
 	public static List<CSSStyleBlock> getStyles() {

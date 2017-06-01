@@ -63,4 +63,8 @@ public interface FhirTreeTableContent {
 	void setFhirIcon(FhirIcon icon);
 	
 	public List<ConstraintInfo> getConstraints();
+	
+	public String getNodeKey();
+
+	Optional<String> getName();
 }
