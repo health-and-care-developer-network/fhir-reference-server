@@ -10,7 +10,7 @@ function setupLinkInterceptsInTabs() {
 		anchorToJumpTo = "";
 	}
 	
-	$(".tabLink").click(function() {
+	$(".fhir-link").click(function() {
 		var href = $(this).attr("href");
 		var linkParts = href.split("#");
 		if (linkParts.length == 2) {
