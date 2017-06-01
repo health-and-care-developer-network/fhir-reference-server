@@ -8,13 +8,17 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.SlicingInfo;
+import uk.nhs.fhir.makehtml.html.CSSRule;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
@@ -30,12 +34,14 @@ public class StructureDefinitionDetails {
 	private final List<String> aliases;
 	private final ResourceFlags resourceFlags;
 	private final Optional<String> comments;
+	private final Optional<SlicingInfo> slicing;
 	private final List<ConstraintInfo> inheritedConstraints;
 	private final List<ConstraintInfo> profileConstraints;
 	
 	public StructureDefinitionDetails(String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			List<LinkData> typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
-			Optional<String> comments, List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
+			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
+			List<ConstraintInfo> profileConstraints) {
 		this.key = key;
 		this.definition = definition;
 		this.cardinality = cardinality;
@@ -45,6 +51,7 @@ public class StructureDefinitionDetails {
 		this.aliases = aliases;
 		this.resourceFlags = resourceFlags;
 		this.comments = comments;
+		this.slicing = slicing;
 		this.inheritedConstraints = inheritedConstraints;
 		this.profileConstraints = profileConstraints;
 	}
@@ -61,6 +68,7 @@ public class StructureDefinitionDetails {
 		addResourceFlags(tableContent, resourceFlags);
 		addDataIfPresent(tableContent, "Comments", comments);
 		addConstraints(tableContent);
+		addSlicing(tableContent);
 	}
 
 	private Element getHeaderRow(String header) {
@@ -172,15 +180,13 @@ public class StructureDefinitionDetails {
 	private void addConstraints(List<Element> tableContent) {
 		if (!profileConstraints.isEmpty() || !inheritedConstraints.isEmpty()) {
 			
-			Element labelCell = dataCell("Invariants", "fhir-details-data-cell");
-	
 			List<Content> constraintInfos = Lists.newArrayList();
 			addConstraintInfos(constraintInfos, profileConstraints, "Defined on this element");
 			addConstraintInfos(constraintInfos, inheritedConstraints, "Affect this element");
 			
 			tableContent.add(
 				getDataRow(
-					labelCell, 
+					dataCell("Invariants", "fhir-details-data-cell"), 
 					Elements.withAttributeAndChildren("td", 
 						new Attribute("class", "fhir-details-data-cell"), 
 						constraintInfos)));
@@ -206,6 +212,38 @@ public class StructureDefinitionDetails {
 				constraintContent += " severity: " + constraint.getSeverity();
 				constraintInfos.add(new Text(constraintContent));
 			}
+		}
+	}
+
+	private void addSlicing(List<Element> tableContent) {
+		if (slicing.isPresent()) {
+			SlicingInfo slicingInfo = slicing.get();
+			
+			List<Content> renderedSlicingInfo = Lists.newArrayList();
+			String description = slicingInfo.getDescription();
+			if (!Strings.isNullOrEmpty(description)) {
+				addSlicingInfo(renderedSlicingInfo, slicingInfo.getDescription());
+			}
+			addSlicingInfo(renderedSlicingInfo, slicingInfo.getOrderedDesc());
+			addSlicingInfo(renderedSlicingInfo, slicingInfo.getRules());
+			addSlicingInfo(renderedSlicingInfo, "discriminators: " + String.join(", ", slicingInfo.getDiscriminatorPaths()));
+			
+			tableContent.add(
+				getDataRow(
+					dataCell("Invariants", "fhir-details-data-cell"),
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", "fhir-details-data-cell"), 
+						Lists.newArrayList(
+							new Text("This element introduces a set of slices. The slicing rules are:"),
+							Elements.withAttributeAndChildren("ul", 
+								new Attribute("class", "fhir-list"), 
+								renderedSlicingInfo)))));
+		}
+	}
+
+	private void addSlicingInfo(List<Content> renderedSlicingInfo, String data) {
+		if (!Strings.isNullOrEmpty(data)) {
+			renderedSlicingInfo.add(Elements.withText("li", data));
 		}
 	}
 
@@ -283,9 +321,15 @@ public class StructureDefinitionDetails {
 		}
 	}
 
-
-	void assertDetailsEqual(String key, StructureDefinitionDetails detail,
-			StructureDefinitionDetails existingDetails) {
+	public static List<CSSStyleBlock> getStyles() {
+		List<CSSStyleBlock> iconStyles = Lists.newArrayList();
+		
+		iconStyles.add(
+				new CSSStyleBlock(Lists.newArrayList(".fhir-list"),
+					Lists.newArrayList(
+						new CSSRule("margin", "0px"))));
+			
+		return iconStyles;
 	}
 	
 }

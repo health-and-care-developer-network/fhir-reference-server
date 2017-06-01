@@ -18,8 +18,6 @@ public enum FhirTreeIcon {
 	VJOIN_END("tbl_vjoin_end.png", FhirTreeIcon.vjoinEndBase64, FhirTreeIcon.VJOIN_END_CLASS),
 	VLINE("tbl_vline.png", FhirTreeIcon.vlineBase64, FhirTreeIcon.VLINE_CLASS);
 	
-	private static final String NHS_CONTAINING_FOLDER = "http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/";
-	
 	private final String filename;
 	private final String base64;
 	private final String cssClass;
@@ -99,6 +97,6 @@ public enum FhirTreeIcon {
 	private static final String VLINE_CLASS = "vline-fhir-tree-icon";
 
 	public String getNhsSrc() {
-		return HTMLConstants.NHS_IMAGES_DIR + getFileName();
+		return HTMLConstants.NHS_FHIR_IMAGES_DIR + getFileName();
 	}
 }

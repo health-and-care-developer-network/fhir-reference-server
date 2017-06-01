@@ -58,7 +58,7 @@ public class TreeNodeCell extends TableCell {
 				: Elements.withAttributesAndChild(
 					"a",
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"),
+						new Attribute("class", String.join(" ", Lists.newArrayList("fhir-link", "tabLink"))),
 						new Attribute("href", "details.html#" + nodeKey)), 
 					new Text(name)));
 		

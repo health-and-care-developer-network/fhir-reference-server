@@ -45,6 +45,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		Table.getStyles().forEach(section::addStyle);
 		FhirPanel.getStyles().forEach(section::addStyle);
 		LinkCell.getStyles().forEach(section::addStyle);
+		StructureDefinitionDetails.getStyles().forEach(section::addStyle);
 		
 		return section;
 	}
@@ -76,7 +77,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(key, definition, cardinality, binding, typeLinks,
-				requirements, aliases, resourceFlags, comments, inheritedConstraints, profileConstraints);
+				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints);
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

@@ -61,7 +61,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return HTMLConstants.NHS_IMAGES_DIR + name + "." + extension;
+		return HTMLConstants.NHS_FHIR_IMAGES_DIR + name + "." + extension;
 	}
 	
 	public String getBase64() {
