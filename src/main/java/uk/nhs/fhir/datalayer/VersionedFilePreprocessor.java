@@ -4,6 +4,7 @@ import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.enums.ResourceType.EXAMPLES;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 
@@ -16,11 +17,14 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -106,6 +110,7 @@ public class VersionedFilePreprocessor {
 	                } else {
 		                // Now, try to build a new versioned filename and copy the file to it
                     	String newFilename = resourceID + "-versioned-" + versionNo + ".xml";
+                    	
                     	LOG.info("Copying new profile into versioned directory with new filename: " + newFilename);
                     	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
                     	File newFile = new File(versioned_path + "/" + newFilename);

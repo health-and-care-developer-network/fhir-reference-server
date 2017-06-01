@@ -25,6 +25,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -111,4 +112,10 @@ public interface Datasource {
      */
     HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
     
+    /**
+     * Gets any example resources we know about for the specified resource type and resource ID
+     * @param resourceTypeAndID
+     * @return
+     */
+    ExampleResources getExamples(String resourceTypeAndID);
 }

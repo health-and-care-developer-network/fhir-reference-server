@@ -55,6 +55,7 @@ import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -363,6 +364,14 @@ public class PlainContent extends CORSInterceptor {
     	// Tree view
     	String textSection = sd.getText().getDivAsString();
     	context.put( "treeView", textSection );
+    	
+    	// Examples
+    	ExampleResources examples = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	if (examples != null) {
+    		if (examples.size() > 0) {
+    			context.put( "examples", examples );
+    		}
+    	}
     	
     	StringWriter sw = new StringWriter();
     	template.merge( context, sw );

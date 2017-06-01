@@ -15,6 +15,12 @@ public class VersionNumber implements Comparable<VersionNumber> {
 	private int minor = 0;
 	private int patch = 0;
 	private boolean valid = false;
+	private boolean versionless = false;
+	
+	public VersionNumber() {
+		this.versionless = true;
+		this.valid = true;
+	}
 	
 	public VersionNumber(String versionStr) {
 		if (versionStr != null) {
@@ -133,5 +139,9 @@ public class VersionNumber implements Comparable<VersionNumber> {
 		if (valid != other.valid)
 			return false;
 		return true;
+	}
+
+	public boolean isVersionless() {
+		return versionless;
 	}
 }

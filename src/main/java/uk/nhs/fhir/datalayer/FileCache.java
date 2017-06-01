@@ -16,6 +16,7 @@
 package uk.nhs.fhir.datalayer;
 
 import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
+import static uk.nhs.fhir.enums.ResourceType.EXAMPLES;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
@@ -26,27 +27,27 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
@@ -61,6 +62,7 @@ public class FileCache {
 
     // Singleton object to act as a cache of the files in the profiles and valueset directories
     private static List<ResourceEntityWithMultipleVersions> resourceList = null;
+    private static HashMap<String, ExampleResources> examplesList = null;
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
@@ -172,8 +174,12 @@ public class FileCache {
             // Add ImplementationGuides
             newList.addAll(cacheFHIRResources(IMPLEMENTATIONGUIDE));
             
+            // Add examples
+            HashMap<String, ExampleResources> newExamplesList = cacheExamples();
+            
             // Swap out for our new list
             resourceList = newList;
+            examplesList = newExamplesList;
             printCacheContent();
         }
     }
@@ -255,6 +261,7 @@ public class FileCache {
 		                    status = guide.getStatus();
 		                }
 		                
+	                	// Load into the main cache for profiles
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
@@ -263,6 +270,7 @@ public class FileCache {
 		                addToResourceList(newFileList,newEntity);
 		                
 		                addMessage("  - Loading " + resourceType + " resource with ID: " + resourceID + " and version: " + versionNo);
+
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
 	                	addMessage("[!] Error loading " + resourceType + " resource from file : " + thisFile.getAbsolutePath() + " message: " + ex.getMessage());
@@ -275,6 +283,87 @@ public class FileCache {
         //Collections.sort(newFileList);
         LOG.fine("Finished reading resources into cache");
         return newFileList;
+    }
+    
+    private static HashMap<String, ExampleResources> cacheExamples(){
+    	
+    	LOG.info("Started loading example resources into cache");
+		addMessage("Started loading example resources into cache");
+    	
+        // Now, read the resources into our cache
+		HashMap<String, ExampleResources> examplesList = new HashMap<String, ExampleResources>();
+        String path = EXAMPLES.getFilesystemPath();
+        File folder = new File(path);
+            File[] fileList = folder.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(fileExtension);
+                }
+            });
+        
+        if (fileList != null) {
+	        for (File thisFile : fileList) {
+	            if (thisFile.isFile()) {
+	                LOG.fine("Reading example ResourceEntity into cache: " + thisFile.getName());
+	                
+	                String resourceID = null;
+	                
+	                try {
+	                	IResource exampleResource = (IResource)FHIRUtils.loadResourceFromFile(thisFile);
+	                	IdDt id = exampleResource.getId();
+	                    resourceID = id.getIdPart();
+	                    
+	                    // Find the profile resource ID the example relates to
+	                    List<? extends IPrimitiveType<String>> profiles = exampleResource.getMeta().getProfile();
+	                    if (profiles.isEmpty()) {
+	                    	LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - no profile was specified in the example!");
+                    		addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " no profile was specified in the example!");
+	                    }
+	                    for (IPrimitiveType<String> profile : profiles) {
+	                    	String profileStr = profile.getValueAsString();
+	                    	if (profileStr != null) {
+	                    		if (profileStr.contains("_history")) {
+	                    			LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - versioned profile URLs not supported!");
+	                    			addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " versioned profile URLs not supported!");
+	                    		} else {
+	                    			String[] profileParts = profileStr.split("/");
+	                    			if (profileParts.length < 3) {
+	                    				LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - profile URL invalid: " + profileStr);
+		                    			addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " - profile URL invalid: " + profileStr);
+	                    			} else {
+	                    				// We seem to have a valid profile - add to our cache
+	            	                    String profileResourceID = profileParts[profileParts.length-2] + "/" + 
+	            	                    							profileParts[profileParts.length-1];
+
+	            	                    // Load the examples into a different in-memory cache for later look-up
+	            	                    ResourceEntity newEntity = new ResourceEntity(null, thisFile, EXAMPLES, false, null,
+	            								null, true, resourceID, null, null, null);
+	            		                
+	            	                    if (examplesList.containsKey(profileResourceID)) {
+	            	                    	examplesList.get(profileResourceID).add(newEntity);
+	            	                    } else {
+	            	                    	ExampleResources e = new ExampleResources();
+	            	                    	e.add(newEntity);
+	            	                    	examplesList.put(profileResourceID, e);
+	            	                    }
+	            	                    
+	            		                addMessage("  - Loading example resource with ID: " + resourceID + " as an example of resource with ID: " + profileResourceID);
+	                    			}
+	                    		}
+	                    	} else {
+	                    		LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - no profile was specified in the example!");
+	                    		addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " no profile was specified in the example!");
+	                    	}
+	                    }
+		                
+	                } catch (Exception ex) {
+	                	LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
+	                	addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " message: " + ex.getMessage());
+	                }
+	            }
+	        }
+        }
+        LOG.fine("Finished reading example resources into cache");
+        return examplesList;
     }
     
     private static ArrayList<SupportingArtefact> processSupportingArtefacts(File resourceFile, ResourceType resourceType) {
@@ -380,6 +469,14 @@ public class FileCache {
 		}
 		return latestResourcesList;
 	}
+	
+	public static ExampleResources getExamples(String resourceTypeAndID) {
+		if(updateRequired()) {
+            updateCache();
+        }
+		return examplesList.get(resourceTypeAndID);
+	}
+
     
     private static void printCacheContent() {
     	addMessage(" ===  ===  ===   Cache Contents   === === ===");
@@ -387,6 +484,17 @@ public class FileCache {
     	for (ResourceEntityWithMultipleVersions entry : resourceList) {
     		LOG.info("  -> " + entry);
     		addMessage(entry.toString());
+    	}
+    	
+    	LOG.info("Examples:");
+    	addMessage("Examples:");
+    	for (String exampleOfProfile : examplesList.keySet()) {
+    		ExampleResources entries = examplesList.get(exampleOfProfile);
+    		addMessage("Examples for profile: " + exampleOfProfile);
+    		for (ResourceEntity entry : entries) {
+	    		LOG.info("  -> " + entry);
+	    		addMessage(entry.toString());
+    		}
     	}
     	addMessage(" ===  ===  ===  End Cache Contents === === ===");
     }

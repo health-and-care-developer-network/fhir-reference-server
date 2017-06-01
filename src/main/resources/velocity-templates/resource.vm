@@ -45,11 +45,21 @@
 				<li><a href="#tabs-$tabname" onclick="loadTab('#tabs-$tabname', '$metadata.getResourceID()', '$metadata.getVersionNo()', 
 								'$artefact.getArtefactType().name()');">$artefact.getArtefactType().getDisplayName()</a></li>
 			#end
+			#if( $examples )
+				<li><a href="#tabs-examples">Examples</a></li>
+			#end
 		</ul>
 		<div id="tabs-main" class='treeView'>$!treeView</div>
 		#foreach( $artefact in $metadata.getArtefacts() )
 			#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
 			<div id="tabs-$tabname">Loading...</div>
+		#end
+		#if( $examples )
+			<div id="tabs-examples">
+				#foreach( $example in $examples )
+					<p>$example.getResourceFile()</p>
+				#end
+			</div>
 		#end
 	</div>
 </div>

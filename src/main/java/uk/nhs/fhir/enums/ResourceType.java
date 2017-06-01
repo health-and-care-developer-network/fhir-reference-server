@@ -18,7 +18,8 @@ public enum ResourceType {
 	VALUESET("ValueSet", "ValueSet", PropertyReader.getProperty("valusetPath")),
 	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition", PropertyReader.getProperty("operationsPath")),
 	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide", PropertyReader.getProperty("guidesPath")),
-	CONFORMANCE("Conformance", "Conformance", PropertyReader.getProperty("conformancePath")), 
+	CONFORMANCE("Conformance", "Conformance", PropertyReader.getProperty("conformancePath")),
+	EXAMPLES("Examples", "Examples", PropertyReader.getProperty("examplesPath")),
 	OTHER("Other", "Other", null);
 	
 	private static final Logger LOG = Logger.getLogger(ResourceType.class.getName());
@@ -51,21 +52,23 @@ public enum ResourceType {
 	}
 	
     public static ResourceType getTypeFromRequest(RequestDetails theRequestDetails) {
-    	
     	String typeInRequest = theRequestDetails.getResourceName();
     	LOG.info("Detecting type of resource: " + typeInRequest);
-    	
-    	if (typeInRequest == null) { 
+    	return getTypeFromHAPIName(typeInRequest);
+    }
+    
+    public static ResourceType getTypeFromHAPIName(String hapiName) {
+    	if (hapiName == null) { 
     		return OTHER;
-    	} else if (typeInRequest.equals(STRUCTUREDEFINITION.hapiName)) {
+    	} else if (hapiName.equals(STRUCTUREDEFINITION.hapiName)) {
     		return STRUCTUREDEFINITION;
-    	} else if (typeInRequest.equals(VALUESET.hapiName)) {
+    	} else if (hapiName.equals(VALUESET.hapiName)) {
     		return VALUESET;
-    	} else if (typeInRequest.equals(OPERATIONDEFINITION.hapiName)) {
+    	} else if (hapiName.equals(OPERATIONDEFINITION.hapiName)) {
     		return OPERATIONDEFINITION;
-    	} else if (typeInRequest.equals(IMPLEMENTATIONGUIDE.hapiName)) {
+    	} else if (hapiName.equals(IMPLEMENTATIONGUIDE.hapiName)) {
     		return IMPLEMENTATIONGUIDE;
-    	} else if (typeInRequest.equals(CONFORMANCE.hapiName)) {
+    	} else if (hapiName.equals(CONFORMANCE.hapiName)) {
     		return CONFORMANCE;
     	}
     	return OTHER;

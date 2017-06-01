@@ -22,6 +22,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.enums.ResourceType;
@@ -179,5 +180,11 @@ public class ResourceWebHandler {
         LOG.fine("Called: ResourceWebHandler.getVSByID(String id)");
         ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
         return valSet;
+    }
+    
+    public ExampleResources getExamples(String resourceTypeAndID) {
+        LOG.fine("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
+        ExampleResources examples = myDataSource.getExamples(resourceTypeAndID);
+        return examples;
     }
 }

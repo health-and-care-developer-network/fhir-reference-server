@@ -20,6 +20,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -215,4 +216,9 @@ public class FilesystemIF implements Datasource {
         LOG.info("Returning matches");
         return matches;
     }
+    
+	@Override
+	public ExampleResources getExamples(String resourceTypeAndID) {
+		return FileCache.getExamples(resourceTypeAndID);
+	}
 }
