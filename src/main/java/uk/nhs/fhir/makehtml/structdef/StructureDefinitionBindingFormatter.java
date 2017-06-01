@@ -103,7 +103,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
 
 	private void processNode(FhirTreeTableContent node)
     {
-
         if (node.hasElement()) {
             ElementDefinitionDt element = node.getElement().get();
             if (node.getBinding().isPresent()) {
@@ -124,12 +123,12 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                 if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
                     foundBinding = true;
                     tableContent.add(
-                            Elements.withChildren("tr",
-                                    labelledValueCell(BLANK, element.getPath(), 1, null),
-                                    labelledValueCell(BLANK, displayDescription, 1, null),
-                                    labelledValueCell(BLANK, element.getBinding().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
-                                    labelledValueCell(BLANK, displayValueSet, 1, null)
-                            ));
+                        Elements.withChildren("tr",
+                            labelledValueCell(BLANK, element.getPath(), 1, "details.html#" + node.getNodeKey()),
+                            labelledValueCell(BLANK, displayDescription, 1, null),
+                            labelledValueCell(BLANK, element.getBinding().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
+                            labelledValueCell(BLANK, displayValueSet, 1, null)
+                        ));
                     done.add(path);
                 }
 

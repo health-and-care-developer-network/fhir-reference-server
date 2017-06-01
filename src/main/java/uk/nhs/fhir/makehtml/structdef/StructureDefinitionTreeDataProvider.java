@@ -5,10 +5,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.SkipRenderGenerationException;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
@@ -23,6 +25,9 @@ import uk.nhs.fhir.makehtml.data.SlicingInfo;
 public class StructureDefinitionTreeDataProvider {
 	
 	private final StructureDefinition source;
+	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
+			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
+			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
 	public StructureDefinitionTreeDataProvider(StructureDefinition source) {
 		this.source = source;
@@ -83,6 +88,16 @@ public class StructureDefinitionTreeDataProvider {
 		}
 		
 		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
+		if (matchingNodes.size() == 0 && !NewMain.STRICT) {
+			String differentialPath = differentialNode.getPath();
+			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
+						
+			if (choiceSuffix.isPresent()) {
+				String suffix = choiceSuffix.get();
+				String choicePath = differentialPath.substring(0, differentialPath.lastIndexOf(suffix)) + "[x]";
+				matchingNodes = findMatchingSnapshotNodes(choicePath, searchRoot);
+			}
+		}
 		
 		if (matchingNodes.size() == 1) {
 			return matchingNodes.get(0);
@@ -118,6 +133,11 @@ public class StructureDefinitionTreeDataProvider {
 				  + ((FhirTreeNode)differentialNode).getName().get() + ".");
 			}
 		} else if (matchingNodes.size() == 0) {
+			String differentialPath = differentialNode.getPath();
+			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
+			if (choiceSuffix.isPresent()) {
+				
+			}
 			throw new SkipRenderGenerationException("No nodes matched for differential element path " + differentialNode.getPath());
 		} else {
 			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + differentialNode.getPath() + ", but first wasn't a slicing node");
