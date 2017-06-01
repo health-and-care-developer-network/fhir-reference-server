@@ -230,7 +230,7 @@ public class StructureDefinitionDetails {
 			
 			tableContent.add(
 				getDataRow(
-					dataCell("Invariants", "fhir-details-data-cell"),
+					dataCell("Slicing", "fhir-details-data-cell"),
 					Elements.withAttributeAndChildren("td", 
 						new Attribute("class", "fhir-details-data-cell"), 
 						Lists.newArrayList(

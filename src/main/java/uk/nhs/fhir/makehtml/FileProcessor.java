@@ -52,16 +52,16 @@ public class FileProcessor {
 		    
 		    List<FormattedOutputSpec> formatters = ResourceFormatter.formattersForResource(resource, outPath);
 		    for (FormattedOutputSpec formatter : formatters) {
-		    	try {
+		    	//try {
 					System.out.println("Generating " + formatter.getOutputPath(inFilePath));
 			    	formatter.formatAndSave(inFilePath);
-		    	} catch (SkipRenderGenerationException e) {
-		    		if (NewMain.STRICT) {
-		    			throw e;
-		    		} else {
-		    			e.printStackTrace();
-		    		}
-		    	}
+		    	//} catch (SkipRenderGenerationException e) {
+		    	//	if (NewMain.STRICT) {
+		    	//		throw e;
+		    	//	} else {
+		    	//		e.printStackTrace();
+		    	//	}
+		    	//}
 		    }
 		}
 	}
