@@ -15,6 +15,10 @@ git clone $GITHUB_URL /source/files
 cd /source/files
 git checkout $BRANCH
 
+# Workaround
+echo "Copying extensions..."
+cp -R ./Extensions/* ./StructureDefinitions/
+
 sed -i -- "s|$OLD_URL|$NEW_URL|g" /source/files/$REPO_PATH/*
 
 mkdir -p /generated/$OUT_PATH
