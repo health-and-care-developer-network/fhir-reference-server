@@ -38,7 +38,7 @@ public class ValueWithInfoCell extends TableCell {
 			valueDataNodes.addAll(nodesForResourceFlag(resourceInfo));
 		}
 		
-		return Elements.withAttributeAndChildren("td", new Attribute("class", "fhir-resource-info-cell"), valueDataNodes);
+		return Elements.withAttributeAndChildren("td", new Attribute("class", FhirCSS.RESOURCE_INFO_CELL), valueDataNodes);
 	}
 	
 	private List<Content> nodesForResourceFlag(ResourceInfo resourceInfo) {
@@ -47,8 +47,8 @@ public class ValueWithInfoCell extends TableCell {
 		ResourceInfoType type = resourceInfo.getType();
 		boolean useTidyStyle = useTidyStyle(type);
 		String nameClass = useTidyStyle ?
-			"fhir-info-name-bold" :
-			"fhir-info-name-block";
+			FhirCSS.INFO_NAME_BOLD :
+			FhirCSS.INFO_NAME_BLOCK;
 		
 		// The tidy style doesn't have a box around the title, so needs a colon to separate it from the content
 		String name = resourceInfo.getName();
@@ -65,7 +65,7 @@ public class ValueWithInfoCell extends TableCell {
 		if (useTidyStyle) {
 			constraintInfoNodes.add(
 				Elements.withAttributeAndChildren("span",
-					new Attribute("class", "fhir-text-italic"),
+					new Attribute("class", FhirCSS.TEXT_ITALIC),
 					resourceInfoText));
 		} else {
 			constraintInfoNodes.addAll(resourceInfoText);
@@ -104,7 +104,7 @@ public class ValueWithInfoCell extends TableCell {
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("href", link),
-						new Attribute("class", "fhir-link")),
+						new Attribute("class", FhirCSS.LINK)),
 					link));
 		}
 			
@@ -129,7 +129,7 @@ public class ValueWithInfoCell extends TableCell {
 	private Content getFormattedTag(String tag) {
 		return 
 			Elements.withAttributeAndText("span", 
-				new Attribute("class", "fhir-info-tag-block"),
+				new Attribute("class", FhirCSS.INFO_TAG_BLOCK),
 				tag);
 	}
 	

@@ -42,11 +42,11 @@ public class Table {
 		//rows.forEach((TableRow row) -> rowElements.add(applyMaxWidths(row.makeRow())));
 		
 		return Elements.withAttributeAndChildren("table",
-			new Attribute("class", "fhir-table"),
+			new Attribute("class", FhirCSS.TABLE),
 			Lists.newArrayList(
 				Elements.withChild("thead",
 					Elements.withAttributeAndChildren("tr", 
-						new Attribute("class", "fhir-table-header-row"), 
+						new Attribute("class", FhirCSS.TABLE_HEADER_ROW), 
 						titleElements)),
 				Elements.withChildren("tbody",
 					rowElements)));

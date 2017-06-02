@@ -156,7 +156,7 @@ public class LinkCell extends TableCell {
 			Elements.addClasses(
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"),
+						new Attribute("class", FhirCSS.LINK),
 						new Attribute("href", linkData.getURL())),
 					linkData.getText()),
 				linkClasses);

@@ -250,7 +250,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 
 		Element table =
 				Elements.withAttributeAndChildren("table",
-						new Attribute("class", "fhir-table"),
+						new Attribute("class", FhirCSS.TABLE),
 						tableContent);
 
 
@@ -381,9 +381,9 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
-		String cssClass = "fhir-metadata-label";
+		String cssClass = FhirCSS.METADATA_LABEL;
 		if (valueIsEmpty && !alwaysBold) {
-			cssClass += " fhir-metadata-label-empty";
+			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -402,8 +402,8 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 	private Element valueSpan(String value, boolean alwaysLargeText, boolean reference , boolean internal, String hint) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
 		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = "fhir-metadata-value";
-		if (!largeText) fhirMetadataClass += " fhir-metadata-value-smalltext";
+		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
+		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
 		    if (reference) {
@@ -419,8 +419,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                                         Elements.withAttributes("img",
                                                 Lists.newArrayList(
                                                         new Attribute("src", FhirIcon.REFERENCE.getUrl()),
-                                                        new Attribute("class", "fhir-tree-resource-icon")))
-                                ))); //value +
+                                                        new Attribute("class", FhirCSS.TREE_RESOURCE_ICON)))))); //value +
             } else if (internal) {
                 return Elements.withAttributeAndChildren("span",
                         new Attribute("class", fhirMetadataClass),
@@ -428,7 +427,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                             Elements.withAttributesAndText("a",
 
                                     Lists.newArrayList(
-                                            new Attribute("class", "fhir-link"),
+                                            new Attribute("class", FhirCSS.LINK),
                                             new Attribute("href", Dstu2Fix.dstu2links(value)),
                                             new Attribute("title", hint)),
                                     value)
@@ -439,7 +438,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                         new Attribute("class", fhirMetadataClass),
                         Elements.withAttributesAndText("a",
                                 Lists.newArrayList(
-                                        new Attribute("class", "fhir-link"),
+                                        new Attribute("class", FhirCSS.LINK),
                                         new Attribute("href", Dstu2Fix.dstu2links(value)),
                                         new Attribute("title", hint)),
                                 value));

@@ -91,7 +91,7 @@ public class ConceptMapMetadataFormatter {
 
 		Element table = 
 			Elements.withAttributeAndChildren("table",
-				new Attribute("class", "fhir-table"),
+				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
 		String panelTitleName =  name.get();
@@ -129,15 +129,15 @@ public class ConceptMapMetadataFormatter {
 	private Element cell(List<? extends Content> content, int colspan) {
 		return Elements.withAttributesAndChildren("td", 
 			Lists.newArrayList(
-				new Attribute("class", "fhir-metadata-cell"),
+				new Attribute("class", FhirCSS.METADATA_CELL),
 				new Attribute("colspan", Integer.toString(colspan))),
 			content);
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty) {
-		String cssClass = "fhir-metadata-label";
+		String cssClass = FhirCSS.METADATA_LABEL;
 		if (valueIsEmpty) {
-			cssClass += " fhir-metadata-label-empty";
+			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -175,7 +175,7 @@ public class ConceptMapMetadataFormatter {
 				new Attribute("class", fhirMetadataClass),
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"),
+						new Attribute("class", FhirCSS.LINK),
 						new Attribute("href", value)),
 				value));
 			

@@ -44,15 +44,15 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 	protected Element cell(List<? extends Content> content, int colspan) {
 		return Elements.withAttributesAndChildren("td", 
 			Lists.newArrayList(
-				new Attribute("class", "fhir-metadata-cell"),
+				new Attribute("class", FhirCSS.METADATA_CELL),
 				new Attribute("colspan", Integer.toString(colspan))),
 			content);
 	}
 	
 	protected Element labelSpan(String label, boolean valueIsEmpty) {
-		String cssClass = "fhir-metadata-label";
+		String cssClass = FhirCSS.METADATA_LABEL;
 		if (valueIsEmpty) {
-			cssClass += " fhir-metadata-label-empty";
+			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -71,15 +71,15 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 	protected Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
 		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = "fhir-metadata-value";
-		if (!largeText) fhirMetadataClass += " fhir-metadata-value-smalltext";
+		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
+		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
 			return Elements.withAttributeAndChild("span", 
 				new Attribute("class", fhirMetadataClass), 
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"), 
+						new Attribute("class", FhirCSS.LINK), 
 						new Attribute("href", value)), 
 				value));
 			

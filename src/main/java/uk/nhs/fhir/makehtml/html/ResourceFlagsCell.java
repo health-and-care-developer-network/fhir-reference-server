@@ -35,7 +35,7 @@ public class ResourceFlagsCell extends TableCell {
 		addIfPresent(ResourceFlag.NOEXTEND, flags, renderedFlags);
 		
 		return Elements.withAttributeAndChildren("td", 
-			new Attribute("class", "fhir-resource-flag"), 
+			new Attribute("class", FhirCSS.RESOURCE_FLAG), 
 			renderedFlags);
 	}
 

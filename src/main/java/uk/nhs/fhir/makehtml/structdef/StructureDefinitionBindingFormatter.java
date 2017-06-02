@@ -27,6 +27,7 @@ import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
+import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
@@ -91,7 +92,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         addStyles(section);
         Element table =
                 Elements.withAttributeAndChildren("table",
-                        new Attribute("class", "fhir-table"),
+                        new Attribute("class", FhirCSS.TABLE),
                         tableContent);
 
         FhirPanel panel = new FhirPanel("Bindings", table);
@@ -156,11 +157,11 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     		uriToDisplay = Optional.of(value);
     	}
     	
-    	String cssClass = "fhir-metadata-value";
+    	String cssClass = FhirCSS.METADATA_VALUE;
     	String displayText = value;
     	if (!Strings.isNullOrEmpty(label)) {
     		displayText = label;
-    		cssClass = "fhir-metadata-label";
+    		cssClass = FhirCSS.METADATA_LABEL;
     	}
         
         List<Element> cellSpans = Lists.newArrayList();
@@ -184,22 +185,24 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         			Elements.withAttributes("img",
                			Lists.newArrayList(
            					new Attribute("src", FhirIcon.REFERENCE.getUrl()),
-           					new Attribute("class", "fhir-tree-resource-icon"))));
+           					new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
         	}
         	
-    		cellSpans.add(linkSpan(linkContents, cssClass, uri));
+        	boolean detailsLink = uri.startsWith("details.html#");
+        	
+    		cellSpans.add(linkSpan(linkContents, cssClass, uri, detailsLink));
 
         }
         
         return cell(cellSpans, colspan);
     }
     
-    private Element linkSpan(List<Content> linkContents, String spanClass, String uri) {
+    private Element linkSpan(List<Content> linkContents, String spanClass, String uri, boolean detailsLink) {
     	return Elements.withAttributeAndChild("span",
 			new Attribute("class", spanClass),
 			Elements.withAttributesAndChildren("a",
 				Lists.newArrayList(
-					new Attribute("class", "fhir-link"),
+					new Attribute("class", FhirCSS.LINK + (detailsLink ? " " + "tabLink" : "")),
 					new Attribute("href", uri)),
 				linkContents));
     }
@@ -209,7 +212,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     private Element cell(List<? extends Content> content, int colspan) {
         return Elements.withAttributesAndChildren("td",
                 Lists.newArrayList(
-                        new Attribute("class", "fhir-metadata-cell"),
+                        new Attribute("class", FhirCSS.METADATA_CELL),
                         new Attribute("colspan", Integer.toString(colspan))),
                 content);
     }

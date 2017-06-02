@@ -30,10 +30,10 @@ public class SimpleTextCell extends TableCell {
 	@Override
 	public Element makeCell() {
 		if (getFaded()) {
-			classes.add("fhir-text-faded");
+			classes.add(FhirCSS.TEXT_FADED);
 		}
 		if (getStrikethrough()) {
-			classes.add("fhir-text-strikethrough");
+			classes.add(FhirCSS.TEXT_STRIKETHROUGH);
 		}
 		
 		if (classes.isEmpty()) {

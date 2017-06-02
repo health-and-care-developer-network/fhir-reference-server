@@ -159,7 +159,7 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
 		Element table = 
 			Elements.withAttributeAndChildren("table",
-				new Attribute("class", "fhir-table"),
+				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
 		String panelTitleName =  name.get();

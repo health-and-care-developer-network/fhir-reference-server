@@ -46,24 +46,24 @@ public class TreeNodeCell extends TableCell {
 				Elements.withAttributes("img", 
 					Lists.newArrayList(
 						new Attribute("src", icon.getNhsSrc()),
-						new Attribute("class", "fhir-tree-icon"))));
+						new Attribute("class", FhirCSS.TREE_ICON))));
 		}
 		contents.add(Elements.withAttributes("img", 
 			Lists.newArrayList(
 				new Attribute("src", fhirIcon.getUrl()),
-				new Attribute("class", "fhir-tree-resource-icon"))));
+				new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
 		contents.add(
 			strikethrough
-				? Elements.withAttributeAndText("span", new Attribute("class", "fhir-text-strikethrough"), name)
+				? Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TEXT_STRIKETHROUGH), name)
 				: Elements.withAttributesAndChild(
 					"a",
 					Lists.newArrayList(
-						new Attribute("class", String.join(" ", Lists.newArrayList("fhir-link", "tabLink"))),
+						new Attribute("class", String.join(" ", Lists.newArrayList(FhirCSS.LINK, "tabLink"))),
 						new Attribute("href", "details.html#" + nodeKey)), 
 					new Text(name)));
 		
 		return Elements.withAttributeAndChildren("td", 
-			new Attribute("class", backgroundClass + " fhir-tree-icons"), 
+			new Attribute("class", String.join(" ", backgroundClass, FhirCSS.TREE_ICONS)), 
 			contents);
 	}
 

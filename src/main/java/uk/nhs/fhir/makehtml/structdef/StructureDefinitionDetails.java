@@ -20,6 +20,7 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.CSSRule;
+import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
@@ -79,15 +80,15 @@ public class StructureDefinitionDetails {
 		if (pathName.endsWith("[x]")) {
 			tableContent.add(
 				getDataRow(
-					dataCell("[x] Note", "fhir-details-data-cell"), 
+					dataCell("[x] Note", FhirCSS.DETAILS_DATA_CELL), 
 					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", "fhir-details-data-cell"), 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
 						Lists.newArrayList(
 							new Text("See "),
 							Elements.withAttributesAndText("a",
 								Lists.newArrayList(
 									new Attribute("href", HTMLConstants.HL7_FORMATS + "#choice"),
-									new Attribute("class", "fhir-link")), 
+									new Attribute("class", FhirCSS.LINK)), 
 								"Choice of Data Types"),
 							new Text(" for further information about how to use [x]")))));
 		}
@@ -95,7 +96,7 @@ public class StructureDefinitionDetails {
 
 	private Element getHeaderRow(String header) {
 		return Elements.withAttributeAndChild("tr", 
-			new Attribute("class", "fhir-details-header-row"), 
+			new Attribute("class", FhirCSS.DETAILS_HEADER_ROW), 
 			Elements.withAttributesAndChildren("td",
 				Lists.newArrayList(
 					new Attribute("class", "fhir-details-header-cell"), 
