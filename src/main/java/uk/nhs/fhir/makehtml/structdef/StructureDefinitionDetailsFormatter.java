@@ -62,6 +62,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		for (FhirTreeTableContent node : snapshotTreeData) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
 			
+			String pathName = fhirTreeNode.getPathName();
 			String key = fhirTreeNode.getNodeKey();
 			Optional<String> definition = fhirTreeNode.getDefinition();
 			String cardinality = fhirTreeNode.getCardinality().toString();
@@ -76,7 +77,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
 			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
-			StructureDefinitionDetails detail = new StructureDefinitionDetails(key, definition, cardinality, binding, typeLinks,
+			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints);
 
 			if (!details.containsKey(key)) {

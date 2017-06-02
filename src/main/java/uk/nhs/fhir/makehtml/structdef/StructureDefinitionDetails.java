@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.LinkData;
@@ -25,6 +26,7 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
 	
+	private final String pathName;
 	private final String key;
 	private final Optional<String> definition;
 	private final String cardinality;
@@ -38,10 +40,11 @@ public class StructureDefinitionDetails {
 	private final List<ConstraintInfo> inheritedConstraints;
 	private final List<ConstraintInfo> profileConstraints;
 	
-	public StructureDefinitionDetails(String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
+	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			List<LinkData> typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
 			List<ConstraintInfo> profileConstraints) {
+		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
 		this.cardinality = cardinality;
@@ -60,15 +63,34 @@ public class StructureDefinitionDetails {
 		tableContent.add(getHeaderRow(key));
 		
 		addDataIfPresent(tableContent, "Definition", definition);
-		addData(tableContent, "Cardinality", cardinality);
-		addBindingRowIfPresent(tableContent, binding);
-		tableContent.add(getLinkRow("Type", typeLinks));
+		addLabelWithLinkDataRow(tableContent, "Cardinality", HTMLConstants.HL7_CONFORMANCE + "#cardinality", cardinality);
+		addBindingRowIfPresent(tableContent);
+		tableContent.add(getLinkRow("Type", HTMLConstants.HL7_DATATYPES, typeLinks));
 		addDataIfPresent(tableContent, "Requirements", requirements);
 		addListDataIfPresent(tableContent, "Alternate Names", aliases);
-		addResourceFlags(tableContent, resourceFlags);
+		addChoiceNoteIfPresent(tableContent);
+		addResourceFlags(tableContent);
 		addDataIfPresent(tableContent, "Comments", comments);
 		addConstraints(tableContent);
 		addSlicing(tableContent);
+	}
+
+	private void addChoiceNoteIfPresent(List<Element> tableContent) {
+		if (pathName.endsWith("[x]")) {
+			tableContent.add(
+				getDataRow(
+					dataCell("[x] Note", "fhir-details-data-cell"), 
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", "fhir-details-data-cell"), 
+						Lists.newArrayList(
+							new Text("See "),
+							Elements.withAttributesAndText("a",
+								Lists.newArrayList(
+									new Attribute("href", HTMLConstants.HL7_FORMATS + "#choice"),
+									new Attribute("class", "fhir-link")), 
+								"Choice of Data Types"),
+							new Text(" for further information about how to use [x]")))));
+		}
 	}
 
 	private Element getHeaderRow(String header) {
@@ -94,6 +116,23 @@ public class StructureDefinitionDetails {
 		tableContent.add(simpleStringDataRow(label, content)); 
 	}
 	
+	private void addLabelWithLinkDataRow(List<Element> tableContent, String label, String url, String content) {
+		Element labelCell = linkCell(label, url);
+		Element dataCell = dataCell(content, "fhir-details-data-cell");
+		
+		tableContent.add(getDataRow(labelCell, dataCell));
+	}
+	
+	private Element linkCell(String label, String url) {
+		return Elements.withAttributeAndChild("td", 
+			new Attribute("class", "fhir-details-data-cell"),
+			Elements.withAttributesAndText("a", 
+				Lists.newArrayList(
+					new Attribute("href", url),
+					new Attribute("class", "fhir-link")),
+				label));
+	}
+	
 	private Element simpleStringDataRow(String title, String content) {
 		
 		Element labelCell = dataCell(title, "fhir-details-data-cell");
@@ -116,7 +155,7 @@ public class StructureDefinitionDetails {
 					dataCell));
 	}
 
-	private void addBindingRowIfPresent(List<Element> tableContent, Optional<BindingInfo> binding) {
+	private void addBindingRowIfPresent(List<Element> tableContent) {
 		if (binding.isPresent()) {
 			BindingInfo info = binding.get();
 
@@ -142,15 +181,15 @@ public class StructureDefinitionDetails {
 			
 			bindingInfo += " (" + info.getStrength() + ")";
 			
-			addData(tableContent, "Binding", bindingInfo);
+			addLabelWithLinkDataRow(tableContent, "Binding", HTMLConstants.HL7_TERMINOLOGIES, bindingInfo);
 		}
 	}
 	
-	private Element getLinkRow(String title, List<LinkData> linkDatas) {
+	private Element getLinkRow(String title, String titleLink, List<LinkData> linkDatas) {
 		return Elements.withAttributeAndChildren("tr", 
 			new Attribute("class", "fhir-details-data-row"),
 				Lists.newArrayList(
-					dataCell(title, "fhir-details-data-cell"),
+					linkCell(title, titleLink),
 					linkCell(linkDatas)));
 	}
 	
@@ -164,16 +203,16 @@ public class StructureDefinitionDetails {
 		}
 	}
 
-	private void addResourceFlags(List<Element> tableContent, ResourceFlags resourceFlags) {
-		addDataIfTrue(tableContent, "Summary", resourceFlags.isSummary());
-		addDataIfTrue(tableContent, "Modifier", resourceFlags.isModifier());
-		//addDataIfTrue(tableContent, "Is Constrained", resourceFlags.isConstrained());
-		addDataIfTrue(tableContent, "Must-Support", resourceFlags.isMustSupport());
+	private void addResourceFlags(List<Element> tableContent) {
+		addDataIfTrue(tableContent, "Summary", HTMLConstants.HL7_SEARCH + "#summary", resourceFlags.isSummary());
+		addDataIfTrue(tableContent, "Modifier", HTMLConstants.HL7_CONFORMANCE + "#ismodifier", resourceFlags.isModifier());
+		//addDataIfTrue(tableContent, "Is Constrained", HTMLConstants.HL7_CONFORMANCE + "#constraints", resourceFlags.isConstrained()); // implied by Invariants entry
+		addDataIfTrue(tableContent, "Must-Support", HTMLConstants.HL7_CONFORMANCE + "#mustSupport", resourceFlags.isMustSupport());
 	}
 
-	private void addDataIfTrue(List<Element> tableContent, String label, boolean condition) {
+	private void addDataIfTrue(List<Element> tableContent, String label, String url, boolean condition) {
 		if (condition) {
-			addData(tableContent, label, "True");
+			addLabelWithLinkDataRow(tableContent, label, url, "True");
 		}
 	}
 	
