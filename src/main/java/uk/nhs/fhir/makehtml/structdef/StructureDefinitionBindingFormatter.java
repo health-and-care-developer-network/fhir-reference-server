@@ -13,6 +13,7 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.api.IDatatype;
@@ -146,64 +147,61 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         return true;
     }
 
-    private Element labelledValueCell(String label, String value, int colspan, String uri) {
-        boolean url = (value.startsWith("http://") || value.startsWith("https://"));
-        boolean internal = (value.contains("https://fhir.nhs.uk/"));
-
-        if (uri == null) {
-            if (url) { uri = value; }
-            else { uri = ""; }
-        }
-        else { url = true; }
-
-
-        String fhirMetadataClass = "fhir-metadata-value";
-        if (label !=null && !label.isEmpty()) {
-            value = label;
-            fhirMetadataClass = "fhir-metadata-label";
-        }
+    private Element labelledValueCell(String label, String value, int colspan, String uriOverride) {
+    	
+    	Optional<String> uriToDisplay = Optional.empty();
+    	if (!Strings.isNullOrEmpty(uriOverride)) {
+    		uriToDisplay = Optional.of(uriOverride);
+    	} else if (value.startsWith("http://") || value.startsWith("https://")) {
+    		uriToDisplay = Optional.of(value);
+    	}
+    	
+    	String cssClass = "fhir-metadata-value";
+    	String displayText = value;
+    	if (!Strings.isNullOrEmpty(label)) {
+    		displayText = label;
+    		cssClass = "fhir-metadata-label";
+    	}
+        
         List<Element> cellSpans = Lists.newArrayList();
-
-
-        if (url) {
-           if (internal) {
-               cellSpans.add(
-                       Elements.withAttributeAndChild("span",
-                               new Attribute("class", fhirMetadataClass),
-                               Elements.withAttributesAndText("a",
-                                       Lists.newArrayList(
-                                               new Attribute("class", "fhir-link"),
-                                               new Attribute("href", Dstu2Fix.dstu2links(uri))
-                                               ),
-                                       value))
-               );
-           } else {
-               cellSpans.add(
-                       Elements.withAttributeAndChild("span",
-                               new Attribute("class", fhirMetadataClass),
-                               Elements.withAttributesAndChildren("a",
-                                       Lists.newArrayList(
-                                               new Attribute("class", "fhir-link"),
-                                               new Attribute("href", Dstu2Fix.dstu2links(uri))
-                                               ),
-                                       Lists.newArrayList(
-                                                new Text(value),
-                                               Elements.withAttributes("img",
-                                                       Lists.newArrayList(
-                                                               new Attribute("src", FhirIcon.REFERENCE.getUrl()),
-                                                               new Attribute("class", "fhir-tree-resource-icon")))
-                                       )
-                               )
-                       ));
-           }
-
-        }
-        else {
+        if (!uriToDisplay.isPresent()) {
             cellSpans.add(Elements.withAttributeAndText("span",
-                    new Attribute("class", fhirMetadataClass),
-                    value));
+                new Attribute("class", cssClass),
+                displayText));
+        } else {
+        	String uri = uriToDisplay.get();
+        	
+        	uri = Dstu2Fix.dstu2links(uri);
+        	
+        	List<Content> linkContents = Lists.newArrayList();
+    		linkContents.add(new Text(displayText));
+
+        	boolean internal = (!uri.startsWith("http://") && !uri.startsWith("https://")) 
+        		|| uri.contains("https://fhir.nhs.uk/");
+    		
+        	if (!internal) {
+        		linkContents.add(
+        			Elements.withAttributes("img",
+               			Lists.newArrayList(
+           					new Attribute("src", FhirIcon.REFERENCE.getUrl()),
+           					new Attribute("class", "fhir-tree-resource-icon"))));
+        	}
+        	
+    		cellSpans.add(linkSpan(linkContents, cssClass, uri));
+
         }
+        
         return cell(cellSpans, colspan);
+    }
+    
+    private Element linkSpan(List<Content> linkContents, String spanClass, String uri) {
+    	return Elements.withAttributeAndChild("span",
+			new Attribute("class", spanClass),
+			Elements.withAttributesAndChildren("a",
+				Lists.newArrayList(
+					new Attribute("class", "fhir-link"),
+					new Attribute("href", uri)),
+				linkContents));
     }
 
 
