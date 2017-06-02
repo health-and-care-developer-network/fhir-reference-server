@@ -56,9 +56,14 @@
 		#end
 		#if( $examples )
 			<div id="tabs-examples">
-				#foreach( $example in $examples )
-					<p>$example.getResourceFile()</p>
-				#end
+				<b>Examples implementing this profile:</b>
+				<p>
+					<ul>
+					#foreach( $example in $examples )
+						<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+					#end
+					</ul>
+				</p>
 			</div>
 		#end
 	</div>

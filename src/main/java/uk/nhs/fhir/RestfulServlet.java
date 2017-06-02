@@ -42,9 +42,10 @@ import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
+import uk.nhs.fhir.servlethelpers.ServletStreamExample;
+import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.PropertyReader;
-import uk.nhs.fhir.util.ServletStreamArtefact;
-import uk.nhs.fhir.util.ServletStreamRawFile;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -80,6 +81,8 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else if (request.getRequestURI().startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, dataSource);
+        } else if (request.getRequestURI().startsWith("/Examples/")) {
+        	ServletStreamExample.streamExample(request, response, dataSource);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");

@@ -1,4 +1,4 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.servlethelpers;
 
 import java.io.IOException;
 import java.io.InputStream;

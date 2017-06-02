@@ -221,4 +221,9 @@ public class FilesystemIF implements Datasource {
 	public ExampleResources getExamples(String resourceTypeAndID) {
 		return FileCache.getExamples(resourceTypeAndID);
 	}
+	
+	@Override
+	public ResourceEntity getExampleByName(String resourceFilename) {
+		return FileCache.getExampleByName(resourceFilename);
+	}
 }

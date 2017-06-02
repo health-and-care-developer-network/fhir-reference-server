@@ -63,6 +63,7 @@ public class FileCache {
     // Singleton object to act as a cache of the files in the profiles and valueset directories
     private static List<ResourceEntityWithMultipleVersions> resourceList = null;
     private static HashMap<String, ExampleResources> examplesList = null;
+    private static HashMap<String, ResourceEntity> examplesListByName = null;
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
@@ -179,9 +180,30 @@ public class FileCache {
             
             // Swap out for our new list
             resourceList = newList;
+            
+            // And also for examples, but in this case also build a second list keyed on name for faster retrieval
             examplesList = newExamplesList;
+            examplesListByName = buildExampleListByName(newExamplesList);
+            
             printCacheContent();
         }
+    }
+    
+    /**
+     * Takes the in-memory index used for finding examples for specific profile IDs and flips it to
+     * return an index keyed on the example filename
+     * @param oldList
+     * @return
+     */
+    private static HashMap<String, ResourceEntity> buildExampleListByName(HashMap<String, ExampleResources> oldList) {
+    	HashMap<String, ResourceEntity> newList = new HashMap<String, ResourceEntity>();
+    	for (String key : oldList.keySet()) {
+    		ExampleResources examples = oldList.get(key);
+    		for (ResourceEntity example : examples) {
+    			newList.put(example.getResourceName(), example);
+    		}
+    	}
+    	return newList;
     }
     
     private static ArrayList<ResourceEntityWithMultipleVersions> cacheFHIRResources(ResourceType resourceType){
@@ -335,7 +357,7 @@ public class FileCache {
 	            	                    							profileParts[profileParts.length-1];
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
-	            	                    ResourceEntity newEntity = new ResourceEntity(null, thisFile, EXAMPLES, false, null,
+	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
 	            								null, true, resourceID, null, null, null);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
@@ -475,6 +497,13 @@ public class FileCache {
             updateCache();
         }
 		return examplesList.get(resourceTypeAndID);
+	}
+
+	public static ResourceEntity getExampleByName(String resourceFilename) {
+		if(updateRequired()) {
+            updateCache();
+        }
+		return examplesListByName.get(resourceFilename);
 	}
 
     

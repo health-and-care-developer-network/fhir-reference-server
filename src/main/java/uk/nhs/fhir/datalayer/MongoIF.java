@@ -247,4 +247,9 @@ public class MongoIF implements Datasource {
 	public ExampleResources getExamples(String resourceTypeAndID) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public ResourceEntity getExampleByName(String resourceFilename) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

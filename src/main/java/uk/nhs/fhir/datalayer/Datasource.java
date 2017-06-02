@@ -118,4 +118,11 @@ public interface Datasource {
      * @return
      */
     ExampleResources getExamples(String resourceTypeAndID);
+    
+    /**
+     * Gets a specific example using its filename
+     * @param resourceFilename
+     * @return
+     */
+    ResourceEntity getExampleByName(String resourceFilename);
 }
