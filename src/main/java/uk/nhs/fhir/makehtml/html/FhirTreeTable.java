@@ -186,10 +186,13 @@ public class FhirTreeTable {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		List<LinkData> typeLinks = nodeToAdd.getTypeLinks();
-		if (NewMain.STRICT && typeLinks.isEmpty()) {
-			throw new IllegalStateException("No type links available for " + nodeToAdd.getPath());
-		} else {
-			System.out.println("No type links available for " + nodeToAdd.getPath());
+		
+		if (typeLinks.isEmpty()) {
+			if (NewMain.STRICT) {
+				throw new IllegalStateException("No type links available for " + nodeToAdd.getPath());
+			} else {
+				System.out.println("No type links available for " + nodeToAdd.getPath());
+			}
 		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
@@ -337,14 +340,14 @@ public class FhirTreeTable {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS),
 				Lists.newArrayList(
 					new CSSRule("padding", "0 4px"),
 					new CSSRule("border-collapse", "collapse"))));
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons img"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS + " img"),
 				Lists.newArrayList(
 					new CSSRule("vertical-align", "top"),
 					new CSSRule("float", "left"),
@@ -352,7 +355,7 @@ public class FhirTreeTable {
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-table", ".fhir-table tbody tr"),
+				Lists.newArrayList("." + FhirCSS.TABLE, "." + FhirCSS.TABLE + " tbody tr"),
 				Lists.newArrayList(
 					new CSSRule("border-collapse", "collapse"),
 					new CSSRule("vertical-align", "top"),
@@ -360,7 +363,7 @@ public class FhirTreeTable {
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons", ".fhir-tree-icons img", ".fhir-table"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS, "." + FhirCSS.TREE_ICONS + " img", "." + FhirCSS.TABLE),
 				Lists.newArrayList(
 					new CSSRule("-webkit-border-horizontal-spacing", "0"),
 					new CSSRule("-webkit-border-vertical-spacing", "0"))));
@@ -384,7 +387,7 @@ public class FhirTreeTable {
 		}*/
 		
 		iconStyles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-tree-resource-icon"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TREE_RESOURCE_ICON),
 				Lists.newArrayList(
 					new CSSRule("padding-right", "4px"),
 					new CSSRule("background-color", "white"),

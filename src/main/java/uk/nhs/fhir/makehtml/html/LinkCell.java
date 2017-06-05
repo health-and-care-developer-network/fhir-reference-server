@@ -140,10 +140,10 @@ public class LinkCell extends TableCell {
 	
 	Element makeDataCell(List<Content> children) {
 		if (getFaded()) {
-			cellClasses.add("fhir-text-faded");
+			cellClasses.add(FhirCSS.TEXT_FADED);
 		}
 		if (getStrikethrough()) {
-			cellClasses.add("fhir-text-strikethrough");
+			cellClasses.add(FhirCSS.TEXT_STRIKETHROUGH);
 		}
 		
 		return Elements.addClasses(
@@ -167,18 +167,18 @@ public class LinkCell extends TableCell {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-link"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LINK), 
 				Lists.newArrayList(
 					new CSSRule("text-decoration", "none"),
 					new CSSRule("color", "#005EB8"))));
 
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-text-faded"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_FADED),
 				Lists.newArrayList(
 					new CSSRule("opacity", "0.4"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-text-strikethrough"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_STRIKETHROUGH),
 				Lists.newArrayList(
 					new CSSRule("text-decoration", "line-through"))));
 		

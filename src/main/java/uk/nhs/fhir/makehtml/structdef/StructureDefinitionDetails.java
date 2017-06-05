@@ -99,7 +99,7 @@ public class StructureDefinitionDetails {
 			new Attribute("class", FhirCSS.DETAILS_HEADER_ROW), 
 			Elements.withAttributesAndChildren("td",
 				Lists.newArrayList(
-					new Attribute("class", "fhir-details-header-cell"), 
+					new Attribute("class", FhirCSS.DETAILS_HEADER_CELL), 
 					new Attribute("colspan", "2")), 
 				Lists.newArrayList(
 					Elements.withAttribute("a", 
@@ -119,25 +119,25 @@ public class StructureDefinitionDetails {
 	
 	private void addLabelWithLinkDataRow(List<Element> tableContent, String label, String url, String content) {
 		Element labelCell = linkCell(label, url);
-		Element dataCell = dataCell(content, "fhir-details-data-cell");
+		Element dataCell = dataCell(content, FhirCSS.DETAILS_DATA_CELL);
 		
 		tableContent.add(getDataRow(labelCell, dataCell));
 	}
 	
 	private Element linkCell(String label, String url) {
 		return Elements.withAttributeAndChild("td", 
-			new Attribute("class", "fhir-details-data-cell"),
+			new Attribute("class", FhirCSS.DETAILS_DATA_CELL),
 			Elements.withAttributesAndText("a", 
 				Lists.newArrayList(
 					new Attribute("href", url),
-					new Attribute("class", "fhir-link")),
+					new Attribute("class", FhirCSS.LINK)),
 				label));
 	}
 	
 	private Element simpleStringDataRow(String title, String content) {
 		
-		Element labelCell = dataCell(title, "fhir-details-data-cell");
-		Element dataCell = dataCell(content, "fhir-details-data-cell");
+		Element labelCell = dataCell(title, FhirCSS.DETAILS_DATA_CELL);
+		Element dataCell = dataCell(content, FhirCSS.DETAILS_DATA_CELL);
 		
 		return getDataRow(labelCell, dataCell);
 	}
@@ -150,7 +150,7 @@ public class StructureDefinitionDetails {
 	
 	private Element getDataRow(Element labelCell, Element dataCell) {
 		return Elements.withAttributeAndChildren("tr", 
-			new Attribute("class", "fhir-details-data-row"),
+			new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
 				Lists.newArrayList(
 					labelCell,
 					dataCell));
@@ -188,14 +188,14 @@ public class StructureDefinitionDetails {
 	
 	private Element getLinkRow(String title, String titleLink, List<LinkData> linkDatas) {
 		return Elements.withAttributeAndChildren("tr", 
-			new Attribute("class", "fhir-details-data-row"),
+			new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
 				Lists.newArrayList(
 					linkCell(title, titleLink),
 					linkCell(linkDatas)));
 	}
 	
 	private Element linkCell(List<LinkData> linkDatas) {
-		return new LinkCell(linkDatas, Sets.newHashSet("fhir-details-data-cell"), Sets.newHashSet(), false, false).makeCell();
+		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet(), false, false).makeCell();
 	}
 
 	private void addListDataIfPresent(List<Element> tableContent, String label, List<String> listData) {
@@ -226,9 +226,9 @@ public class StructureDefinitionDetails {
 			
 			tableContent.add(
 				getDataRow(
-					dataCell("Invariants", "fhir-details-data-cell"), 
+					dataCell("Invariants", FhirCSS.DETAILS_DATA_CELL), 
 					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", "fhir-details-data-cell"), 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
 						constraintInfos)));
 		}
 	}
@@ -270,13 +270,13 @@ public class StructureDefinitionDetails {
 			
 			tableContent.add(
 				getDataRow(
-					dataCell("Slicing", "fhir-details-data-cell"),
+					dataCell("Slicing", FhirCSS.DETAILS_DATA_CELL),
 					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", "fhir-details-data-cell"), 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
 						Lists.newArrayList(
 							new Text("This element introduces a set of slices. The slicing rules are:"),
 							Elements.withAttributeAndChildren("ul", 
-								new Attribute("class", "fhir-list"), 
+								new Attribute("class", FhirCSS.LIST), 
 								renderedSlicingInfo)))));
 		}
 	}
@@ -365,7 +365,7 @@ public class StructureDefinitionDetails {
 		List<CSSStyleBlock> iconStyles = Lists.newArrayList();
 		
 		iconStyles.add(
-				new CSSStyleBlock(Lists.newArrayList(".fhir-list"),
+				new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LIST),
 					Lists.newArrayList(
 						new CSSRule("margin", "0px"))));
 			

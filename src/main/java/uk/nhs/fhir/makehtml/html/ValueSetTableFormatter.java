@@ -411,7 +411,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                         new Attribute("class", fhirMetadataClass),
                         Elements.withAttributesAndChildren("a",
                                 Lists.newArrayList(
-                                        new Attribute("class", "fhir-link"),
+                                        new Attribute("class", FhirCSS.LINK),
                                         new Attribute("href", Dstu2Fix.dstu2links(value)),
                                          new Attribute("title", hint)),
                                 Lists.newArrayList(

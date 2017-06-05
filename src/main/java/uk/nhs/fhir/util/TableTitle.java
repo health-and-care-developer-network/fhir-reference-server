@@ -7,6 +7,8 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.html.FhirCSS;
+
 public class TableTitle {
 	private final String title;
 	private final String hoverText;
@@ -47,7 +49,7 @@ public class TableTitle {
 				Lists.newArrayList(
 					new Attribute("title", hoverText),
 					new Attribute("style", styleValue),
-					new Attribute("class", "fhir-table-title")), 
+					new Attribute("class", FhirCSS.TABLE_TITLE)), 
 				title);
 	}
 }

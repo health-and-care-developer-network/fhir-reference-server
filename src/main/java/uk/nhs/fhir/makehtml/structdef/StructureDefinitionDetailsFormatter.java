@@ -26,6 +26,7 @@ import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.html.CSSRule;
+import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -95,7 +96,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		
 		Element table = 
 			Elements.withAttributeAndChildren("table",
-				new Attribute("class", "fhir-table"),
+				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
 		FhirPanel panel = new FhirPanel("Details", table);
@@ -132,7 +133,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-details-header-row"),
+				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_ROW),
 				Lists.newArrayList(
 					new CSSRule("font-size", "12px"),
 					new CSSRule("font-family", "verdana"),
@@ -147,7 +148,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-details-data-row", ".fhir-details-data-cell"),
+				Lists.newArrayList("." + FhirCSS.DETAILS_DATA_ROW, "." + FhirCSS.DETAILS_DATA_CELL),
 				Lists.newArrayList(
 					new CSSRule("padding", "3px"),
 					new CSSRule("font-family", "verdana"),
@@ -159,7 +160,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-details-header-cell"),
+				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_CELL),
 				Lists.newArrayList(
 					new CSSRule("font-size", "12px"),
 					new CSSRule("font-family", "verdana"),

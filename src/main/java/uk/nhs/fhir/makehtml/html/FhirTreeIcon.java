@@ -72,7 +72,7 @@ public enum FhirTreeIcon {
 		
 		rules.add(
 			new CSSStyleBlock(
-				Lists.newArrayList("img." + "fhir-tree-icon"), 
+				Lists.newArrayList("img." + FhirCSS.TREE_ICON), 
 				Lists.newArrayList(
 					new CSSRule("background-color", "white"),
 					new CSSRule("border", "0"),

@@ -91,19 +91,19 @@ public class Table {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList("tr", ".fhir-table-title"), 
+			new CSSStyleBlock(Lists.newArrayList("tr", "." + FhirCSS.TABLE_TITLE), 
 				Lists.newArrayList(
 					new CSSRule("font-size", "11px"),
 					new CSSRule("font-family", "verdana"),
 					new CSSRule("vertical-align", "top"),
 					new CSSRule("border", "0"))));
 		
-		styles.add(new CSSStyleBlock(Lists.newArrayList("td", ".fhir-table-title"), 
+		styles.add(new CSSStyleBlock(Lists.newArrayList("td", "." + FhirCSS.TABLE_TITLE), 
 			Lists.newArrayList(
 				new CSSRule("padding", "0px 4px"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-panel-heading-box"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL_HEADING_BOX), 
 				Lists.newArrayList(
 					new CSSRule("margin", "-15px -15px 15px"),
 					new CSSRule("padding", "10px 15px"),
@@ -113,7 +113,7 @@ public class Table {
 					new CSSRule("border-top-right-radius", "3px"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-panel-heading-text"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL_HEADING_TEXT), 
 				Lists.newArrayList(
 					new CSSRule("margin-top", "0"),
 					new CSSRule("margin-bottom", "0"),
@@ -127,12 +127,12 @@ public class Table {
 				new CSSRule("line-height", "1.66em"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-table-header-row"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TABLE_HEADER_ROW), 
 				Lists.newArrayList(
 					new CSSRule("border", "1px #F0F0F0 solid"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList("tr", "fhir-table-title", "td"), 
+			new CSSStyleBlock(Lists.newArrayList("tr", FhirCSS.TABLE_TITLE, "td"), 
 				Lists.newArrayList(
 					new CSSRule("text-align", "left"),
 					new CSSRule("vertical-align", "top"))));
@@ -145,7 +145,7 @@ public class Table {
 					new CSSRule("border-collapse", "collapse"))));
 
 		styles.add(new CSSStyleBlock(
-			Lists.newArrayList(".fhir-panel *"),
+			Lists.newArrayList("." + FhirCSS.PANEL + " *"),
 			Lists.newArrayList(
 				new CSSRule("-webkit-box-sizing", "border-box"),
 				new CSSRule("-moz-box-sizing", "border-box"),
@@ -153,7 +153,7 @@ public class Table {
 		
 		// Styling hack to add space between thead and tbody
 		styles.add(new CSSStyleBlock(
-			Lists.newArrayList(".fhir-table tbody:before"),
+			Lists.newArrayList("." + FhirCSS.TABLE + " tbody:before"),
 			Lists.newArrayList(
 				new CSSRule("content", "'-'"),
 				new CSSRule("display", "block"),

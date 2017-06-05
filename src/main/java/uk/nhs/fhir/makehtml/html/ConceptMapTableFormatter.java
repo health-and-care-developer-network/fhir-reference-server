@@ -168,36 +168,36 @@ public class ConceptMapTableFormatter {
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-cell"),
+				Lists.newArrayList("." + FhirCSS.METADATA_CELL),
 				Lists.newArrayList(
 					new CSSRule("border", "1px solid #f0f0f0"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label", ".fhir-telecom-name"),
+					Lists.newArrayList("." + FhirCSS.METADATA_LABEL, "." + FhirCSS.TELECOM_NAME),
 					Lists.newArrayList(
 						new CSSRule("color", "#808080"),
 						new CSSRule("font-weight", "bold"),
 						new CSSRule("font-size", "13"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-label-empty"),
+					Lists.newArrayList("." + FhirCSS.METADATA_LABEL_EMPTY),
 					Lists.newArrayList(
 						new CSSRule("color", "#D0D0D0"),
 						new CSSRule("font-weight", "normal"))));
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-metadata-value", ".fhir-telecom-value"),
+				Lists.newArrayList("." + FhirCSS.METADATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
 				Lists.newArrayList(
 					new CSSRule("color", "#000000"),
 					new CSSRule("font-size", "13"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-value-smalltext"),
+					Lists.newArrayList("." + FhirCSS.METADATA_VALUE_SMALLTEXT),
 					Lists.newArrayList(
 						new CSSRule("font-size", "10"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList(".fhir-metadata-block-title"),
+					Lists.newArrayList("." + FhirCSS.METADATA_BLOCK_TITLE),
 					Lists.newArrayList(
 							new CSSRule("color", "#808080"),
 							new CSSRule("font-weight", "bold"),

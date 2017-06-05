@@ -138,10 +138,9 @@ public class ValueWithInfoCell extends TableCell {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name-block, .fhir-info-tag-block"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK, "." + FhirCSS.INFO_TAG_BLOCK),
 				Lists.newArrayList(
 					new CSSRule("display", "inline"),
-					new CSSRule("background-color", "#cccccc"),
 					new CSSRule("color", "#ffffff"),
 					new CSSRule("font-weight", "bold"),
 					new CSSRule("font-size", "10px"),
@@ -153,27 +152,27 @@ public class ValueWithInfoCell extends TableCell {
 					new CSSRule("border-radius", ".25em"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-info-name-block"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK),
 				Lists.newArrayList(new CSSRule("background-color", "#cccccc"))));
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-info-tag-block"),
+				Lists.newArrayList("." + FhirCSS.INFO_TAG_BLOCK),
 				Lists.newArrayList(new CSSRule("background-color", "#ffbb55"))));
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-info-name-bold"),
+				Lists.newArrayList("." + FhirCSS.INFO_NAME_BOLD),
 				Lists.newArrayList(new CSSRule("font-weight", "bold"))));
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-text-italic"),
+				Lists.newArrayList("." + FhirCSS.TEXT_ITALIC),
 				Lists.newArrayList(new CSSRule("font-style", "italic"))));
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-resource-info-cell"),
+				Lists.newArrayList("." + FhirCSS.RESOURCE_INFO_CELL),
 				Lists.newArrayList(
 					new CSSRule("padding", "5px 4px"),
 					new CSSRule("border-bottom", "1px solid #F0F0F0"))));

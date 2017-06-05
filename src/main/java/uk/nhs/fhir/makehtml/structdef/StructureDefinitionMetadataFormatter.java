@@ -27,6 +27,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.HTMLConstants;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
+import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -129,7 +130,7 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		List<Content> externalSpecMappings = Lists.newArrayList();
 		boolean multipleMappings = mappings.size() >= 2;
 		if (multipleMappings) {
-			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-block-title"), "External Specifications"));
+			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_BLOCK_TITLE), "External Specifications"));
 		}
 		for (Mapping mapping : mappings) {
 			// always present
@@ -148,12 +149,12 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 			displayName += ": ";
 			
 			externalSpecMappings.add(
-				Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), displayName));
+				Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), displayName));
 			if (mappingUri.isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-value"), mappingUri.get()));
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_VALUE), mappingUri.get()));
 			}
 			if (mappingComments.isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-value"), "(" + mappingComments.get() + ")"));
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_VALUE), "(" + mappingComments.get() + ")"));
 			}
 		}
 		
@@ -242,7 +243,7 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		
 		Element table = 
 			Elements.withAttributeAndChildren("table",
-				new Attribute("class", "fhir-table"),
+				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
 		String panelTitleName = display.isPresent() ? display.get() : name;
@@ -264,21 +265,21 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				}
 				
 				String telecomDesc = individualName.isPresent() ? individualName.get() : "General";
-				publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), telecomDesc));
+				publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), telecomDesc));
 				if (individualTelecoms.size() == 1) {
-					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-telecom-name"), ": "));
-					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-value"), individualTelecoms.get(0).getValue()));
+					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), ": "));
+					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), individualTelecoms.get(0).getValue()));
 				} else {
 					for (ContactPointDt individualTelecom : individualTelecoms) {
 						publishingOrgContacts.add(Elements.newElement("br"));
-						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-value"), "\t" + individualTelecom.getValue()));
+						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), "\t" + individualTelecom.getValue()));
 					}
 				}
 			}
 		}
 		
 		if (!publishingOrgContacts.isEmpty()) {
-			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", "fhir-metadata-label"), "Contacts"));
+			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_LABEL), "Contacts"));
 			publishingOrgContacts.add(1, Elements.newElement("br"));
 		}
 		
