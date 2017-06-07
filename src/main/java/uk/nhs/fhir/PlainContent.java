@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -146,7 +147,7 @@ public class PlainContent extends CORSInterceptor {
         // We either don't have an operation, or we don't understand the operation, so
         // return a list of resources instead
         if (showList) {
-        	renderListOfResources(theRequestDetails, content, resourceType);
+        	content.append(renderListOfResources(theRequestDetails, resourceType));
         }
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
@@ -387,9 +388,9 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
+    private String renderListOfResources(RequestDetails theRequestDetails, ResourceType resourceType) {
 
-        Map<String, String[]> params = theRequestDetails.getParameters();
+        /*Map<String, String[]> params = theRequestDetails.getParameters();
 
         content.append(GenerateIntroSection());
 
@@ -407,7 +408,59 @@ public class PlainContent extends CORSInterceptor {
             content.append(myWebHandler.getAGroupedListOfResources(resourceType));
         }
         content.append("</ul>");
-        content.append("</div>");
+        content.append("</div>");*/
+    	
+    	VelocityContext context = new VelocityContext();
+    	Template template = null;
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
+    	
+    	Map<String, String[]> params = theRequestDetails.getParameters();
+    	
+    	if (params.containsKey("name") || params.containsKey("name:contains")) {
+            
+    		// We are showing a list of matching resources for the specified name query
+    		List<ResourceEntity> list = null;
+    		
+    		if (params.containsKey("name")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
+            } else if (params.containsKey("name:contains")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
+            }
+
+            try {
+          	  template = Velocity.getTemplate("/velocity-templates/search-results.vm");
+          	} catch( Exception e ) {
+          		e.printStackTrace();
+          	}
+          	
+          	// Put content into template
+          	context.put( "list", list );
+          	context.put( "resourceType", resourceType );
+          	context.put( "baseURL", baseURL );
+          	
+          	StringWriter sw = new StringWriter();
+          	template.merge( context, sw );
+          	return sw.toString();
+    		
+        } else {
+        	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
+        	HashMap<String, List<ResourceEntity>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
+        	
+        	try {
+        	  template = Velocity.getTemplate("/velocity-templates/list.vm");
+        	} catch( Exception e ) {
+        		e.printStackTrace();
+        	}
+        	
+        	// Put content into template
+        	context.put( "groupedResources", groupedResources );
+        	context.put( "resourceType", resourceType );
+        	context.put( "baseURL", baseURL );
+        	
+        	StringWriter sw = new StringWriter();
+        	template.merge( context, sw );
+        	return sw.toString();
+        }
     }
 
     /**

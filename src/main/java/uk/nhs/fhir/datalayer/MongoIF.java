@@ -229,7 +229,7 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+	public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

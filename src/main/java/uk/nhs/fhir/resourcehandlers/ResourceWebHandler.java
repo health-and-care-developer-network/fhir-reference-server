@@ -47,8 +47,6 @@ public class ResourceWebHandler {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     
-    private static String startOfBaseResourceBox = null;
-    private static String endOfBaseResourceBox = null;
     Datasource myDataSource = null;
 
     public ResourceWebHandler(Datasource dataSource) {
@@ -64,82 +62,29 @@ public class ResourceWebHandler {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
-        endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
         LOG.fine("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    /*public String getAllStructureDefinitionNames(String resourceType) {
-        LOG.fine("Called: ResourceWebHandler.getAllNames()");
-        List<String> myNames = myDataSource.getAllResourceNames(ResourceType.STRUCTUREDEFINITION);
-        StringBuilder sb = new StringBuilder();
-        
-        for(String name : myNames) {
-            sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
-            sb.append("<br />");
-        }
-        return sb.toString();
-    }*/
     
-    public String getAGroupedListOfResources(ResourceType resourceType) {
+    
+    public HashMap<String, List<ResourceEntity>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.fine("Called: ResourceWebHandler.getAlGroupedNames()");
-        StringBuilder sb = new StringBuilder();
-        
         if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
         		|| resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
-        	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
-        	
             HashMap<String, List<ResourceEntity>> myNames = null;
-            
             if(resourceType == STRUCTUREDEFINITION) {
-            	myNames = myDataSource.getAllResourceNamesByBaseResource(resourceType);
+            	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
-            	myNames = myDataSource.getAllResourceNamesByCategory(resourceType);
-            }
-            
-            for(String base : myNames.keySet()) {
-                    sb.append(startOfBaseResourceBox);
-                    sb.append(base);
-                    sb.append(endOfBaseResourceBox);
-                    for(ResourceEntity resource : myNames.get(base)) {
-                    	String name_for_url = resource.getResourceID();
-						try {
-							name_for_url = URLEncoder.encode(resource.getResourceID(), Charset.defaultCharset().name());
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                    	sb.append("<li><a href=").append(resourceType.getHAPIName()).append('/').append(name_for_url).append('>').append(resource.getResourceName()).append("</a></li>");
-	                }
-                sb.append("</ul></section></div></div>");
+            	return myDataSource.getAllResourceNamesByCategory(resourceType);
             }
         }
-        
-        /*
-        if(resourceType == VALUESET) {
-            List<String> myNames = myDataSource.getAllValueSetNames();
-            
-            for(String name : myNames) {
-                sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
-            }
-            sb.append("</ul></section></div></div>");        	
-        }*/
-        
-        
-        sb.append("</div>");        
-        return sb.toString();
+        return null;
     }
 
-    public String getAllNames(ResourceType resourceType, String namePart) {
+    public List<ResourceEntity> getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
-        List<String> myResourceIDs = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
-        StringBuilder sb = new StringBuilder();
-        
-        for(String id : myResourceIDs) {
-            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(id).append('>').append(id).append("</a>");
-            sb.append("<br />");
-        }
-        return sb.toString();
+        List<ResourceEntity> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
+        return myResourceList;
     }
     
     public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {

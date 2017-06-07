@@ -102,7 +102,7 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of names, grouped by category (specific to the resourcetype) for the web view

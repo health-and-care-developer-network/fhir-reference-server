@@ -132,10 +132,10 @@ public class FilesystemIF implements Datasource {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
-        List<String> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(resourceType, theNamePart);
+        List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(resourceType, theNamePart);
 
-        for(String id : matchingIDs) {
-        	list.add(getResourceByID(id));
+        for(ResourceEntity entity : matchingIDs) {
+        	list.add(getResourceByID(entity.getResourceID()));
         }
         return list;
     }
@@ -189,14 +189,14 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return a list of IDs of matching resources
      */
-    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of profiles first");
         List<ResourceEntity> resourceList = FileCache.getResourceList();
         
         LOG.info("Now filtering the list to those matching our criteria");
-        ArrayList<String> matches = new ArrayList<String>();
+        ArrayList<ResourceEntity> matches = new ArrayList<ResourceEntity>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
         
@@ -210,7 +210,7 @@ public class FilesystemIF implements Datasource {
             // Now create matcher object.
             Matcher m = r.matcher(resourceName);
             if (m.find()) {
-               matches.add(entry.getResourceID());
+               matches.add(entry);
             }
         }
         LOG.info("Returning matches");
