@@ -43,6 +43,7 @@ import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
@@ -61,7 +62,9 @@ public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
-    Datasource dataSource = null;
+    private static Datasource dataSource = null;
+    private static ResourceWebHandler webber = null;
+    private static RawResourceRender myRawResourceRenderer = null;
 
     //private static String css = FileLoader.loadFileOnClasspath("/style.css");
     //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
@@ -83,7 +86,7 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, dataSource);
         } else if (request.getRequestURI().startsWith("/Examples/")) {
-        	ServletStreamExample.streamExample(request, response, dataSource);
+        	ServletStreamExample.streamExample(request, response, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
@@ -119,8 +122,8 @@ public class RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-
-        ResourceWebHandler webber = new ResourceWebHandler(dataSource);
+        webber = new ResourceWebHandler(dataSource);
+        myRawResourceRenderer = new RawResourceRender(webber);
         IndexServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();

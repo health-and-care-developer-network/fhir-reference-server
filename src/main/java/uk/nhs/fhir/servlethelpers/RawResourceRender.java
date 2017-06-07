@@ -122,7 +122,7 @@ public class RawResourceRender {
      * @param source
      * @return syntax highlighted source
      */
-    private final String syntaxHighlight(String source) {
+    public final String syntaxHighlight(String source) {
         source = source.replaceAll("<([^>/]*)/>", "&lt;~blue~$1~/~/&gt;");
         source = source.replaceAll("<([^>]*)>", "&lt;~blue~$1~/~&gt;");
         source = source.replaceAll("([\\w]+)=\"([^\"]*)\"", "~red~$1~/~~black~=\"~/~~green~$2~/~~black~\"~/~");

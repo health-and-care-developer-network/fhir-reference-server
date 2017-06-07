@@ -16,11 +16,16 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.enums.MimeType;
+import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.PageTemplateHelper;
 
 public class ServletStreamExample {
 	private static final Logger LOG = Logger.getLogger(ServletStreamExample.class.getName());
+	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
 	
-	public static void streamExample(HttpServletRequest request, HttpServletResponse response, Datasource dataSource) throws IOException {
+	public static void streamExample(HttpServletRequest request, HttpServletResponse response, Datasource dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
     	
 		// Parse the URL
 		String exampleName = request.getRequestURI().substring(10);
@@ -33,33 +38,15 @@ public class ServletStreamExample {
 			response.setStatus(200);
 			//response.setContentType("text/html");
 			File srcFile = exampleEntity.getResourceFile();
-		    FileUtils.copyFile(srcFile, response.getOutputStream());
-		    return;
+			
+		    //FileUtils.copyFile(srcFile, response.getOutputStream());
+			
+			String fileContent = FileLoader.loadFile(srcFile);
+			fileContent = myRawResourceRenderer.syntaxHighlight(fileContent);
+			StringBuffer sb = new StringBuffer();
+			myRawResourceRenderer.renderSingleWrappedRAWResource(fileContent, sb, MimeType.XML);
+			
+			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES, exampleName, sb, request.getContextPath());
 		}
-		
-		// Load a supporting artefact
-    	/*String resourceID = request.getParameter("resourceID");
-    	String resourceVersion = request.getParameter("resourceVersion");
-    	String artefactType = request.getParameter("artefactType");
-    	LOG.info("Request to stream artefact: " + artefactType);
-    	
-    	if (resourceID != null && artefactType != null) {
-    		IdDt theId = new IdDt(resourceID);
-    		if (resourceVersion != null) {
-    			theId = theId.withVersion(resourceVersion);
-    		}
-    		ResourceEntity entity = dataSource.getResourceEntityByID(theId);
-    		for (SupportingArtefact artefact : entity.getArtefacts()) {
-    			if (artefact.getArtefactType().name().equals(artefactType)) {
-    				// We've found a matching artefact - stream it back
-    				response.setStatus(200);
-    				response.setContentType("text/html");
-    				File srcFile = artefact.getFilename();
-    			    FileUtils.copyFile(srcFile, response.getOutputStream());
-    			    return;
-    			}
-    		}
-    	}
-    	LOG.severe("Unable to find matching artefact - resourceID=" + resourceID + ", version=" + resourceVersion);*/
 	}
 }
