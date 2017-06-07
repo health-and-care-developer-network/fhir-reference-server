@@ -33,6 +33,7 @@ import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.resourcehandlers.BundleProvider;
+import uk.nhs.fhir.resourcehandlers.ConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.OperationDefinitionProvider;
@@ -120,6 +121,7 @@ public class RestfulServlet extends RestfulServer {
         dataSource = DataSourceFactory.getDataSource();
 
         ResourceWebHandler webber = new ResourceWebHandler(dataSource);
+        IndexServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
@@ -131,6 +133,7 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
         resourceProviders.add(new ImplementationGuideProvider(dataSource));
+        resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");

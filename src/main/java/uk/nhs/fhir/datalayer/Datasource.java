@@ -125,4 +125,10 @@ public interface Datasource {
      * @return
      */
     ResourceEntity getExampleByName(String resourceFilename);
+    
+    /**
+     * Gets a count of how many resources we have of each type
+     * @return
+     */
+    HashMap<String,Integer> getResourceTypeCounts();
 }

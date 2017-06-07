@@ -64,6 +64,7 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
@@ -77,11 +78,13 @@ public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ResourceWebHandler myWebHandler = null;
+    RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
     private static String guidesPath = PropertyReader.getProperty("guidesPath");
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
+        myRawResourceRenderer = new RawResourceRender(webber);
         templateHelper = new PageTemplateHelper();
         Velocity.init(PropertyReader.getProperties());
     }
@@ -135,7 +138,8 @@ public class PlainContent extends CORSInterceptor {
         if (operation != null) {
         	if (operation == READ || operation == VREAD) {
 	        	if (mimeType == XML || mimeType == JSON) {
-	        		resourceName = renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
+	        		resourceName = myRawResourceRenderer.renderSingleWrappedRAWResource(
+	        										theRequestDetails, content, resourceType, mimeType);
 	        		showList = false;
 	        	} else {
 	        		resourceName = renderSingleResource(theRequestDetails, content, resourceType);
@@ -193,7 +197,7 @@ public class PlainContent extends CORSInterceptor {
 	    		renderConformance(content, theResponseObject, mimeType);
 	    		LOG.info(content.toString());
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, "Server Conformance Statement", content, baseURL);
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, null, content, baseURL);
 	    		return false;
     		}
         }
@@ -203,24 +207,15 @@ public class PlainContent extends CORSInterceptor {
 		return true;
 	}
     
-    private String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
-        content.append(GenerateIntroSection());
-        IdDt resourceID = (IdDt)theRequestDetails.getId();
-        content.append(getResourceContent(resourceID, mimeType, resourceType));
-        content.append("</div>");
-        // Return resource name (for breadcrumb)
-        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
-    }
-    
     private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
     	LOG.info("Attempting to render conformance statement");
-    	content.append(GenerateIntroSection());
+    	String resourceContent = null;
     	if (mimeType == JSON) {
-    		content.append(getResourceAsJSON(conformance, null));
+    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, null);
     	} else {
-    		content.append(getResourceAsXML(conformance, null));
+    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, null);
     	}
-        content.append("</div>");
+    	myRawResourceRenderer.renderSingleWrappedRAWResource(resourceContent, content, mimeType);
     }
 
     /**
@@ -256,73 +251,6 @@ public class PlainContent extends CORSInterceptor {
         return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
     }
     
-    private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
-    	
-    	IBaseResource resource = null;
-    	
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	
-    	if (resourceType == STRUCTUREDEFINITION) {
-    		StructureDefinition sd = myWebHandler.getSDByID(resourceID);
-    		sd.setText(textElement);
-    		resource = sd;
-    	} else if (resourceType == VALUESET) {
-    		ValueSet vs = myWebHandler.getVSByID(resourceID);
-    		vs.setText(textElement);
-    		resource = vs;
-    	} else if (resourceType == OPERATIONDEFINITION) {
-     		OperationDefinition od = myWebHandler.getOperationByID(resourceID);
-     		od.setText(textElement);
-     		resource = od;
-    	} else if (resourceType == IMPLEMENTATIONGUIDE) {
-     		ImplementationGuide ig = myWebHandler.getImplementationGuideByID(resourceID);
-     		ig.setText(textElement);
-     		resource = ig;
-     	}
-        
-        if (mimeType == JSON) {
-        	return getResourceAsJSON(resource, resourceID);
-        } else {
-        	return getResourceAsXML(resource, resourceID);
-        }
-    }
-    
-    private String getResourceAsXML(IBaseResource resource, IdDt resourceID) {
-        // Serialise it to XML
-        FhirContext ctx = FhirContext.forDstu2();
-        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
-        // Encode it for HTML output
-        String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
-        // Wrap it in a div and pre tag
-        StringBuffer out = new StringBuffer();
-        if (resourceID != null) {
-        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
-        }
-        out.append("<div class='rawXML'><pre lang='xml'>");
-        out.append(xml);
-        out.append("</pre></div>");
-        return out.toString();
-    }
-    
-    private String getResourceAsJSON(IBaseResource resource, IdDt resourceID) {
-        // Serialise it to JSON
-        FhirContext ctx = FhirContext.forDstu2();
-        String serialised = ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
-        // Encode it for HTML output
-        //String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
-        // Wrap it in a div and pre tag
-        StringBuffer out = new StringBuffer();
-        if (resourceID != null) {
-        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
-        }
-        out.append("<div class='rawXML'><pre lang='json'>");
-        out.append(serialised);
-        out.append("</pre></div>");
-        return out.toString();
-    }
     
     private String makeResourceURL(IdDt resourceID, String baseURL) {
     	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
@@ -383,32 +311,11 @@ public class PlainContent extends CORSInterceptor {
      * Code called to render a list of resources. for example in response to a
      * url like http://host/fhir/StructureDefinition
      *
-     *
      * @param theRequestDetails
      * @param content
      * @param resourceType
      */
     private String renderListOfResources(RequestDetails theRequestDetails, ResourceType resourceType) {
-
-        /*Map<String, String[]> params = theRequestDetails.getParameters();
-
-        content.append(GenerateIntroSection());
-
-        content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2>");
-
-        content.append("<ul>");
-        if (params.containsKey("name") || params.containsKey("name:contains")) {
-            if (params.containsKey("name")) {
-                content.append(myWebHandler.getAllNames(resourceType, params.get("name")[0]));
-            }
-            if (params.containsKey("name:contains")) {
-                content.append(myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]));
-            }
-        } else {
-            content.append(myWebHandler.getAGroupedListOfResources(resourceType));
-        }
-        content.append("</ul>");
-        content.append("</div>");*/
     	
     	VelocityContext context = new VelocityContext();
     	Template template = null;
@@ -461,33 +368,5 @@ public class PlainContent extends CORSInterceptor {
         	template.merge( context, sw );
         	return sw.toString();
         }
-    }
-
-    /**
-     * Simply encapsulates multiple repeated lines used to build the start of
-     * the html section
-     *
-     * @return
-     */
-    private String GenerateIntroSection() {
-        StringBuilder buffer = new StringBuilder();
-
-        String fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
-        String fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
-
-        buffer.append("<div class='fhirServerGeneratedContent'>");
-        buffer.append(fhirServerWarning);
-        buffer.append(fhirServerNotice);
-        return buffer.toString();
-    }
-
-    /**
-     * Simple helper class to avoid errors caused by null values.
-     *
-     * @param input
-     * @return
-     */
-    private static Object printIfNotNull(Object input) {
-        return (input == null) ? "" : input;
     }
 }

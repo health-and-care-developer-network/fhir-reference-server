@@ -68,7 +68,7 @@ h2.resourceType {
     margin-top: 5px;
 }
 
-.rawXML {
+.rawXML, .rawJSON {
     overflow-x: scroll;
     border: thin solid #d4d2d2;
     padding: 5px;

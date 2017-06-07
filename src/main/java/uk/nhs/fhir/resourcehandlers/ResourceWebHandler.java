@@ -132,4 +132,8 @@ public class ResourceWebHandler {
         ExampleResources examples = myDataSource.getExamples(resourceTypeAndID);
         return examples;
     }
+    
+    public HashMap<String,Integer> getResourceTypeCounts() {
+    	return myDataSource.getResourceTypeCounts();
+    }
 }

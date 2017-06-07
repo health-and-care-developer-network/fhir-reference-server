@@ -226,4 +226,20 @@ public class FilesystemIF implements Datasource {
 	public ResourceEntity getExampleByName(String resourceFilename) {
 		return FileCache.getExampleByName(resourceFilename);
 	}
+
+	@Override
+	public HashMap<String, Integer> getResourceTypeCounts() {
+		HashMap<String, Integer> results = new HashMap<String, Integer>();
+		List<ResourceEntity> list = FileCache.getResourceList();
+		for (ResourceEntity entry : list) {
+			String type = entry.getResourceType().toString();
+			if (results.containsKey(type)) {
+				Integer i = results.get(type);
+				results.put(type, i + 1);
+			} else {
+				results.put(type, new Integer(1));
+			}
+		}
+		return results;
+	}
 }

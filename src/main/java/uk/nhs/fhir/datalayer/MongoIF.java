@@ -252,4 +252,9 @@ public class MongoIF implements Datasource {
 	public ResourceEntity getExampleByName(String resourceFilename) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public HashMap<String, Integer> getResourceTypeCounts() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }
