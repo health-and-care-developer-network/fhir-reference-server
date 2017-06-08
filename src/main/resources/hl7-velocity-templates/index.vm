@@ -30,7 +30,7 @@
 		      <div class="container">        
 		        <img src="/images/hl7logo.png" id="leftlogo">
 		        <h3>HL7 UK INTEROPen CareConnect FHIR Profiles</h3>
-		        <img src="/images/interopenlogo.png" id="rightlogo">
+		        <img src="/images/interopen-transparent.gif" id="rightlogo">
 		      </div>
 	      </a>
 	    </div>

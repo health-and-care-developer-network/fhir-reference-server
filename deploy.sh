@@ -9,7 +9,8 @@ PORT=${PORT:-8080}
 TAG_NAME=$3
 
 IMAGE_NAME=fhir-server
-CONTAINER_NAME=fhir-server
+CONTAINER_NAME=${CONTAINER_NAME:-fhir-server}
+CONFIG_FILE=${CONFIG_FILE}
 
 if [ ! -z $TAG_NAME ]
 then
@@ -47,6 +48,7 @@ docker $TARGET_PREFIX run -p $PORT:8080 --name $CONTAINER_NAME \
 	--restart=on-failure:5 \
         -m $MEMORYFLAG \
 	-c $CPUFLAG \
+	-e "CONFIG_FILE=$CONFIG_FILE" \
 	-v /docker-data/fhir-profiles:/opt/fhir \
 	-v /docker-data/fhir-server-temp:/tmp/jetty \
 	-d $SOURCE
