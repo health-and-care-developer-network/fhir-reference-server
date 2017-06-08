@@ -42,6 +42,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 	private static final Logger LOG = Logger.getLogger(IndexServlet.class.getName());
 	PageTemplateHelper templateHelper = null;
 	private static ResourceWebHandler myWebHandler = null;
+	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 	
 	protected static void setResourceHandler(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
@@ -66,7 +67,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate("/velocity-templates/home.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "home.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}

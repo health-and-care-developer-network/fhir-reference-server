@@ -42,6 +42,7 @@ public class ExtensionServlet extends javax.servlet.http.HttpServlet {
 	private static final Logger LOG = Logger.getLogger(ExtensionServlet.class.getName());
 	PageTemplateHelper templateHelper = null;
 	private static ResourceWebHandler myWebHandler = null;
+	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 	
 	protected static void setResourceHandler(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
@@ -66,7 +67,7 @@ public class ExtensionServlet extends javax.servlet.http.HttpServlet {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate("/velocity-templates/extensions.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "extensions.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}

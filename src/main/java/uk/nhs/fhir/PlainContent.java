@@ -81,6 +81,7 @@ public class PlainContent extends CORSInterceptor {
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
     private static String guidesPath = PropertyReader.getProperty("guidesPath");
+    private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
@@ -269,7 +270,7 @@ public class PlainContent extends CORSInterceptor {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate("/velocity-templates/resource.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "resource.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}
@@ -335,7 +336,7 @@ public class PlainContent extends CORSInterceptor {
             }
 
             try {
-          	  template = Velocity.getTemplate("/velocity-templates/search-results.vm");
+          	  template = Velocity.getTemplate(templateDirectory + "search-results.vm");
           	} catch( Exception e ) {
           		e.printStackTrace();
           	}
@@ -354,7 +355,7 @@ public class PlainContent extends CORSInterceptor {
         	HashMap<String, List<ResourceEntity>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
         	
         	try {
-        	  template = Velocity.getTemplate("/velocity-templates/list.vm");
+        	  template = Velocity.getTemplate(templateDirectory + "list.vm");
         	} catch( Exception e ) {
         		e.printStackTrace();
         	}

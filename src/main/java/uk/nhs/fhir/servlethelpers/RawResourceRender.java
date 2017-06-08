@@ -25,10 +25,12 @@ import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.PropertyReader;
 
 public class RawResourceRender {
 	
 	ResourceWebHandler myWebHandler = null;
+	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 	
 	public RawResourceRender(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
@@ -46,7 +48,7 @@ public class RawResourceRender {
     	VelocityContext context = new VelocityContext();
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate("/velocity-templates/raw-resource.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "raw-resource.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}

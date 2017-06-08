@@ -22,6 +22,7 @@ import static uk.nhs.fhir.enums.ResourceType.*;
 public class PageTemplateHelper {
 	
 	private static final Logger LOG = Logger.getLogger(PageTemplateHelper.class.getName());
+	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
     
     public PageTemplateHelper() {
     	Velocity.init(PropertyReader.getProperties());
@@ -32,7 +33,7 @@ public class PageTemplateHelper {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate("/velocity-templates/index.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "index.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}

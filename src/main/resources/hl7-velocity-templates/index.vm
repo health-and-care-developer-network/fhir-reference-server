@@ -11,6 +11,12 @@
 		<title>HL7 UK FHIR Reference Server</title>
 		<meta name="Content-Type" content="text/html"/>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<!-- Bootstrap and JQuery -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="/js/jquery-ui/jquery-ui.css" rel="stylesheet">
 	
 		<link rel="stylesheet" href="/hl7style.css"/>
 		
@@ -28,17 +34,28 @@
 		      </div>
 	      </a>
 	    </div>
-		<div class="main">
-			<div class="wrapper cf container">{{PAGE-CONTENT}}</div><!--end main_content-->
-		</div><!-- end main -->
+	    <div class="container">
 
-		<footer>
-			<div class="links">
-				<li><a href="http://www.hl7.org.uk/">HL7 UK Home Page</a></li>
-			</div>
-			<div class="copyright">
-				<a target="_blank" href="https://www.nationalarchives.gov.uk/information-management/our-services/crown-copyright.htm" class="copyright">&copy; Crown Copyright 2017</a>
-			</div>
-		</footer>
+		    <div class="breadcrumbs">
+		    	#parse( "/hl7-velocity-templates/breadcrumbs.vm" )
+		    </div>
+
+			<div class="main">
+				<div class="wrapper cf container">$page-content</div><!--end main_content-->
+			</div><!-- end main -->
+	
+			<footer>
+				<div class="links">
+					<li><a href="http://www.hl7.org.uk/">HL7 UK Home Page</a></li>
+				</div>
+				<div class="copyright">
+					&copy;2017 HL7 UK</a>
+				</div>
+			</footer>
+		</div>
+		
+		<!-- JQuery UI and site scripts -->
+		<script src="/js/jquery-ui/jquery-ui.js"></script>
+		<script src="/js/site-functions.js"></script>
 	</body>
 </html>
