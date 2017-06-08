@@ -50,6 +50,7 @@
 				</a>
 		</li>
 	</ul>
+	<!--
 	<h3>ImplementationGuide</h3>
 	<ul>
 		<li><a href="/ImplementationGuide">List all ImplementationGuides
@@ -75,3 +76,4 @@
 		</li>
 		<li><a href="/metadata">Download conformance resource for this FHIR server</a></li>
 	</ul>
+	-->
