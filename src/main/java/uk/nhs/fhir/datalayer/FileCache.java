@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
@@ -103,6 +106,7 @@ public class FileCache {
         	if (entry.getLatest().isExtension())
         		results.add(entry.getLatest());
         }
+		Collections.sort(results);
         return results;
 	}
     
@@ -264,6 +268,7 @@ public class FileCache {
 	                String url = null;
 	                String extensionCardinality = null;
 	                ArrayList<String> extensionContexts = null;
+	                String extensionDescription = null;
 	                
 	                try {
 		                if (resourceType == STRUCTUREDEFINITION) {
@@ -275,7 +280,6 @@ public class FileCache {
 		                		baseType = profile.getConstrainedType();
 		                	} else {
 		                		// Extra metadata for extensions
-		                		baseType = profile.getContextType();
 		                		int min = profile.getSnapshot().getElementFirstRep().getMin();
 		                		String max = profile.getSnapshot().getElementFirstRep().getMax();
 		                		extensionCardinality = min + ".." + max;
@@ -285,6 +289,27 @@ public class FileCache {
 		                		for (StringDt context : contextList) {
 		                			extensionContexts.add(context.getValueAsString());
 		                		}
+		                		
+		                		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+		                		
+		                		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
+		                		boolean isSimple = false;
+		                		if (diffElements.size() == 3) {
+		                			if (diffElements.get(1).getPath().equals("Extension.url")) {
+		                				isSimple = true;
+		                				// It is a simple extension, so we can also find a type
+		                				List<Type> typeList = diffElements.get(2).getType();
+		                				if (typeList.size() == 1) {
+		                					baseType = typeList.get(0).getCode();
+		                				} else {
+		                					baseType = "(choice)";
+		                				}
+		                			}
+		                		}
+		                		if (!isSimple) {
+		                			baseType = "(complex)";
+		                		}
+		                	
 		                	}
 		                    url = profile.getUrl();
 		                    resourceID = getResourceIDFromURL(url, name);
@@ -325,7 +350,7 @@ public class FileCache {
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
 								displayGroup, example, resourceID, versionNo, status, artefacts, extensionCardinality,
-								extensionContexts);
+								extensionContexts, extensionDescription);
 		                
 		                addToResourceList(newFileList,newEntity);
 		                
@@ -396,7 +421,7 @@ public class FileCache {
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
 	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
-	            								null, true, resourceID, null, null, null, null, null);
+	            								null, true, resourceID, null, null, null, null, null, null);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
 	            	                    	examplesList.get(profileResourceID).add(newEntity);
