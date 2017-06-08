@@ -155,7 +155,7 @@ public class PlainContent extends CORSInterceptor {
         }
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
-        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, resourceName, content, baseURL);
+        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType.toString(), resourceName, content, baseURL);
         
         return false;
     }
@@ -197,7 +197,7 @@ public class PlainContent extends CORSInterceptor {
 	    		renderConformance(content, theResponseObject, mimeType);
 	    		LOG.info(content.toString());
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, null, content, baseURL);
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE.toString(), null, content, baseURL);
 	    		return false;
     		}
         }

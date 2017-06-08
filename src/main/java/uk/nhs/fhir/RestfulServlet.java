@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -124,7 +125,10 @@ public class RestfulServlet extends RestfulServer {
         dataSource = DataSourceFactory.getDataSource();
         webber = new ResourceWebHandler(dataSource);
         myRawResourceRenderer = new RawResourceRender(webber);
+        
+        // Pass our resource handler to the other servlets
         IndexServlet.setResourceHandler(webber);
+        ExtensionServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));

@@ -162,6 +162,15 @@ public class FilesystemIF implements Datasource {
     }
     
     /**
+     * Get a list of all extensions to show in the extensions registry
+     * @return
+     */
+    public List<ResourceEntity> getExtensions()  {
+    	LOG.info("Getting all Extensions");
+        return FileCache.getExtensions();
+    }
+    
+    /**
      * Gets a full list of names grouped by base resource for the web view 
      * of /StructureDefinition requests.
      * 
@@ -233,6 +242,9 @@ public class FilesystemIF implements Datasource {
 		List<ResourceEntity> list = FileCache.getResourceList();
 		for (ResourceEntity entry : list) {
 			String type = entry.getResourceType().toString();
+			if (entry.isExtension()) {
+				type = "Extension";
+			}
 			if (results.containsKey(type)) {
 				Integer i = results.get(type);
 				results.put(type, i + 1);

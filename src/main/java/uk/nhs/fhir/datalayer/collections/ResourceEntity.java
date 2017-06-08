@@ -18,11 +18,14 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private VersionNumber versionNo = null;
 	private String status = null;
 	ArrayList<SupportingArtefact> artefacts = null;
+	private String extensionCardinality = null;
+	ArrayList<String> extensionContexts = null;
 	
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,
-							ArrayList<SupportingArtefact> artefacts) {
+							ArrayList<SupportingArtefact> artefacts, String cardinality,
+							ArrayList<String> extensionContexts) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -34,6 +37,8 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.versionNo = versionNo;
 		this.status = status;
 		this.artefacts = artefacts;
+		this.extensionCardinality = cardinality;
+		this.extensionContexts = extensionContexts;
 	}
 	
 	public String getResourceName() {
@@ -153,5 +158,21 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 
 	public void setArtefacts(ArrayList<SupportingArtefact> artefacts) {
 		this.artefacts = artefacts;
+	}
+
+	public String getExtensionCardinality() {
+		return extensionCardinality;
+	}
+
+	public void setExtensionCardinality(String extensionCardinality) {
+		this.extensionCardinality = extensionCardinality;
+	}
+
+	public ArrayList<String> getExtensionContexts() {
+		return extensionContexts;
+	}
+
+	public void setExtensionContexts(ArrayList<String> extensionContexts) {
+		this.extensionContexts = extensionContexts;
 	}
 }

@@ -89,6 +89,12 @@ public interface Datasource {
     List<String> getAllResourceNames(ResourceType resourceType);
 
     /**
+     * Get a list of all extensions to show in the extensions registry
+     * @return
+     */
+    List<ResourceEntity> getExtensions();
+    
+    /**
      * Gets a full list of names, grouped by base resource for the web view of
      * /StructureDefinition requests.
      *

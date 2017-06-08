@@ -46,7 +46,7 @@ public class ServletStreamExample {
 			StringBuffer sb = new StringBuffer();
 			myRawResourceRenderer.renderSingleWrappedRAWResource(fileContent, sb, MimeType.XML);
 			
-			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES, exampleName, sb, request.getContextPath());
+			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES.toString(), exampleName, sb, request.getContextPath());
 		}
 	}
 }

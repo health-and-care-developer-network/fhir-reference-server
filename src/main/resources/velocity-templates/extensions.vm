@@ -1,0 +1,30 @@
+<div class='fhirServerGeneratedContent'>
+	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental, and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
+
+	<table id="extensionTable">
+		<tr>
+			<th>ID</th>
+			<th>Description</th>
+			<th><a href="defining-extensions.html#cardinality">Card.</a></th>
+			<th>Type</th>
+			<th>Context</th>
+			<th><a href="versions.html#maturity">FMM</a></th>
+		</tr>
+		
+		#foreach( $extension in $extensions )
+		<tr>
+			<td><a href="/StructureDefinition/$extension.getResourceID()">$extension.getResourceName()</a></td>
+			<td>&nbsp;</td>
+			<td>$extension.getExtensionCardinality()</td>
+			<td>$extension.getBaseType()</td>
+			<td>
+				#foreach( $extensionContext in $extension.getExtensionContexts() )
+					<p>$extensionContext</p>
+				#end
+			</td>
+			<td>&nbsp;</td>
+		</tr>
+		#end
+		
+	</table>
+</div>

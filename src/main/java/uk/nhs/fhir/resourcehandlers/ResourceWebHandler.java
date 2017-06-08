@@ -87,6 +87,11 @@ public class ResourceWebHandler {
         return myResourceList;
     }
     
+    public List<ResourceEntity> getExtensions() {
+        LOG.fine("Called: ResourceWebHandler.getExtensions()");
+        return myDataSource.getExtensions();
+    }
+    
     public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getVersionsForID(IdDt id)");
         return myDataSource.getVersionsByID(id);

@@ -1,3 +1,16 @@
+#extensionTable {
+	width:100%;
+}
+
+#extensionTable th {
+	font-weight: bold;
+	border-bottom: solid thin lightgrey;
+}
+
+#extensionTable td {
+	border-bottom: solid thin lightgrey;
+}
+
 #tabs ul {
 	margin-left: 0px;
 }

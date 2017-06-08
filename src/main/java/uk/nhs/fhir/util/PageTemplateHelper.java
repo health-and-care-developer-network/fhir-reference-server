@@ -27,7 +27,7 @@ public class PageTemplateHelper {
     	Velocity.init(PropertyReader.getProperties());
     }
     
-    public String wrapContentInTemplate(ResourceType resourceType, String resourceName, StringBuffer content, String baseURL) {
+    public String wrapContentInTemplate(String resourceType, String resourceName, StringBuffer content, String baseURL) {
     	VelocityContext context = new VelocityContext();
     	
     	Template template = null;
@@ -48,7 +48,7 @@ public class PageTemplateHelper {
     	return sw.toString();
     }
     
-    public void streamTemplatedHTMLresponse(HttpServletResponse theResponse, ResourceType resourceType,
+    public void streamTemplatedHTMLresponse(HttpServletResponse theResponse, String resourceType,
     									String resourceName, StringBuffer content, String baseURL) {
     	try {
 	    	// Initialise the output

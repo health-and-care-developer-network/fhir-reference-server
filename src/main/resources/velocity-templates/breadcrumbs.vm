@@ -13,7 +13,7 @@
 			<li>
 				<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
 					<span typeof="v:Breadcrumb">
-						<a href="$baseURL" rel="v:url" property="v:title">FHIR Reference Server</a>
+						<a href="/" rel="v:url" property="v:title">FHIR Reference Server</a>
 						<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
 			</li>
 			#if($resourceName)

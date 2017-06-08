@@ -257,4 +257,9 @@ public class MongoIF implements Datasource {
 	public HashMap<String, Integer> getResourceTypeCounts() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public List<ResourceEntity> getExtensions() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

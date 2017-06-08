@@ -41,6 +41,7 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
@@ -90,6 +91,23 @@ public class FileCache {
     }
     
     /**
+     * Get a list of all extensions to show in the extensions registry
+     * @return
+     */
+    public static List<ResourceEntity> getExtensions()  {
+    	List<ResourceEntity> results = new ArrayList<ResourceEntity>();
+    	if(updateRequired()) {
+            updateCache();
+        }
+		for(ResourceEntityWithMultipleVersions entry : resourceList) {
+        	if (entry.getLatest().isExtension())
+        		results.add(entry.getLatest());
+        }
+        return results;
+	}
+    
+    
+    /**
      * Return resource list grouped into sensible groups
      * @param resourceType
      * @return
@@ -105,16 +123,18 @@ public class FileCache {
             for(ResourceEntityWithMultipleVersions entry : resourceList) {
             	if (entry.getLatest().getResourceType() == resourceType) {
 	            	boolean isExtension = entry.getLatest().isExtension();
-	                //TODO: Show extensions differently?
 	                String group = entry.getLatest().getDisplayGroup();
-	                String name = entry.getLatest().getResourceName();
-	                if(result.containsKey(group)) {
-	                    List<ResourceEntity> resultEntry = result.get(group);
-	                    resultEntry.add(entry.getLatest());
-	                } else {
-	                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
-	                    resultEntry.add(entry.getLatest());
-	                    result.put(group, resultEntry);
+	                
+	                // Don't include extensions
+	                if (!isExtension) {
+		                if(result.containsKey(group)) {
+		                    List<ResourceEntity> resultEntry = result.get(group);
+		                    resultEntry.add(entry.getLatest());
+		                } else {
+		                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
+		                    resultEntry.add(entry.getLatest());
+		                    result.put(group, resultEntry);
+		                }
 	                }
             	}
             }
@@ -242,13 +262,30 @@ public class FileCache {
 	                VersionNumber versionNo = null;
 	                String status = null;
 	                String url = null;
+	                String extensionCardinality = null;
+	                ArrayList<String> extensionContexts = null;
 	                
 	                try {
 		                if (resourceType == STRUCTUREDEFINITION) {
 		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
 		                	name = profile.getName();
 		                	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-		                    baseType = profile.getConstrainedType();
+		                    
+		                	if (!extension) {
+		                		baseType = profile.getConstrainedType();
+		                	} else {
+		                		// Extra metadata for extensions
+		                		baseType = profile.getContextType();
+		                		int min = profile.getSnapshot().getElementFirstRep().getMin();
+		                		String max = profile.getSnapshot().getElementFirstRep().getMax();
+		                		extensionCardinality = min + ".." + max;
+		                		
+		                		extensionContexts = new ArrayList<String>();
+		                		List<StringDt> contextList = profile.getContext();
+		                		for (StringDt context : contextList) {
+		                			extensionContexts.add(context.getValueAsString());
+		                		}
+		                	}
 		                    url = profile.getUrl();
 		                    resourceID = getResourceIDFromURL(url, name);
 		                    displayGroup = baseType;
@@ -287,7 +324,8 @@ public class FileCache {
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
-								displayGroup, example, resourceID, versionNo, status, artefacts);
+								displayGroup, example, resourceID, versionNo, status, artefacts, extensionCardinality,
+								extensionContexts);
 		                
 		                addToResourceList(newFileList,newEntity);
 		                
@@ -358,7 +396,7 @@ public class FileCache {
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
 	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
-	            								null, true, resourceID, null, null, null);
+	            								null, true, resourceID, null, null, null, null, null);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
 	            	                    	examplesList.get(profileResourceID).add(newEntity);
@@ -498,7 +536,7 @@ public class FileCache {
         }
 		return examplesList.get(resourceTypeAndID);
 	}
-
+	
 	public static ResourceEntity getExampleByName(String resourceFilename) {
 		if(updateRequired()) {
             updateCache();
