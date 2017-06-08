@@ -1,5 +1,8 @@
 package uk.nhs.fhir.makehtml.data;
 
+import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.NewMain;
+
 /**
  * Data class holding information for a link to be displayed on a screen
  */
@@ -17,6 +20,12 @@ public class SimpleLinkData implements LinkData {
 		return this;
 	}
 	public String getURL() {
+		if (NewMain.FHIR_HL7_ORG_LINKS_LOCAL) {
+			if (url.startsWith(HTMLConstants.FHIR_HL7_ORG_UK)) {
+				String localUrl = url.substring(HTMLConstants.FHIR_HL7_ORG_UK.length());
+				return localUrl;
+			}
+		}
 		return url;
 	}
 	public String getText() {

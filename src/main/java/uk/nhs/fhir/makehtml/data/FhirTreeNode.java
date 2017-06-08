@@ -8,7 +8,6 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.makehtml.NewMain;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -17,7 +16,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
 	private final Optional<String> max;
-	//private final FhirCardinality cardinality;
 	private final List<LinkData> typeLinks;
 	private final String information;
 	private final List<ConstraintInfo> constraints;
@@ -28,7 +26,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
-	private Optional<ElementDefinitionDt> element = Optional.empty();
 	private Optional<String> definition = Optional.empty();
 	private Optional<String> requirements = Optional.empty();
 	private Optional<String> comments = Optional.empty();
@@ -45,7 +42,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			ResourceFlags flags,
 			Integer min,
 			String max,
-			//FhirCardinality cardinality,
 			List<LinkData> typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
@@ -55,36 +51,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.resourceFlags = flags;
 		this.min = Optional.ofNullable(min);
 		this.max = Optional.ofNullable(max);
-		//this.cardinality = cardinality;
 		this.typeLinks = typeLinks;
 		this.information = information;
 		this.constraints = constraints;
 		this.path = path;
-	}
-
-	public FhirTreeNode(
-			FhirIcon icon,
-			Optional<String> name,
-			ResourceFlags flags,
-			Integer min,
-			String max,
-			//FhirCardinality cardinality,
-			List<LinkData> typeLinks,
-			String information,
-			List<ConstraintInfo> constraints,
-			String path,
-			ElementDefinitionDt element ) {
-		this.icon = icon;
-		this.name = name;
-		this.resourceFlags = flags;
-		this.min = Optional.ofNullable(min);
-		this.max = Optional.ofNullable(max);
-		//this.cardinality = cardinality;
-		this.typeLinks = typeLinks;
-		this.information = information;
-		this.constraints = constraints;
-		this.path = path;
-		this.element = Optional.ofNullable(element);
 	}
 	
 	/**
@@ -350,15 +320,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public String toString() {
 		return getPath();
-	}
-
-	// KGM Added Element 9/May/2017
-	public Optional<ElementDefinitionDt> getElement() { return this.element; }
-
-	public boolean hasElement() { return this.element.isPresent(); }
-
-	public void setElement(ElementDefinitionDt exampleValue) {
-		this.element = Optional.ofNullable(exampleValue);
 	}
 
 	public Optional<String> getRequirements() {

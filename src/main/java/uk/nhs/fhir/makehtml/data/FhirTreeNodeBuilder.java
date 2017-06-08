@@ -107,9 +107,7 @@ public class FhirTreeNodeBuilder {
 			typeLinks, 
 			shortDescription,
 			constraints,
-			path,
-
-			elementDefinition);
+			path);
 
 		String definition = elementDefinition.getDefinition();
 		if (!Strings.isNullOrEmpty(definition)) {

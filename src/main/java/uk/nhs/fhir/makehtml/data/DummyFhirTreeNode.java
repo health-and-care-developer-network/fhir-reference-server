@@ -1,11 +1,10 @@
 package uk.nhs.fhir.makehtml.data;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
@@ -166,13 +165,6 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 		return false;
 	}
 
-	// KGM 9/May/2017
-	@Override
-	public boolean hasElement() { return false; }
-
-	@Override
-	public Optional<ElementDefinitionDt> getElement() { return Optional.empty(); }
-
 	@Override
 	public Optional<BindingInfo> getBinding() {
 		throw new IllegalStateException("Dummy node cannot have fixed binding info");
@@ -206,5 +198,10 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public Optional<String> getName() {
 		return backup.getName();
+	}
+
+	@Override
+	public Optional<String> getDefinition() {
+		return backup.getDefinition();
 	}
 }

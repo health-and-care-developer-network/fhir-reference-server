@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.structdef;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,11 +17,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
@@ -105,36 +102,27 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
 
 	private void processNode(FhirTreeTableContent node)
     {
-        if (node.hasElement()) {
-            ElementDefinitionDt element = node.getElement().get();
-            if (node.getBinding().isPresent()) {
+        if (node.getBinding().isPresent()) {
 
-                Optional<String> description = Optional.ofNullable(element.getDefinition());
-                String displayDescription = (description != null && description.isPresent()) ? description.get() : BLANK;
-                //System.out.println(displayDescription);
-                IDatatype valueset = element.getBinding().getValueSet();
-                String displayValueSet = "";
-                if (valueset instanceof ResourceReferenceDt) {
-                    displayValueSet = ((ResourceReferenceDt) valueset).getReference().getValue();
-                }
-                if (valueset instanceof UriDt) {
-                    displayValueSet = ((UriDt) valueset).getValue();
-                }
-
-                String path = element.getPath() + displayDescription;
-                if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
-                    foundBinding = true;
-                    tableContent.add(
-                        Elements.withChildren("tr",
-                            labelledValueCell(BLANK, element.getPath(), 1, "details.html#" + node.getNodeKey()),
-                            labelledValueCell(BLANK, displayDescription, 1, null),
-                            labelledValueCell(BLANK, element.getBinding().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
-                            labelledValueCell(BLANK, displayValueSet, 1, null)
-                        ));
-                    done.add(path);
-                }
-
+            Optional<String> description = node.getDefinition();
+            String displayDescription = description.isPresent() ? description.get() : BLANK;
+           
+            Optional<URL> url = node.getBinding().get().getUrl();
+            String displayValueSet = url.isPresent() ? url.get().toString() : "";
+            
+            String path = node.getPath() + displayDescription;
+            if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
+                foundBinding = true;
+                tableContent.add(
+                    Elements.withChildren("tr",
+                        labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
+                        labelledValueCell(BLANK, displayDescription, 1, null),
+                        labelledValueCell(BLANK, node.getBinding().get().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
+                        labelledValueCell(BLANK, displayValueSet, 1, null)
+                    ));
+                done.add(path);
             }
+
         }
     }
 

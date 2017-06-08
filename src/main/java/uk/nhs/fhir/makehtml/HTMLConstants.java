@@ -12,4 +12,6 @@ public interface HTMLConstants {
 	public static final String HL7_TERMINOLOGIES = HL7_DSTU2 + "/terminologies.html";
 	public static final String HL7_SEARCH = HL7_DSTU2 + "/search.html";
 	public static final String HL7_FORMATS = HL7_DSTU2 + "/formats.html";
+	
+	public static final String FHIR_HL7_ORG_UK = "https://fhir.hl7.org.uk";
 }
