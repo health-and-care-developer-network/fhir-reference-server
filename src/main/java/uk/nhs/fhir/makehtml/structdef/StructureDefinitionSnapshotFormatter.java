@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.TreeTableFormatter;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.UnchangedSliceInfoRemover;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -35,7 +36,11 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 		FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
 		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
-		Table snapshotTable = snapshotTree.asTable(false, Optional.ofNullable(differentialTreeData));
+		snapshotTree.stripRemovedElements();
+		if (!isExtension) {
+			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTree.getData());
+		}
+		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();
 
 		addStyles(section);

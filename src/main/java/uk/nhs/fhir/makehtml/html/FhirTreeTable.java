@@ -25,12 +25,9 @@ import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.makehtml.data.UnchangedSliceInfoRemover;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
-	// Hide the slicing of extensions
-	private static final boolean dropExtensionSlicingNodes = true;
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
@@ -43,8 +40,8 @@ public class FhirTreeTable {
 		return data;
 	}
 
-	public Table asTable(boolean showRemoved, Optional<FhirTreeData> differential) {
-		return new Table(getColumns(), getRows(showRemoved, differential), Sets.newHashSet());
+	public Table asTable() {
+		return new Table(getColumns(), getRows(), Sets.newHashSet());
 	}
 	
 	private List<TableTitle> getColumns() {
@@ -57,25 +54,10 @@ public class FhirTreeTable {
 		);
 	}
 	
-	private List<TableRow> getRows(boolean showRemoved, Optional<FhirTreeData> differential) {
+	private List<TableRow> getRows() {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
-		if (!showRemoved) {
-			data.stripRemovedElements();
-		}
-		
-		if (dropExtensionSlicingNodes) {
-			removeExtensionsSlicingNodes(data.getRoot());
-		}
-		
-		if (differential.isPresent()) {
-			UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(differential.get());
-			remover.process(data);
-		}
-		
-		stripChildlessDummyNodes(data.getRoot());
-		
-		addSlicingIcons(data.getRoot());
+		tidyData();
 		
 		FhirTreeTableContent root = data.getRoot();
 		
@@ -90,6 +72,14 @@ public class FhirTreeTable {
 		addNodeRows(root, tableRows, rootVlines);
 		
 		return tableRows;
+	}
+	
+	private void tidyData() {
+		FhirTreeTableContent treeRoot = data.getRoot();
+		
+		removeExtensionsSlicingNodes(treeRoot);
+		stripChildlessDummyNodes(treeRoot);
+		addSlicingIcons(treeRoot);
 	}
 
 	private void stripChildlessDummyNodes(FhirTreeTableContent node) {
@@ -396,5 +386,9 @@ public class FhirTreeTable {
 					new CSSRule("height", "16"))));
 		
 		return iconStyles;
+	}
+
+	public void stripRemovedElements() {
+		data.stripRemovedElements();
 	}
 }

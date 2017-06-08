@@ -1,7 +1,5 @@
 package uk.nhs.fhir.makehtml.structdef;
 
-import java.util.Optional;
-
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -19,7 +17,6 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 
 	public StructureDefinitionDifferentialFormatter() { this.resourceSectionType = ResourceSectionType.DIFFERENTIAL; }
 
-
 	@Override
 	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
 		StructureDefinition structureDefinition = (StructureDefinition)source;
@@ -28,7 +25,7 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		
 		FhirTreeTable differentialTreeData = new FhirTreeTable(dataProvider.getDifferentialTreeData());
-		Table differentialTable = differentialTreeData.asTable(true, Optional.empty());
+		Table differentialTable = differentialTreeData.asTable();
 		Element differentialHtmlTable = differentialTable.makeTable();
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);

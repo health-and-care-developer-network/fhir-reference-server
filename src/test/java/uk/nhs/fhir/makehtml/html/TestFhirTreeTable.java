@@ -29,7 +29,10 @@ public class TestFhirTreeTable {
 			Lists.newArrayList(),
 			"path.to.resource");
 		FhirTreeData data = new FhirTreeData(node);
-		Table table = new FhirTreeTable(data).asTable(false, Optional.empty());
+		
+		FhirTreeTable fhirTreeTable = new FhirTreeTable(data);
+		fhirTreeTable.stripRemovedElements();
+		Table table = fhirTreeTable.asTable();
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);
 		System.out.println(output);
