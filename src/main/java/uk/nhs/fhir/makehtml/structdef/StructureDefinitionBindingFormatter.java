@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.structdef;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +21,7 @@ import uk.nhs.fhir.makehtml.HTMLDocSection;
 import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
@@ -107,8 +107,15 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
             Optional<String> description = node.getDefinition();
             String displayDescription = description.isPresent() ? description.get() : BLANK;
            
-            Optional<URL> url = node.getBinding().get().getUrl();
-            String displayValueSet = url.isPresent() ? url.get().toString() : "";
+            Optional<FhirURL> url = node.getBinding().get().getUrl();
+
+            //String displayValueSet = url.isPresent() ? url.get().toString() : "";
+            Element valueSetCell;
+            if (url.isPresent()) {
+            	valueSetCell = labelledValueCell(BLANK, url.get(), 1);
+            } else {
+            	valueSetCell = labelledValueCell(BLANK, "", 1, null);
+            }
             
             String path = node.getPath() + displayDescription;
             if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
@@ -118,7 +125,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
                         labelledValueCell(BLANK, node.getBinding().get().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
-                        labelledValueCell(BLANK, displayValueSet, 1, null)
+                        valueSetCell
                     ));
                 done.add(path);
             }
@@ -134,6 +141,10 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         }
         if (node.getParent() != null) { return isElementIsActive(node.getParent()); }
         return true;
+    }
+    
+    private Element labelledValueCell(String label, FhirURL url, int colspan) {
+    	return labelledValueCell(label, url.toFullString(), colspan, url.toLinkString());
     }
 
     private Element labelledValueCell(String label, String value, int colspan, String uriOverride) {

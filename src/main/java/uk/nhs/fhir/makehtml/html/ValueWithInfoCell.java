@@ -88,7 +88,7 @@ public class ValueWithInfoCell extends TableCell {
 		}
 		
 		String description = hasText ? resourceInfo.getDescription().get() : "";
-		String link = hasLink ? resourceInfo.getDescriptionLink().get().toString() : "";
+		String link = hasLink ? resourceInfo.getDescriptionLink().get().toLinkString() : "";
 		
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {

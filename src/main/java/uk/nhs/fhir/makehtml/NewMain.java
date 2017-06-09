@@ -34,7 +34,7 @@ public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 	public static final boolean STRICT = false;
-	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = false;
+	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
 
     private final File inputDirectory;
     private final String outPath;

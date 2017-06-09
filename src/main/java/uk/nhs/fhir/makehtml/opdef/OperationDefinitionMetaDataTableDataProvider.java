@@ -1,17 +1,19 @@
 package uk.nhs.fhir.makehtml.opdef;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
 import ca.uhn.fhir.model.primitive.CodeDt;
-import com.google.common.collect.Lists;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.StringUtil;
 import uk.nhs.fhir.util.TableTitle;
-
-import java.util.List;
 
 // KGM 8/May/2017 Altered meta table column widths
 
@@ -52,7 +54,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 	private OperationDefinitionMetaDataRowData createOperationKindRow(String desc, OperationKindEnum operationKind) {
 		return new OperationDefinitionMetaDataRowData(
 			desc, 
-			new SimpleLinkData(operationKind.getSystem(), OperationKindEnum.VALUESET_NAME),
+			new SimpleLinkData(FhirURL.buildOrThrow(operationKind.getSystem()), OperationKindEnum.VALUESET_NAME),
 			StringUtil.capitaliseLowerCase(operationKind.getCode()));
 	}
 

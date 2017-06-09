@@ -166,7 +166,7 @@ public class StructureDefinitionDetails {
 			boolean hasDesc = info.getDescription().isPresent();
 			
 			if (hasUrl) {
-				String fullUrl = info.getUrl().get().toString();
+				String fullUrl = info.getUrl().get().toFullString();
 				String hyphenatedUrlName = fullUrl.substring(fullUrl.lastIndexOf('/') + 1);
 				String urlName = StringUtil.hyphenatedToPascalCase(hyphenatedUrlName);
 				bindingInfo += urlName;

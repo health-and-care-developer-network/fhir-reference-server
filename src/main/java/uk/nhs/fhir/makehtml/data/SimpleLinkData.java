@@ -1,17 +1,14 @@
 package uk.nhs.fhir.makehtml.data;
 
-import uk.nhs.fhir.makehtml.HTMLConstants;
-import uk.nhs.fhir.makehtml.NewMain;
-
 /**
  * Data class holding information for a link to be displayed on a screen
  */
 public class SimpleLinkData implements LinkData {
 	
-	private final String url;
+	private final FhirURL url;
 	private final String text;
 	
-	public SimpleLinkData(String url, String text) {
+	public SimpleLinkData(FhirURL url, String text) {
 		this.url = url;
 		this.text = text;
 	}
@@ -19,13 +16,7 @@ public class SimpleLinkData implements LinkData {
 	public SimpleLinkData getPrimaryLinkData() {
 		return this;
 	}
-	public String getURL() {
-		if (NewMain.FHIR_HL7_ORG_LINKS_LOCAL) {
-			if (url.startsWith(HTMLConstants.FHIR_HL7_ORG_UK)) {
-				String localUrl = url.substring(HTMLConstants.FHIR_HL7_ORG_UK.length());
-				return localUrl;
-			}
-		}
+	public FhirURL getURL() {
 		return url;
 	}
 	public String getText() {

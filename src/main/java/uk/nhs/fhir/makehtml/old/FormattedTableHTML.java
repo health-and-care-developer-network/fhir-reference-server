@@ -182,7 +182,7 @@ public class FormattedTableHTML {
 				LinkData link = links.get(i);
 				children.add(
 					Elements.withAttributesAndText("a", 
-						Lists.newArrayList(new Attribute("href", link.getURL())), 
+						Lists.newArrayList(new Attribute("href", link.getURL().toLinkString())), 
 						link.getText()));
 				
 				if (i < links.size() - 1) {

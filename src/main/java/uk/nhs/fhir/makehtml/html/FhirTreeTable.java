@@ -1,7 +1,6 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +19,7 @@ import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
@@ -279,11 +279,7 @@ public class FhirTreeTable {
 				  && link.getPrimaryLinkData().getText().equals("Extension")) {
 					NestedLinkData extensionLinkData = (NestedLinkData)link;
 					for (SimpleLinkData nestedLink : extensionLinkData.getNestedLinks()) {
-						try {
-							resourceInfos.add(new ResourceInfo("URL", new URL(nestedLink.getURL()), ResourceInfoType.EXTENSION_URL));
-						} catch (MalformedURLException e) {
-							throw new IllegalStateException("Failed to create URL for extension node");
-						}
+						resourceInfos.add(new ResourceInfo("URL", nestedLink.getURL(), ResourceInfoType.EXTENSION_URL));
 					}
 				}
 			}
@@ -295,7 +291,7 @@ public class FhirTreeTable {
 	private ResourceInfo makeResourceInfoWithMaybeUrl(String title, String value, ResourceInfoType type) {
 		if (looksLikeUrl(value)) {
 			try {
-				return new ResourceInfo(title, new URL(value), type);
+				return new ResourceInfo(title, new FhirURL(value), type);
 			} catch (MalformedURLException e) {
 				// revert to non-link version
 			}

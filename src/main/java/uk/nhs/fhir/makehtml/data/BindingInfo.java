@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.net.URL;
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
@@ -12,10 +11,10 @@ public class BindingInfo {
 	public static final String STAND_IN_DESCRIPTION = "STAND IN STRING BECAUSE IT'S MISSING FROM THE SNAPSHOT";
 	
 	private final Optional<String> description;
-	private final Optional<URL> url;
+	private final Optional<FhirURL> url;
 	private final String strength;
 
-	public BindingInfo(Optional<String> description, Optional<URL> url, String strength) {
+	public BindingInfo(Optional<String> description, Optional<FhirURL> url, String strength) {
 		this.description = description;
 		this.url = url;
 		this.strength = strength;
@@ -25,7 +24,7 @@ public class BindingInfo {
 		return description;
 	}
 	
-	public Optional<URL> getUrl() {
+	public Optional<FhirURL> getUrl() {
 		return url;
 	}
 	
@@ -35,15 +34,15 @@ public class BindingInfo {
 
 	public static BindingInfo resolveWithBackupData(BindingInfo binding, BindingInfo backup) {
 		Optional<String> bindingDescription = binding.getDescription();
-		Optional<URL> bindingUrl = binding.getUrl();
+		Optional<FhirURL> bindingUrl = binding.getUrl();
 		String bindingStrength = binding.getStrength();
 		
 		Optional<String> backupDescription = backup.getDescription();
-		Optional<URL> backupUrl = backup.getUrl();
+		Optional<FhirURL> backupUrl = backup.getUrl();
 		String backupStrength = backup.getStrength();
 
 		Optional<String> resolvedDescription = bindingDescription.isPresent() ? bindingDescription : backupDescription;
-		Optional<URL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
+		Optional<FhirURL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
 		String resolvedStrength = !bindingStrength.isEmpty() ? bindingStrength : backupStrength; 
 		
 		try {

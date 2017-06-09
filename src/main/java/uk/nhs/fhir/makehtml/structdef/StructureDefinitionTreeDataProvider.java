@@ -17,6 +17,7 @@ import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
@@ -278,7 +279,7 @@ public class StructureDefinitionTreeDataProvider {
 				  && typeLinkToMatch.getPrimaryLinkData().getText().equals("Extension")
 				  && ((NestedLinkData) typeLinkToMatch).getNestedLinks().size() == 1) {
 					SimpleLinkData nestedLinkToMatch = ((NestedLinkData)typeLinkToMatch).getNestedLinks().get(0);
-					String urlToMatch = nestedLinkToMatch.getURL();
+					FhirURL urlToMatch = nestedLinkToMatch.getURL();
 					
 					for (LinkData typeLink : pathMatch.getTypeLinks()) {
 						if (typeLink instanceof NestedLinkData

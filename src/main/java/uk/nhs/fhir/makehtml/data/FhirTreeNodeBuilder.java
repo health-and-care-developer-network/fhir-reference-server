@@ -1,7 +1,6 @@
 package uk.nhs.fhir.makehtml.data;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -154,13 +153,15 @@ public class FhirTreeNodeBuilder {
 		
 		Binding binding = elementDefinition.getBinding();
 		if (!binding.isEmpty()) {
-			Optional<URL> url;
+			
+			IDatatype valueSet = binding.getValueSet();
+			Optional<FhirURL> url;
 			try {
-				IDatatype valueSet = binding.getValueSet();
-				url = valueSet == null ? Optional.empty() : Optional.of(new URL(HAPIUtils.resolveDatatypeValue(valueSet)));
+				url = valueSet == null ? Optional.empty() : Optional.of(new FhirURL(HAPIUtils.resolveDatatypeValue(valueSet)));
 			} catch (MalformedURLException e) {
-				throw new RuntimeException(e);
+				throw new IllegalStateException(e);
 			}
+			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
 			String strength = binding.getStrength();
 			

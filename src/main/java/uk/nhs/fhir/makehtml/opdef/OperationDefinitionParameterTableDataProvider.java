@@ -1,23 +1,25 @@
 package uk.nhs.fhir.makehtml.opdef;
 
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.NotImplementedException;
+
+import com.google.common.collect.Lists;
+
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.ParameterBinding;
 import ca.uhn.fhir.model.primitive.CodeDt;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.NotImplementedException;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.TableTitle;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 
 // KGM 8/May/2017 Altered meta table column to % widths
 
@@ -61,31 +63,30 @@ public class OperationDefinitionParameterTableDataProvider {
 	
 	private List<ResourceInfo> getParameterFlags(Parameter parameter) {
 		
-		try {
+		List<ResourceInfo> resourceFlags = Lists.newArrayList();
 		
-			List<ResourceInfo> resourceFlags = Lists.newArrayList();
-			
-			ParameterBinding binding = parameter.getBinding();
-			if (!binding.isEmpty()) {
-				ResourceInfo bindingFlag = buildBindingResourceInfo(binding);
-				resourceFlags.add(bindingFlag);
-			}
-			
-			ResourceReferenceDt profile = parameter.getProfile();
-			if (!profile.isEmpty()) {
-				resourceFlags.add(new ResourceInfo("Profile", new URL(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
-			}
-			
-			//TODO tuple parameters
-			List<Parameter> parts = parameter.getPart();
-			if (!parts.isEmpty()) {
-				throw new NotImplementedException("Tuple parameter");
-			}
-			
-			return resourceFlags;
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+		ParameterBinding binding = parameter.getBinding();
+		if (!binding.isEmpty()) {
+			ResourceInfo bindingFlag = buildBindingResourceInfo(binding);
+			resourceFlags.add(bindingFlag);
 		}
+		
+		ResourceReferenceDt profile = parameter.getProfile();
+		if (!profile.isEmpty()) {
+			try {
+				resourceFlags.add(new ResourceInfo("Profile", new FhirURL(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		
+		//TODO tuple parameters
+		List<Parameter> parts = parameter.getPart();
+		if (!parts.isEmpty()) {
+			throw new NotImplementedException("Tuple parameter");
+		}
+		
+		return resourceFlags;
 	}
 	
 	ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
@@ -93,9 +94,9 @@ public class OperationDefinitionParameterTableDataProvider {
 		String strength = binding.getStrength();
 		
 		try {
-			return new BindingResourceInfo(Optional.empty(), Optional.of(new URL(choice)), strength);
+			return new BindingResourceInfo(Optional.empty(), Optional.of(new FhirURL(choice)), strength);
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 }
