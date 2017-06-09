@@ -25,7 +25,7 @@ public class TestFhirTreeTable {
 			new ResourceFlags(),
 			0,
 			"1",
-			Lists.newArrayList(new SimpleLinkData(FhirURL.buildOrThrow("#"), "testlink")),
+			Lists.newArrayList(new SimpleLinkData(FhirURL.buildOrThrow("http://www.example.com"), "testlink")),
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource");
