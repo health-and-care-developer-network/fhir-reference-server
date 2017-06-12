@@ -15,35 +15,56 @@
  */
 package uk.nhs.fhir;
 
-import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.*;
-import static uk.nhs.fhir.enums.ClientType.*;
-import static uk.nhs.fhir.enums.MimeType.*;
-import static uk.nhs.fhir.enums.ResourceType.*;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.READ;
+import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.VREAD;
+import static uk.nhs.fhir.enums.ClientType.BROWSER;
+import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
+import static uk.nhs.fhir.enums.MimeType.JSON;
+import static uk.nhs.fhir.enums.MimeType.XML;
+import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
+import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
+import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.VALUESET;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
@@ -57,12 +78,16 @@ public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     ResourceWebHandler myWebHandler = null;
+    RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
     private static String guidesPath = PropertyReader.getProperty("guidesPath");
+    private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
+        myRawResourceRenderer = new RawResourceRender(webber);
         templateHelper = new PageTemplateHelper();
+        Velocity.init(PropertyReader.getProperties());
     }
     
     @Override
@@ -79,7 +104,7 @@ public class PlainContent extends CORSInterceptor {
         LOG.info("Resource type: " + resourceType.toString());
         
         // First, check if this is a request for a markdown or text file from the ImplementationGuide directory..
-        if (operation == READ && resourceType == IMPLEMENTATIONGUIDE) {
+        if ((operation == READ || operation == VREAD) && resourceType == IMPLEMENTATIONGUIDE) {
         	String resourceName = theRequestDetails.getId().getIdPart();
         	if (resourceName.endsWith(".md") || resourceName.endsWith(".txt")) {
         		streamFileDirectly(theResponse, resourceName);
@@ -109,14 +134,16 @@ public class PlainContent extends CORSInterceptor {
         LOG.info("Format to return to browser: " + mimeType.toString());
         
         boolean showList = true;
+        String resourceName = null;
         
         if (operation != null) {
-        	if (operation == READ) {
+        	if (operation == READ || operation == VREAD) {
 	        	if (mimeType == XML || mimeType == JSON) {
-	        		renderSingleWrappedRAWResource(theRequestDetails, content, resourceType, mimeType);
+	        		resourceName = myRawResourceRenderer.renderSingleWrappedRAWResource(
+	        										theRequestDetails, content, resourceType, mimeType);
 	        		showList = false;
 	        	} else {
-	        		renderSingleResource(theRequestDetails, content, resourceType);
+	        		resourceName = renderSingleResource(theRequestDetails, content, resourceType);
 	        		showList = false;
 	        	}
 	        }
@@ -125,10 +152,11 @@ public class PlainContent extends CORSInterceptor {
         // We either don't have an operation, or we don't understand the operation, so
         // return a list of resources instead
         if (showList) {
-        	renderListOfResources(theRequestDetails, content, resourceType);
+        	content.append(renderListOfResources(theRequestDetails, resourceType));
         }
 
-        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType, content);
+        String baseURL = theRequestDetails.getServerBaseForRequest();
+        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType.toString(), resourceName, content, baseURL);
         
         return false;
     }
@@ -169,7 +197,8 @@ public class PlainContent extends CORSInterceptor {
 	    		StringBuffer content = new StringBuffer();
 	    		renderConformance(content, theResponseObject, mimeType);
 	    		LOG.info(content.toString());
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE, content);
+	    		String baseURL = theRequestDetails.getServerBaseForRequest();
+	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE.toString(), null, content, baseURL);
 	    		return false;
     		}
         }
@@ -179,22 +208,15 @@ public class PlainContent extends CORSInterceptor {
 		return true;
 	}
     
-    private void renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
-        content.append(GenerateIntroSection());
-        String resourceID = theRequestDetails.getId().getIdPart();
-        content.append(getResourceContent(resourceID, mimeType, resourceType));
-        content.append("</div>");
-    }
-    
     private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
     	LOG.info("Attempting to render conformance statement");
-    	content.append(GenerateIntroSection());
+    	String resourceContent = null;
     	if (mimeType == JSON) {
-    		content.append(getResourceAsJSON(conformance, null));
+    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, null);
     	} else {
-    		content.append(getResourceAsXML(conformance, null));
+    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, null);
     	}
-        content.append("</div>");
+    	myRawResourceRenderer.renderSingleWrappedRAWResource(resourceContent, content, mimeType);
     }
 
     /**
@@ -205,170 +227,35 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private void renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
+    private String renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
 
-        content.append(GenerateIntroSection());
+    	VelocityContext context = new VelocityContext();
+    	
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
 
-        String resourceID = theRequestDetails.getId().getIdPart();
-
+        IdDt resourceID = (IdDt)theRequestDetails.getId();
+        
         if (resourceType == STRUCTUREDEFINITION) {
-            content.append(DescribeStructureDefinition(resourceID));
+            content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
         }
         if (resourceType == VALUESET) {
-            content.append(DescribeValueSet(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));
         }
         if (resourceType == OPERATIONDEFINITION) {
-        	content.append(DescribeOperationDefinition(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Operation Description", resourceType));
         }
         if (resourceType == IMPLEMENTATIONGUIDE) {
-        	content.append(DescribeImplementationGuide(resourceID));
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
         
-        //content.append(GetXMLContent(resourceName));
-        
-        content.append("</div>");
-        
+        // Return resource name (for breadcrumb)
+        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
     }
     
-    private String getResourceContent(String resourceID, MimeType mimeType, ResourceType resourceType) {
-    	
-    	IBaseResource resource = null;
-    	
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	
-    	if (resourceType == STRUCTUREDEFINITION) {
-    		StructureDefinition sd = myWebHandler.getSDByID(resourceID);
-    		sd.setText(textElement);
-    		resource = sd;
-    	} else if (resourceType == VALUESET) {
-    		ValueSet vs = myWebHandler.getVSByID(resourceID);
-    		vs.setText(textElement);
-    		resource = vs;
-    	} else if (resourceType == OPERATIONDEFINITION) {
-     		OperationDefinition od = myWebHandler.getOperationByID(resourceID);
-     		od.setText(textElement);
-     		resource = od;
-    	} else if (resourceType == IMPLEMENTATIONGUIDE) {
-     		ImplementationGuide ig = myWebHandler.getImplementationGuideByID(resourceID);
-     		ig.setText(textElement);
-     		resource = ig;
-     	}
-        
-        if (mimeType == JSON) {
-        	return getResourceAsJSON(resource, resourceID);
-        } else {
-        	return getResourceAsXML(resource, resourceID);
-        }
-    }
     
-    private String getResourceAsXML(IBaseResource resource, String resourceID) {
-        // Serialise it to XML
-        FhirContext ctx = FhirContext.forDstu2();
-        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
-        // Encode it for HTML output
-        String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
-        // Wrap it in a div and pre tag
-        StringBuffer out = new StringBuffer();
-        if (resourceID != null) {
-        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
-        }
-        out.append("<div class='rawXML'><pre lang='xml'>");
-        out.append(xml);
-        out.append("</pre></div>");
-        return out.toString();
-    }
-    
-    private String getResourceAsJSON(IBaseResource resource, String resourceID) {
-        // Serialise it to JSON
-        FhirContext ctx = FhirContext.forDstu2();
-        String serialised = ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
-        // Encode it for HTML output
-        //String xml = serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
-        // Wrap it in a div and pre tag
-        StringBuffer out = new StringBuffer();
-        if (resourceID != null) {
-        	out.append("<p><a href='./" + resourceID + "'>Back to rendered view</a></p>");
-        }
-        out.append("<div class='rawXML'><pre lang='json'>");
-        out.append(serialised);
-        out.append("</pre></div>");
-        return out.toString();
-    }
-
-    /**
-     * Code in here to create the HTML response to a request for a
-     * StructureDefinition we hold.
-     *
-     * @param resourceID Name of the SD we need to describe.
-     * @return
-     */
-    private String DescribeStructureDefinition(String resourceID) {
-        StringBuilder content = new StringBuilder();
-        StructureDefinition sd;
-        sd = myWebHandler.getSDByID(resourceID);
-        content.append("<h2 class='resourceType'>" + sd.getName() + " (StructureDefinition)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(sd.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(sd.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(sd.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(sd.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(sd.getDescription()) + "</li>");
-        content.append("<li>Requirements: " + printIfNotNull(sd.getRequirements()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(sd.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(sd.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(sd.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(sd.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        String textSection = sd.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='treeView'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
-    }
-
-
-    /**
-     * Code in here to create the HTML response to a request for a
-     * StructureDefinition we hold.
-     *
-     * @param resourceID Name of the SD we need to describe.
-     * @return
-     */
-    private String DescribeOperationDefinition(String resourceID) {
-        StringBuilder content = new StringBuilder();
-        OperationDefinition od;
-        od = myWebHandler.getOperationByID(resourceID);
-        content.append("<h2 class='resourceType'>" + od.getName() + " (OperationDefinition)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
-        content.append("<li>Requirements: " + printIfNotNull(od.getRequirements()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw Profile: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        String textSection = od.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='operationTable'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
+    private String makeResourceURL(IdDt resourceID, String baseURL) {
+    	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
+    	return entity.getVersionedUrl(baseURL);
     }
     
     /**
@@ -378,135 +265,109 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String DescribeImplementationGuide(String resourceID) {
-        StringBuilder content = new StringBuilder();
-        ImplementationGuide od;
-        od = myWebHandler.getImplementationGuideByID(resourceID);
-        content.append("<h2 class='resourceType'>" + od.getName() + " (ImplementationGuide)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        content.append("<li>URL: " + printIfNotNull(od.getUrl()) + "</li>");
-        content.append("<li>Version: " + printIfNotNull(od.getVersion()) + "</li>");
-        content.append("<li>Name: " + printIfNotNull(od.getName()) + "</li>");
-        content.append("<li>Publisher: " + printIfNotNull(od.getPublisher()) + "</li>");
-        content.append("<li id='description'>Description: " + printIfNotNull(od.getDescription()) + "</li>");
-        content.append("<li>Status: " + printIfNotNull(od.getStatus()) + "</li>");
-        content.append("<li>Experimental: " + printIfNotNull(od.getExperimental()) + "</li>");
-        content.append("<li>Date: " + printIfNotNull(od.getDate()) + "</li>");
-        content.append("<li>FHIRVersion: " + printIfNotNull(od.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ImplementationGuide: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        String textSection = od.getText().getDivAsString();
-        if (textSection != null) {
-	        content.append("<div class='guideContent'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
+    private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    	IResource sd = myWebHandler.getResourceByID(resourceID);
+    	
+    	Template template = null;
+    	try {
+    	  template = Velocity.getTemplate(templateDirectory + "resource.vm");
+    	} catch( Exception e ) {
+    		e.printStackTrace();
+    	}
+    	
+    	// Values to insert into template
+    	context.put( "resource", sd );
+    	context.put( "type", resourceType );
+    	context.put( "baseURL", baseURL );
+    	context.put( "firstTabName", firstTabName );
+    	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	
+    	// List of versions
+    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
+    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
+    	context.put( "versions", list );
+    	
+    	// Resource metadata
+    	ResourceEntity metadata = myWebHandler.getResourceEntityByID(resourceID);
+    	context.put( "metadata", metadata );
+    	
+    	// Tree view
+    	String textSection = sd.getText().getDivAsString();
+    	context.put( "treeView", textSection );
+    	
+    	// Examples
+    	ExampleResources examples = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	if (examples != null) {
+    		if (examples.size() > 0) {
+    			context.put( "examples", examples );
+    		}
+    	}
+    	
+    	StringWriter sw = new StringWriter();
+    	template.merge( context, sw );
+    	return sw.toString();
     }
     
-    
-    /**
-     * Code to generate a HTML view of the named ValueSet
-     *
-     * @param resourceID Named resource we need to describe.
-     *
-     * @return
-     */
-    private String DescribeValueSet(String resourceID) {
-        StringBuilder content = new StringBuilder();
-        ValueSet valSet;
-        valSet = myWebHandler.getVSByID(resourceID);
-        String textSection = valSet.getText().getDivAsString();
-        
-        
-        content.append("<h2 class='resourceType'>" + valSet.getName() + " (ValueSet)</h2>");
-        content.append("<div class='resourceSummary'>");
-        content.append("<ul>");
-        if (textSection == null) {
-        	// Only output summary fields if there is nothing in the text section as these are duplicated in there..
-	        content.append("<li>URL: " + printIfNotNull(valSet.getUrl()) + "</li>");
-	        content.append("<li>Version: " + printIfNotNull(valSet.getVersion()) + "</li>");
-	        content.append("<li>Name: " + printIfNotNull(valSet.getName()) + "</li>");
-	        content.append("<li>Publisher: " + printIfNotNull(valSet.getPublisher()) + "</li>");
-	        content.append("<li id='description'>Description: " + printIfNotNull(valSet.getDescription()) + "</li>");
-	        content.append("<li>Requirements: " + printIfNotNull(valSet.getRequirements()) + "</li>");
-	        content.append("<li>Status: " + printIfNotNull(valSet.getStatus()) + "</li>");
-	        content.append("<li>Experimental: " + printIfNotNull(valSet.getExperimental()) + "</li>");
-	        content.append("<li>Date: " + printIfNotNull(valSet.getDate()) + "</li>");
-        }
-        // These ones aren't in the test section, so output them in all cases
-        content.append("<li>FHIRVersion: " + printIfNotNull(valSet.getStructureFhirVersionEnum()) + "</li>");
-        content.append("<li>Show Raw ValueSet: <a href='./" + resourceID + "?_format=xml'>XML</a>"
-        		+ " | <a href='./" + resourceID + "?_format=json'>JSON</a></li>");
-        content.append("</div>");
-        
-        if (textSection != null) {
-	        content.append("<div class='treeView'>");
-	        content.append(textSection);
-	        content.append("</div>");
-        }
-        return content.toString();
-    }
-
     /**
      * Code called to render a list of resources. for example in response to a
      * url like http://host/fhir/StructureDefinition
-     *
      *
      * @param theRequestDetails
      * @param content
      * @param resourceType
      */
-    private void renderListOfResources(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
-
-        Map<String, String[]> params = theRequestDetails.getParameters();
-
-        content.append(GenerateIntroSection());
-
-        content.append("<h2 class='resourceType'>" + resourceType + " Resources</h2>");
-
-        content.append("<ul>");
-        if (params.containsKey("name") || params.containsKey("name:contains")) {
-            if (params.containsKey("name")) {
-                content.append(myWebHandler.getAllNames(resourceType, params.get("name")[0]));
+    private String renderListOfResources(RequestDetails theRequestDetails, ResourceType resourceType) {
+    	
+    	VelocityContext context = new VelocityContext();
+    	Template template = null;
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
+    	
+    	Map<String, String[]> params = theRequestDetails.getParameters();
+    	
+    	if (params.containsKey("name") || params.containsKey("name:contains")) {
+            
+    		// We are showing a list of matching resources for the specified name query
+    		List<ResourceEntity> list = null;
+    		
+    		if (params.containsKey("name")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
+            } else if (params.containsKey("name:contains")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
             }
-            if (params.containsKey("name:contains")) {
-                content.append(myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]));
-            }
+
+            try {
+          	  template = Velocity.getTemplate(templateDirectory + "search-results.vm");
+          	} catch( Exception e ) {
+          		e.printStackTrace();
+          	}
+          	
+          	// Put content into template
+          	context.put( "list", list );
+          	context.put( "resourceType", resourceType );
+          	context.put( "baseURL", baseURL );
+          	
+          	StringWriter sw = new StringWriter();
+          	template.merge( context, sw );
+          	return sw.toString();
+    		
         } else {
-            content.append(myWebHandler.getAGroupedListOfResources(resourceType));
+        	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
+        	HashMap<String, List<ResourceEntity>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
+        	
+        	try {
+        	  template = Velocity.getTemplate(templateDirectory + "list.vm");
+        	} catch( Exception e ) {
+        		e.printStackTrace();
+        	}
+        	
+        	// Put content into template
+        	context.put( "groupedResources", groupedResources );
+        	context.put( "resourceType", resourceType );
+        	context.put( "baseURL", baseURL );
+        	
+        	StringWriter sw = new StringWriter();
+        	template.merge( context, sw );
+        	return sw.toString();
         }
-        content.append("</ul>");
-        content.append("</div>");
-    }
-
-    /**
-     * Simply encapsulates multiple repeated lines used to build the start of
-     * the html section
-     *
-     * @return
-     */
-    private String GenerateIntroSection() {
-        StringBuilder buffer = new StringBuilder();
-
-        String fhirServerNotice = PropertyReader.getProperty("fhirServerNotice");
-        String fhirServerWarning = PropertyReader.getProperty("fhirServerWarning");
-
-        buffer.append("<div class='fhirServerGeneratedContent'>");
-        buffer.append(fhirServerWarning);
-        buffer.append(fhirServerNotice);
-        return buffer.toString();
-    }
-
-    /**
-     * Simple helper class to avoid errors caused by null values.
-     *
-     * @param input
-     * @return
-     */
-    private static Object printIfNotNull(Object input) {
-        return (input == null) ? "" : input;
     }
 }

@@ -24,19 +24,46 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 
 public interface Datasource {
 
     /**
-     * Gets a specific one
+     * Gets a specific one, optionally also with a specific version
      *
-     * @param name
+     * @param id
+     * @return
+     */
+	IBaseResource getResourceByID(IdDt theId);
+
+    /**
+     * Gets resource metadata for a specific ID and version
+     *
+     * @param id
+     * @return
+     */
+	ResourceEntity getResourceEntityByID(IdDt theId);
+	
+	/**
+	 * Gets the metadata about the resource and versions held
+	 * @param theId
+	 * @return
+	 */
+	ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId);
+	
+    /**
+     * Gets a specific one, with no version specified (i.e. get the latest)
+     *
+     * @param id
      * @return
      */
 	IBaseResource getResourceByID(String id);
-    
+	    
     /**
      * This is the method to do a search based on name, ie to find where
      * name:contains=[parameter]
@@ -62,6 +89,12 @@ public interface Datasource {
     List<String> getAllResourceNames(ResourceType resourceType);
 
     /**
+     * Get a list of all extensions to show in the extensions registry
+     * @return
+     */
+    List<ResourceEntity> getExtensions();
+    
+    /**
      * Gets a full list of names, grouped by base resource for the web view of
      * /StructureDefinition requests.
      *
@@ -75,7 +108,7 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of names, grouped by category (specific to the resourcetype) for the web view
@@ -85,4 +118,23 @@ public interface Datasource {
      */
     HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
     
+    /**
+     * Gets any example resources we know about for the specified resource type and resource ID
+     * @param resourceTypeAndID
+     * @return
+     */
+    ExampleResources getExamples(String resourceTypeAndID);
+    
+    /**
+     * Gets a specific example using its filename
+     * @param resourceFilename
+     * @return
+     */
+    ResourceEntity getExampleByName(String resourceFilename);
+    
+    /**
+     * Gets a count of how many resources we have of each type
+     * @return
+     */
+    HashMap<String,Integer> getResourceTypeCounts();
 }

@@ -35,6 +35,8 @@ public class PropertyReader implements GlobalConstants {
     	String configFile = System.getenv("CONFIG_FILE");
     	if (configFile == null) {
     		initialise(defaultProperties, PROPERTY_FILE);
+    	} else if (configFile.length() == 0) {
+    		initialise(defaultProperties, PROPERTY_FILE);
     	} else {
     		System.out.println("Using custom configuration from: " + configFile);
     		initialise(defaultProperties, configFile);
@@ -77,5 +79,9 @@ public class PropertyReader implements GlobalConstants {
 		else
 			return null;
     }
+
+	public static Properties getProperties() {
+		return defaultProperties;
+	}
 
 }

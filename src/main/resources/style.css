@@ -1,3 +1,25 @@
+#extensionTable {
+	width:100%;
+}
+
+#extensionTable th {
+	font-weight: bold;
+	border-bottom: solid thin lightgrey;
+}
+
+#extensionTable td {
+	border-bottom: solid thin lightgrey;
+}
+
+#tabs ul {
+	margin-left: 0px;
+}
+
+.fhir-table a {
+    text-decoration: none;
+    color: #005EB8;
+}
+
 .one_third.tree_wrap {
     min-height: 0px !IMPORTANT;
 }
@@ -23,15 +45,34 @@ h2.resourceType {
     color: #ce5c00;
     padding: 15px;
 }
+
+.metadataSection {
+	border: thin solid #d4d2d2;
+}
+
+.clearPara {
+	clear: both;
+}
+
 .resourceSummary {
-    border: thin solid #d4d2d2;
+    float: left;
     padding: 5px;
     font-size: 0.8em;
+    width: 80%;
 }
+
+.resourceVersions {
+	float: left;
+    padding: 5px;
+    font-size: 0.8em;
+    width: 17%;
+}
+
 .treeView, .operationTable, .guideContent {
     border: thin solid #d4d2d2;
     padding: 5px;
     margin-top: 5px;
+    clear: both;
 }
 
 .renderedValueSet {
@@ -40,7 +81,7 @@ h2.resourceType {
     margin-top: 5px;
 }
 
-.rawXML {
+.rawXML, .rawJSON {
     overflow-x: scroll;
     border: thin solid #d4d2d2;
     padding: 5px;

@@ -1,0 +1,79 @@
+<div class='fhirServerGeneratedContent'>
+<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental, and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
+
+	<h3>StructureDefinition</h3>
+	<ul>
+		<li><a href="/StructureDefinition">List all StructureDefinitions
+				#set( $count = $counts.get("StructureDefinition") )
+				#if( $count )
+				  ($count)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+
+	<h3>ValueSet</h3>
+	<ul>
+		<li><a href="/ValueSet">List all ValueSets
+				#set( $countVS = $counts.get("ValueSet") )
+				#if( $countVS )
+				  ($countVS)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>OperationDefinition</h3>
+	<ul>
+		<li><a href="/OperationDefinition">List all OperationDefinitions
+				#set( $countOD = $counts.get("OperationDefinition") )
+				#if( $countOD )
+				  ($countOD)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>Extensions</h3>
+	<ul>
+		<li><a href="/Extensions">Extension Registry
+				#set( $countER = $counts.get("Extension") )
+				#if( $countER )
+				  ($countER)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<!--
+	<h3>ImplementationGuide</h3>
+	<ul>
+		<li><a href="/ImplementationGuide">List all ImplementationGuides
+				#set( $countIG = $counts.get("ImplementationGuide") )
+				#if( $countIG )
+				  ($countIG)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>Conformance</h3>
+	<ul>
+		<li><a href="/Conformance">List all Conformance resources
+				#set( $countC = $counts.get("Conformance") )
+				#if( $countC )
+				  ($countC)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+		<li><a href="/metadata">Download conformance resource for this FHIR server</a></li>
+	</ul>
+	-->

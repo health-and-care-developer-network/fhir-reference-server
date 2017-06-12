@@ -35,7 +35,10 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -79,6 +82,17 @@ public class MongoIF implements Datasource {
 	 */
     @Override
 	public IBaseResource getResourceByID(String id) {
+        LOG.info("Getting Resource with id=" + id);
+        BasicDBObject query = new BasicDBObject("id", id);
+        DBObject found = profiles.findOne(query);
+        IBaseResource foundDocRef = (IBaseResource) ctx.newJsonParser().parseResource(found.toString());
+        return foundDocRef;
+    }
+    
+    @Override
+	public IBaseResource getResourceByID(IdDt theId) {
+    	String id = theId.getIdPart();
+    	// No support for versioning in this implementation yet.
         LOG.info("Getting Resource with id=" + id);
         BasicDBObject query = new BasicDBObject("id", id);
         DBObject found = profiles.findOne(query);
@@ -215,7 +229,37 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+	public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ResourceEntity getResourceEntityByID(IdDt theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ExampleResources getExamples(String resourceTypeAndID) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ResourceEntity getExampleByName(String resourceFilename) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public HashMap<String, Integer> getResourceTypeCounts() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public List<ResourceEntity> getExtensions() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

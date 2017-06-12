@@ -15,12 +15,16 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -43,8 +47,6 @@ public class ResourceWebHandler {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     
-    private static String startOfBaseResourceBox = null;
-    private static String endOfBaseResourceBox = null;
     Datasource myDataSource = null;
 
     public ResourceWebHandler(Datasource dataSource) {
@@ -60,105 +62,83 @@ public class ResourceWebHandler {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        startOfBaseResourceBox = PropertyReader.getProperty("startOfBaseResourceBox");
-        endOfBaseResourceBox = PropertyReader.getProperty("endOfBaseResourceBox");
-        LOG.fine("Created ProfileWebHandler handler to respond to requests for Profile resource types from a browser.");
+        LOG.fine("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    /*public String getAllStructureDefinitionNames(String resourceType) {
-        LOG.fine("Called: ProfileWebHandler.getAllNames()");
-        List<String> myNames = myDataSource.getAllResourceNames(ResourceType.STRUCTUREDEFINITION);
-        StringBuilder sb = new StringBuilder();
-        
-        for(String name : myNames) {
-            sb.append("<a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a>");
-            sb.append("<br />");
-        }
-        return sb.toString();
-    }*/
     
-    public String getAGroupedListOfResources(ResourceType resourceType) {
-        LOG.fine("Called: ProfileWebHandler.getAlGroupedNames()");
-        StringBuilder sb = new StringBuilder();
-        
+    
+    public HashMap<String, List<ResourceEntity>> getAGroupedListOfResources(ResourceType resourceType) {
+        LOG.fine("Called: ResourceWebHandler.getAlGroupedNames()");
         if(resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
         		|| resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
-        	sb.append("<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>");
-        	
             HashMap<String, List<ResourceEntity>> myNames = null;
-            
             if(resourceType == STRUCTUREDEFINITION) {
-            	myNames = myDataSource.getAllResourceNamesByBaseResource(resourceType);
+            	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
-            	myNames = myDataSource.getAllResourceNamesByCategory(resourceType);
-            }
-            
-            for(String base : myNames.keySet()) {
-                    sb.append(startOfBaseResourceBox);
-                    sb.append(base);
-                    sb.append(endOfBaseResourceBox);
-                    for(ResourceEntity resource : myNames.get(base)) {
-                    	String name_for_url = resource.getResourceID();
-						try {
-							name_for_url = URLEncoder.encode(resource.getResourceID(), Charset.defaultCharset().name());
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                    	sb.append("<li><a href=").append(resourceType.getHAPIName()).append('/').append(name_for_url).append('>').append(resource.getResourceName()).append("</a></li>");
-	                }
-                sb.append("</ul></section></div></div>");
+            	return myDataSource.getAllResourceNamesByCategory(resourceType);
             }
         }
-        
-        /*
-        if(resourceType == VALUESET) {
-            List<String> myNames = myDataSource.getAllValueSetNames();
-            
-            for(String name : myNames) {
-                sb.append("<li><a href=").append(resourceType).append('/').append(name).append('>').append(name).append("</a></li>");
-            }
-            sb.append("</ul></section></div></div>");        	
-        }*/
-        
-        
-        sb.append("</div>");        
-        return sb.toString();
+        return null;
     }
 
-    public String getAllNames(ResourceType resourceType, String namePart) {
-        LOG.fine("Called: ProfileWebHandler.getAllNames(String namePart)");
-        List<String> myResourceIDs = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
-        StringBuilder sb = new StringBuilder();
-        
-        for(String id : myResourceIDs) {
-            sb.append("<a href=").append(resourceType.getHAPIName()).append('/').append(id).append('>').append(id).append("</a>");
-            sb.append("<br />");
-        }
-        return sb.toString();
+    public List<ResourceEntity> getAllNames(ResourceType resourceType, String namePart) {
+        LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
+        List<ResourceEntity> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
+        return myResourceList;
     }
-        
-    public StructureDefinition getSDByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getSDByID(String id)");
+    
+    public List<ResourceEntity> getExtensions() {
+        LOG.fine("Called: ResourceWebHandler.getExtensions()");
+        return myDataSource.getExtensions();
+    }
+    
+    public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getVersionsForID(IdDt id)");
+        return myDataSource.getVersionsByID(id);
+    }
+    
+    public ResourceEntity getResourceEntityByID(IdDt theId) {
+        LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
+        return myDataSource.getResourceEntityByID(theId);
+    }
+    
+    public IResource getResourceByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
+        IResource resource = (IResource)myDataSource.getResourceByID(id);
+        return resource;
+    }
+    
+    public StructureDefinition getSDByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getSDByID(String id)");
         StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
         return sd;
     }
 
-    public OperationDefinition getOperationByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getOperationByID(String id)");
+    public OperationDefinition getOperationByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getOperationByID(String id)");
         OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(id);
         return od;
     }
 
-    public ImplementationGuide getImplementationGuideByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getImplementationGuideByID(String id)");
+    public ImplementationGuide getImplementationGuideByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getImplementationGuideByID(String id)");
         ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(id);
         return ig;
     }
     
-    public ValueSet getVSByID(String id) {
-        LOG.fine("Called: ProfileWebHandler.getVSByID(String id)");
+    public ValueSet getVSByID(IdDt id) {
+        LOG.fine("Called: ResourceWebHandler.getVSByID(String id)");
         ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
         return valSet;
+    }
+    
+    public ExampleResources getExamples(String resourceTypeAndID) {
+        LOG.fine("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
+        ExampleResources examples = myDataSource.getExamples(resourceTypeAndID);
+        return examples;
+    }
+    
+    public HashMap<String,Integer> getResourceTypeCounts() {
+    	return myDataSource.getResourceTypeCounts();
     }
 }

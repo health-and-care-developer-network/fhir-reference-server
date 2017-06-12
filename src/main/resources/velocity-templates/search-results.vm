@@ -1,0 +1,24 @@
+<div class='fhirServerGeneratedContent'>
+	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental, and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
+	<div class='fhirServerNotice'>This is a HL7 FHIR server, and as you appear to be accessing this page from a web browser you  are seeing a HTML version of the requested resource(s). You can also access this URL from a FHIR client as a ReSTful API call. For more details please see the <a href="https://www.hl7.org/fhir/">HL7 FHIR specification</a>.</div>
+
+	<h2 class='resourceType'>$resourceType Resources</h2>
+
+	<ul>
+		<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>
+			<div class="one_third tree_wrap" style="min-height: 306px;">
+				<div class="box">
+					<div class="line aquaBlue_line"></div>
+					<section class="nav_box aquablue">
+						<h3>Search results</h3>
+						<ul>
+							#foreach( $resource in $list )
+								<li><a href="$resourceType/$resource.getResourceID()">$resource.getResourceName()</a></li>
+							#end
+						</ul>
+					</section>
+				</div>
+			</div>
+		</div>
+	</ul>
+</div>

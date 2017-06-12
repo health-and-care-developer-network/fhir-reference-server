@@ -120,10 +120,9 @@ public class ValueSetProvider implements IResourceProvider {
      * @return
      *    Returns a resource matching this identifier, or null if none exists.
      */
-    @Read()
+    @Read(version=true)
     public ValueSet getValueSetById(@IdParam IdDt theId) {
-        String id = theId.getIdPart().toString();
-        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(id);
+        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(theId);
         return foundItem;
     }
     

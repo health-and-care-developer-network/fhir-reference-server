@@ -19,7 +19,11 @@ import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
@@ -28,6 +32,7 @@ import uk.nhs.fhir.util.PropertyReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,17 +67,44 @@ public class FilesystemIF implements Datasource {
     }
 
     /**
-     * Gets a specific one
+     * Gets a specific one, optionally also with a specific version
+     * @param id
+     * @return 
+     */
+    public IBaseResource getResourceByID(IdDt theId) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(theId);
+    	if (entry != null) {
+	    	File path = entry.getResourceFile();
+	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
+	        
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
+	        return foundResource;
+    	} else {
+    		return null;
+    	}
+    }
+    
+    public ResourceEntity getResourceEntityByID(IdDt theId) {
+    	if (theId.hasVersionIdPart()) {
+    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    		return FileCache.getversionsByID(theId).getSpecificVersion(version);
+    	} else {
+    		return FileCache.getversionsByID(theId).getLatest();
+    	}
+    	
+    }
+    
+    public ResourceEntityWithMultipleVersions getVersionsByID(IdDt id) {
+    	return FileCache.getversionsByID(id);
+    }
+
+    /**
+     * Gets a specific one, with no version specified (i.e. get the latest)
      * @param id
      * @return 
      */
     public IBaseResource getResourceByID(String id) {
-    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting Resource with id=" + id + " looking for file: " + path.getAbsolutePath());
-        
-    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
-        return foundResource;
+    	return getResourceByID(new IdDt(id));
     }
     
     /**
@@ -100,10 +132,10 @@ public class FilesystemIF implements Datasource {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
-        List<String> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(resourceType, theNamePart);
+        List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(resourceType, theNamePart);
 
-        for(String id : matchingIDs) {
-        	list.add(getResourceByID(id));
+        for(ResourceEntity entity : matchingIDs) {
+        	list.add(getResourceByID(entity.getResourceID()));
         }
         return list;
     }
@@ -127,6 +159,15 @@ public class FilesystemIF implements Datasource {
     public List<String> getAllResourceNames(ResourceType resourceType) {
         LOG.info("Getting all Resource Names for type: " + resourceType.name());
         return FileCache.getResourceNameList(resourceType);
+    }
+    
+    /**
+     * Get a list of all extensions to show in the extensions registry
+     * @return
+     */
+    public List<ResourceEntity> getExtensions()  {
+    	LOG.info("Getting all Extensions");
+        return FileCache.getExtensions();
     }
     
     /**
@@ -157,14 +198,14 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return a list of IDs of matching resources
      */
-    public List<String> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         LOG.info("Getting full list of profiles first");
         List<ResourceEntity> resourceList = FileCache.getResourceList();
         
         LOG.info("Now filtering the list to those matching our criteria");
-        ArrayList<String> matches = new ArrayList<String>();
+        ArrayList<ResourceEntity> matches = new ArrayList<ResourceEntity>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
         
@@ -178,96 +219,39 @@ public class FilesystemIF implements Datasource {
             // Now create matcher object.
             Matcher m = r.matcher(resourceName);
             if (m.find()) {
-               matches.add(entry.getResourceID());
+               matches.add(entry);
             }
         }
         LOG.info("Returning matches");
         return matches;
-    }
-
-    /**
-     * Gets a specific ValueSet specified by id.
-     * 
-     * @param id
-     * @return 
-     */
-    public ValueSet getSingleValueSetByID(String id) {
-    	ResourceEntity entry = FileCache.getSingleResourceByID(id);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting ValueSet with id=" + id + " looking for file: " + path.getAbsolutePath());
-        
-    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
-        return foundValSet;
-    }
-
-    /**
-     * Gets a specific ValueSet specified by name.
-     * 
-     * @param name
-     * @return 
-     */
-    public ValueSet getSingleValueSetByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting ValueSet with name=" + name + " looking for file: " + path.getAbsolutePath());
-        
-    	ValueSet foundValSet = (ValueSet)FHIRUtils.loadResourceFromFile(path);
-        return foundValSet;
     }
     
-    /**
-     * This is the method to do a search based on name, ie to find where
-     * name:contains=[parameter]
-     * 
-     * @param theNamePart
-     * @return a List of matched ValueSet objects
-     */
-    public List<ValueSet> getValueSetMatchByName(String theNamePart) {
-        LOG.info("Getting ValueSets with name=" + theNamePart);
-        List<ValueSet> list = new ArrayList<ValueSet>();
-        List<String> matchingNames = getAllMatchedValueSetNames(theNamePart);
+	@Override
+	public ExampleResources getExamples(String resourceTypeAndID) {
+		return FileCache.getExamples(resourceTypeAndID);
+	}
+	
+	@Override
+	public ResourceEntity getExampleByName(String resourceFilename) {
+		return FileCache.getExampleByName(resourceFilename);
+	}
 
-        for(String name : matchingNames) {
-            list.add(getSingleValueSetByName(name));
-        }
-        return list;
-    }
-
-    /**
-     * This is the method to search by name, e.g. name:contains=Patient
-     * 
-     * @param theNamePart
-     * @return 
-     */
-    public List<String> getAllMatchedValueSetNames(String theNamePart) {
-        LOG.info("Getting all ValueSet Names containing: " + theNamePart + " in their name");
-        
-        LOG.info("Getting full list of ValueSets first");
-        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
-        
-        LOG.info("Now filtering the list to those matching our criteria");
-        ArrayList<String> matches = new ArrayList<String>();
-        
-        String pattern = "(.*)" + theNamePart + "(.*)";
-        
-        for (String valSetName : valSetList) {
-        	// Create a Pattern object
-            Pattern r = Pattern.compile(pattern);
-
-            // Now create matcher object.
-            Matcher m = r.matcher(valSetName);
-            if (m.find()) {
-               matches.add(valSetName);
-            }
-        }
-        LOG.info("Returning matches");
-        return matches;
-    }
-
-    public List<String> getAllValueSetNames() {
-        LOG.info("Getting all ValueSet Names");
-        List<String> valSetList = FileCache.getResourceNameList(ResourceType.VALUESET);
-        
-        return valSetList;
-    }
+	@Override
+	public HashMap<String, Integer> getResourceTypeCounts() {
+		HashMap<String, Integer> results = new HashMap<String, Integer>();
+		List<ResourceEntity> list = FileCache.getResourceList();
+		for (ResourceEntity entry : list) {
+			String type = entry.getResourceType().toString();
+			if (entry.isExtension()) {
+				type = "Extension";
+			}
+			if (results.containsKey(type)) {
+				Integer i = results.get(type);
+				results.put(type, i + 1);
+			} else {
+				results.put(type, new Integer(1));
+			}
+		}
+		return results;
+	}
 }

@@ -1,6 +1,9 @@
 # Dockerfile to run my WAR file
 # This uses a base image from jetty, which can run war files...
 FROM jetty:9.3.12-jre8-alpine
+
+ENV CONFIG_FILE ""
+
 # Adds war into the image
 ADD ./target/fhir-1.0-SNAPSHOT.war /var/lib/jetty/webapps/ROOT.war
 

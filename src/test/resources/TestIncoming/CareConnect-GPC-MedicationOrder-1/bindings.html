@@ -1,0 +1,718 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <style>tr,
+.fhir-table-title {
+	font-size: 11px;
+	font-family: verdana;
+	vertical-align: top;
+	border: 0
+}
+td,
+.fhir-table-title {
+	padding: 0px 4px
+}
+.fhir-panel-heading-box {
+	margin: -15px -15px 15px;
+	padding: 10px 15px;
+	background-color: #f7f7f7;
+	border-bottom: 1px solid #dddddd;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px
+}
+.fhir-panel-heading-text {
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 17.5px;
+	font-weight: 500
+}
+tr {
+	padding: 3px;
+	line-height: 1.66em
+}
+.fhir-table-header-row {
+	border: 1px #F0F0F0 solid
+}
+tr,
+fhir-table-title,
+td,
+tr,
+fhir-table-title,
+td {
+	text-align: left;
+	text-align: left
+}
+fhir-table-title,
+td,
+fhir-table-title,
+td {
+	vertical-align: top;
+	vertical-align: top
+}
+table {
+	width: 100%;
+	font-family: sans-serif;
+	border-collapse: collapse
+}
+.fhir-panel * {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box
+}
+.fhir-table tbody:before {
+	content: '-';
+	display: block;
+	line-height: 1em;
+	color: transparent
+}
+.fhir-panel {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	line-height: 1.4;
+	width: 95%;
+	max-width: 100%;
+	word-wrap: break-word
+}
+.fhir-panel {
+	padding: 15px;
+	margin-bottom: 20;
+	background-color: #ffffff;
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05)
+}
+.fhir-info-name-block, .fhir-info-tag-block {
+	display: inline;
+	background-color: #cccccc;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 10px;
+	padding: .2em .6em .3em;
+	text-align: center;
+	vertical-align: baseline;
+	white-space: nowrap;
+	line-height: 2em;
+	border-radius: .25em
+}
+.fhir-info-name-block {
+	background-color: #cccccc
+}
+.fhir-info-tag-block {
+	background-color: #ffbb55
+}
+.fhir-info-name-bold {
+	font-weight: bold
+}
+.fhir-text-italic {
+	font-style: italic
+}
+.fhir-resource-info-cell {
+	padding: 5px 4px;
+	border-bottom: 1px solid #F0F0F0
+}
+.fhir-link {
+	text-decoration: none;
+	color: #005EB8
+}
+.fhir-text-faded {
+	opacity: 0.4
+}
+.fhir-text-strikethrough {
+	text-decoration: line-through
+}
+.fhir-metadata-cell {
+	border: 1px solid #f0f0f0
+}
+.fhir-metadata-label,
+.fhir-telecom-name {
+	color: #808080;
+	font-weight: bold;
+	font-size: 13
+}
+.fhir-metadata-label-empty {
+	color: #D0D0D0;
+	font-weight: normal
+}
+.fhir-metadata-value,
+.fhir-telecom-value {
+	color: #000000;
+	font-size: 13
+}
+.fhir-metadata-value-smalltext {
+	font-size: 10
+}
+.fhir-metadata-block-title {
+	color: #808080;
+	font-weight: bold;
+	text-decoration: underline;
+	font-size: 13
+}</style>
+  </head>
+  <body>
+    <div class="fhir-panel">
+      <div class="fhir-panel-heading-box">
+        <h3 class="fhir-panel-heading-text">Bindings</h3>
+      </div>
+      <div class="fhir-panel-body">
+        <table class="fhir-table">
+          <colgroup>
+            <col width="20%" />
+            <col width="40%" />
+            <col width="10%" />
+            <col width="30%" />
+          </colgroup>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-label">Path</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-label">Definition</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-label">Type</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-label">Reference</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.identifier.use</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">The purpose of this identifier.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-identifier-use.html">
+                  http://hl7.org/fhir/ValueSet/identifier-use
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.identifier.type</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A coded type for the identifier that can be used to determine which identifier to use for a specific purpose.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  extensible
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-identifier-type.html">
+                  http://hl7.org/fhir/ValueSet/identifier-type
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.status</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A code specifying the state of the order.  Generally this will be active or completed state.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-medication-order-status.html">
+                  http://hl7.org/fhir/ValueSet/medication-order-status
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.reasonEnded</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">The reason why the prescription was stopped, if it was.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value" />
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.reasonEnded.coding</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A reference to a code defined by a terminology system.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://snomed.info/sct">
+                  http://snomed.info/sct
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.reason[x]</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">Can be the reason or the indication for writing the prescription.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-condition-code.html">
+                  http://hl7.org/fhir/ValueSet/condition-code
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.medication[x]</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">Identifies the medication being administered.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://fhir-test.nhs.uk/ValueSet/careconnect-manufacturedmaterialsnct-1">
+                  http://fhir-test.nhs.uk/ValueSet/careconnect-manufacturedmaterialsnct-1
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.additionalInstructions</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">Additional instructions such as "Swallow with plenty of water" which may or may not be coded.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value" />
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.additionalInstructions.coding</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A reference to a code defined by a terminology system.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://snomed.info/sct">
+                  http://snomed.info/sct
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.timing.repeat.durationUnits</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">The units of time for the duration, in UCUM units.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-units-of-time.html">
+                  http://hl7.org/fhir/ValueSet/units-of-time
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.timing.repeat.periodUnits</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">The units of time for the period in UCUM units.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-units-of-time.html">
+                  http://hl7.org/fhir/ValueSet/units-of-time
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.timing.repeat.when</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A real world event that the occurrence of the event should be tied to.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-event-timing.html">
+                  http://hl7.org/fhir/ValueSet/event-timing
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.timing.code</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A code for the timing pattern. Some codes such as BID are ubiquitous, but many institutions define their own additional codes.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-timing-abbreviation.html">
+                  http://hl7.org/fhir/ValueSet/timing-abbreviation
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.asNeeded[x]</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">Indicates whether the Medication is only taken when needed within a specific dosing schedule (Boolean option), or it indicates the precondition for taking the Medication (CodeableConcept).</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://snomed.info/sct">
+                  http://snomed.info/sct
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.site[x]</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A coded specification of the anatomic site where the medication first enters the body.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-approach-site-codes.html">
+                  http://hl7.org/fhir/ValueSet/approach-site-codes
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.route</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A code specifying the route or physiological path of administration of a therapeutic agent into or onto a patient's body.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-route-codes.html">
+                  http://hl7.org/fhir/ValueSet/route-codes
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.route.coding</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A reference to a code defined by a terminology system.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://fhir-test.nhs.uk/ValueSet/careconnect-medicationdosageroute-1">
+                  http://fhir-test.nhs.uk/ValueSet/careconnect-medicationdosageroute-1
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.method</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A coded value indicating the method by which the medication is introduced into or onto the body. Most commonly used for injections.  For examples, Slow Push; Deep IV.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value" />
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.method.coding</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A reference to a code defined by a terminology system.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  preferred
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://fhir-test.nhs.uk/ValueSet/careconnect-medicationdosagemethod-1">
+                  http://fhir-test.nhs.uk/ValueSet/careconnect-medicationdosagemethod-1
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.maxDosePerPeriod.numerator.comparator</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">How the value should be understood and represented - whether the actual value is greater or less than the stated value due to measurement issues; e.g. if the comparator is "&lt;" , then the real value is &lt; stated value.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-quantity-comparator.html">
+                  http://hl7.org/fhir/ValueSet/quantity-comparator
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.dosageInstruction.maxDosePerPeriod.denominator.comparator</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">How the value should be understood and represented - whether the actual value is greater or less than the stated value due to measurement issues; e.g. if the comparator is "&lt;" , then the real value is &lt; stated value.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  required
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-quantity-comparator.html">
+                  http://hl7.org/fhir/ValueSet/quantity-comparator
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.substitution.type</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">A code signifying whether a different drug should be dispensed from what was prescribed.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-v3-ActSubstanceAdminSubstitutionCode.html">
+                  http://hl7.org/fhir/ValueSet/v3-ActSubstanceAdminSubstitutionCode
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">MedicationOrder.substitution.reason</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">Indicates the reason for the substitution, or why substitution must or must not be performed.</span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="https://www.hl7.org/fhir/terminologies.html#example">
+                  example
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+            <td class="fhir-metadata-cell" colspan="1">
+              <span class="fhir-metadata-value">
+                <a class="fhir-link" href="http://hl7.org/fhir/DSTU2/valueset-v3-SubstanceAdminSubstitutionReason.html">
+                  http://hl7.org/fhir/ValueSet/v3-SubstanceAdminSubstitutionReason
+                  <img src="http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/icon_reference.png" class="fhir-tree-resource-icon" />
+                </a>
+              </span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

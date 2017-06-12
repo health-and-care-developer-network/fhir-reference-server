@@ -1,14 +1,45 @@
+.fhir-panel {
+	width: 100% !IMPORTANT;
+}
+
+.wrapper.cf.container {
+    padding-left: 0px;
+    padding-right: 30px;
+}
+
+#extensionTable {
+	width:100%;
+}
+
+#extensionTable th {
+	font-weight: bold;
+	border-bottom: solid thin lightgrey;
+}
+
+#extensionTable td {
+	border-bottom: solid thin lightgrey;
+}
+
+#tabs ul {
+	margin-left: 0px;
+}
+
 body {
     background-color: #ffffff;
     position: relative;
     padding-top: 0;
     font-family: Arial, Helvetica, sans-serif;
+    font-size: 12pt;
 }
 
 #header {
     border-bottom: 1px solid silver;
     background-color: #f5f5f5;
-    height: 80px;
+    height: 87px;
+}
+
+.breadcrumbs {
+    padding-top: 20px;
 }
 
 #header h1, #header h2, #header h3 {
@@ -38,8 +69,12 @@ footer {
     padding: 10px;
     background-color: #f5f5f5;
     border-top: 1px solid #CCC;
-    font-size: 12px;
-    height: 20px;
+    font-size: 16px;
+    height: 50px;
+}
+
+.main {
+	min-height: 530px;
 }
 
 footer div.links {
@@ -55,8 +90,8 @@ h2.resourceType {
 }
 
 .fhirServerWarning {
-    margin-bottom: 10px;
-    margin-top: 10px;
+    /*margin-bottom: 10px;
+    margin-top: 10px;*/
     background-color: #f2dede;
     border-color: #eed3d7;
     color: #b94a48;
@@ -70,11 +105,27 @@ h2.resourceType {
     color: #ce5c00;
     padding: 15px;
 }
-.resourceSummary {
-    border: thin solid #d4d2d2;
-    padding: 5px;
-    font-size: 0.8em;
+
+.metadataSection {
+	border: thin solid #d4d2d2;
 }
+
+.resourceSummary {
+    float: left;
+    padding: 5px;
+    width: 80%;
+}
+
+.resourceVersions {
+	float: left;
+    padding: 5px;
+    width: 17%;
+}
+
+.clearPara {
+	clear: both;
+}
+
 .treeView, .operationTable, .guideContent {
     border: thin solid #d4d2d2;
     padding: 5px;
@@ -87,7 +138,7 @@ h2.resourceType {
     margin-top: 5px;
 }
 
-.rawXML {
+.rawXML, .rawJSON {
     overflow-x: scroll;
     border: thin solid #d4d2d2;
     padding: 5px;

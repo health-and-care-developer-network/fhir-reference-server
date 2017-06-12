@@ -15,29 +15,40 @@
  */
 package uk.nhs.fhir;
 
-import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.RestfulServer;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.RestfulServer;
+import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.resourcehandlers.*;
-
-import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.resourcehandlers.BundleProvider;
+import uk.nhs.fhir.resourcehandlers.ConformanceProvider;
+import uk.nhs.fhir.resourcehandlers.DocumentReferenceProvider;
+import uk.nhs.fhir.resourcehandlers.ImplementationGuideProvider;
+import uk.nhs.fhir.resourcehandlers.OperationDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.OrganizationProvider;
+import uk.nhs.fhir.resourcehandlers.PatientProvider;
+import uk.nhs.fhir.resourcehandlers.PractitionerProvider;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
+import uk.nhs.fhir.servlethelpers.ServletStreamExample;
+import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.PropertyReader;
-import uk.nhs.fhir.util.ServletStreamRawFile;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -52,7 +63,9 @@ public class RestfulServlet extends RestfulServer {
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
-    Datasource dataSource = null;
+    private static Datasource dataSource = null;
+    private static ResourceWebHandler webber = null;
+    private static RawResourceRender myRawResourceRenderer = null;
 
     //private static String css = FileLoader.loadFileOnClasspath("/style.css");
     //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
@@ -68,9 +81,18 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().endsWith("favicon.ico")) {
         	// favicon.ico
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
-        } else if (request.getRequestURI().startsWith("/images/")) {
-        	// Image files
+        } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
+        	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
+        } else if (request.getRequestURI().startsWith("/artefact")) {
+        	ServletStreamArtefact.streamArtefact(request, response, dataSource);
+        } else if (request.getRequestURI().startsWith("/Examples/")) {
+        	ServletStreamExample.streamExample(request, response, dataSource, myRawResourceRenderer);
+        } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
+	    	response.setStatus(200);
+			response.setContentType("text/plain");
+			PrintWriter outputStream = response.getWriter();
+	        outputStream.write(DataLoaderMessages.getProfileLoadMessages());
         } else {
             super.doGet(request, response);
         }
@@ -101,8 +123,12 @@ public class RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-
-        ResourceWebHandler webber = new ResourceWebHandler(dataSource);
+        webber = new ResourceWebHandler(dataSource);
+        myRawResourceRenderer = new RawResourceRender(webber);
+        
+        // Pass our resource handler to the other servlets
+        IndexServlet.setResourceHandler(webber);
+        ExtensionServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
@@ -114,6 +140,7 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
         resourceProviders.add(new ImplementationGuideProvider(dataSource));
+        resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
         LOG.info("resourceProviders added");
