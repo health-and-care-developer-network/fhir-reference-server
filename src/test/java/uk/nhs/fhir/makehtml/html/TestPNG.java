@@ -11,10 +11,11 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.SectionedHTMLDoc;
 
 public class TestPNG {
 	

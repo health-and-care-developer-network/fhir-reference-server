@@ -25,6 +25,7 @@ import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
+import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 
 /**
  *

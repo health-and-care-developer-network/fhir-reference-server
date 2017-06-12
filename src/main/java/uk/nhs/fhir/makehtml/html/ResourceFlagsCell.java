@@ -9,9 +9,9 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.ResourceFlag;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.util.Elements;
 
 public class ResourceFlagsCell extends TableCell {

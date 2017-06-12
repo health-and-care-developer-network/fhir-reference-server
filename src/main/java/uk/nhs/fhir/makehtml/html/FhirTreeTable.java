@@ -9,7 +9,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
@@ -25,6 +24,8 @@ import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {

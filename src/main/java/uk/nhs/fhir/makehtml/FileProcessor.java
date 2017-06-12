@@ -16,6 +16,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import com.google.common.base.Preconditions;
 
 import ca.uhn.fhir.context.FhirContext;
+import uk.nhs.fhir.makehtml.render.ResourceBuilder;
+import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.makehtml.render.ResourceTextSectionInserter;
 import uk.nhs.fhir.util.SharedFhirContext;
 
 public class FileProcessor {

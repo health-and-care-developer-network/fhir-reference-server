@@ -11,7 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
 import com.google.common.base.Strings;
-import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.util.SharedFhirContext;
 
@@ -61,7 +61,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return HTMLConstants.NHS_FHIR_IMAGES_DIR + name + "." + extension;
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + name + "." + extension;
 	}
 	
 	public String getBase64() {

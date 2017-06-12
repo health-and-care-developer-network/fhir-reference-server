@@ -4,8 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
-import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 /**
  * Icons used to display the type of an element in a FHIR tree
@@ -97,6 +98,6 @@ public enum FhirTreeIcon {
 	private static final String VLINE_CLASS = "vline-fhir-tree-icon";
 
 	public String getNhsSrc() {
-		return HTMLConstants.NHS_FHIR_IMAGES_DIR + getFileName();
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + getFileName();
 	}
 }

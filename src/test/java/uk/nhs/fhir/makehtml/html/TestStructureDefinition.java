@@ -18,11 +18,11 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.HTMLDocSection;
-import uk.nhs.fhir.makehtml.ResourceFormatter;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
+import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.SectionedHTMLDoc;
 import uk.nhs.fhir.util.SharedFhirContext;
 
 public class TestStructureDefinition {

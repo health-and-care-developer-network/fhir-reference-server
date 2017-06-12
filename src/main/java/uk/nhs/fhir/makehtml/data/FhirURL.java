@@ -3,7 +3,7 @@ package uk.nhs.fhir.makehtml.data;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.NewMain;
 
 /**
@@ -32,8 +32,8 @@ public class FhirURL {
 		String fullUrl = url.toString();
 		
 		if (NewMain.FHIR_HL7_ORG_LINKS_LOCAL 
-		  && fullUrl.startsWith(HTMLConstants.FHIR_HL7_ORG_UK)) {
-			return fullUrl.substring(HTMLConstants.FHIR_HL7_ORG_UK.length());
+		  && fullUrl.startsWith(FhirURLConstants.FHIR_HL7_ORG_UK)) {
+			return fullUrl.substring(FhirURLConstants.FHIR_HL7_ORG_UK.length());
 		} else {
 			return url.toString();
 		}
