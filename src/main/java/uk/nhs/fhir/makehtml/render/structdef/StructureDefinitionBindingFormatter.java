@@ -17,6 +17,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -119,12 +120,15 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
             
             String path = node.getPath() + displayDescription;
             if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
+            	String bindingStrength = node.getBinding().get().getStrength();
+            	String anchorStrength = bindingStrength.equals("required") ? "code" : bindingStrength;
+            	
                 foundBinding = true;
                 tableContent.add(
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, node.getBinding().get().getStrength(), 1, "https://www.hl7.org/fhir/terminologies.html#example"),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HL7_DSTU2 + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);
@@ -171,13 +175,13 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         } else {
         	String uri = uriToDisplay.get();
         	
-        	uri = Dstu2Fix.dstu2links(uri);
+        	uri = Dstu2Fix.valuesetDstu2links(uri);
         	
         	List<Content> linkContents = Lists.newArrayList();
     		linkContents.add(new Text(displayText));
 
         	boolean internal = (!uri.startsWith("http://") && !uri.startsWith("https://")) 
-        		|| uri.contains("https://fhir.nhs.uk/");
+        		|| uri.contains(FhirURLConstants.FHIR_NHS_UK);
     		
         	if (!internal) {
         		linkContents.add(
@@ -206,8 +210,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
 				linkContents));
     }
 
-
-
     private Element cell(List<? extends Content> content, int colspan) {
         return Elements.withAttributesAndChildren("td",
                 Lists.newArrayList(
@@ -215,8 +217,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                         new Attribute("colspan", Integer.toString(colspan))),
                 content);
     }
-
-
 
     public void addStyles(HTMLDocSection section) {
         Table.getStyles().forEach(section::addStyle);

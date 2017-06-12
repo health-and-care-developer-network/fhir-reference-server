@@ -157,17 +157,6 @@ public class ConceptMapMetadataFormatter {
 			new Attribute("class", cssClass), 
 			label);
 	}
-
-	/*
-	private String dstu2link(String value)
-	{
-		if (value.equals("https://www.hl7.org/fhir/codesystem-concept-map-equivalence.html#concept-map-equivalence-equivalent")) {
-			value = "http://hl7.org/fhir/DSTU2/valueset-concept-map-equivalence.html";
-		}
-		return value;
-	}
-
-	*/
 	
 	private Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));

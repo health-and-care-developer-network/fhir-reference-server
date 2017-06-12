@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -52,8 +53,7 @@ public class ConceptMapTableFormatter {
 				tableContent.add(
 						Elements.withChildren("tr",
 								labelledValueCell(BLANK, element.getCode(), 1, true, true),
-								// STU3 url labelledHttpCell("https://www.hl7.org/fhir/codesystem-concept-map-equivalence.html#concept-map-equivalence-equivalent", target.getEquivalence(),  1, true, false),
-								labelledHttpCell("http://hl7.org/fhir/DSTU2/valueset-concept-map-equivalence.html", target.getEquivalence(),  1, true, false),
+								labelledHttpCell(FhirURLConstants.HL7_DSTU2 + "/valueset-concept-map-equivalence.html", target.getEquivalence(),  1, true, false),
 								labelledValueCell(BLANK, target.getCode(), 1, true),
 								labelledValueCell(BLANK, displayComments, 1, true)));
 			}
