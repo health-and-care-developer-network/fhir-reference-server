@@ -26,7 +26,6 @@ import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.util.TableTitle;
 
 public class FhirTreeTable {
 	

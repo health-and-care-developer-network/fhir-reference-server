@@ -17,13 +17,13 @@ import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.util.Elements;
 
 public class ValueSetTableFormatter extends MetadataTableFormatter {
 

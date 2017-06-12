@@ -1,5 +1,18 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.base.Strings;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
@@ -10,17 +23,9 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
-import com.google.common.base.Strings;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.NewMain;
-import uk.nhs.fhir.util.SharedFhirContext;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -128,7 +133,7 @@ public enum FhirIcon {
 
 	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
 
-		FhirContext ctx = SharedFhirContext.get();
+		FhirContext ctx = HAPIUtils.sharedFhirContext();
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {

@@ -7,13 +7,13 @@ import org.jdom2.Element;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.html.jdom2.Elements;
+import uk.nhs.fhir.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
 import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
-import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileWriter;
-import uk.nhs.fhir.util.HTMLUtil;
 
 public class ResourceTextSectionInserter {
 	

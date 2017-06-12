@@ -135,7 +135,7 @@ public class FhirTreeNodeBuilder {
 				node.setExample(examplePrimitive.getValueAsString());
 			} else if (example instanceof PeriodDt) {
 				PeriodDt examplePeriod = (PeriodDt)example;
-				node.setExample(StringUtil.periodToString(examplePeriod));
+				node.setExample(HAPIUtils.periodToString(examplePeriod));
 			} else {
 				throw new IllegalStateException("Unhandled type for example value: " + example.getClass().getName());
 			}

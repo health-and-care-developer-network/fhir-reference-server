@@ -17,13 +17,13 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.SharedFhirContext;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
@@ -33,7 +33,7 @@ public class TestStructureDefinition {
 	@Ignore
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
-		IParser parser = SharedFhirContext.get().newXmlParser();
+		IParser parser = HAPIUtils.sharedFhirContext().newXmlParser();
 		try (
 				// TODO KGM 9/May/2017 moved to older strucutre definition example.
 			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition3.xml").getFile()));

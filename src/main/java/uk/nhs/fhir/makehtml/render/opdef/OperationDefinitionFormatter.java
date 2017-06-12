@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
@@ -21,7 +22,6 @@ import uk.nhs.fhir.makehtml.html.TableRow;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
 public class OperationDefinitionFormatter extends ResourceFormatter {

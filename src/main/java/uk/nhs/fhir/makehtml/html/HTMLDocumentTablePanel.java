@@ -7,8 +7,7 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.util.TableTitle;
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.html.jdom2.Elements;
 
 public abstract class HTMLDocumentTablePanel extends HTMLDocumentPanel {
 

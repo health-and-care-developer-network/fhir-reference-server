@@ -2,13 +2,7 @@ package uk.nhs.fhir.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
-
-import com.google.common.collect.Lists;
-
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.primitive.StringDt;
 
 public class StringUtil {
 	public static boolean hasUpperCaseChars(String value) {
@@ -45,24 +39,11 @@ public class StringUtil {
 			return value;
 		}
 	}
-
-	public static String join(String delimiter, List<StringDt> wrappedStrings) {
-		List<String> unwrappedStrings = Lists.newArrayList();
-		wrappedStrings.forEach((StringDt wrapped) -> unwrappedStrings.add(wrapped.getValue()));
-		return String.join(delimiter, unwrappedStrings);
-	}
 	
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 	
 	public static String dateToString(Date date) {
 		return dateFormat.format(date);
-	}
-	
-	public static String periodToString(PeriodDt period) {
-		Date start = period.getStart();
-		Date end = period.getEnd();
-		
-		return dateToString(start) + " - " + dateToString(end);
 	}
 
 	public static void printIfPresent(String desc, Optional<String> s) {

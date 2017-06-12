@@ -10,8 +10,8 @@ import org.jdom2.Text;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.util.Elements;
 
 public class TreeNodeCell extends TableCell {
 

@@ -7,11 +7,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import uk.nhs.fhir.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FileWriter;
-import uk.nhs.fhir.util.HTMLUtil;
 
 public class FormattedOutputSpec {
 	private final IBaseResource resource;

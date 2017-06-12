@@ -28,7 +28,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.makehtml.prep.ResourcePreparer;
-import uk.nhs.fhir.util.SharedFhirContext;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public class ResourceBuilder {
 	private final ResourcePreparer<StructureDefinition> structureDefinitionPreparer;
@@ -54,7 +54,7 @@ public class ResourceBuilder {
 	}
 	
 	protected String addTextSection(String resourceXML, String textSection, String newBaseURL) throws Exception {
-		FhirContext ctx = SharedFhirContext.get();
+		FhirContext ctx = HAPIUtils.sharedFhirContext();
 		BaseResource resource = parseResource(ctx, resourceXML);
 		addHumanReadableText(resource, textSection);
         prepareResource(resource, newBaseURL);

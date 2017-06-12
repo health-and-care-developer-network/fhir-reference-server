@@ -17,9 +17,9 @@ import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
+import uk.nhs.fhir.makehtml.html.TableTitle;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
-import uk.nhs.fhir.util.TableTitle;
 
 // KGM 8/May/2017 Altered meta table column to % widths
 

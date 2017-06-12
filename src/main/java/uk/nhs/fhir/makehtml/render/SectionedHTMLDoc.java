@@ -10,8 +10,8 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.util.Elements;
 
 public class SectionedHTMLDoc extends HTMLDocSection {
 	

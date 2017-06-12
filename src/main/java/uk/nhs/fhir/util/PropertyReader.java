@@ -22,14 +22,14 @@ import java.util.logging.Logger;
  * Convenience class to read configuration from a property file
  * @author Adam Hatherly
  */
-public class PropertyReader implements GlobalConstants {
+public class PropertyReader {
+	public static final String PROPERTY_FILE = "config.properties";
+
 	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());
-	
-    private static Properties defaultProperties;
+    private static final Properties defaultProperties = new Properties();
 
     // When this class is loaded by the JVM, immediately read the property file
     static {
-    	defaultProperties = new Properties();
     	initialise(defaultProperties, PROPERTY_FILE);        
     }
 
@@ -37,23 +37,11 @@ public class PropertyReader implements GlobalConstants {
      * Load the property values into a local object from the property file.
      */
     private static void initialise(Properties props, String filename) {
-        InputStream in = null;
         
-        try {
-        	in = PropertyReader.class.getClassLoader().getResourceAsStream(filename);
-            if (in != null) {
-            	props.load(in);
-            	in.close();
-            }
-        } catch (Exception ex) {
+        try (InputStream in = PropertyReader.class.getClassLoader().getResourceAsStream(filename)){
+            props.load(in);
+        } catch (IOException ex) {
        		logger.severe("Config file not found: " + filename);
-        } finally {
-            try {
-                if (in != null) {
-                	in.close();
-                }
-            } catch (IOException ex) {
-            }
         }
     }
 

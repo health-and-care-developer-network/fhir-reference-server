@@ -19,7 +19,7 @@ import ca.uhn.fhir.context.FhirContext;
 import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.ResourceTextSectionInserter;
-import uk.nhs.fhir.util.SharedFhirContext;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
@@ -29,7 +29,7 @@ public class FileProcessor {
     
     public FileProcessor(ResourceBuilder resourceBuilder) {
     	
-    	this.fhirContext = SharedFhirContext.get();
+    	this.fhirContext = HAPIUtils.sharedFhirContext();
     	Preconditions.checkNotNull(resourceBuilder);
     	
     	this.resourceBuilder = resourceBuilder;

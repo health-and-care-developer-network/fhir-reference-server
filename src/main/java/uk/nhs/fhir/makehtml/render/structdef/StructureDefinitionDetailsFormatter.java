@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
@@ -30,7 +31,6 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.util.Elements;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 

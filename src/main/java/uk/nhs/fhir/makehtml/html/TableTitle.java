@@ -1,4 +1,4 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.makehtml.html;
 
 import java.util.Optional;
 
@@ -7,6 +7,7 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 
 public class TableTitle {

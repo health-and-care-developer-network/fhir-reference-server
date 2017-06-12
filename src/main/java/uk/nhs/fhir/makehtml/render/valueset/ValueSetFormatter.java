@@ -24,7 +24,7 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapTableFormatter;
-import uk.nhs.fhir.util.SharedFhirContext;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public class ValueSetFormatter extends ResourceFormatter {
 
@@ -36,7 +36,7 @@ public class ValueSetFormatter extends ResourceFormatter {
 	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
 		ValueSet valueSet = (ValueSet)source;
 		
-        FhirValidator validator = SharedFhirContext.get().newValidator();
+        FhirValidator validator = HAPIUtils.sharedFhirContext().newValidator();
         FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
         validator.registerValidatorModule(instanceValidator);
 

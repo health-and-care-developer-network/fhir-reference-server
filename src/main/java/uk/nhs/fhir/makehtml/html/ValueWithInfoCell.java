@@ -9,11 +9,11 @@ import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.util.Elements;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueWithInfoCell extends TableCell {

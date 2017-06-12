@@ -11,11 +11,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.TableTitle;
 
 public class TestFormatTable {
 	@Test

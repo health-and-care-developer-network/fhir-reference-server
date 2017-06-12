@@ -9,10 +9,9 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.util.Elements;
-import uk.nhs.fhir.util.TableTitle;
 
 public class Table {
 	private final List<TableTitle> cols = Lists.newArrayList();
