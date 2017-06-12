@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.html.jdom2.Elements;
-import uk.nhs.fhir.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;

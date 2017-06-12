@@ -17,7 +17,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -29,6 +28,7 @@ import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 

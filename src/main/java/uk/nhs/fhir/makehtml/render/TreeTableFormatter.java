@@ -11,13 +11,13 @@ import org.jdom2.filter.Filters;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.TablePNGGenerator;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 

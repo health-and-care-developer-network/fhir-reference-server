@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html.jdom2;
+package uk.nhs.fhir.makehtml.html.jdom2;
 
 import java.io.IOException;
 import java.io.StringWriter;

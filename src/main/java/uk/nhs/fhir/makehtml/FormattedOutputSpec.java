@@ -7,11 +7,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.FileWriter;
+import uk.nhs.fhir.util.FileUtils;
 
 public class FormattedOutputSpec {
 	private final IBaseResource resource;
@@ -41,7 +41,7 @@ public class FormattedOutputSpec {
 		outputDoc.addSection(sectionHTML);
 		String outputString = HTMLUtil.docToString(outputDoc.getHTML(), true, false);
 		
-		if (!FileWriter.writeFile(outputPath, outputString.getBytes("UTF-8"))) {
+		if (!FileUtils.writeFile(outputPath, outputString.getBytes("UTF-8"))) {
 			throw new IllegalStateException("Failed to write file " + outputPath);
 		}
 	}

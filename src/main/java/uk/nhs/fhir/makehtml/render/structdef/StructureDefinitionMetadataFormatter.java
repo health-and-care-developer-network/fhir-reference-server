@@ -25,12 +25,12 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 

@@ -8,8 +8,8 @@ import org.jdom2.Element;
 import org.junit.Test;
 
 import junit.framework.Assert;
-import uk.nhs.fhir.html.jdom2.Elements;
-import uk.nhs.fhir.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 
 public class TestPanel {
 

@@ -7,8 +7,8 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 
 public class TableTitle {
 	private final String title;
