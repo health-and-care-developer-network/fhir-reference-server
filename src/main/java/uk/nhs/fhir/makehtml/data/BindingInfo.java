@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 
 import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class BindingInfo {
 
@@ -45,15 +46,10 @@ public class BindingInfo {
 		Optional<FhirURL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
 		String resolvedStrength = !bindingStrength.isEmpty() ? bindingStrength : backupStrength; 
 		
-		try {
-			Preconditions.checkArgument(resolvedDescription.isPresent() || resolvedUrl.isPresent(), "Description or URL must be present");
-		} catch (IllegalArgumentException e) {
-			if (!NewMain.STRICT) {
-				e.printStackTrace();
-				resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
-			} else {
-				throw e;
-			}
+		if (!resolvedDescription.isPresent() 
+		  && !resolvedUrl.isPresent()) {
+			RendererError.handle(RendererError.Key.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
+			resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
 		}
 		
 		return new BindingInfo(resolvedDescription, resolvedUrl, resolvedStrength);

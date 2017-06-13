@@ -22,10 +22,10 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
-import uk.nhs.fhir.util.StringUtil;
 
 public class FhirTreeNodeBuilder {
 	private final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
@@ -33,11 +33,19 @@ public class FhirTreeNodeBuilder {
 	public FhirTreeNode fromElementDefinition(ElementDefinitionDt elementDefinition) {
 		
 		Optional<String> name = Optional.ofNullable(elementDefinition.getName());
-		
-		List<Type> snapshotElementTypes = elementDefinition.getType();
+
 		List<LinkData> typeLinks = Lists.newArrayList();
-		if (!snapshotElementTypes.isEmpty()) {
-			typeLinks.addAll(getTypeLinks(snapshotElementTypes));
+		if (elementDefinition.getPath().split("\\.").length == 1) {
+			try {
+				typeLinks.add(new SimpleLinkData(new FhirURL(FhirURLConstants.HL7_DSTU2 + "/profiling.html"), "Profile"));
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
+		} else {
+			List<Type> snapshotElementTypes = elementDefinition.getType();
+			if (!snapshotElementTypes.isEmpty()) {
+				typeLinks.addAll(getTypeLinks(snapshotElementTypes));
+			}
 		}
 
 		ResourceFlags flags = ResourceFlags.forDefinition(elementDefinition);
@@ -60,13 +68,7 @@ public class FhirTreeNodeBuilder {
 		for (Constraint constraint : elementDefinition.getConstraint()) {
 			String key = constraint.getKey();
 			if (!conditionIds.contains(key)) {
-				String errorMessage = "***Constraint " + key + " doesn't have an associated condition pointing at it***";
-				/*if (NewMain.STRICT) {
-					throw new IllegalStateException(errorMessage);
-				} else {
-					System.out.println(errorMessage);
-				}*/
-				System.out.println(errorMessage);
+				RendererError.handle(RendererError.Key.CONSTRAINT_WITHOUT_CONDITION, "Constraint " + key + " doesn't have an associated condition pointing at it");
 			}
 			
 			String description = constraint.getHuman();
@@ -78,18 +80,13 @@ public class FhirTreeNodeBuilder {
 			constraints.add(new ConstraintInfo(key, description, severity, requirements, xpath));
 		}
 
-		//validate for duplicate keys
+		//check for duplicate keys
 		for (int i=0; i<constraints.size(); i++) {
 			ConstraintInfo constraint1 = constraints.get(i);
 			for (int j=i+1; j<constraints.size(); j++) {
 				ConstraintInfo constraint2 = constraints.get(j);
 				if (constraint1.getKey().equals(constraint2.getKey())) {
-					String warning = "Node with constraints with duplicate key: '" + constraint1.getKey() + "'";
-					if (NewMain.STRICT) {
-						throw new IllegalStateException(warning);
-					} else {
-						System.out.println("***" + warning + "***");
-					}
+					RendererError.handle(RendererError.Key.DUPLICATE_CONSTRAINT_KEYS, "Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
 				}
 			}
 		}

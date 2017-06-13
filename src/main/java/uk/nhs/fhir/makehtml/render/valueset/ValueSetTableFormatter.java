@@ -414,7 +414,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                         Elements.withAttributesAndChildren("a",
                                 Lists.newArrayList(
                                         new Attribute("class", FhirCSS.LINK),
-                                        new Attribute("href", Dstu2Fix.valuesetDstu2links(value)),
+                                        new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
                                          new Attribute("title", hint)),
                                 Lists.newArrayList(
                                         new Text(value),
@@ -430,7 +430,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 
                                     Lists.newArrayList(
                                             new Attribute("class", FhirCSS.LINK),
-                                            new Attribute("href", Dstu2Fix.valuesetDstu2links(value)),
+                                            new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
                                             new Attribute("title", hint)),
                                     value)
                         //        ,new Text(" (internal)") // Removed internal, using icon for external instead
@@ -441,7 +441,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                         Elements.withAttributesAndText("a",
                                 Lists.newArrayList(
                                         new Attribute("class", FhirCSS.LINK),
-                                        new Attribute("href", Dstu2Fix.valuesetDstu2links(value)),
+                                        new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
                                         new Attribute("title", hint)),
                                 value));
             }

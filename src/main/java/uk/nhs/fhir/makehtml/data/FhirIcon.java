@@ -24,7 +24,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.HAPIUtils;
 
 public enum FhirIcon {
@@ -158,18 +158,25 @@ public enum FhirIcon {
 			String pathName = suppliedResourcesFolderPath + fileName;
 			File file = new File(pathName);
 			
-			if (!NewMain.STRICT && !file.exists()) {
+			if (!file.exists()) {
+				// case insensitive search
 				for (File f : new File(suppliedResourcesFolderPath).listFiles()) {
 					if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
 						file = f;
 						break;
 					}
 				}
-				
+			}
+
+			if (!file.exists()) {
 				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
-					System.out.println("FIXING PATH FOR " + fileName);
-					fileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					// fix up for known incorrectly named file
+					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
+					fileName = newFileName;
 					file = new File(suppliedResourcesFolderPath + fileName);
+				} else {
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 				}
 			}
 			

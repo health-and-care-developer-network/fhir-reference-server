@@ -26,6 +26,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.data.FhirVersion;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
@@ -91,7 +92,11 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		
 		Optional<String> requirements = Optional.ofNullable(source.getRequirements());
 		Optional<String> copyrightInfo = Optional.ofNullable(source.getCopyright());
-		Optional<String> fhirVersion = Optional.ofNullable(source.getFhirVersion());
+		
+		Optional<String> fhirVersionStr = Optional.ofNullable(source.getFhirVersion());
+		Optional<FhirVersion> fhirVersion = fhirVersionStr.isPresent() ? Optional.of(FhirVersion.forString(fhirVersionStr.get())) : Optional.empty();
+		Optional<String> fhirVersionDesc = fhirVersion.isPresent() ? Optional.of(fhirVersion.get().getDesc()) : Optional.empty();
+		
 		Optional<String> contextType = Optional.ofNullable(source.getContextType());
 		
 		List<List<Content>> identifierCells = Lists.newArrayList();
@@ -193,7 +198,7 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				labelledValueCell("Last updated", displayDate, 1),
 				labelledValueCell("Status", status, 1),
 				labelledValueCell("Kind", StringUtil.capitaliseLowerCase(kind), 1),
-				labelledValueCell("FHIR Version", fhirVersion, 1)));
+				labelledValueCell("FHIR Version", fhirVersionDesc, 1)));
 		tableContent.add(
 			Elements.withChildren("tr", 
 				labelledValueCell("Constrained type", constrainedType, 1),

@@ -73,6 +73,8 @@ public class FhirDocLinkFactory {
 				return urlForSimpleDataType(dataTypeName);
 			case DOMAIN_RESOURCE:
 				return FhirURLConstants.HL7_DSTU2 + "/domainresource.html";
+			case ELEMENT:
+				return urlForComplexDataType(dataTypeName);
 			default:
 				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}

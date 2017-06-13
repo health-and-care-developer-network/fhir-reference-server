@@ -175,7 +175,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         } else {
         	String uri = uriToDisplay.get();
         	
-        	uri = Dstu2Fix.valuesetDstu2links(uri);
+        	uri = Dstu2Fix.fixValuesetLink(uri);
         	
         	List<Content> linkContents = Lists.newArrayList();
     		linkContents.add(new Text(displayText));

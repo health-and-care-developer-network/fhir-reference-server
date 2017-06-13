@@ -10,7 +10,6 @@ import com.google.common.collect.Sets;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
-import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.SkipRenderGenerationException;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
@@ -22,6 +21,7 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
+import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class StructureDefinitionTreeDataProvider {
 	
@@ -88,15 +88,24 @@ public class StructureDefinitionTreeDataProvider {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}
 		
+		// Workaround for a Forge bug which means the differential node for the profiled choice is correctly renamed
+		// but the snapshot name is unchanged.
 		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
-		if (matchingNodes.size() == 0 && !NewMain.STRICT) {
+		if (matchingNodes.size() == 0) {
 			String differentialPath = differentialNode.getPath();
 			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
-						
+			
+			List<FhirTreeNode> matchingUnchangedChoiceNodes = Lists.newArrayList();
 			if (choiceSuffix.isPresent()) {
 				String suffix = choiceSuffix.get();
 				String choicePath = differentialPath.substring(0, differentialPath.lastIndexOf(suffix)) + "[x]";
-				matchingNodes = findMatchingSnapshotNodes(choicePath, searchRoot);
+				matchingUnchangedChoiceNodes = findMatchingSnapshotNodes(choicePath, searchRoot);
+				
+				// This workaround is necessary due to an error in the Forge Tool (apparently fixed for STU3), so we should potentially highlight it.
+				if (matchingUnchangedChoiceNodes.size() > 0) {
+					RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + choicePath);
+					matchingNodes = matchingUnchangedChoiceNodes;
+				}
 			}
 		}
 		

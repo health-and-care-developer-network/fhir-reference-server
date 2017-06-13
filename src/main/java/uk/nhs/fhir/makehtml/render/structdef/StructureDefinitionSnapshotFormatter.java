@@ -27,17 +27,15 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		
-		/**
-		 * The differential data is used to remove children of slicing nodes which are not modified
-		 * from the base resource.
-		 */
-		FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
-		
 		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
-		snapshotTree.stripRemovedElements();
+		
 		if (!isExtension) {
+			FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
 			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTree.getData());
 		}
+		
+		snapshotTree.stripRemovedElements();
+		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();
 

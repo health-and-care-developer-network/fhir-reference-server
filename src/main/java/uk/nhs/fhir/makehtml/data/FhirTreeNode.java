@@ -8,7 +8,7 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
 	private FhirIcon icon;
@@ -143,9 +143,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 				String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
 				return new FhirCardinality(resolvedMin, resolvedMax);
 			} catch (NullPointerException e) {
-				if (backupNode == null 
-				  && !NewMain.STRICT) {
-					e.printStackTrace();
+				if (backupNode == null) {
+					RendererError.handle(RendererError.Key.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
 					return new FhirCardinality(0, "*");
 				} else {
 					throw e;
@@ -164,15 +163,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 
 		if (typeLinks.isEmpty()
-		  && FhirTypeByPath.recognisedPath(getPath())) {
+		  && FhirTypeByPath.recognisedPath(path)) {
 
-			LinkData linkForPath = FhirTypeByPath.forPath(getPath());
+			LinkData linkForPath = FhirTypeByPath.forPath(path);
 			typeLinks.add(linkForPath);
 		}
 
-		if (NewMain.STRICT
-		  && typeLinks.isEmpty()) {
-			throw new IllegalStateException("Couldn't find any typelinks for " + getPath());
+		if (typeLinks.isEmpty()) {
+			RendererError.handle(RendererError.Key.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
 		}
 
 		return typeLinks;

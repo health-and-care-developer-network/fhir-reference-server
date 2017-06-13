@@ -9,7 +9,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
@@ -178,11 +177,7 @@ public class FhirTreeTable {
 		List<LinkData> typeLinks = nodeToAdd.getTypeLinks();
 		
 		if (typeLinks.isEmpty()) {
-			if (NewMain.STRICT) {
-				throw new IllegalStateException("No type links available for " + nodeToAdd.getPath());
-			} else {
-				System.out.println("No type links available for " + nodeToAdd.getPath());
-			}
+			RendererError.handle(RendererError.Key.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
 		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
@@ -265,7 +260,8 @@ public class FhirTreeTable {
 			}
 			
 			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
-				throw new IllegalStateException("Stand-in description being displayed - expected this to have been removed by cardinality in profile");
+				RendererError.handle(RendererError.Key.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
+					"Stand-in description being displayed - expected this to have been removed by cardinality in profile");
 			} else {
 				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
 			}

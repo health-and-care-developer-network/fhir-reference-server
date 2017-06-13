@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
+	public static final boolean DISPLAY_DUMMY_NODE_TYPES = true;
+	
 	private FhirTreeNode backup = null;
 	private FhirTreeTableContent parent;
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
@@ -79,7 +81,11 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public List<LinkData> getTypeLinks() {
-		return Lists.newArrayList();
+		if (DISPLAY_DUMMY_NODE_TYPES) {
+			return backup.getTypeLinks();
+		} else {
+			return Lists.newArrayList();
+		}
 	}
 
 	@Override
