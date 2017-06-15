@@ -13,6 +13,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
@@ -68,21 +69,25 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		Optional<String> displayBaseUrl = Optional.empty();
 		String origBaseUrl = source.getBase();
 		if (origBaseUrl != null) {
-			displayBaseUrl = Optional.of(FhirURLConstants.HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/'), origBaseUrl.length()));
+			displayBaseUrl = Optional.of(FhirURLConstants.HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')));
 		}
 		
+		// version is kept in a meta tag
 		Optional<String> version = Optional.ofNullable(source.getVersion());
 		Optional<String> display = Optional.ofNullable(source.getDisplay());
 		
+		// never used in NHS Digital profiles
+		/*
 		String displayExperimental;
 		Boolean experimental = source.getExperimental();
 		if (experimental == null) {
 			displayExperimental = BLANK;
 		} else {
 			displayExperimental = experimental ? "Yes" : "No";
-		}
+		}*/
 		
 		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
+		
 		
 		Date date = source.getDate();
 		Optional<String> displayDate = 
@@ -90,12 +95,16 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				Optional.empty() : 
 				Optional.of(StringUtil.dateToString(date));
 		
+		// never used for NHS Digital StructureDefinitions
+		/*
 		Optional<String> requirements = Optional.ofNullable(source.getRequirements());
+		*/
 		Optional<String> copyrightInfo = Optional.ofNullable(source.getCopyright());
 		
-		Optional<String> fhirVersionStr = Optional.ofNullable(source.getFhirVersion());
-		Optional<FhirVersion> fhirVersion = fhirVersionStr.isPresent() ? Optional.of(FhirVersion.forString(fhirVersionStr.get())) : Optional.empty();
-		Optional<String> fhirVersionDesc = fhirVersion.isPresent() ? Optional.of(fhirVersion.get().getDesc()) : Optional.empty();
+		Optional<String> fhirVersionDesc = Optional.empty();
+		if (!Strings.isNullOrEmpty(source.getFhirVersion())) {
+			fhirVersionDesc = Optional.of(FhirVersion.forString(source.getFhirVersion()).getDesc());
+		}
 		
 		Optional<String> contextType = Optional.ofNullable(source.getContextType());
 		
@@ -182,35 +191,29 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		}
 		
 		List<Element> tableContent = Lists.newArrayList(colgroup);
-
-		String gridName = name;
-		if (version.isPresent()) {
-			gridName += " (v" + version.get() + ")";
-		}
 		
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Name", gridName, 2, true),
-				//labelledValueCell("Version", version, 1),
+				labelledValueCell("Name", name, 2, true),
 				labelledValueCell("URL", url, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Last updated", displayDate, 1),
-				labelledValueCell("Status", status, 1),
-				labelledValueCell("Kind", StringUtil.capitaliseLowerCase(kind), 1),
-				labelledValueCell("FHIR Version", fhirVersionDesc, 1)));
-		tableContent.add(
-			Elements.withChildren("tr", 
+				labelledValueCell("Version", StringUtil.firstPresent(getVersionId(source), version), 1),
 				labelledValueCell("Constrained type", constrainedType, 1),
-				labelledValueCell("Base resource", displayBaseUrl, 1),
-				labelledValueCell("Abstract", displayIsAbstract, 1),
-				labelledValueCell("Experimental", displayExperimental, 1)));
+				labelledValueCell("Constrained URL", displayBaseUrl, 1),
+				labelledValueCell("Status", status, 1)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Published by", publisher, 1), 
+				labelledValueCell("Published by", publisher, 1),
+				labelledValueCell("Created date", displayDate, 1),
+				labelledValueCell("Last updated", getLastUpdated(source), 1),
+				labelledValueCell("Kind", StringUtil.capitaliseLowerCase(kind), 1)));
+		tableContent.add(
+			Elements.withChildren("tr",
+				labelledValueCell("FHIR Version", fhirVersionDesc, 1),
 				labelledValueCell("DisplayName", display, 1),
-				labelledValueCell("Requirements", requirements, 1),
-				labelledValueCell("Context type", contextType, 1)));
+				labelledValueCell("Abstract", displayIsAbstract, 1),
+				labelledValueCell("Context type", contextType, 2)));
 		
 		if (!publishingOrgContacts.isEmpty()) {
 			tableContent.add(

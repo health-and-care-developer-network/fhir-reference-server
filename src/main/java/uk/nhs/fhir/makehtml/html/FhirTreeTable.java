@@ -2,6 +2,8 @@ package uk.nhs.fhir.makehtml.html;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,6 +81,23 @@ public class FhirTreeTable {
 		removeExtensionsSlicingNodes(treeRoot);
 		stripChildlessDummyNodes(treeRoot);
 		addSlicingIcons(treeRoot);
+		removeUnwantedConstraints(treeRoot);
+	}
+
+	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
+	
+	private void removeUnwantedConstraints(FhirTreeTableContent node) {
+		for (FhirTreeTableContent child : node.getChildren()) {
+			List<ConstraintInfo> constraints = child.getConstraints();
+			for (int constraintIndex=constraints.size()-1; constraintIndex>=0; constraintIndex--) {
+				ConstraintInfo constraint = constraints.get(constraintIndex);
+				if (constraintKeysToRemove.contains(constraint.getKey())) {
+					constraints.remove(constraintIndex);
+				}
+			}
+			
+			removeUnwantedConstraints(child);
+		}
 	}
 
 	private void stripChildlessDummyNodes(FhirTreeTableContent node) {
@@ -235,7 +254,7 @@ public class FhirTreeTable {
 		
 		if (node.hasDefaultValue()
 		  && node.isFixedValue()) {
-			throw new IllegalStateException("Found and example");
+			throw new IllegalStateException("Fixed value and default value");
 		}
 		
 		// Default Value

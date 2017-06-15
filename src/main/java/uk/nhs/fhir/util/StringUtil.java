@@ -69,4 +69,15 @@ public class StringUtil {
 			return Character.toUpperCase(tok.charAt(0)) + tok.substring(1);
 		}
 	}
+
+	@SafeVarargs
+	public static <T> Optional<T> firstPresent(Optional<T>... options) {
+		for (Optional<T> option : options) {
+			if (option.isPresent()) {
+				return option;
+			}
+		}
+		
+		return Optional.empty();
+	}
 }

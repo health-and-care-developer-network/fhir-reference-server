@@ -1,8 +1,10 @@
 package uk.nhs.fhir.makehtml.html;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -10,12 +12,16 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.util.StringUtil;
 
 public abstract class MetadataTableFormatter extends ResourceFormatter {
+	
+	protected static final String VERSION_DATE = "Version date";
 	
 	protected static final String BLANK = "";
 	
@@ -69,9 +75,39 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 			label);
 	}
 	
+	protected Optional<String> getVersionId(BaseResource source) {
+		Optional<IBaseMetaType> metaInfo = getMeta(source);
+		if (metaInfo.isPresent()) {
+			return Optional.ofNullable(metaInfo.get().getVersionId());
+		} else {
+			return Optional.empty();
+		}
+	}
+	
+	protected Optional<String> getLastUpdated(BaseResource source) {
+		Optional<IBaseMetaType> metaInfo = getMeta(source);
+		if (metaInfo.isPresent()) {
+			Date lastUpdated = metaInfo.get().getLastUpdated();
+			if (lastUpdated != null) {
+				return Optional.of(StringUtil.dateToString(lastUpdated));
+			}
+		}
+		
+		return Optional.empty();
+	}
+	
+	private Optional<IBaseMetaType> getMeta(BaseResource source) {
+		IBaseMetaType metaInfo = source.getMeta();
+		if (!metaInfo.isEmpty()) {
+			return Optional.of(metaInfo);
+		} else {
+			return Optional.empty();
+		}
+	}
+	
 	protected Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
-		boolean largeText = alwaysLargeText || value.length() < 20;
+		boolean largeText = alwaysLargeText || value.length() < 25;
 		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
@@ -82,7 +118,7 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK), 
 						new Attribute("href", value)), 
-				value));
+					value));
 			
 		} else {
 			return Elements.withAttributeAndText("span", 

@@ -2,9 +2,6 @@ package uk.nhs.fhir.makehtml.data;
 
 import java.util.Optional;
 
-import com.google.common.base.Preconditions;
-
-import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class BindingInfo {

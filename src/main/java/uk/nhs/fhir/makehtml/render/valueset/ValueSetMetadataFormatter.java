@@ -1,7 +1,5 @@
 package uk.nhs.fhir.makehtml.render.valueset;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +21,7 @@ import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.util.StringUtil;
 
 public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
@@ -62,36 +61,32 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
 		Optional<String> version = Optional.ofNullable(source.getVersion());
 
-		String displayExperimental;
+		// Never used in NHS Digital value sets
+		/*String displayExperimental;
 		Boolean experimental = source.getExperimental();
 		if (experimental == null) {
 			displayExperimental = BLANK;
 		} else {
 			displayExperimental = experimental ? "Yes" : "No";
-		}
+		}*/
+		
 		Optional<String> description = Optional.ofNullable(source.getDescription());
 		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
 		Optional<String> copyright = Optional.ofNullable(source.getCopyright());
 
 		Optional<String> requirement = Optional.ofNullable(source.getRequirements());
 
-		String gridName = name.get();
-		if (version.isPresent()) {
-			gridName += " (v" + version.get() + ")";
-		}
-        DateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
 		Date date = source.getDate();
 		Optional<String> displayDate =
 				(date == null) ?
 						Optional.empty() :
-						Optional.of(df.format(date));
+						Optional.of(StringUtil.dateToString(date));
         if (!displayDate.isPresent())
         {
             Date lastUpdated = source.getMeta().getLastUpdated();
             if (lastUpdated != null)
-            displayDate = Optional.of(df.format(lastUpdated));
+            displayDate = Optional.of(StringUtil.dateToString(lastUpdated));
         }
-
 
         Element colgroup = Elements.newElement("colgroup");
         int columns = 4;
@@ -109,16 +104,13 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Name", gridName, 2, true),
+				labelledValueCell("Name", name.get(), 2, true),
 				labelledValueCell("URL", url.get(), 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-					labelledValueCell("Status", status, 1),
 					labelledValueCell("Version", version, 1),
-					labelledValueCell("Last updated", displayDate, 1),
-
-						labelledValueCell("Experimental", displayExperimental, 1)
-						));
+					labelledValueCell("Status", status, 1),
+					labelledValueCell("Last updated", displayDate, 2)));
 
 		tableContent.add(
 				Elements.withChildren("tr",
