@@ -21,7 +21,7 @@ function setupLinkInterceptsInTabs() {
 			var tabName = tabName.split(".")[0];
 			
 			// Activate the relevant tab
-			$( "#tabs" ).find('a[href=#tabs-' + tabName + ']').click();
+			$( "#tabs" ).find('a[href=\\#tabs-' + tabName + ']').click();
 			// And set the anchor to scroll to (once the tab has been loaded)
 			anchorToJumpTo = anchor;
 		} else {
