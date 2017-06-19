@@ -1,6 +1,7 @@
 package uk.nhs.fhir.datalayer.collections;
 
 import java.io.File;
+import java.util.Comparator;
 
 import uk.nhs.fhir.enums.ArtefactType;
 
@@ -35,4 +36,16 @@ public class SupportingArtefact {
 	public void setArtefactType(ArtefactType artefactType) {
 		this.artefactType = artefactType;
 	}
+	
+	/**
+	 * Used for sorting artefacts by weight
+	 * @author adam
+	 */
+	public static class OrderByWeight implements Comparator<SupportingArtefact> {
+		@Override
+        public int compare(SupportingArtefact o1, SupportingArtefact o2) {
+            return o1.artefactType.getWeight() > o2.artefactType.getWeight() ? 1 : (o1.artefactType.getWeight() < o2.artefactType.getWeight() ? -1 : 0);
+        }
+	}
+
 }

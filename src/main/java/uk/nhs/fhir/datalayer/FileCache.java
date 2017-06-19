@@ -49,6 +49,7 @@ import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ResourceType;
@@ -347,6 +348,8 @@ public class FileCache {
 		                
 	                	// Load into the main cache for profiles
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
+		                // Sort artefacts by weight so they display in the correct order
+		                Collections.sort(artefacts, new OrderByWeight());
 		                
 		                ResourceEntity newEntity = new ResourceEntity(name, thisFile, resourceType, extension, baseType,
 								displayGroup, example, resourceID, versionNo, status, artefacts, extensionCardinality,

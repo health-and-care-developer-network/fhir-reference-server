@@ -1,5 +1,6 @@
 package uk.nhs.fhir.enums;
 
+import java.util.Comparator;
 import java.util.logging.Logger;
 
 import ca.uhn.fhir.rest.method.RequestDetails;
@@ -13,9 +14,9 @@ public enum ArtefactType {
 	
 	//METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata"),
 	//SNAPSHOT("snapshot.html", ResourceType.STRUCTUREDEFINITION, "Snapshot"),
-	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings"),
-	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions"),
-	DIFFERENTIAL("differential.html", ResourceType.STRUCTUREDEFINITION, "Differential"),
+	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings", 30),
+	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions", 20),
+	DIFFERENTIAL("differential.html", ResourceType.STRUCTUREDEFINITION, "Differential", 10),
 	
 	//OPERATION_RENDER("render.html", ResourceType.OPERATIONDEFINITION, "Details"),
 	
@@ -24,15 +25,17 @@ public enum ArtefactType {
 	
 	private static final Logger LOG = Logger.getLogger(ArtefactType.class.getName());
 	
-	private ArtefactType(String filename, ResourceType relatesToResourceType, String displayName) {
+	private ArtefactType(String filename, ResourceType relatesToResourceType, String displayName, int weight) {
 		this.displayName = displayName;
 		this.relatesToResourceType = relatesToResourceType;
 		this.filename = filename;
+		this.weight = weight;
 	}
 	
 	private String filename = null;
 	private ResourceType relatesToResourceType = null;
 	private String displayName = null;
+	private int weight = 0;
 	
 	/**
 	 * Takes a filename and resourceType and returns a matching ArtefactType (or null if not found)
@@ -92,5 +95,9 @@ public enum ArtefactType {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public int getWeight() {
+		return weight;
 	}
 }
