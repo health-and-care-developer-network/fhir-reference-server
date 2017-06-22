@@ -1,7 +1,5 @@
 package uk.nhs.fhir.makehtml.data;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -52,10 +50,6 @@ public interface FhirTreeTableContent {
 	boolean hasBinding();
 	Optional<BindingInfo> getBinding();
 
-	// KGM Added Element 9/May/2017
-	boolean hasElement();
-	Optional<ElementDefinitionDt> getElement();
-
 	void setBackupNode(FhirTreeNode backupNode);
 	boolean hasBackupNode();
 	Optional<FhirTreeNode> getBackupNode();
@@ -63,4 +57,12 @@ public interface FhirTreeTableContent {
 	void setFhirIcon(FhirIcon icon);
 	
 	public List<ConstraintInfo> getConstraints();
+	
+	public String getNodeKey();
+
+	Optional<String> getName();
+
+	public Optional<String> getDefinition();
+	
+	public Optional<ExtensionType> getExtensionType();
 }

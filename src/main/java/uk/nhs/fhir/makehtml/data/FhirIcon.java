@@ -1,5 +1,18 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.base.Strings;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
@@ -10,17 +23,9 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
-import com.google.common.base.Strings;
-import uk.nhs.fhir.makehtml.HTMLConstants;
-import uk.nhs.fhir.makehtml.NewMain;
-import uk.nhs.fhir.util.SharedFhirContext;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -45,7 +50,7 @@ public enum FhirIcon {
 	private final String base64;
 	
 	// Set on startup. Path to folder containing extension files.
-	private static String suppliedResourcesFolderPath = null;
+	static String suppliedResourcesFolderPath = null;
 	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
 		FhirIcon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
 	}
@@ -61,7 +66,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return HTMLConstants.NHS_IMAGES_DIR + name + "." + extension;
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + "/" + name + "." + extension;
 	}
 	
 	public String getBase64() {
@@ -128,7 +133,7 @@ public enum FhirIcon {
 
 	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
 
-		FhirContext ctx = SharedFhirContext.get();
+		FhirContext ctx = HAPIUtils.sharedFhirContext();
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {
@@ -153,18 +158,25 @@ public enum FhirIcon {
 			String pathName = suppliedResourcesFolderPath + fileName;
 			File file = new File(pathName);
 			
-			if (!NewMain.STRICT && !file.exists()) {
+			if (!file.exists()) {
+				// case insensitive search
 				for (File f : new File(suppliedResourcesFolderPath).listFiles()) {
 					if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
 						file = f;
 						break;
 					}
 				}
-				
+			}
+
+			if (!file.exists()) {
 				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
-					System.out.println("FIXING PATH FOR " + fileName);
-					fileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					// fix up for known incorrectly named file
+					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
+					fileName = newFileName;
 					file = new File(suppliedResourcesFolderPath + fileName);
+				} else {
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 				}
 			}
 			

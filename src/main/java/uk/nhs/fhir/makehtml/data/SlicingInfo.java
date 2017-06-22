@@ -38,6 +38,22 @@ public class SlicingInfo {
 	public Set<String> getDiscriminatorPaths() {
 		return discriminatorPaths;
 	}
+	
+	public Boolean getOrdered() {
+		return ordered;
+	}
+
+	public String getOrderedDesc() {
+		return (ordered != null && ordered) ? "ordered" : "unordered";
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public String getRules() {
+		return rules;
+	}
 
 	/**
 	 * @return an Optional<ResourceInfo> summarising the slicing info, or Optional.empty() if no info present
@@ -46,7 +62,7 @@ public class SlicingInfo {
 		List<String> info = Lists.newArrayList();
 
 		if (!Strings.isNullOrEmpty(description)) {
-			info.add("Ordering: " + description); 
+			info.add("Description: " + description); 
 		}
 		
 		if (discriminatorPaths.size() == 1) {

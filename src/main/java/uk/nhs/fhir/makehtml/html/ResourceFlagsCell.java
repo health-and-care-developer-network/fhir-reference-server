@@ -9,10 +9,10 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.ResourceFlag;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public class ResourceFlagsCell extends TableCell {
 
@@ -35,7 +35,7 @@ public class ResourceFlagsCell extends TableCell {
 		addIfPresent(ResourceFlag.NOEXTEND, flags, renderedFlags);
 		
 		return Elements.withAttributeAndChildren("td", 
-			new Attribute("class", "fhir-resource-flag"), 
+			new Attribute("class", FhirCSS.RESOURCE_FLAG), 
 			renderedFlags);
 	}
 
@@ -52,7 +52,7 @@ public class ResourceFlagsCell extends TableCell {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		/*styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-resource-flag span"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.RESOURCE_FLAG + " span"),
 				Lists.newArrayList(
 					new CSSRule("background-color", "#ffffbb"))));*/
 		

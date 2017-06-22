@@ -33,7 +33,7 @@ public class NestedLinkData implements LinkData {
 	}
 
 	@Override
-	public String getURL() {
+	public FhirURL getURL() {
 		return outerLink.getURL();
 	}
 

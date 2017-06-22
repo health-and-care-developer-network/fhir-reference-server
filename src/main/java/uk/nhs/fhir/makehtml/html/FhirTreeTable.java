@@ -1,8 +1,9 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -10,8 +11,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.makehtml.UrlTester;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
@@ -20,17 +20,16 @@ import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.makehtml.data.UnchangedSliceInfoRemover;
-import uk.nhs.fhir.util.TableTitle;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public class FhirTreeTable {
-	// Hide the slicing of extensions
-	private static final boolean dropExtensionSlicingNodes = true;
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
@@ -43,8 +42,8 @@ public class FhirTreeTable {
 		return data;
 	}
 
-	public Table asTable(boolean showRemoved, Optional<FhirTreeData> differential) {
-		return new Table(getColumns(), getRows(showRemoved, differential), Sets.newHashSet());
+	public Table asTable() {
+		return new Table(getColumns(), getRows(), Sets.newHashSet());
 	}
 	
 	private List<TableTitle> getColumns() {
@@ -57,25 +56,10 @@ public class FhirTreeTable {
 		);
 	}
 	
-	private List<TableRow> getRows(boolean showRemoved, Optional<FhirTreeData> differential) {
+	private List<TableRow> getRows() {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
-		if (!showRemoved) {
-			data.stripRemovedElements();
-		}
-		
-		if (dropExtensionSlicingNodes) {
-			removeExtensionsSlicingNodes(data.getRoot());
-		}
-		
-		if (differential.isPresent()) {
-			UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(differential.get());
-			remover.process(data);
-		}
-		
-		stripChildlessDummyNodes(data.getRoot());
-		
-		addSlicingIcons(data.getRoot());
+		tidyData();
 		
 		FhirTreeTableContent root = data.getRoot();
 		
@@ -90,6 +74,31 @@ public class FhirTreeTable {
 		addNodeRows(root, tableRows, rootVlines);
 		
 		return tableRows;
+	}
+	
+	private void tidyData() {
+		FhirTreeTableContent treeRoot = data.getRoot();
+		
+		removeExtensionsSlicingNodes(treeRoot);
+		stripChildlessDummyNodes(treeRoot);
+		addSlicingIcons(treeRoot);
+		removeUnwantedConstraints(treeRoot);
+	}
+
+	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
+	
+	private void removeUnwantedConstraints(FhirTreeTableContent node) {
+		for (FhirTreeTableContent child : node.getChildren()) {
+			List<ConstraintInfo> constraints = child.getConstraints();
+			for (int constraintIndex=constraints.size()-1; constraintIndex>=0; constraintIndex--) {
+				ConstraintInfo constraint = constraints.get(constraintIndex);
+				if (constraintKeysToRemove.contains(constraint.getKey())) {
+					constraints.remove(constraintIndex);
+				}
+			}
+			
+			removeUnwantedConstraints(child);
+		}
 	}
 
 	private void stripChildlessDummyNodes(FhirTreeTableContent node) {
@@ -186,17 +195,16 @@ public class FhirTreeTable {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		List<LinkData> typeLinks = nodeToAdd.getTypeLinks();
-		if (NewMain.STRICT && typeLinks.isEmpty()) {
-			throw new IllegalStateException("No type links available for " + nodeToAdd.getPath());
-		} else {
-			System.out.println("No type links available for " + nodeToAdd.getPath());
+		
+		if (typeLinks.isEmpty()) {
+			RendererError.handle(RendererError.Key.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
 		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
 		
 		tableRows.add(
 			new TableRow(
-				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile),
+				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
 				new SimpleTextCell(nodeToAdd.getCardinality().toString(), nodeToAdd.useBackupCardinality(), removedByProfile), 
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile), 
@@ -236,7 +244,16 @@ public class FhirTreeTable {
 		// FixedValue
 		if (node.isFixedValue()) {
 			String description = node.getFixedValue().get();
-			resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			boolean maybeLogicalUrl = node.getPath().endsWith("coding.system")
+			  || node.getPath().endsWith("identifier.system");
+			
+			if (maybeLogicalUrl
+			  && looksLikeUrl(description)
+			  && !new UrlTester().testSingleUrl(description)) {
+				resourceInfos.add(new ResourceInfo("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			} else {
+				resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			}
 		}
 		
 		// Example
@@ -247,7 +264,7 @@ public class FhirTreeTable {
 		
 		if (node.hasDefaultValue()
 		  && node.isFixedValue()) {
-			throw new IllegalStateException("Found and example");
+			throw new IllegalStateException("Fixed value and default value");
 		}
 		
 		// Default Value
@@ -272,7 +289,8 @@ public class FhirTreeTable {
 			}
 			
 			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
-				throw new IllegalStateException("Stand-in description being displayed - expected this to have been removed by cardinality in profile");
+				RendererError.handle(RendererError.Key.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
+					"Stand-in description being displayed - expected this to have been removed by cardinality in profile");
 			} else {
 				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
 			}
@@ -286,11 +304,7 @@ public class FhirTreeTable {
 				  && link.getPrimaryLinkData().getText().equals("Extension")) {
 					NestedLinkData extensionLinkData = (NestedLinkData)link;
 					for (SimpleLinkData nestedLink : extensionLinkData.getNestedLinks()) {
-						try {
-							resourceInfos.add(new ResourceInfo("URL", new URL(nestedLink.getURL()), ResourceInfoType.EXTENSION_URL));
-						} catch (MalformedURLException e) {
-							throw new IllegalStateException("Failed to create URL for extension node");
-						}
+						resourceInfos.add(new ResourceInfo("URL", nestedLink.getURL(), ResourceInfoType.EXTENSION_URL));
 					}
 				}
 			}
@@ -302,7 +316,7 @@ public class FhirTreeTable {
 	private ResourceInfo makeResourceInfoWithMaybeUrl(String title, String value, ResourceInfoType type) {
 		if (looksLikeUrl(value)) {
 			try {
-				return new ResourceInfo(title, new URL(value), type);
+				return new ResourceInfo(title, new FhirURL(value), type);
 			} catch (MalformedURLException e) {
 				// revert to non-link version
 			}
@@ -312,7 +326,13 @@ public class FhirTreeTable {
 	}
 
 	private boolean looksLikeUrl(String description) {
-		return description.startsWith("http://") || description.startsWith("https://");
+		boolean hasScheme = description.startsWith("http://") || description.startsWith("https://");
+		
+		if (!hasScheme && description.contains("/")) {
+			System.out.println("Should this be a link? " + description);
+		}
+		
+		return hasScheme;
 	}
 	
 	private boolean[] listToBoolArray(List<Boolean> bools) {
@@ -337,14 +357,14 @@ public class FhirTreeTable {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS),
 				Lists.newArrayList(
 					new CSSRule("padding", "0 4px"),
 					new CSSRule("border-collapse", "collapse"))));
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons img"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS + " img"),
 				Lists.newArrayList(
 					new CSSRule("vertical-align", "top"),
 					new CSSRule("float", "left"),
@@ -352,7 +372,7 @@ public class FhirTreeTable {
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-table", ".fhir-table tbody tr"),
+				Lists.newArrayList("." + FhirCSS.TABLE, "." + FhirCSS.TABLE + " tbody tr"),
 				Lists.newArrayList(
 					new CSSRule("border-collapse", "collapse"),
 					new CSSRule("vertical-align", "top"),
@@ -360,7 +380,7 @@ public class FhirTreeTable {
 		
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList(".fhir-tree-icons", ".fhir-tree-icons img", ".fhir-table"),
+				Lists.newArrayList("." + FhirCSS.TREE_ICONS, "." + FhirCSS.TREE_ICONS + " img", "." + FhirCSS.TABLE),
 				Lists.newArrayList(
 					new CSSRule("-webkit-border-horizontal-spacing", "0"),
 					new CSSRule("-webkit-border-vertical-spacing", "0"))));
@@ -384,7 +404,7 @@ public class FhirTreeTable {
 		}*/
 		
 		iconStyles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-tree-resource-icon"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TREE_RESOURCE_ICON),
 				Lists.newArrayList(
 					new CSSRule("padding-right", "4px"),
 					new CSSRule("background-color", "white"),
@@ -393,5 +413,9 @@ public class FhirTreeTable {
 					new CSSRule("height", "16"))));
 		
 		return iconStyles;
+	}
+
+	public void stripRemovedElements() {
+		data.stripRemovedElements();
 	}
 }

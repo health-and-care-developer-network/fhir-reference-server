@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml.data;
 
-import uk.nhs.fhir.util.SectionedHTMLDoc;
+import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 
 /**
  * Created by kevinmayfield on 08/05/2017.
