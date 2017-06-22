@@ -132,8 +132,8 @@ public class FhirURL {
 		}
 		
 		if (hostAndPath.startsWith(FhirURLConstants.HL7_DSTU2_VALUESET)) {
-			hostAndPath = FhirURLConstants.HL7_DSTU2 + hostAndPath.substring(FhirURLConstants.HL7_DSTU2_VALUESET.length());
-			hostAndPath = ensureHtmlEnd(hostAndPath);
+			String urlEnd = hostAndPath.substring(FhirURLConstants.HL7_DSTU2_VALUESET.length() + 1);
+			hostAndPath = FhirURLConstants.HL7_DSTU2 + "/valueset-" + ensureHtmlEnd(urlEnd);
 		}
 		
 		return hostAndPath;
