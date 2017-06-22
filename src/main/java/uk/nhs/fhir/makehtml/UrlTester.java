@@ -44,9 +44,17 @@ public class UrlTester {
 	}
 	
 	public static void logSuccessAndFailures() {
-		System.out.println("Success responses received from:\n" + String.join("\n", success.keySet()));
-		System.out.println("Silent failure responses received from:\n" + String.join("\n", silentFailure.keySet()));
-		System.out.println("Failure responses received from:\n" + String.join("\n", failure.keySet()));
+		if (!success.isEmpty()) {
+			System.out.println("Successfully tested the following link URLs:\n" + String.join("\n", success.keySet()));
+		}
+		
+		if (!silentFailure.isEmpty()) {
+			System.out.println("Displaying the following URLs as text rather than a link (received failure response):\n" + String.join("\n", silentFailure.keySet()));
+		}
+		
+		if (!failure.isEmpty()) {
+			System.out.println("WARNING - the following links are broken and included in output:\n" + String.join("\n", failure.keySet()));
+		}
 	}
 
 	public boolean testSingleUrl(String linkUrl) {
