@@ -34,11 +34,15 @@ import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+    
+    // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
 	
-	// output any links with host fhir.hl7.org.uk as relative links =
+	// convert any links with host fhir.hl7.org.uk into relative links
 	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
-	public static final boolean TEST_LINK_URLS = true;
+	
+	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
+	public static final boolean TEST_LINK_URLS = false;
 
     private final File inputDirectory;
     private final String outPath;
@@ -118,7 +122,7 @@ public class NewMain {
         
         if (TEST_LINK_URLS) {
         	new UrlTester().testUrls(FhirURL.getLinkUrls());
+            UrlTester.logSuccessAndFailures();
         }
-        UrlTester.logSuccessAndFailures();
     }
 }

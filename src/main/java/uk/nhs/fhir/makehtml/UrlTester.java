@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.net.ssl.SSLHandshakeException;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -14,6 +15,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class UrlTester {
 
@@ -80,31 +82,76 @@ public class UrlTester {
 	private void testUrl(CloseableHttpClient client, String linkUrl, Map<String, Integer> failureMap) throws IOException {
 		// fix up relative URLs before testing
 		if (linkUrl.startsWith("/")) {
-			// don't bother testing local addresses
+			// don't bother testing local addresses - would need to modify the URL to point at some up-to-date instance of the server
 			return;
 		}
 		
-		System.out.println("Sending GET request to " + linkUrl);
+		int statusCode;
+		if (!NewMain.TEST_LINK_URLS) {
+			statusCode = getRecordedResponseCode(linkUrl);
+		} else {
+			statusCode = sendTestRequest(client, linkUrl);
+		}
 		
-		HttpGet request = new HttpGet(linkUrl);
-		request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		
-		try (CloseableHttpResponse response = client.execute(request)) {
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode >= 200 && statusCode < 300) {
-				success.put(linkUrl, statusCode);
-			} else if (statusCode >= 300 && statusCode < 400) {
-				response.getStatusLine().getReasonPhrase();
-				System.out.println("" + statusCode);
-				success.put(linkUrl, statusCode);
-			} else if (statusCode >= 400) {
-				failureMap.put(linkUrl, statusCode);
-				System.out.println("" + statusCode);
-			} else {
-				failureMap.put(linkUrl, statusCode);
-				System.out.println("" + statusCode);
-			}
+		if (statusCode >= 200 && statusCode < 300) {
+			success.put(linkUrl, statusCode);
+		} else if (statusCode >= 300 && statusCode < 400) {
+			success.put(linkUrl, statusCode);
+		} else if (statusCode >= 400) {
+			failureMap.put(linkUrl, statusCode);
+		} else {
+			failureMap.put(linkUrl, statusCode);
 		}
 	}
+
+	private int sendTestRequest(CloseableHttpClient client, String linkUrl) throws ClientProtocolException, IOException {
+		HttpGet request = new HttpGet(linkUrl);
+		request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 	
+		System.out.println("Sending GET request to " + linkUrl);
+		
+		int statusCode;
+		try (CloseableHttpResponse response = client.execute(request)) {
+			statusCode = response.getStatusLine().getStatusCode();
+		}
+		System.out.println("" + statusCode);
+		return statusCode;
+	}
+
+	private static final Set<String> knownFailureUrls = Sets.newHashSet(
+		"https://fhir.hl7.org.uk/CareConnect-ConditionClinicalStatus",
+		"https://fhir.hl7.org.uk/CareConnect-MedicationFlag-1",
+		"https://fhir.hl7.org.uk/CareConnect-RegistrationStatus-1",
+		"https://fhir.hl7.org.uk/CareConnect-ConditionEpisodicity",
+		"https://fhir.hl7.org.uk/CareConnect-NHSNumberVerificationStatus-1",
+		"https://fhir.hl7.org.uk/CareConnect-PersonRelationshipType-1",
+		"https://fhir.hl7.org.uk/CareConnect-HumanLanguage-1",
+		"https://fhir.hl7.org.uk/CareConnect-TreatmentCategory-1",
+		"https://fhir.hl7.org.uk/CareConnect-PersonStatedGender-DDMAP-1",
+		"https://fhir.hl7.org.uk/CareConnect-LanguageAbilityMode-1",
+		"https://fhir.hl7.org.uk/CareConnect-ConditionRelationship",
+		"https://fhir.hl7.org.uk/CareConnect-ResidentialStatus-1",
+		"https://fhir.hl7.org.uk/CareConnect-RegistrationType-1",
+		"https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1",
+		"https://fhir.hl7.org.uk/CareConnect-EthnicCategory-1",
+		"https://fhir.hl7.org.uk/CareConnect-MaritalStatus-DDMAP-1",
+		"https://fhir.hl7.org.uk/CareConnect-LanguageAbilityProficiency-1",
+		"https://fhir.hl7.org.uk/CareConnect-SDSJobRoleName-1",
+		
+		"http://snomed.info/sct",
+		
+		"https://fhir.nhs.uk/Id/local-organization-code",
+		"https://fhir.nhs.uk/Id/ods-organization-code",
+		"https://fhir.nhs.uk/Id/nhs-number",
+		"https://fhir.nhs.uk/Id/local-practitioner-identifier",
+		"https://fhir.nhs.uk/Id/sds-user-id",
+		"https://fhir.nhs.uk/Id/local-patient-identifier",
+		"https://fhir.nhs.uk/Id/sds-role-profile-id",
+		"https://fhir.nhs.uk/Id/local-location-identifier",
+		"https://fhir.nhs.uk/Id/ods-site-code"
+	);
+	
+	private int getRecordedResponseCode(String linkUrl) {
+		return knownFailureUrls.contains(linkUrl) ? 400 : 200;
+	}
 }
