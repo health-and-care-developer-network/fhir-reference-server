@@ -11,6 +11,7 @@ public class ImplementationGuidePreparer implements ResourcePreparer<Implementat
         	if (newBaseURL.endsWith("/")) {
         		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
         	}
+        	
         	impGuideResource.setUrl(newBaseURL+"/ImplementationGuide/"+resourceName);
         }
 	}

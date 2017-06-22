@@ -7,7 +7,7 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 
 public class SimpleTextCell extends TableCell {
 
@@ -30,10 +30,10 @@ public class SimpleTextCell extends TableCell {
 	@Override
 	public Element makeCell() {
 		if (getFaded()) {
-			classes.add("fhir-text-faded");
+			classes.add(FhirCSS.TEXT_FADED);
 		}
 		if (getStrikethrough()) {
-			classes.add("fhir-text-strikethrough");
+			classes.add(FhirCSS.TEXT_STRIKETHROUGH);
 		}
 		
 		if (classes.isEmpty()) {

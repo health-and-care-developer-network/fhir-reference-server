@@ -1,14 +1,15 @@
 package uk.nhs.fhir.makehtml.data;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
+	public static final boolean DISPLAY_DUMMY_NODE_TYPES = true;
+	
 	private FhirTreeNode backup = null;
 	private FhirTreeTableContent parent;
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
@@ -80,7 +81,11 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public List<LinkData> getTypeLinks() {
-		return Lists.newArrayList();
+		if (DISPLAY_DUMMY_NODE_TYPES) {
+			return backup.getTypeLinks();
+		} else {
+			return Lists.newArrayList();
+		}
 	}
 
 	@Override
@@ -166,13 +171,6 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 		return false;
 	}
 
-	// KGM 9/May/2017
-	@Override
-	public boolean hasElement() { return false; }
-
-	@Override
-	public Optional<ElementDefinitionDt> getElement() { return Optional.empty(); }
-
 	@Override
 	public Optional<BindingInfo> getBinding() {
 		throw new IllegalStateException("Dummy node cannot have fixed binding info");
@@ -196,5 +194,25 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public String toString() {
 		return "{" + getPath() + "}";
+	}
+
+	@Override
+	public String getNodeKey() {
+		return backup.getNodeKey();
+	}
+
+	@Override
+	public Optional<String> getName() {
+		return backup.getName();
+	}
+
+	@Override
+	public Optional<String> getDefinition() {
+		return backup.getDefinition();
+	}
+
+	@Override
+	public Optional<ExtensionType> getExtensionType() {
+		return backup.getExtensionType();
 	}
 }

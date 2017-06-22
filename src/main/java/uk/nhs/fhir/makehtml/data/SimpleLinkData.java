@@ -5,10 +5,10 @@ package uk.nhs.fhir.makehtml.data;
  */
 public class SimpleLinkData implements LinkData {
 	
-	private final String url;
+	private final FhirURL url;
 	private final String text;
 	
-	public SimpleLinkData(String url, String text) {
+	public SimpleLinkData(FhirURL url, String text) {
 		this.url = url;
 		this.text = text;
 	}
@@ -16,7 +16,7 @@ public class SimpleLinkData implements LinkData {
 	public SimpleLinkData getPrimaryLinkData() {
 		return this;
 	}
-	public String getURL() {
+	public FhirURL getURL() {
 		return url;
 	}
 	public String getText() {
