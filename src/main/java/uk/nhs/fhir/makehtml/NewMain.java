@@ -42,7 +42,7 @@ public class NewMain {
 	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
 	
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
-	public static final boolean TEST_LINK_URLS = false;
+	public static final boolean TEST_LINK_URLS = true;
 
     private final File inputDirectory;
     private final String outPath;
