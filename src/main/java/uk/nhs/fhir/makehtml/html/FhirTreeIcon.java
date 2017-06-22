@@ -98,6 +98,6 @@ public enum FhirTreeIcon {
 	private static final String VLINE_CLASS = "vline-fhir-tree-icon";
 
 	public String getNhsSrc() {
-		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + getFileName();
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + "/" + getFileName();
 	}
 }

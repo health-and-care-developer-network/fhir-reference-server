@@ -11,6 +11,7 @@ public class ResourceInfo {
 	private final Optional<String> description;
 	private final Optional<FhirURL> descriptionLink;
 	private final List<String> extraTags= Lists.newArrayList();
+	private final boolean textualLink;
 	
 	private final ResourceInfoType type;
 
@@ -23,14 +24,23 @@ public class ResourceInfo {
 	public ResourceInfo(String constraintName, String description, FhirURL descriptionLink, ResourceInfoType type) {
 		this(constraintName, Optional.of(description), Optional.of(descriptionLink), type);
 	}
-	
+
 	public ResourceInfo(String constraintName, Optional<String> description, Optional<FhirURL> descriptionLink, ResourceInfoType type) {
+		this(constraintName, description, descriptionLink, type, false);
+	}
+	
+	public ResourceInfo(String constraintName, Optional<String> description, Optional<FhirURL> descriptionLink, ResourceInfoType type, boolean textualLink) {
 		Preconditions.checkArgument(description.isPresent() || descriptionLink.isPresent(), "Constraint without description or link");
+		
+		if (!textualLink && descriptionLink.isPresent() && FhirURL.isLogicalUrl(descriptionLink.get().toLinkString())) {
+			throw new IllegalStateException("Storing logical URL as link data");
+		}
 		
 		this.constraintName = constraintName;
 		this.description = description;
 		this.descriptionLink = descriptionLink;
 		this.type = type;
+		this.textualLink = textualLink;
 	}
 	
 	public void addExtraTag(String tag) {
@@ -55,5 +65,9 @@ public class ResourceInfo {
 	
 	public ResourceInfoType getType() {
 		return type;
+	}
+	
+	public boolean getTextualLink() {
+		return textualLink;
 	}
 }

@@ -69,7 +69,11 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		Optional<String> displayBaseUrl = Optional.empty();
 		String origBaseUrl = source.getBase();
 		if (origBaseUrl != null) {
-			displayBaseUrl = Optional.of(FhirURLConstants.HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')));
+			if (origBaseUrl.equals("http://hl7.org/fhir/StructureDefinition/Extension")) {
+				displayBaseUrl = Optional.of("http://hl7.org/fhir/extensibility.html#extension");
+			} else {
+				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
+			}
 		}
 		
 		// version is kept in a meta tag

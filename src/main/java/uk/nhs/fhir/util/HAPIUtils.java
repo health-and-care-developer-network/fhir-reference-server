@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.primitive.StringDt;
+import ca.uhn.fhir.parser.IParser;
 
 public class HAPIUtils {
 	private static final FhirContext context = FhirContext.forDstu2();
@@ -21,11 +22,11 @@ public class HAPIUtils {
 		return context;
 	}
 	
+	public static IParser newXmlParser() {
+		return context.newXmlParser();
+	}
+	
 	public static String resolveDatatypeValue(IDatatype datatype) {
-		if (datatype == null) {
-			return null;
-		}
-		
 		if (datatype instanceof BasePrimitive) {
 			return ((BasePrimitive<?>) datatype).getValueAsString();
 		} else if (datatype instanceof ResourceReferenceDt) {

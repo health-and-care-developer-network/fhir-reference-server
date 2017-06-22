@@ -4,10 +4,14 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
+import ca.uhn.fhir.context.FhirDataTypes;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -21,6 +25,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final List<ConstraintInfo> constraints;
 	private final String path;
 
+	private Optional<ExtensionType> extensionType = Optional.empty();
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
 	private Optional<String> fixedValue = Optional.empty();
 	private Optional<String> example = Optional.empty();
@@ -172,10 +177,26 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (typeLinks.isEmpty()) {
 			RendererError.handle(RendererError.Key.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
 		}
-
+		
+		if (getPathName().endsWith("[x]")
+		  && hasAllTypes()) {
+			return Lists.newArrayList(FhirDataTypes.openTypeLink());
+		}
+		
 		return typeLinks;
 	}
 	
+	private boolean hasAllTypes() {
+		Set<String> allTypes = Sets.newHashSet("Boolean", "Integer", "Decimal", "base64Binary", "Instant", 
+				"String", "Uri", "Date", "dateTime", "Time", "Code", "Oid", "Id", "unsignedInt", "positiveInt",
+				"Markdown", "Annotation", "Attachment", "Identifier", "CodeableConcept", "Coding", "Quantity",
+				"Range", "Period", "Ratio", "SampledData", "Signature", "HumanName", "Address", "ContactPoint",
+				"Timing", "Reference", "Meta");
+		
+		Set<String> containedTypes = typeLinks.stream().map(typeLink -> typeLink.getText()).collect(Collectors.toSet());
+		return allTypes.stream().allMatch(type -> containedTypes.contains(type));
+	}
+
 	public String getNodeKey() {
 		Deque<String> ancestorKeys = new LinkedList<>();
 		
@@ -197,6 +218,20 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 		
 		return nodeKey;
+	}
+	
+	public boolean isExtension() {
+		return extensionType.isPresent();
+	}
+	
+	public boolean isSimpleExtension() {
+		return extensionType.isPresent() &&
+			extensionType.get().equals(ExtensionType.SIMPLE);
+	}
+	
+	public boolean isComplexExtension() {
+		return extensionType.isPresent() &&
+			extensionType.get().equals(ExtensionType.COMPLEX);
 	}
 
 	public boolean useBackupTypeLinks() {
@@ -344,4 +379,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.aliases = aliases;
 	}
 	
+	public void setExtensionType(ExtensionType extensionType) {
+		this.extensionType = Optional.of(extensionType);
+	}
+	
+	public Optional<ExtensionType> getExtensionType() {
+		return extensionType;
+	}
 }

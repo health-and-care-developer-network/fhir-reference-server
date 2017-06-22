@@ -31,8 +31,8 @@ public class ResourceTextSectionInserter {
 		defaultView.addSection(defaultViewSection);
 		
 		Element textSection = Elements.withChildren("div", 
-				defaultView.createStyleSection(),
-				Elements.withChildren("div", defaultView.getBodyElements()));
+			defaultView.createStyleSection(),
+			Elements.withChildren("div", defaultView.getBodyElements()));
 		    
 	    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
 	    

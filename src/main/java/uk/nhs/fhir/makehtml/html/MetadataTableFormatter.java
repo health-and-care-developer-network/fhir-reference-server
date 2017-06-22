@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.html;
 
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
@@ -112,13 +114,17 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
-			return Elements.withAttributeAndChild("span", 
-				new Attribute("class", fhirMetadataClass), 
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", value)), 
-					value));
+			try {
+				return Elements.withAttributeAndChild("span", 
+					new Attribute("class", fhirMetadataClass), 
+					Elements.withAttributesAndText("a", 
+						Lists.newArrayList(
+							new Attribute("class", FhirCSS.LINK), 
+							new Attribute("href", new FhirURL(value).toLinkString())), 
+						value));
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
 			
 		} else {
 			return Elements.withAttributeAndText("span", 

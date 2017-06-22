@@ -1,5 +1,6 @@
 package ca.uhn.fhir.context;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +15,11 @@ import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
+import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HAPIUtils;
 
 /**
@@ -98,5 +103,13 @@ public class FhirDataTypes {
 	
 	private static boolean implementsOrExtends(Class<?> implementor, Class<?> implementee) {
 		return implementee.isAssignableFrom(implementor);
+	}
+	
+	public static LinkData openTypeLink() {
+		try {
+			return new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

@@ -23,7 +23,7 @@ public class FhirDocLinkFactory {
 			return forCodedType((CodeDt)fhirData);
 		} else {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
-			typeURL = FhirURLConstants.HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
+			typeURL = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
 			
 			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL), StringUtil.capitaliseLowerCase(dataTypeName));
 		}
@@ -57,7 +57,7 @@ public class FhirDocLinkFactory {
 	private String urlForDataTypeName(String dataTypeName) {
 		switch (FhirDataTypes.forType(dataTypeName)) {
 			case EXTENSION:
-				return FhirURLConstants.HL7_DSTU2 + "/extensibility.html#Extension";
+				return FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension";
 			case RESOURCE:
 				return urlForComplexDataType(dataTypeName);
 			case SIMPLE_ELEMENT:
@@ -72,7 +72,7 @@ public class FhirDocLinkFactory {
 				dataTypeName = "Code";
 				return urlForSimpleDataType(dataTypeName);
 			case DOMAIN_RESOURCE:
-				return FhirURLConstants.HL7_DSTU2 + "/domainresource.html";
+				return FhirURLConstants.HTTP_HL7_DSTU2 + "/domainresource.html";
 			case ELEMENT:
 				return urlForComplexDataType(dataTypeName);
 			default:
@@ -81,10 +81,10 @@ public class FhirDocLinkFactory {
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
-		return FhirURLConstants.HL7_DSTU2 + "/" + complexTypeName.toLowerCase() + ".html";
+		return FhirURLConstants.HTTP_HL7_DSTU2 + "/" + complexTypeName.toLowerCase() + ".html";
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return FhirURLConstants.HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
+		return FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
 	}
 }

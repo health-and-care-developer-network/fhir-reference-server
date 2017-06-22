@@ -22,7 +22,10 @@ public class RendererError {
 		EXTENSION_FILE_NOT_FOUND,
 		BINDING_WITHOUT_DESC_OR_URL,
 		STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
-		CONSTRAINT_WITHOUT_CONDITION
+		CONSTRAINT_WITHOUT_CONDITION, 
+		HL7_URL_WITHOUT_DSTU2, 
+		LINK_WITH_LOGICAL_URL, 
+		HL7_ORG_UK_HOST;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -31,12 +34,15 @@ public class RendererError {
 		responses.put(Key.MISNAMED_SNAPSHOT_CHOICE_NODE, ErrorResponse.IGNORE);
 		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
+		responses.put(Key.HL7_ORG_UK_HOST, ErrorResponse.IGNORE);
 
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
 		
 		responses.put(Key.BINDING_WITHOUT_DESC_OR_URL, ErrorResponse.LOG_WARNING);
 		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.LOG_WARNING);
-		
+		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.LOG_WARNING);
+
+		responses.put(Key.LINK_WITH_LOGICAL_URL, ErrorResponse.THROW);
 		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.THROW);
 		responses.put(Key.EXTENSION_FILE_MISNAMED, ErrorResponse.THROW);
 		responses.put(Key.EXTENSION_FILE_NOT_FOUND, ErrorResponse.THROW);

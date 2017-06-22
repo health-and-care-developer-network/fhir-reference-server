@@ -50,7 +50,7 @@ public enum FhirIcon {
 	private final String base64;
 	
 	// Set on startup. Path to folder containing extension files.
-	private static String suppliedResourcesFolderPath = null;
+	static String suppliedResourcesFolderPath = null;
 	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
 		FhirIcon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
 	}
@@ -66,7 +66,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + name + "." + extension;
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + "/" + name + "." + extension;
 	}
 	
 	public String getBase64() {

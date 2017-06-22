@@ -1,6 +1,13 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,10 +26,13 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.model.primitive.UriDt;
+import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
@@ -37,7 +47,7 @@ public class FhirTreeNodeBuilder {
 		List<LinkData> typeLinks = Lists.newArrayList();
 		if (elementDefinition.getPath().split("\\.").length == 1) {
 			try {
-				typeLinks.add(new SimpleLinkData(new FhirURL(FhirURLConstants.HL7_DSTU2 + "/profiling.html"), "Profile"));
+				typeLinks.add(new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
 			} catch (MalformedURLException e) {
 				throw new IllegalStateException(e);
 			}
@@ -119,7 +129,15 @@ public class FhirTreeNodeBuilder {
 		if (fixed != null) {
 			if (fixed instanceof BasePrimitive) {
 				BasePrimitive<?> fixedPrimitive = (BasePrimitive<?>)fixed;
-				node.setFixedValue(fixedPrimitive.getValueAsString());
+				String fixedValueAsString = fixedPrimitive.getValueAsString();
+				
+				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
+					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
+					RendererError.handle(RendererError.Key.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
+					fixedValueAsString = correctedUrl;
+				}
+				
+				node.setFixedValue(fixedValueAsString);
 			} else {
 				throw new IllegalStateException("Unhandled type for fixed value: " + fixed.getClass().getName());
 			}
@@ -152,11 +170,14 @@ public class FhirTreeNodeBuilder {
 		if (!binding.isEmpty()) {
 			
 			IDatatype valueSet = binding.getValueSet();
-			Optional<FhirURL> url;
-			try {
-				url = valueSet == null ? Optional.empty() : Optional.of(new FhirURL(HAPIUtils.resolveDatatypeValue(valueSet)));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
+			Optional<FhirURL> url = Optional.empty();
+			if (valueSet != null) {
+				String urlString = HAPIUtils.resolveDatatypeValue(valueSet);
+				try {
+					url = Optional.of(new FhirURL(Dstu2Fix.fixValuesetLink(urlString)));
+				} catch (MalformedURLException e) {
+					throw new IllegalStateException(e);
+				}
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -181,7 +202,75 @@ public class FhirTreeNodeBuilder {
 			node.setAliases(aliases);
 		}
 		
+		ExtensionType extensionType = null;
+		for (Type type : elementDefinition.getType()) {
+			if (type.getCode() != null 
+			  && type.getCode().equals("Extension")) {
+				extensionType = lookupExtensionType(type);
+				break;
+			}
+		}
+		if (extensionType != null) {
+			node.setExtensionType(extensionType);
+		}
+		
 		return node;
+	}
+	
+	/**
+	 * Consider the extension complex iff it has an element with path "Extension.extension.url"
+	 */
+	private static ExtensionType lookupExtensionType(Type type)  {
+
+		List<UriDt> profiles = type.getProfile();
+
+		for (UriDt uriDt : profiles) {
+
+			String filePath;
+			try {
+				URI uri = new URI(uriDt.getValue());
+				filePath = uri.toURL().getFile() + ".xml";
+			} catch (URISyntaxException | MalformedURLException e) {
+				throw new IllegalStateException("URI/URL error for uri " + uriDt.getValue(), e);
+			}
+			
+			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+			// case insensitive search
+			File extensionFile = null;
+			for (File f : new File(FhirIcon.suppliedResourcesFolderPath).listFiles()) {
+				if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
+					extensionFile = f;
+					break;
+				}
+			}
+
+			if (extensionFile == null) {
+				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml")) {
+					// fix up for known incorrectly named file
+					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
+					fileName = newFileName;
+					extensionFile = new File(FhirIcon.suppliedResourcesFolderPath + fileName);
+				} else {
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
+				}
+			}
+			
+			try (FileInputStream fis = new FileInputStream(extensionFile);
+				Reader reader = new InputStreamReader(fis)) {
+				
+				IParser parser = HAPIUtils.newXmlParser();
+				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
+
+				if (extension.getSnapshot().getElement().stream().anyMatch(element -> element.getPath().contains("Extension.extension.url"))) {
+					return ExtensionType.COMPLEX;
+				}
+			} catch (IOException ie) {
+				throw new IllegalStateException(ie);
+			}
+		}
+
+		return ExtensionType.SIMPLE;
 	}
 
 	private List<LinkData> getTypeLinks(List<Type> snapshotElementTypes) {

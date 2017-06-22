@@ -210,4 +210,9 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public Optional<String> getDefinition() {
 		return backup.getDefinition();
 	}
+
+	@Override
+	public Optional<ExtensionType> getExtensionType() {
+		return backup.getExtensionType();
+	}
 }

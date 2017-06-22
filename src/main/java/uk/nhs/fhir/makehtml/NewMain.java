@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
@@ -28,14 +29,16 @@ import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
 import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 
 /**
- *
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 	public static final boolean STRICT = false;
+	
+	// output any links with host fhir.hl7.org.uk as relative links =
 	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
+	public static final boolean TEST_LINK_URLS = true;
 
     private final File inputDirectory;
     private final String outPath;
@@ -112,5 +115,10 @@ public class NewMain {
         } catch (Exception e) {
         	e.printStackTrace();
         }
+        
+        if (TEST_LINK_URLS) {
+        	new UrlTester().testUrls(FhirURL.getLinkUrls());
+        }
+        UrlTester.logSuccessAndFailures();
     }
 }

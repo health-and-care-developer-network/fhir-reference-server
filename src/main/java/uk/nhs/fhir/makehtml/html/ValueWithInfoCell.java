@@ -100,13 +100,18 @@ public class ValueWithInfoCell extends TableCell {
 			constraintInfoText.add(new Text(" ("));
 		}
 		
-		if (hasLink) {	
-			constraintInfoText.add(
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("href", link),
-						new Attribute("class", FhirCSS.LINK)),
-					link));
+		if (hasLink) {
+			if (resourceInfo.getTextualLink()) {
+				// This URL would result in a broken link - it is only intended to be used as an identifier
+				constraintInfoText.add(new Text(link));
+			} else {
+				constraintInfoText.add(
+					Elements.withAttributesAndText("a", 
+						Lists.newArrayList(
+							new Attribute("href", link),
+							new Attribute("class", FhirCSS.LINK)),
+						link));
+			}
 		}
 			
 		if (bracketLink) {

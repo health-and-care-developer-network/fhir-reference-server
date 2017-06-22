@@ -17,7 +17,9 @@ import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.UrlTester;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
@@ -402,7 +404,8 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 	}
 	
 	private Element valueSpan(String value, boolean alwaysLargeText, boolean reference , boolean internal, String hint) {
-		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
+		boolean url = (value.startsWith("http://") || value.startsWith("https://"))
+		  && new UrlTester().testSingleUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 20;
 		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
@@ -410,46 +413,45 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 		if (url) {
 		    if (reference) {
                 return Elements.withAttributeAndChild("span",
-                        new Attribute("class", fhirMetadataClass),
-                        Elements.withAttributesAndChildren("a",
+                    new Attribute("class", fhirMetadataClass),
+                    Elements.withAttributesAndChildren("a",
+                        Lists.newArrayList(
+                            new Attribute("class", FhirCSS.LINK),
+                            new Attribute("href", FhirURL.createOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("title", hint)),
+                        Lists.newArrayList(
+                            new Text(value),
+                            Elements.withAttributes("img",
                                 Lists.newArrayList(
-                                        new Attribute("class", FhirCSS.LINK),
-                                        new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
-                                         new Attribute("title", hint)),
-                                Lists.newArrayList(
-                                        new Text(value),
-                                        Elements.withAttributes("img",
-                                                Lists.newArrayList(
-                                                        new Attribute("src", FhirIcon.REFERENCE.getUrl()),
-                                                        new Attribute("class", FhirCSS.TREE_RESOURCE_ICON)))))); //value +
+                                    new Attribute("src", FhirIcon.REFERENCE.getUrl()),
+                                    new Attribute("class", FhirCSS.TREE_RESOURCE_ICON)))))); //value +
             } else if (internal) {
                 return Elements.withAttributeAndChildren("span",
-                        new Attribute("class", fhirMetadataClass),
-                        Lists.newArrayList(
-                            Elements.withAttributesAndText("a",
-
-                                    Lists.newArrayList(
-                                            new Attribute("class", FhirCSS.LINK),
-                                            new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
-                                            new Attribute("title", hint)),
-                                    value)
-                        //        ,new Text(" (internal)") // Removed internal, using icon for external instead
-                        ));
+                    new Attribute("class", fhirMetadataClass),
+                    Lists.newArrayList(
+                        Elements.withAttributesAndText("a",
+                            Lists.newArrayList(
+                                new Attribute("class", FhirCSS.LINK),
+                                new Attribute("href", FhirURL.createOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                                new Attribute("title", hint)),
+                            value)
+                //        ,new Text(" (internal)") // Removed internal, using icon for external instead
+                    ));
             } else {
                 return Elements.withAttributeAndChild("span",
-                        new Attribute("class", fhirMetadataClass),
-                        Elements.withAttributesAndText("a",
-                                Lists.newArrayList(
-                                        new Attribute("class", FhirCSS.LINK),
-                                        new Attribute("href", Dstu2Fix.fixValuesetLink(value)),
-                                        new Attribute("title", hint)),
-                                value));
+                    new Attribute("class", fhirMetadataClass),
+                    Elements.withAttributesAndText("a",
+                        Lists.newArrayList(
+                            new Attribute("class", FhirCSS.LINK),
+                            new Attribute("href", FhirURL.createOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("title", hint)),
+                        value));
             }
 			
 		} else {
 			return Elements.withAttributeAndText("span",
-                    new Attribute("class", fhirMetadataClass),
-                    value);
+                new Attribute("class", fhirMetadataClass),
+                value);
 		}
 	}
 }

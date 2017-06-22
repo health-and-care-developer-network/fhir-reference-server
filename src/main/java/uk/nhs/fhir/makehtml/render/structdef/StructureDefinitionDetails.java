@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.render.structdef;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
@@ -64,9 +66,9 @@ public class StructureDefinitionDetails {
 		tableContent.add(getHeaderRow(key));
 		
 		addDataIfPresent(tableContent, "Definition", definition);
-		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURLConstants.HL7_CONFORMANCE + "#cardinality", cardinality);
+		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#cardinality"), cardinality);
 		addBindingRowIfPresent(tableContent);
-		tableContent.add(getLinkRow("Type", FhirURLConstants.HL7_DATATYPES, typeLinks));
+		tableContent.add(getLinkRow("Type", FhirURL.createOrThrow(FhirURLConstants.HL7_DATATYPES), typeLinks));
 		addDataIfPresent(tableContent, "Requirements", requirements);
 		addListDataIfPresent(tableContent, "Alternate Names", aliases);
 		addChoiceNoteIfPresent(tableContent);
@@ -77,20 +79,24 @@ public class StructureDefinitionDetails {
 	}
 
 	private void addChoiceNoteIfPresent(List<Element> tableContent) {
-		if (pathName.endsWith("[x]")) {
-			tableContent.add(
-				getDataRow(
-					dataCell("[x] Note", FhirCSS.DETAILS_DATA_CELL), 
-					Elements.withAttributeAndChildren("td", 
-						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
-						Lists.newArrayList(
-							new Text("See "),
-							Elements.withAttributesAndText("a",
-								Lists.newArrayList(
-									new Attribute("href", FhirURLConstants.HL7_FORMATS + "#choice"),
-									new Attribute("class", FhirCSS.LINK)), 
-								"Choice of Data Types"),
-							new Text(" for further information about how to use [x]")))));
+		try {
+			if (pathName.endsWith("[x]")) {
+				tableContent.add(
+					getDataRow(
+						dataCell("[x] Note", FhirCSS.DETAILS_DATA_CELL), 
+						Elements.withAttributeAndChildren("td", 
+							new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
+							Lists.newArrayList(
+								new Text("See "),
+								Elements.withAttributesAndText("a",
+									Lists.newArrayList(
+										new Attribute("href", new FhirURL(FhirURLConstants.HL7_FORMATS + "#choice").toLinkString()),
+										new Attribute("class", FhirCSS.LINK)), 
+									"Choice of Data Types"),
+								new Text(" for further information about how to use [x]")))));
+			}
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -117,19 +123,19 @@ public class StructureDefinitionDetails {
 		tableContent.add(simpleStringDataRow(label, content)); 
 	}
 	
-	private void addLabelWithLinkDataRow(List<Element> tableContent, String label, String url, String content) {
+	private void addLabelWithLinkDataRow(List<Element> tableContent, String label, FhirURL url, String content) {
 		Element labelCell = linkCell(label, url);
 		Element dataCell = dataCell(content, FhirCSS.DETAILS_DATA_CELL);
 		
 		tableContent.add(getDataRow(labelCell, dataCell));
 	}
 	
-	private Element linkCell(String label, String url) {
+	private Element linkCell(String label, FhirURL url) {
 		return Elements.withAttributeAndChild("td", 
 			new Attribute("class", FhirCSS.DETAILS_DATA_CELL),
 			Elements.withAttributesAndText("a", 
 				Lists.newArrayList(
-					new Attribute("href", url),
+					new Attribute("href", url.toLinkString()),
 					new Attribute("class", FhirCSS.LINK)),
 				label));
 	}
@@ -182,11 +188,11 @@ public class StructureDefinitionDetails {
 			
 			bindingInfo += " (" + info.getStrength() + ")";
 			
-			addLabelWithLinkDataRow(tableContent, "Binding", FhirURLConstants.HL7_TERMINOLOGIES, bindingInfo);
+			addLabelWithLinkDataRow(tableContent, "Binding", FhirURL.createOrThrow(FhirURLConstants.HL7_TERMINOLOGIES), bindingInfo);
 		}
 	}
 	
-	private Element getLinkRow(String title, String titleLink, List<LinkData> linkDatas) {
+	private Element getLinkRow(String title, FhirURL titleLink, List<LinkData> linkDatas) {
 		return Elements.withAttributeAndChildren("tr", 
 			new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
 				Lists.newArrayList(
@@ -205,13 +211,13 @@ public class StructureDefinitionDetails {
 	}
 
 	private void addResourceFlags(List<Element> tableContent) {
-		addDataIfTrue(tableContent, "Summary", FhirURLConstants.HL7_SEARCH + "#summary", resourceFlags.isSummary());
-		addDataIfTrue(tableContent, "Modifier", FhirURLConstants.HL7_CONFORMANCE + "#ismodifier", resourceFlags.isModifier());
-		//addDataIfTrue(tableContent, "Is Constrained", HTMLConstants.HL7_CONFORMANCE + "#constraints", resourceFlags.isConstrained()); // implied by Invariants entry
-		addDataIfTrue(tableContent, "Must-Support", FhirURLConstants.HL7_CONFORMANCE + "#mustSupport", resourceFlags.isMustSupport());
+		addDataIfTrue(tableContent, "Summary", FhirURL.createOrThrow(FhirURLConstants.HL7_SEARCH + "#summary"), resourceFlags.isSummary());
+		addDataIfTrue(tableContent, "Modifier", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#ismodifier"), resourceFlags.isModifier());
+		//addDataIfTrue(tableContent, "Is Constrained", FhirURL.createOrThrow(HTMLConstants.HL7_CONFORMANCE + "#constraints"), resourceFlags.isConstrained()); // implied by Invariants entry
+		addDataIfTrue(tableContent, "Must-Support", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#mustSupport"), resourceFlags.isMustSupport());
 	}
 
-	private void addDataIfTrue(List<Element> tableContent, String label, String url, boolean condition) {
+	private void addDataIfTrue(List<Element> tableContent, String label, FhirURL url, boolean condition) {
 		if (condition) {
 			addLabelWithLinkDataRow(tableContent, label, url, "True");
 		}

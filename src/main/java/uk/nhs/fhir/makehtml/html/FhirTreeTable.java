@@ -11,6 +11,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.makehtml.UrlTester;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
@@ -243,7 +244,16 @@ public class FhirTreeTable {
 		// FixedValue
 		if (node.isFixedValue()) {
 			String description = node.getFixedValue().get();
-			resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			boolean maybeLogicalUrl = node.getPath().endsWith("coding.system")
+			  || node.getPath().endsWith("identifier.system");
+			
+			if (maybeLogicalUrl
+			  && looksLikeUrl(description)
+			  && !new UrlTester().testSingleUrl(description)) {
+				resourceInfos.add(new ResourceInfo("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			} else {
+				resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+			}
 		}
 		
 		// Example
@@ -316,7 +326,13 @@ public class FhirTreeTable {
 	}
 
 	private boolean looksLikeUrl(String description) {
-		return description.startsWith("http://") || description.startsWith("https://");
+		boolean hasScheme = description.startsWith("http://") || description.startsWith("https://");
+		
+		if (!hasScheme && description.contains("/")) {
+			System.out.println("Should this be a link? " + description);
+		}
+		
+		return hasScheme;
 	}
 	
 	private boolean[] listToBoolArray(List<Boolean> bools) {

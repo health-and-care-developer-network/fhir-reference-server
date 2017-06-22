@@ -128,7 +128,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HL7_DSTU2 + "/terminologies.html#" + anchorStrength),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HTTP_HL7_DSTU2 + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);
@@ -181,7 +181,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     		linkContents.add(new Text(displayText));
 
         	boolean internal = (!uri.startsWith("http://") && !uri.startsWith("https://")) 
-        		|| uri.contains(FhirURLConstants.FHIR_NHS_UK);
+        	  || uri.contains(FhirURLConstants.FHIR_NHS_UK);
     		
         	if (!internal) {
         		linkContents.add(
@@ -192,6 +192,11 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         	}
         	
         	boolean detailsLink = uri.startsWith("details.html#");
+        	
+        	if (!detailsLink) {
+        		// allow checking whether these URLs are dead links
+        		FhirURL.addLinkUrl(uri);
+        	}
         	
     		cellSpans.add(linkSpan(linkContents, cssClass, uri, detailsLink));
 

@@ -63,4 +63,6 @@ public interface FhirTreeTableContent {
 	Optional<String> getName();
 
 	public Optional<String> getDefinition();
+	
+	public Optional<ExtensionType> getExtensionType();
 }

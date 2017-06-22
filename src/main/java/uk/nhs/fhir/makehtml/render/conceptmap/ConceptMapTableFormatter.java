@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.render.conceptmap;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -50,12 +52,17 @@ public class ConceptMapTableFormatter {
 			for (ConceptMap.ElementTarget target : element.getTarget()) {
 				Optional<String> comments = Optional.ofNullable(target.getComments());
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
-				tableContent.add(
-						Elements.withChildren("tr",
+				
+				try {
+					tableContent.add(
+							Elements.withChildren("tr",
 								labelledValueCell(BLANK, element.getCode(), 1, true, true),
-								labelledHttpCell(FhirURLConstants.HL7_DSTU2 + "/valueset-concept-map-equivalence.html", target.getEquivalence(),  1, true, false),
+								labelledHttpCell(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/valueset-concept-map-equivalence.html"), target.getEquivalence(),  1, true, false),
 								labelledValueCell(BLANK, target.getCode(), 1, true),
 								labelledValueCell(BLANK, displayComments, 1, true)));
+				} catch (MalformedURLException e) {
+					throw new IllegalStateException(e);
+				}
 			}
 		}
         Element table =
@@ -90,7 +97,7 @@ public class ConceptMapTableFormatter {
 		return cell(cellSpans, colspan);
 	}
 
-    private Element labelledHttpCell(String http, String value, int colspan, boolean alwaysBig, boolean alwaysBold) {
+    private Element labelledHttpCell(FhirURL http, String value, int colspan, boolean alwaysBig, boolean alwaysBold) {
         List<Element> cellSpans = Lists.newArrayList();
         cellSpans.add(valueSpanRef(value, http, alwaysBig));
         return cell(cellSpans, colspan);
@@ -123,7 +130,7 @@ public class ConceptMapTableFormatter {
 			label);
 	}
 
-    private Element valueSpanRef(String value, String http, boolean alwaysLargeText) {
+    private Element valueSpanRef(String value, FhirURL http, boolean alwaysLargeText) {
 
         boolean largeText = alwaysLargeText || value.length() < 20;
         String fhirMetadataClass = FhirCSS.METADATA_VALUE;
@@ -137,7 +144,7 @@ public class ConceptMapTableFormatter {
                     Elements.withAttributesAndText("a",
                             Lists.newArrayList(
                                     new Attribute("class", FhirCSS.LINK),
-                                    new Attribute("href", http)),
+                                    new Attribute("href", http.toLinkString())),
                             value));
 
 
@@ -150,13 +157,17 @@ public class ConceptMapTableFormatter {
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
-			return Elements.withAttributeAndChild("span", 
-				new Attribute("class", fhirMetadataClass), 
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", value)), 
-				value));
+			try {
+				return Elements.withAttributeAndChild("span", 
+					new Attribute("class", fhirMetadataClass), 
+					Elements.withAttributesAndText("a", 
+						Lists.newArrayList(
+							new Attribute("class", FhirCSS.LINK), 
+							new Attribute("href", new FhirURL(value).toLinkString())), 
+					value));
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
 			
 		} else {
 			return Elements.withAttributeAndText("span", 

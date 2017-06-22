@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.render.conceptmap;
 
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -33,7 +35,6 @@ public class ConceptMapMetadataFormatter {
 	public Element getMetadataTable() {
 		
 		// These are all required and so should always be present
-
 		Optional<String>  url = Optional.ofNullable(source.getUrl());
 		Optional<String>  name = Optional.ofNullable(source.getName());
 
@@ -165,14 +166,17 @@ public class ConceptMapMetadataFormatter {
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
+			try {
 			return Elements.withAttributeAndChild("span",
 				new Attribute("class", fhirMetadataClass),
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK),
-						new Attribute("href", value)),
+						new Attribute("href", new FhirURL(value).toLinkString())),
 				value));
-			
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(e);
+			}
 		} else {
 			return Elements.withAttributeAndText("span", 
 				new Attribute("class", fhirMetadataClass), 

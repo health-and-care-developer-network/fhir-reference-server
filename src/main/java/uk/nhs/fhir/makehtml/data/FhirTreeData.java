@@ -56,6 +56,25 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			}
 		}
 	}
+	
+	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
+		boolean isComplexExtension = node.getExtensionType().isPresent() 
+		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
+		  // exclude root node
+		  && node.getPath().contains(".");
+		
+		List<? extends FhirTreeTableContent> children = node.getChildren();
+		
+		for (int i=children.size()-1; i>=0; i--) {
+			
+			FhirTreeTableContent child = children.get(i);
+			if (isComplexExtension) {
+				children.remove(i);
+			} else {
+				stripComplexExtensionChildren(child);
+			}
+		}
+	}
 }
 
 class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
