@@ -1,3 +1,7 @@
+#versionMetadata ul a {
+    font-size: 100%;
+}
+
 #extensionTable {
 	width:100%;
 }
@@ -89,16 +93,6 @@ h2.resourceType {
     margin-top: 5px;
     line-height: 1.2em;
 }
-
-/*
-.treeView tr {
-    line-height: 0.8em;
-}
-
-.renderedValueSet td {
-    padding: 5px;
-}
-*/
 
 .operationTable th {
     background: #f0f0f0;

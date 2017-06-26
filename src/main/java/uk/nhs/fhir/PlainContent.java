@@ -270,7 +270,7 @@ public class PlainContent extends CORSInterceptor {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate(templateDirectory + "resource.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "resource-with-metadata.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}

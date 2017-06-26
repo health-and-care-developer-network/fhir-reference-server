@@ -12,7 +12,8 @@ import ca.uhn.fhir.rest.method.RequestDetails;
  */
 public enum ArtefactType {
 	
-	//METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata"),
+	// Note: To stop an artefact being displayed, use a weight of -1
+	METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata", -1),
 	//SNAPSHOT("snapshot.html", ResourceType.STRUCTUREDEFINITION, "Snapshot"),
 	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings", 30),
 	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions", 20),

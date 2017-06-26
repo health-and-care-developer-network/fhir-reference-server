@@ -39,6 +39,13 @@ function loadTab(tabID, resourceID, resourceVersion, artefactType) {
 			setupLinkInterceptsInTabs);
 }
 
+function loadMetadata() {
+	resourceID = $('#metadataFromGenerator').attr('resourceID');
+	resourceVersion = $('#metadataFromGenerator').attr('version');
+	$('#metadataFromGenerator').load("/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType=METADATA");
+}
+
 // Initialise tabs
 $( "#tabs" ).tabs();
 setupLinkInterceptsInTabs();
+loadMetadata();
