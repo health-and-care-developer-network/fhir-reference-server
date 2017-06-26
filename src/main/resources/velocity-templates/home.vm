@@ -1,5 +1,5 @@
 <div class='fhirServerGeneratedContent'>
-	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental, and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
+	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
 
 	<ul>
 		<div class='fw_nav_boxes isotope' style='position: relative; overflow: hidden;'>

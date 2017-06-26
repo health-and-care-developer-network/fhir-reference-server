@@ -22,7 +22,6 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
   sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet"><link rel="stylesheet" href="\/style.css"\/>' devnet.html
 
   # Update breadcrumbs
-  #NEW_CRUMBS="<span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"http:\/\/$ROOT_URL\/\" rel=\"v:url\" property=\"v:title\">Home<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"></span></li>    <li><span xmlns:v=\"http:\/\/rdf\.data-vocabulary\.org\/#\"><span typeof=\"v:Breadcrumb\"><a href=\"http:\/\/$ROOT_URL\/\/apis\/\" rel=\"v:url\" property=\"v:title\">APIs<\/a>  <span class=\"bc_arrow\" aria-hidden=\"true\" data-icon=\"&#x2a;\"><\/span><\/li>     <li> <strong class=\"breadcrumb_last\">$ROOT_CRUMB<\/strong><\/span><\/span><\/li><\/ul>	<\/div><!--end wrapper-->"
   NEW_CRUMBS="#parse( \"\/velocity-templates\/breadcrumbs.vm\" )"
   sed -i '/typeof=\"v:Breadcrumb\"/c\'"$NEW_CRUMBS"'' devnet.html
 
@@ -34,6 +33,13 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
 
   # Add jquery ui tabs initialisation
   sed -i '/<\/body>/i\        <script src="\/js\/jquery-ui\/jquery-ui.js"></script><script src="\/js\/site-functions.js"></script>' devnet.html
+
+  # Remove old copyright statement
+  sed -i '/Crown Copyright/d' devnet.html
+  # Rewrite contact us to not have the "last" class
+  sed -i 's/class="last" href="https:\/\/developer.nhs.uk\/contact-us/href="https:\/\/developer\.nhs\.uk\/contact-us/' devnet.html
+  # Add the copyright statement and HL7 trademark statement
+  sed -i '/https:\/\/developer\.nhs\.uk\/contact-us/a\<li><a target="_blank" href="http:\/\/www\.hl7\.org\.uk\/">HL7\&reg; and FHIR\&reg; are the registered trademarks of Health Level Seven International<\/a><\/li><li><a class="last" target="_blank" href="https:\/\/www\.nationalarchives\.gov\.uk\/information-management\/our-services\/crown-copyright\.htm" class="copyright">\&copy; Crown Copyright 2017<\/a><\/li>' devnet.html
 
   # Copy this to be our index page template
   cp devnet.html index.vm

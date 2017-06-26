@@ -46,10 +46,8 @@
 	
 			<footer>
 				<div class="links">
-					<li><a href="http://www.hl7.org.uk/">HL7 UK Home Page</a></li>
-				</div>
-				<div class="copyright">
-					&copy;2017 HL7 UK</a>
+					<a href="http://www.hl7.org.uk/">&copy;2017 HL7 UK.</a>
+					HL7&reg; and FHIR&reg; are the registered trademarks of Health Level Seven International.
 				</div>
 			</footer>
 		</div>
