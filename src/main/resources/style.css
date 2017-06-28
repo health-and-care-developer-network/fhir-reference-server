@@ -1,3 +1,7 @@
+#metadataFromGenerator .fhir-table tbody:before {
+	display:none;
+}
+
 #metadataFromGenerator .fhir-panel, #versionMetadata {
     width: 97%;
     border: none;
@@ -68,10 +72,6 @@ h2.resourceType {
 	border: thin solid #d4d2d2;
 }
 
-.clearPara {
-	clear: both;
-}
-
 .resourceSummary {
     float: left;
     padding: 5px;
@@ -84,6 +84,10 @@ h2.resourceType {
     padding: 5px;
     font-size: 0.8em;
     width: 17%;
+}
+
+.clearPara {
+	clear: both;
 }
 
 .treeView, .operationTable, .guideContent {
