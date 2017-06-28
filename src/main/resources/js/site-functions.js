@@ -39,6 +39,25 @@ function loadTab(tabID, resourceID, resourceVersion, artefactType) {
 			setupLinkInterceptsInTabs);
 }
 
-// Initialise tabs
-$( "#tabs" ).tabs();
-setupLinkInterceptsInTabs();
+function loadMetadata() {
+	resourceID = $('#metadataFromGenerator').attr('resourceID');
+	resourceVersion = $('#metadataFromGenerator').attr('version');
+	$('#metadataFromGenerator').load("/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType=METADATA",
+			addExpandCollapseForMetadata);
+}
+
+function addExpandCollapseForMetadata() {
+	$('.fhir-panel-heading-text').prepend("<span class='ui-accordion-header-icon ui-icon ui-icon-triangle-1-s'/>");
+	$('.fhir-panel-heading-text').click(function(){
+	    $('.metadataSection .fhir-panel-body').slideToggle('slow');
+	    $('.metadataSection .ui-icon').toggleClass("ui-icon-triangle-1-s");
+	    $('.metadataSection .ui-icon').toggleClass("ui-icon-triangle-1-e");
+	});
+}
+
+$( document ).ready(function() {
+	// Initialise tabs
+	$( "#tabs" ).tabs();
+	setupLinkInterceptsInTabs();
+	loadMetadata();
+});

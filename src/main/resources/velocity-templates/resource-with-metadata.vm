@@ -1,0 +1,47 @@
+<div class='fhirServerGeneratedContent'>
+	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
+	<div class='fhirServerNotice'>This is a HL7 FHIR server, and as you appear to be accessing this page from a web browser you  are seeing a HTML version of the requested resource(s). You can also access this URL from a FHIR client as a ReSTful API call. For more details please see the <a href="https://www.hl7.org/fhir/">HL7 FHIR specification</a>.</div>
+
+	#if( $hasGeneratedMetadataFromRenderer )
+		#parse( "/velocity-templates/resource-metadata-from-renderer.vm" )
+	#else
+		#if( $type == "ValueSet" || $type == "OperationDefinition" )
+			#parse( "/velocity-templates/minimal-metadata.vm" )
+		#else
+			#parse( "/velocity-templates/resource-metadata.vm" )
+		#end
+	#end
+
+	<div id="tabs">
+		<ul>
+			<li><a href="#tabs-main">$firstTabName</a></li>
+			#foreach( $artefact in $metadata.getArtefacts() )
+			    #if( $artefact.getArtefactType().getWeight() >= 0 )
+					#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
+					<li><a href="#tabs-$tabname" onclick="loadTab('#tabs-$tabname', '$metadata.getResourceID()', '$metadata.getVersionNo()', 
+									'$artefact.getArtefactType().name()');">$artefact.getArtefactType().getDisplayName()</a></li>
+				#end
+			#end
+			#if( $examples )
+				<li><a href="#tabs-examples">Examples</a></li>
+			#end
+		</ul>
+		<div id="tabs-main" class='treeView'>$!treeView</div>
+		#foreach( $artefact in $metadata.getArtefacts() )
+			#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
+			<div id="tabs-$tabname"></div>
+		#end
+		#if( $examples )
+			<div id="tabs-examples">
+				<b>Examples implementing this profile:</b>
+				<p>
+					<ul>
+					#foreach( $example in $examples )
+						<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+					#end
+					</ul>
+				</p>
+			</div>
+		#end
+	</div>
+</div>

@@ -1,0 +1,44 @@
+	<div class='metadataSection'>
+		<div id='metadataFromGenerator' resourceID='$metadata.getResourceID()', version='$metadata.getVersionNo()'></div>
+
+        <div class="fhir-panel" id="versionMetadata">
+          <div class="fhir-panel-body">
+			<table class="fhir-table">
+	          <colgroup>
+	            <col width="50%">
+	            <col width="50%">
+	          </colgroup>
+	          <tbody>
+	          <tr>
+	            <td class="fhir-metadata-cell">
+	              <span class="fhir-metadata-label">FHIR Version:</span>
+	              <span class="fhir-metadata-value">$!resource.getStructureFhirVersionEnum()</span>
+	            </td>
+	            <td class="fhir-metadata-cell" rowspan="2">
+	              <span class="fhir-metadata-label"><u>Version History</u></span>
+	              <span class="fhir-metadata-value">
+					<ul>
+						#foreach( $version_no in $versions.keySet() )
+						    #set( $version_entry = $versions.get($version_no) )
+							#if( $version_entry.getVersionNo() == $resource.getVersion() )
+							  <b>
+							#end
+						    <li><a href="$version_entry.getVersionedUrl($baseURL)">Version: $version_no</a> <span class='versionStatusLabel'>$version_entry.getStatus()</span></li>
+						    #if( $version_entry.getVersionNo() == $resource.getVersion() )
+							  </b>
+							#end
+						#end
+					</ul>
+	              </span>
+	            </td>
+	          </tr>
+	          <tr>
+	            <td class="fhir-metadata-cell">
+	              <span class="fhir-metadata-label">Show Raw Profile:</span>
+	              <span class="fhir-metadata-value"><a href='$generatedurl?_format=xml'>XML</a> | <a href='$generatedurl?_format=json'>JSON</a></span>
+	            </td>
+	          </tr>
+	        </tbody></table>
+          </div>
+        </div>
+	</div>
