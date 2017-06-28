@@ -1,3 +1,16 @@
+#metadataFromGenerator .fhir-table tbody:before {
+	display:none;
+}
+
+#metadataFromGenerator .fhir-panel, #versionMetadata {
+    width: 97%;
+    border: none;
+}
+
+div#versionMetadata {
+    padding-top: 0px;
+}
+
 .fhir-panel {
 	width: 100% !IMPORTANT;
 }
@@ -135,6 +148,7 @@ h2.resourceType {
     border: thin solid #d4d2d2;
     padding: 5px;
     margin-top: 5px;
+    clear: both;
 }
 
 .renderedValueSet {
@@ -151,16 +165,6 @@ h2.resourceType {
     margin-top: 5px;
     line-height: 1.2em;
 }
-
-/*
-.treeView tr {
-    line-height: 0.8em;
-}
-
-.renderedValueSet td {
-    padding: 5px;
-}
-*/
 
 .operationTable th {
     background: #f0f0f0;
