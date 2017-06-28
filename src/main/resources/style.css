@@ -1,14 +1,32 @@
+#metadataFromGenerator .fhir-panel, #versionMetadata {
+    width: 97%;
+    border: none;
+}
+
+div#versionMetadata {
+    padding-top: 0px;
+}
+
+#versionMetadata ul a {
+    font-size: 100%;
+}
+
 #extensionTable {
 	width:100%;
+	margin-top: 20px;
+	font-size: 11px;
+    font-family: verdana;
 }
 
 #extensionTable th {
 	font-weight: bold;
 	border-bottom: solid thin lightgrey;
+	padding-right: 15px;
 }
 
 #extensionTable td {
 	border-bottom: solid thin lightgrey;
+	padding-right: 15px;
 }
 
 #tabs ul {
@@ -89,16 +107,6 @@ h2.resourceType {
     margin-top: 5px;
     line-height: 1.2em;
 }
-
-/*
-.treeView tr {
-    line-height: 0.8em;
-}
-
-.renderedValueSet td {
-    padding: 5px;
-}
-*/
 
 .operationTable th {
     background: #f0f0f0;
