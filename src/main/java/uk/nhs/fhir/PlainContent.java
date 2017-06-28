@@ -59,7 +59,9 @@ import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
@@ -290,6 +292,16 @@ public class PlainContent extends CORSInterceptor {
     	// Resource metadata
     	ResourceEntity metadata = myWebHandler.getResourceEntityByID(resourceID);
     	context.put( "metadata", metadata );
+    	
+    	// Check if we have a nice metadata table from the renderer
+    	boolean hasGeneratedMetadataFromRenderer = false;
+    	for (SupportingArtefact artefact : metadata.getArtefacts()) {
+    		if (artefact.getArtefactType().equals(ArtefactType.METADATA)) {
+    			hasGeneratedMetadataFromRenderer = true;
+    		}
+    	}
+    	LOG.info("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
+    	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
     	
     	// Tree view
     	String textSection = sd.getText().getDivAsString();
