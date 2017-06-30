@@ -25,6 +25,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
@@ -94,7 +95,7 @@ public class ImplementationGuideProvider implements IResourceProvider  {
      */
     @Read(version=true)
     public ImplementationGuide getResourceById(@IdParam IdDt theId) {
-        ImplementationGuide foundItem = (ImplementationGuide)myDataSource.getResourceByID(theId);
+        ImplementationGuide foundItem = (ImplementationGuide)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
     
@@ -106,7 +107,7 @@ public class ImplementationGuideProvider implements IResourceProvider  {
     @Search
     public List<IBaseResource> getAllImplementationGuides() {
         LOG.info("Request for ALL ImplementationGuide objects");
-        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.IMPLEMENTATIONGUIDE);
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.IMPLEMENTATIONGUIDE);
         return foundList;
     }
 

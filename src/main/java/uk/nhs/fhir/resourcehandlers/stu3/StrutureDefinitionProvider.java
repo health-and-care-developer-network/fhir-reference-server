@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.stu3;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.hl7.fhir.instance.model.IdType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
@@ -28,11 +34,6 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
@@ -44,7 +45,7 @@ import uk.nhs.fhir.validator.ValidateAny;
  * @author Tim Coates
  */
 public class StrutureDefinitionProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
+    private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDatasource = null;
@@ -113,8 +114,8 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      * @return A StructureDefinition resource
      */
     @Read(version=true)
-    public StructureDefinition getResourceById(@IdParam IdDt theId) {
-        StructureDefinition foundItem = (StructureDefinition)myDatasource.getResourceByID(FHIRVersion.DSTU2, theId);
+    public StructureDefinition getResourceById(@IdParam IdType theId) {
+        StructureDefinition foundItem = (StructureDefinition)myDatasource.getResourceByID(FHIRVersion.STU3, theId);
         return foundItem;
     }
 
@@ -127,7 +128,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<IBaseResource> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
     	LOG.info("Request for StructureDefinition objects matching name: " + theNamePart);
-    	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
+    	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
 
@@ -139,7 +140,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<IBaseResource> getAllStructureDefinitions() {
         LOG.info("Request for ALL StructureDefinition objects");
-        List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.STRUCTUREDEFINITION);
+        List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.STRUCTUREDEFINITION);
         return foundList;
     }
 //</editor-fold>

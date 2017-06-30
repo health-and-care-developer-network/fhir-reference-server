@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
@@ -95,7 +96,7 @@ public class OperationDefinitionProvider implements IResourceProvider  {
      */
     @Read(version=true)
     public OperationDefinition getResourceById(@IdParam IdDt theId) {
-        OperationDefinition foundItem = (OperationDefinition)myDataSource.getResourceByID(theId);
+        OperationDefinition foundItem = (OperationDefinition)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
     
@@ -107,7 +108,7 @@ public class OperationDefinitionProvider implements IResourceProvider  {
     @Search
     public List<IBaseResource> getAllOperationDefinitions() {
         LOG.info("Request for ALL OperationDefinition objects");
-        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.OPERATIONDEFINITION);
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.OPERATIONDEFINITION);
         return foundList;
     }
 
@@ -120,7 +121,7 @@ public class OperationDefinitionProvider implements IResourceProvider  {
     @Search
     public List<IBaseResource> searchByNamePart(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
     	LOG.info("Request for OperationDefinition objects matching name: " + theNamePart);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
         return foundList;
     }
 

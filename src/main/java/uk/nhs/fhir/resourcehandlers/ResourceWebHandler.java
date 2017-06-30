@@ -25,6 +25,7 @@ import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -73,9 +74,9 @@ public class ResourceWebHandler {
         		|| resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
             HashMap<String, List<ResourceEntity>> myNames = null;
             if(resourceType == STRUCTUREDEFINITION) {
-            	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
+            	return myDataSource.getAllResourceNamesByBaseResource(FHIRVersion.DSTU2, resourceType);
             } else {
-            	return myDataSource.getAllResourceNamesByCategory(resourceType);
+            	return myDataSource.getAllResourceNamesByCategory(FHIRVersion.DSTU2, resourceType);
             }
         }
         return null;
@@ -83,62 +84,62 @@ public class ResourceWebHandler {
 
     public List<ResourceEntity> getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
-        List<ResourceEntity> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(resourceType, namePart);
+        List<ResourceEntity> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion.DSTU2, resourceType, namePart);
         return myResourceList;
     }
     
     public List<ResourceEntity> getExtensions() {
         LOG.fine("Called: ResourceWebHandler.getExtensions()");
-        return myDataSource.getExtensions();
+        return myDataSource.getExtensions(FHIRVersion.DSTU2);
     }
     
     public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getVersionsForID(IdDt id)");
-        return myDataSource.getVersionsByID(id);
+        return myDataSource.getVersionsByID(FHIRVersion.DSTU2, id);
     }
     
     public ResourceEntity getResourceEntityByID(IdDt theId) {
         LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
-        return myDataSource.getResourceEntityByID(theId);
+        return myDataSource.getResourceEntityByID(FHIRVersion.DSTU2, theId);
     }
     
     public IResource getResourceByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
-        IResource resource = (IResource)myDataSource.getResourceByID(id);
+        IResource resource = (IResource)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return resource;
     }
     
     public StructureDefinition getSDByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getSDByID(String id)");
-        StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(id);
+        StructureDefinition sd = (StructureDefinition)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return sd;
     }
 
     public OperationDefinition getOperationByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getOperationByID(String id)");
-        OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(id);
+        OperationDefinition od = (OperationDefinition)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return od;
     }
 
     public ImplementationGuide getImplementationGuideByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getImplementationGuideByID(String id)");
-        ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(id);
+        ImplementationGuide ig = (ImplementationGuide)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return ig;
     }
     
     public ValueSet getVSByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getVSByID(String id)");
-        ValueSet valSet = (ValueSet)myDataSource.getResourceByID(id);
+        ValueSet valSet = (ValueSet)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return valSet;
     }
     
     public ExampleResources getExamples(String resourceTypeAndID) {
         LOG.fine("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
-        ExampleResources examples = myDataSource.getExamples(resourceTypeAndID);
+        ExampleResources examples = myDataSource.getExamples(FHIRVersion.DSTU2, resourceTypeAndID);
         return examples;
     }
     
     public HashMap<String,Integer> getResourceTypeCounts() {
-    	return myDataSource.getResourceTypeCounts();
+    	return myDataSource.getResourceTypeCounts(FHIRVersion.DSTU2);
     }
 }

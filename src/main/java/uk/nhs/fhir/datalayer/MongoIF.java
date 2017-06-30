@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
+import org.hl7.fhir.instance.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.mongodb.BasicDBObject;
@@ -31,14 +31,12 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -81,7 +79,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getSingleStructureDefinitionByName(java.lang.String)
 	 */
     @Override
-	public IBaseResource getResourceByID(String id) {
+	public IBaseResource getResourceByID(FHIRVersion fhirVersion, String id) {
         LOG.info("Getting Resource with id=" + id);
         BasicDBObject query = new BasicDBObject("id", id);
         DBObject found = profiles.findOne(query);
@@ -90,7 +88,7 @@ public class MongoIF implements Datasource {
     }
     
     @Override
-	public IBaseResource getResourceByID(IdDt theId) {
+	public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdDt theId) {
     	String id = theId.getIdPart();
     	// No support for versioning in this implementation yet.
         LOG.info("Getting Resource with id=" + id);
@@ -132,7 +130,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAll()
 	 */
     @Override
-	public List<IBaseResource> getAllResourcesOfType(ResourceType resourceType) {
+	public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType) {
         LOG.info("Getting all resources of type:" + resourceType.name());
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
@@ -164,7 +162,7 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAllNames()
 	 */
     @Override
-	public List<String> getAllResourceNames(ResourceType resourceType) {
+	public List<String> getAllResourceNames(FHIRVersion fhirVersion, ResourceType resourceType) {
         LOG.info("Getting all StructureDefinition Names");
         
         List<String> list = new ArrayList<String>();
@@ -214,52 +212,67 @@ public class MongoIF implements Datasource {
         return list;
     }*/
     
-    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(FHIRVersion fhirVersion, ResourceType resourceType) {
     	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 	@Override
-	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
+	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(FHIRVersion fhirVersion, ResourceType resourceType) {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
-	public List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart) {
+	public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+	public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId) {
+	public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdDt theId) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public ResourceEntity getResourceEntityByID(IdDt theId) {
+	public ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdDt theId) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public ExampleResources getExamples(String resourceTypeAndID) {
+	public ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public ResourceEntity getExampleByName(String resourceFilename) {
+	public ResourceEntity getExampleByName(FHIRVersion fhirVersion, String resourceFilename) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public HashMap<String, Integer> getResourceTypeCounts() {
+	public HashMap<String, Integer> getResourceTypeCounts(FHIRVersion fhirVersion) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<ResourceEntity> getExtensions() {
+	public List<ResourceEntity> getExtensions(FHIRVersion fhirVersion) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdType theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdType theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

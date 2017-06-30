@@ -26,6 +26,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
@@ -73,7 +74,7 @@ public class ConformanceProvider implements IResourceProvider  {
      */
     @Read(version=true)
     public Conformance getResourceById(@IdParam IdDt theId) {
-    	Conformance foundItem = (Conformance)myDataSource.getResourceByID(theId);
+    	Conformance foundItem = (Conformance)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
     
@@ -85,7 +86,7 @@ public class ConformanceProvider implements IResourceProvider  {
     @Search
     public List<IBaseResource> getAllConformance() {
         LOG.info("Request for ALL Conformance objects");
-        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(ResourceType.CONFORMANCE);
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CONFORMANCE);
         return foundList;
     }
 

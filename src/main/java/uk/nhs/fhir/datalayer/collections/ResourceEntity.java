@@ -1,9 +1,29 @@
 package uk.nhs.fhir.datalayer.collections;
 
+import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
+import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
+import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
+import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
+import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
+import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.primitive.StringDt;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact.OrderByWeight;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.FHIRUtils;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String resourceName = null;
@@ -22,6 +42,108 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
 	
+	/**
+	 * Extract the metadata from the resource file
+	 * @param fhirVersion
+	 * @param resource
+	 */
+	public ResourceEntity(FHIRVersion fhirVersion, File thisFile) {
+		
+		// Different parsing for different FHIR versions...
+		if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+            if (resourceType == STRUCTUREDEFINITION) {
+            	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+            	resourceName = profile.getName();
+            	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+                
+            	if (!extension) {
+            		baseType = profile.getConstrainedType();
+            	} else {
+            		// Extra metadata for extensions
+            		int min = profile.getSnapshot().getElementFirstRep().getMin();
+            		String max = profile.getSnapshot().getElementFirstRep().getMax();
+            		extensionCardinality = min + ".." + max;
+            		
+            		extensionContexts = new ArrayList<String>();
+            		List<StringDt> contextList = profile.getContext();
+            		for (StringDt context : contextList) {
+            			extensionContexts.add(context.getValueAsString());
+            		}
+            		
+            		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+            		
+            		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
+            		boolean isSimple = false;
+            		if (diffElements.size() == 3) {
+            			if (diffElements.get(1).getPath().equals("Extension.url")) {
+            				isSimple = true;
+            				// It is a simple extension, so we can also find a type
+            				List<Type> typeList = diffElements.get(2).getType();
+            				if (typeList.size() == 1) {
+            					baseType = typeList.get(0).getCode();
+            				} else {
+            					baseType = "(choice)";
+            				}
+            			}
+            		}
+            		if (!isSimple) {
+            			baseType = "(complex)";
+            		}
+            	
+            	}
+                String url = profile.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = baseType;
+                versionNo = new VersionNumber(profile.getVersion());
+                status = profile.getStatus();
+            } else if (resourceType == VALUESET) {
+            	displayGroup = "Code List";
+            	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
+            	resourceName = profile.getName();
+            	String url = profile.getUrl();
+            	resourceID = getResourceIDFromURL(url, resourceName);
+            	if (FHIRUtils.isValueSetSNOMED(profile)) {
+            		displayGroup = "SNOMED CT Code List";
+            	}
+            	versionNo = new VersionNumber(profile.getVersion());
+            	status = profile.getStatus();
+            } else if (resourceType == OPERATIONDEFINITION) {
+            	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+            	resourceName = operation.getName();
+            	String url = operation.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = "Operations";
+                versionNo = new VersionNumber(operation.getVersion());
+                status = operation.getStatus();
+            } else if (resourceType == IMPLEMENTATIONGUIDE) {
+            	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
+            	resourceName = guide.getName();
+            	String url = guide.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = "Implementation Guides";
+                versionNo = new VersionNumber(guide.getVersion());
+                status = guide.getStatus();
+            }
+		}
+	}
+	
+	/**
+	 * Create some metadata for the resource
+	 * @param resourceName
+	 * @param resourceFile
+	 * @param resourceType
+	 * @param extension
+	 * @param baseType
+	 * @param displayGroup
+	 * @param example
+	 * @param resourceID
+	 * @param versionNo
+	 * @param status
+	 * @param artefacts
+	 * @param cardinality
+	 * @param extensionContexts
+	 * @param extensionDescription
+	 */
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,

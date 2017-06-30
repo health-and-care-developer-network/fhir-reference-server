@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
@@ -122,7 +123,7 @@ public class ValueSetProvider implements IResourceProvider {
      */
     @Read(version=true)
     public ValueSet getValueSetById(@IdParam IdDt theId) {
-        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(theId);
+        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
     
@@ -142,7 +143,7 @@ public class ValueSetProvider implements IResourceProvider {
     @Search()
     public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
     	LOG.info("Request for ValueSet objects matching name: " + theName);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.VALUESET, theName.getValue());
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.VALUESET, theName.getValue());
         return foundList;
     }
     
@@ -164,14 +165,14 @@ public class ValueSetProvider implements IResourceProvider {
         
         List<String> ids = codeCache.findCode(theCode.getValue());
         for(String theID : ids) {
-            results.add((ValueSet)myDataSource.getResourceByID(theID));
+            results.add((ValueSet)myDataSource.getResourceByID(FHIRVersion.DSTU2, theID));
         }
         return results;
     }
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(ResourceType.VALUESET);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
         return results;
     }
 //</editor-fold>

@@ -29,6 +29,7 @@ import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -41,7 +42,7 @@ public class VersionedFilePreprocessor {
 	private static String fileExtension = PropertyReader.getProperty("fileExtension");
 	
 
-	protected static void copyFHIRResourcesIntoVersionedDirectory(ResourceType resourceType) throws IOException {
+	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
 		
 		//profileLoadMessages.clear();
 		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server");
@@ -49,12 +50,12 @@ public class VersionedFilePreprocessor {
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 		
 		// Check the versioned directory exists, and create it if not
-		String versioned_path = resourceType.getVersionedFilesystemPath();
+		String versioned_path = resourceType.getVersionedFilesystemPath(fhirVersion);
 		FileUtils.forceMkdir(new File(versioned_path));
 		
 		// Now, look in the root path for this resource type to see if we have any files to process
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
-        String path = resourceType.getFilesystemPath();
+        String path = resourceType.getFilesystemPath(fhirVersion);
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {

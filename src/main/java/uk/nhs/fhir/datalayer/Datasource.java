@@ -18,28 +18,25 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hl7.fhir.instance.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 
 public interface Datasource {
 
-    /**
+	/**
      * Gets a specific one, optionally also with a specific version
      *
      * @param id
      * @return
      */
-	IBaseResource getResourceByID(IdDt theId);
+	IBaseResource getResourceByID(FHIRVersion fhirVersion, IdType theId);
 
     /**
      * Gets resource metadata for a specific ID and version
@@ -47,14 +44,38 @@ public interface Datasource {
      * @param id
      * @return
      */
-	ResourceEntity getResourceEntityByID(IdDt theId);
+	ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdType theId);
 	
 	/**
 	 * Gets the metadata about the resource and versions held
 	 * @param theId
 	 * @return
 	 */
-	ResourceEntityWithMultipleVersions getVersionsByID(IdDt theId);
+	
+	
+	ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId);
+    /**
+     * Gets a specific one, optionally also with a specific version
+     *
+     * @param id
+     * @return
+     */
+	IBaseResource getResourceByID(FHIRVersion fhirVersion, IdDt theId);
+
+    /**
+     * Gets resource metadata for a specific ID and version
+     *
+     * @param id
+     * @return
+     */
+	ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdDt theId);
+	
+	/**
+	 * Gets the metadata about the resource and versions held
+	 * @param theId
+	 * @return
+	 */
+	ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdDt theId);
 	
     /**
      * Gets a specific one, with no version specified (i.e. get the latest)
@@ -62,7 +83,7 @@ public interface Datasource {
      * @param id
      * @return
      */
-	IBaseResource getResourceByID(String id);
+	IBaseResource getResourceByID(FHIRVersion fhirVersion, String id);
 	    
     /**
      * This is the method to do a search based on name, ie to find where
@@ -71,14 +92,14 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart);
+    List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of StructureDefinition objects
      *
      * @return
      */
-    List<IBaseResource> getAllResourcesOfType(ResourceType resourceType);
+    List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType);
 
     /**
      * Gets a full list of names for the web view of /StructureDefinition
@@ -86,13 +107,13 @@ public interface Datasource {
      *
      * @return
      */
-    List<String> getAllResourceNames(ResourceType resourceType);
+    List<String> getAllResourceNames(FHIRVersion fhirVersion, ResourceType resourceType);
 
     /**
      * Get a list of all extensions to show in the extensions registry
      * @return
      */
-    List<ResourceEntity> getExtensions();
+    List<ResourceEntity> getExtensions(FHIRVersion fhirVersion);
     
     /**
      * Gets a full list of names, grouped by base resource for the web view of
@@ -100,7 +121,7 @@ public interface Datasource {
      *
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType);
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(FHIRVersion fhirVersion, ResourceType resourceType);
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -108,7 +129,7 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart);
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart);
 
     /**
      * Gets a full list of names, grouped by category (specific to the resourcetype) for the web view
@@ -116,25 +137,25 @@ public interface Datasource {
      * @param resourceType
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(FHIRVersion fhirVersion, ResourceType resourceType);
     
     /**
      * Gets any example resources we know about for the specified resource type and resource ID
      * @param resourceTypeAndID
      * @return
      */
-    ExampleResources getExamples(String resourceTypeAndID);
+    ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID);
     
     /**
      * Gets a specific example using its filename
      * @param resourceFilename
      * @return
      */
-    ResourceEntity getExampleByName(String resourceFilename);
+    ResourceEntity getExampleByName(FHIRVersion fhirVersion, String resourceFilename);
     
     /**
      * Gets a count of how many resources we have of each type
      * @return
      */
-    HashMap<String,Integer> getResourceTypeCounts();
+    HashMap<String,Integer> getResourceTypeCounts(FHIRVersion fhirVersion);
 }
