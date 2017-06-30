@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
@@ -32,16 +33,16 @@ import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
- * @author tim
+ * @author Adam Hatherly
  */
-public class ImplementationGuideProvider implements IResourceProvider  {
-    private static final Logger LOG = Logger.getLogger(ImplementationGuideProvider.class.getName());
+public class ConformanceProvider implements IResourceProvider  {
+    private static final Logger LOG = Logger.getLogger(ConformanceProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
     FhirContext ctx = null;
 
-    public ImplementationGuideProvider(Datasource dataSource) {
+    public ConformanceProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -55,59 +56,37 @@ public class ImplementationGuideProvider implements IResourceProvider  {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
-        LOG.fine("Created ImplementationGuideProvider handler to respond to requests for ImplementationGuide resource types.");
+        LOG.fine("Created ConformanceProvider handler to respond to requests for Conformance resource types.");
 
     }
     
     
     @Override
     public Class<? extends IBaseResource> getResourceType() {
-        return ImplementationGuide.class;
+        return Conformance.class;
     }
 
-
-//<editor-fold defaultstate="collapsed" desc="Validation">
-    /**
-     * Code to call the validation process, whatever that happens to be...
-     *
-     * See: http://hapifhir.io/doc_rest_operations.html#Type_Level_-_Validate
-     *
-     * @param resourceToTest
-     * @param theMode
-     * @param theProfile
-     * @return
-     */
-    @Validate
-    public MethodOutcome validateImplementationGuide(
-            @ResourceParam Patient resourceToTest,
-            @Validate.Mode ValidationModeEnum theMode,
-            @Validate.Profile String theProfile) { 
-        
-        MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
-        return retval;
-    }
-//</editor-fold>
 
     /**
      * Instance level GET of a resource... 
      *
-     * @return An ImplementationGuide resource
+     * @return A Conformance resource
      */
     @Read(version=true)
-    public ImplementationGuide getResourceById(@IdParam IdDt theId) {
-        ImplementationGuide foundItem = (ImplementationGuide)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
+    public Conformance getResourceById(@IdParam IdDt theId) {
+    	Conformance foundItem = (Conformance)myDataSource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
     
     /**
-     * Overall search, will return ALL ImplementationGuides so responds to: /ImplementationGuide
+     * Overall search, will return ALL Conformance resources so responds to: /Conformance
      *
      * @return
      */
     @Search
-    public List<IBaseResource> getAllImplementationGuides() {
-        LOG.info("Request for ALL ImplementationGuide objects");
-        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.IMPLEMENTATIONGUIDE);
+    public List<IBaseResource> getAllConformance() {
+        LOG.info("Request for ALL Conformance objects");
+        List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CONFORMANCE);
         return foundList;
     }
 

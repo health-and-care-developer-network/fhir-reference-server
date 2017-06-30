@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers;
+package uk.nhs.fhir.servlethelpers.dstu2;
 
 import static uk.nhs.fhir.enums.MimeType.JSON;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
@@ -24,7 +24,7 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.util.PropertyReader;
 
 public class RawResourceRender {

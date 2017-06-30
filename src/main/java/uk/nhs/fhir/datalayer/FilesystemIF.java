@@ -73,7 +73,7 @@ public class FilesystemIF implements Datasource {
 	    	File path = entry.getResourceFile();
 	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
-	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;
     	} else {
     		return null;
@@ -91,7 +91,7 @@ public class FilesystemIF implements Datasource {
 	    	File path = entry.getResourceFile();
 	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
-	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;
     	} else {
     		return null;

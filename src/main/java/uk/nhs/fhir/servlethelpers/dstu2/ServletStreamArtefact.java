@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers;
+package uk.nhs.fhir.servlethelpers.dstu2;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.enums.FHIRVersion;
 
 public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
@@ -33,7 +34,7 @@ public class ServletStreamArtefact {
     		if (resourceVersion != null) {
     			theId = theId.withVersion(resourceVersion);
     		}
-    		ResourceEntity entity = dataSource.getResourceEntityByID(theId);
+    		ResourceEntity entity = dataSource.getResourceEntityByID(FHIRVersion.DSTU2, theId);
     		for (SupportingArtefact artefact : entity.getArtefacts()) {
     			if (artefact.getArtefactType().name().equals(artefactType)) {
     				// We've found a matching artefact - stream it back

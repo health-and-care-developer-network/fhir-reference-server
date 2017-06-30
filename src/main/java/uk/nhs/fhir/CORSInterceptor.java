@@ -38,7 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+
+import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;

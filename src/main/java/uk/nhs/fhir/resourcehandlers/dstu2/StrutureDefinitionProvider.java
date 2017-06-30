@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;

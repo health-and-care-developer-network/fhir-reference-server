@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
+import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -47,12 +50,15 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	 * @param fhirVersion
 	 * @param resource
 	 */
-	public ResourceEntity(FHIRVersion fhirVersion, File thisFile) {
+	public ResourceEntity(ResourceType resourceType, FHIRVersion fhirVersion, File thisFile) {
+		
+		this.resourceType = resourceType;
+		this.resourceFile = thisFile;
 		
 		// Different parsing for different FHIR versions...
 		if (fhirVersion.equals(FHIRVersion.DSTU2)) {
             if (resourceType == STRUCTUREDEFINITION) {
-            	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+            	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
             	resourceName = profile.getName();
             	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
                 
@@ -98,7 +104,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
                 status = profile.getStatus();
             } else if (resourceType == VALUESET) {
             	displayGroup = "Code List";
-            	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
+            	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
             	resourceName = profile.getName();
             	String url = profile.getUrl();
             	resourceID = getResourceIDFromURL(url, resourceName);
@@ -108,7 +114,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
             	versionNo = new VersionNumber(profile.getVersion());
             	status = profile.getStatus();
             } else if (resourceType == OPERATIONDEFINITION) {
-            	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+            	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
             	resourceName = operation.getName();
             	String url = operation.getUrl();
                 resourceID = getResourceIDFromURL(url, resourceName);
@@ -116,13 +122,91 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
                 versionNo = new VersionNumber(operation.getVersion());
                 status = operation.getStatus();
             } else if (resourceType == IMPLEMENTATIONGUIDE) {
-            	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
+            	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
             	resourceName = guide.getName();
             	String url = guide.getUrl();
                 resourceID = getResourceIDFromURL(url, resourceName);
                 displayGroup = "Implementation Guides";
                 versionNo = new VersionNumber(guide.getVersion());
                 status = guide.getStatus();
+            }
+		} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+            if (resourceType == STRUCTUREDEFINITION) {
+            	org.hl7.fhir.dstu3.model.StructureDefinition profile =
+            			(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+            	resourceName = profile.getName();
+            	extension = (profile.getBaseDefinition().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+                
+            	if (!extension) {
+            		baseType = profile.getType();
+            	} else {
+            		// Extra metadata for extensions
+            		int min = profile.getSnapshot().getElementFirstRep().getMin();
+            		String max = profile.getSnapshot().getElementFirstRep().getMax();
+            		extensionCardinality = min + ".." + max;
+            		
+            		extensionContexts = new ArrayList<String>();
+            		List<StringType> contextList = profile.getContext();
+            		for (StringType context : contextList) {
+            			extensionContexts.add(context.getValueAsString());
+            		}
+            		
+            		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+            		
+            		List<ElementDefinition> diffElements = profile.getDifferential().getElement();
+            		boolean isSimple = false;
+            		if (diffElements.size() == 3) {
+            			if (diffElements.get(1).getPath().equals("Extension.url")) {
+            				isSimple = true;
+            				// It is a simple extension, so we can also find a type
+            				List<TypeRefComponent> typeList = diffElements.get(2).getType();
+            				if (typeList.size() == 1) {
+            					baseType = typeList.get(0).getCode();
+            				} else {
+            					baseType = "(choice)";
+            				}
+            			}
+            		}
+            		if (!isSimple) {
+            			baseType = "(complex)";
+            		}
+            	
+            	}
+                String url = profile.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = baseType;
+                versionNo = new VersionNumber(profile.getVersion());
+                status = profile.getStatus().name();
+            } else if (resourceType == VALUESET) {
+            	displayGroup = "Code List";
+            	org.hl7.fhir.dstu3.model.ValueSet profile =
+            			(org.hl7.fhir.dstu3.model.ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+            	resourceName = profile.getName();
+            	String url = profile.getUrl();
+            	resourceID = getResourceIDFromURL(url, resourceName);
+            	if (FHIRUtils.isValueSetSNOMED(profile)) {
+            		displayGroup = "SNOMED CT Code List";
+            	}
+            	versionNo = new VersionNumber(profile.getVersion());
+            	status = profile.getStatus().name();
+            } else if (resourceType == OPERATIONDEFINITION) {
+            	org.hl7.fhir.dstu3.model.OperationDefinition operation =
+            			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+            	resourceName = operation.getName();
+            	String url = operation.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = "Operations";
+                versionNo = new VersionNumber(operation.getVersion());
+                status = operation.getStatus().name();
+            } else if (resourceType == IMPLEMENTATIONGUIDE) {
+            	org.hl7.fhir.dstu3.model.ImplementationGuide guide =
+            			(org.hl7.fhir.dstu3.model.ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+            	resourceName = guide.getName();
+            	String url = guide.getUrl();
+                resourceID = getResourceIDFromURL(url, resourceName);
+                displayGroup = "Implementation Guides";
+                versionNo = new VersionNumber(guide.getVersion());
+                status = guide.getStatus().name();
             }
 		}
 	}

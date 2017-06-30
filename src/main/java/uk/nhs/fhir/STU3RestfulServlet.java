@@ -33,13 +33,13 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
+import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamArtefact;
+import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamExample;
+import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamRawFile;
+import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
-import uk.nhs.fhir.servlethelpers.RawResourceRender;
-import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
-import uk.nhs.fhir.servlethelpers.ServletStreamExample;
-import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**

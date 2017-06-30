@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers;
+package uk.nhs.fhir.servlethelpers.dstu2;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +16,7 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FileLoader;
@@ -31,7 +32,7 @@ public class ServletStreamExample {
 		String exampleName = request.getRequestURI().substring(10);
 		System.out.println("Example="+exampleName);
 		
-		ResourceEntity exampleEntity = dataSource.getExampleByName(exampleName);
+		ResourceEntity exampleEntity = dataSource.getExampleByName(FHIRVersion.DSTU2, exampleName);
 		
 		if (exampleEntity != null) {
 			// We've found a matching example - stream it back

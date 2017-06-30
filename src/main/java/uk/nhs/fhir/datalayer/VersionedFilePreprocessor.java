@@ -45,7 +45,7 @@ public class VersionedFilePreprocessor {
 	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
 		
 		//profileLoadMessages.clear();
-		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server");
+		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 		
@@ -74,22 +74,22 @@ public class VersionedFilePreprocessor {
 	                
 	                try {
 		                if (resourceType == STRUCTUREDEFINITION) {
-		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
 		                    name = profile.getName();
 		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
 		                    versionNo = new VersionNumber(profile.getVersion());
 		                } else if (resourceType == VALUESET) {
-		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
+		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
 		                	name = profile.getName();
 		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
 		                	versionNo = new VersionNumber(profile.getVersion());
 		                } else if (resourceType == OPERATIONDEFINITION) {
-		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
+		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
 		                	name = operation.getName();
 		                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
 		                    versionNo = new VersionNumber(operation.getVersion());
 		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
+		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
 		                	name = guide.getName();
 		                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
 		                    versionNo = new VersionNumber(guide.getVersion());

@@ -166,7 +166,7 @@ public class FileCache {
         ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
         for (ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType) {
-        		IBaseResource vs = FHIRUtils.loadResourceFromFile(entry.getLatest().getResourceFile());
+        		IBaseResource vs = FHIRUtils.loadResourceFromFile(fhirVersion, entry.getLatest().getResourceFile());
         		allFiles.add(vs);
         	}
         }
@@ -256,7 +256,8 @@ public class FileCache {
     	
         // Now, read the resources from the versioned path into our cache
     	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<ResourceEntityWithMultipleVersions>();
-        String path = resourceType.getVersionedFilesystemPath(fhirVersion);
+    	String path = resourceType.getVersionedFilesystemPath(fhirVersion);
+    	LOG.info("Reading pre-processed files from path: " + path);
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -270,7 +271,8 @@ public class FileCache {
 	                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
 	                
 	                try {
-	                	ResourceEntity newEntity = new ResourceEntity(fhirVersion, thisFile);           
+	                	ResourceEntity newEntity = new ResourceEntity(resourceType, fhirVersion, thisFile);           
+	                	LOG.info("Entity metadata: " + newEntity);
 	                	// Load into the main cache for profiles
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
 		                // Sort artefacts by weight so they display in the correct order
@@ -284,6 +286,7 @@ public class FileCache {
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
 	                	addMessage("[!] Error loading " + resourceType + " resource from file : " + thisFile.getAbsolutePath() + " message: " + ex.getMessage());
+	                	ex.printStackTrace();
 	                }
 	            }
 	        }
@@ -318,7 +321,7 @@ public class FileCache {
 	                String resourceID = null;
 	                
 	                try {
-	                	IResource exampleResource = (IResource)FHIRUtils.loadResourceFromFile(thisFile);
+	                	IResource exampleResource = (IResource)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
 	                	IdDt id = exampleResource.getId();
 	                    resourceID = id.getIdPart();
 	                    
