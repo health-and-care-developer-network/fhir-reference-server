@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.hl7.fhir.instance.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -37,6 +39,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -44,7 +47,7 @@ import uk.nhs.fhir.validator.ValidateAny;
  *
  * @author Tim Coates
  */
-public class StrutureDefinitionProvider implements IResourceProvider {
+public class StrutureDefinitionProvider implements IResourceProvider, IResourceHelper {
     private static final Logger LOG = Logger.getLogger(StrutureDefinitionProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
@@ -144,5 +147,20 @@ public class StrutureDefinitionProvider implements IResourceProvider {
         return foundList;
     }
 //</editor-fold>
+    
+    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    	// Clear out the generated text
+        Narrative textElement = new Narrative();
+        textElement.setStatus(NarrativeStatus.GENERATED);
+        textElement.setDivAsString("");
+    	StructureDefinition output = (StructureDefinition)resource;
+    	output.setText(textElement);
+    	return output;
+    }
+    
+    public String getTextSection(IBaseResource resource) {
+    	return ((StructureDefinition)resource).getText().getDivAsString();
+    }
+
 
 }

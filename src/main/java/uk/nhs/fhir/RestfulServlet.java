@@ -33,8 +33,10 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
+import uk.nhs.fhir.resourcehandlers.dstu2.CustomServerConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
@@ -44,10 +46,10 @@ import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
+import uk.nhs.fhir.servlethelpers.ServletStreamExample;
+import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamArtefact;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamExample;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamRawFile;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -61,6 +63,7 @@ import uk.nhs.fhir.util.PropertyReader;
 public class RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
+    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     private static Datasource dataSource = null;
@@ -85,9 +88,9 @@ public class RestfulServlet extends RestfulServer {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else if (request.getRequestURI().startsWith("/artefact")) {
-        	ServletStreamArtefact.streamArtefact(request, response, dataSource);
+        	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
         } else if (request.getRequestURI().startsWith("/Examples/")) {
-        	ServletStreamExample.streamExample(request, response, dataSource, myRawResourceRenderer);
+        	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
@@ -132,11 +135,11 @@ public class RestfulServlet extends RestfulServer {
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
-        resourceProviders.add(new PatientProvider(dataSource));
-        resourceProviders.add(new DocumentReferenceProvider(dataSource));
-        resourceProviders.add(new PractitionerProvider(dataSource));
-        resourceProviders.add(new OrganizationProvider(dataSource));
-        resourceProviders.add(new BundleProvider(dataSource));
+        //resourceProviders.add(new PatientProvider(dataSource));
+        //resourceProviders.add(new DocumentReferenceProvider(dataSource));
+        //resourceProviders.add(new PractitionerProvider(dataSource));
+        //resourceProviders.add(new OrganizationProvider(dataSource));
+        //resourceProviders.add(new BundleProvider(dataSource));
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
         resourceProviders.add(new ImplementationGuideProvider(dataSource));

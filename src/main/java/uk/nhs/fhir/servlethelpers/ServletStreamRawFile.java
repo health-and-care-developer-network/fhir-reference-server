@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers.dstu2;
+package uk.nhs.fhir.servlethelpers;
 
 import java.io.IOException;
 import java.io.InputStream;

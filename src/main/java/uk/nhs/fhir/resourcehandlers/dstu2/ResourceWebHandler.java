@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 /**
  *
  * @author Tim Coates
@@ -103,7 +105,7 @@ public class ResourceWebHandler {
         return myDataSource.getResourceEntityByID(FHIRVersion.DSTU2, theId);
     }
     
-    public IResource getResourceByID(IdDt id) {
+    public IBaseResource getResourceByID(IdDt id) {
         LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
         IResource resource = (IResource)myDataSource.getResourceByID(FHIRVersion.DSTU2, id);
         return resource;
@@ -142,4 +144,8 @@ public class ResourceWebHandler {
     public HashMap<String,Integer> getResourceTypeCounts() {
     	return myDataSource.getResourceTypeCounts(FHIRVersion.DSTU2);
     }
+
+	public Datasource getMyDataSource() {
+		return myDataSource;
+	}
 }

@@ -73,27 +73,55 @@ public class VersionedFilePreprocessor {
 	                VersionNumber versionNo = null;
 	                
 	                try {
-		                if (resourceType == STRUCTUREDEFINITION) {
-		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-		                    name = profile.getName();
-		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-		                    versionNo = new VersionNumber(profile.getVersion());
-		                } else if (resourceType == VALUESET) {
-		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-		                	name = profile.getName();
-		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-		                	versionNo = new VersionNumber(profile.getVersion());
-		                } else if (resourceType == OPERATIONDEFINITION) {
-		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-		                	name = operation.getName();
-		                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
-		                    versionNo = new VersionNumber(operation.getVersion());
-		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-		                	name = guide.getName();
-		                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
-		                    versionNo = new VersionNumber(guide.getVersion());
-		                }
+	                	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+			                if (resourceType == STRUCTUREDEFINITION) {
+			                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                    name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                    versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == VALUESET) {
+			                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                	versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == OPERATIONDEFINITION) {
+			                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = operation.getName();
+			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
+			                    versionNo = new VersionNumber(operation.getVersion());
+			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+			                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = guide.getName();
+			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
+			                    versionNo = new VersionNumber(guide.getVersion());
+			                }
+	                	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+	                		if (resourceType == STRUCTUREDEFINITION) {
+	                			org.hl7.fhir.dstu3.model.StructureDefinition profile =
+	                					(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                    name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                    versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == VALUESET) {
+			                	org.hl7.fhir.dstu3.model.ValueSet profile =
+			                			(org.hl7.fhir.dstu3.model.ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                	versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == OPERATIONDEFINITION) {
+			                	org.hl7.fhir.dstu3.model.OperationDefinition operation =
+			                			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = operation.getName();
+			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
+			                    versionNo = new VersionNumber(operation.getVersion());
+			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+			                	org.hl7.fhir.dstu3.model.ImplementationGuide guide =
+			                			(org.hl7.fhir.dstu3.model.ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = guide.getName();
+			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
+			                    versionNo = new VersionNumber(guide.getVersion());
+			                }
+	                	}
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
 	                	ex.printStackTrace();

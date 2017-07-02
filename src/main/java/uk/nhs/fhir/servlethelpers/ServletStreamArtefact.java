@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers.dstu2;
+package uk.nhs.fhir.servlethelpers;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,8 @@ import uk.nhs.fhir.enums.FHIRVersion;
 public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
 	
-	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response, Datasource dataSource) throws IOException {
+	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response,
+										FHIRVersion fhirVersion, Datasource dataSource) throws IOException {
     	
 		// Load a supporting artefact
     	String resourceID = request.getParameter("resourceID");
@@ -34,7 +35,7 @@ public class ServletStreamArtefact {
     		if (resourceVersion != null) {
     			theId = theId.withVersion(resourceVersion);
     		}
-    		ResourceEntity entity = dataSource.getResourceEntityByID(FHIRVersion.DSTU2, theId);
+    		ResourceEntity entity = dataSource.getResourceEntityByID(fhirVersion, theId);
     		for (SupportingArtefact artefact : entity.getArtefacts()) {
     			if (artefact.getArtefactType().name().equals(artefactType)) {
     				// We've found a matching artefact - stream it back

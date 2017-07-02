@@ -22,10 +22,14 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.util.PropertyReader;
+import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 public class RawResourceRender {
 	
@@ -36,9 +40,10 @@ public class RawResourceRender {
 		myWebHandler = webHandler;
 	}
 
-    public String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
+    public String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content,
+    									FHIRVersion fhirVersion, ResourceType resourceType, MimeType mimeType) {
     	IdDt resourceID = (IdDt)theRequestDetails.getId();
-    	String rawResource = getResourceContent(resourceID, mimeType, resourceType);
+    	String rawResource = getResourceContent(resourceID, mimeType, fhirVersion, resourceType);
     	renderSingleWrappedRAWResource(rawResource, content, mimeType);
     	// Return resource name (for breadcrumb)
         return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
@@ -68,32 +73,13 @@ public class RawResourceRender {
     	content.append(sw.toString());
     }
 
-    private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
+    private String getResourceContent(IdDt resourceID, MimeType mimeType, FHIRVersion fhirVersion, ResourceType resourceType) {
     	
-    	IBaseResource resource = null;
+    	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
     	
     	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	
-    	if (resourceType == STRUCTUREDEFINITION) {
-    		StructureDefinition sd = myWebHandler.getSDByID(resourceID);
-    		sd.setText(textElement);
-    		resource = sd;
-    	} else if (resourceType == VALUESET) {
-    		ValueSet vs = myWebHandler.getVSByID(resourceID);
-    		vs.setText(textElement);
-    		resource = vs;
-    	} else if (resourceType == OPERATIONDEFINITION) {
-     		OperationDefinition od = myWebHandler.getOperationByID(resourceID);
-     		od.setText(textElement);
-     		resource = od;
-    	} else if (resourceType == IMPLEMENTATIONGUIDE) {
-     		ImplementationGuide ig = myWebHandler.getImplementationGuideByID(resourceID);
-     		ig.setText(textElement);
-     		resource = ig;
-     	}
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+        resource = helper.getResourceWithoutTextSection(resource);
         
         if (mimeType == JSON) {
         	return getResourceAsJSON(resource, resourceID);
@@ -116,21 +102,5 @@ public class RawResourceRender {
         // Serialise it to JSON
         FhirContext ctx = FhirContext.forDstu2();
         return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
-    }
-    
-    /**
-     * Simple XML syntax highlight
-	 * @see https://coderwall.com/p/rjwkma/simple-java-html-syntax-highlighter-for-xml-code
-     * @param source
-     * @return syntax highlighted source
-     */
-    public final String syntaxHighlight(String source) {
-        source = source.replaceAll("<([^>/]*)/>", "&lt;~blue~$1~/~/&gt;");
-        source = source.replaceAll("<([^>]*)>", "&lt;~blue~$1~/~&gt;");
-        source = source.replaceAll("([\\w]+)=\"([^\"]*)\"", "~red~$1~/~~black~=\"~/~~green~$2~/~~black~\"~/~");
-        source = source.replaceAll("~([a-z]+)~", "<span style=\"color: $1;\">");
-        source = source.replace("~/~", "</span>");
-        return source;
-    }
-	
+    }	
 }

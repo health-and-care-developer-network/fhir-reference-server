@@ -33,11 +33,12 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
+import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
+import uk.nhs.fhir.servlethelpers.ServletStreamExample;
+import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamArtefact;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamExample;
-import uk.nhs.fhir.servlethelpers.dstu2.ServletStreamRawFile;
 import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
 import uk.nhs.fhir.util.PropertyReader;
@@ -53,6 +54,7 @@ import uk.nhs.fhir.util.PropertyReader;
 public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
+    private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     private static Datasource dataSource = null;
@@ -77,9 +79,9 @@ public class STU3RestfulServlet extends RestfulServer {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
         } else if (request.getRequestURI().startsWith("/artefact")) {
-        	ServletStreamArtefact.streamArtefact(request, response, dataSource);
+        	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
         } else if (request.getRequestURI().startsWith("/Examples/")) {
-        	ServletStreamExample.streamExample(request, response, dataSource, myRawResourceRenderer);
+        	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");

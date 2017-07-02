@@ -5,10 +5,18 @@
  */
 package uk.nhs.fhir.resourcehandlers.dstu2;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
@@ -20,14 +28,10 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -35,7 +39,7 @@ import uk.nhs.fhir.validator.ValidateAny;
  *
  * @author tim
  */
-public class OperationDefinitionProvider implements IResourceProvider  {
+public class OperationDefinitionProvider implements IResourceProvider, IResourceHelper  {
     private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
@@ -124,5 +128,21 @@ public class OperationDefinitionProvider implements IResourceProvider  {
     	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
         return foundList;
     }
+
+    
+    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    	// Clear out the generated text
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv("");
+    	OperationDefinition output = (OperationDefinition)resource;
+    	output.setText(textElement);
+    	return output;
+    }
+    
+    public String getTextSection(IBaseResource resource) {
+    	return ((OperationDefinition)resource).getText().getDivAsString();
+    }
+
 
 }

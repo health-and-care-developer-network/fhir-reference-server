@@ -42,17 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
@@ -63,8 +54,10 @@ import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ClientType;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
@@ -79,6 +72,7 @@ import uk.nhs.fhir.util.PropertyReader;
 public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
+    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
     ResourceWebHandler myWebHandler = null;
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
@@ -142,7 +136,7 @@ public class PlainContent extends CORSInterceptor {
         	if (operation == READ || operation == VREAD) {
 	        	if (mimeType == XML || mimeType == JSON) {
 	        		resourceName = myRawResourceRenderer.renderSingleWrappedRAWResource(
-	        										theRequestDetails, content, resourceType, mimeType);
+	        										theRequestDetails, content, fhirVersion, resourceType, mimeType);
 	        		showList = false;
 	        	} else {
 	        		resourceName = renderSingleResource(theRequestDetails, content, resourceType);
@@ -268,7 +262,7 @@ public class PlainContent extends CORSInterceptor {
      * @return
      */
     private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
-    	IResource sd = myWebHandler.getResourceByID(resourceID);
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
     	
     	Template template = null;
     	try {
@@ -278,7 +272,7 @@ public class PlainContent extends CORSInterceptor {
     	}
     	
     	// Values to insert into template
-    	context.put( "resource", sd );
+    	context.put( "resource", resource );
     	context.put( "type", resourceType );
     	context.put( "baseURL", baseURL );
     	context.put( "firstTabName", firstTabName );
@@ -304,7 +298,7 @@ public class PlainContent extends CORSInterceptor {
     	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
     	
     	// Tree view
-    	String textSection = sd.getText().getDivAsString();
+    	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
     	context.put( "treeView", textSection );
     	
     	// Examples

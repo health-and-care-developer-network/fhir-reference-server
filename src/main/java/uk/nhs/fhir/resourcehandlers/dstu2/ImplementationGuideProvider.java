@@ -12,9 +12,10 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
@@ -27,6 +28,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -34,7 +36,7 @@ import uk.nhs.fhir.validator.ValidateAny;
  *
  * @author tim
  */
-public class ImplementationGuideProvider implements IResourceProvider  {
+public class ImplementationGuideProvider implements IResourceProvider, IResourceHelper  {
     private static final Logger LOG = Logger.getLogger(ImplementationGuideProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
@@ -111,5 +113,18 @@ public class ImplementationGuideProvider implements IResourceProvider  {
         return foundList;
     }
 
+    
+    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    	// Clear out the generated text
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv("");
+    	ImplementationGuide output = (ImplementationGuide)resource;
+    	output.setText(textElement);
+    	return output;
+    }
 
+    public String getTextSection(IBaseResource resource) {
+    	return ((ImplementationGuide)resource).getText().getDivAsString();
+    }
 }
