@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.hl7.fhir.instance.model.IdType;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.mongodb.BasicDBObject;

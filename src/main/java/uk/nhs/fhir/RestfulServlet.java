@@ -34,6 +34,7 @@ import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.CustomServerConformanceProvider;
@@ -43,7 +44,6 @@ import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OrganizationProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
@@ -126,7 +126,7 @@ public class RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-        webber = new ResourceWebHandler(dataSource);
+        webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
         // Pass our resource handler to the other servlets

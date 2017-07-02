@@ -42,9 +42,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
@@ -59,7 +59,7 @@ import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.stu3.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
@@ -69,17 +69,17 @@ import uk.nhs.fhir.util.PropertyReader;
  *
  * @author Tim Coates, Adam Hatherly
  */
-public class PlainContent extends CORSInterceptor {
+public class STU3PlainContent extends CORSInterceptor {
 
-    private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
-    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
+    private static final Logger LOG = Logger.getLogger(STU3PlainContent.class.getName());
+    private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
     ResourceWebHandler myWebHandler = null;
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
     private static String guidesPath = PropertyReader.getProperty("guidesPath");
     private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 
-    public PlainContent(ResourceWebHandler webber) {
+    public STU3PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         myRawResourceRenderer = new RawResourceRender(webber);
         templateHelper = new PageTemplateHelper();
@@ -229,7 +229,7 @@ public class PlainContent extends CORSInterceptor {
     	
     	String baseURL = theRequestDetails.getServerBaseForRequest();
 
-        IdDt resourceID = (IdDt)theRequestDetails.getId();
+        IdType resourceID = (IdType)theRequestDetails.getId();
         
         if (resourceType == STRUCTUREDEFINITION) {
             content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
@@ -249,7 +249,7 @@ public class PlainContent extends CORSInterceptor {
     }
     
     
-    private String makeResourceURL(IdDt resourceID, String baseURL) {
+    private String makeResourceURL(IdType resourceID, String baseURL) {
     	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
     	return entity.getVersionedUrl(baseURL);
     }
@@ -261,7 +261,7 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    private String describeResource(IdType resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
     	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
     	
     	Template template = null;

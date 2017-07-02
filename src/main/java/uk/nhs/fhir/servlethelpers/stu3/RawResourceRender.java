@@ -1,26 +1,17 @@
-package uk.nhs.fhir.servlethelpers.dstu2;
+package uk.nhs.fhir.servlethelpers.stu3;
 
 import static uk.nhs.fhir.enums.MimeType.JSON;
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.StringWriter;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
@@ -29,7 +20,6 @@ import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.PropertyReader;
-import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 public class RawResourceRender {
 	
@@ -42,7 +32,7 @@ public class RawResourceRender {
 
     public String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content,
     									FHIRVersion fhirVersion, ResourceType resourceType, MimeType mimeType) {
-    	IdDt resourceID = (IdDt)theRequestDetails.getId();
+    	IdType resourceID = (IdType)theRequestDetails.getId();
     	String rawResource = getResourceContent(resourceID, mimeType, fhirVersion, resourceType);
     	renderSingleWrappedRAWResource(rawResource, content, mimeType);
     	// Return resource name (for breadcrumb)
@@ -73,7 +63,7 @@ public class RawResourceRender {
     	content.append(sw.toString());
     }
 
-    private String getResourceContent(IdDt resourceID, MimeType mimeType, FHIRVersion fhirVersion, ResourceType resourceType) {
+    private String getResourceContent(IdType resourceID, MimeType mimeType, FHIRVersion fhirVersion, ResourceType resourceType) {
     	
     	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
     	
@@ -88,7 +78,7 @@ public class RawResourceRender {
         }
     }
     
-    public String getResourceAsXML(IBaseResource resource, IdDt resourceID) {
+    public String getResourceAsXML(IBaseResource resource, IdType resourceID) {
         // Serialise it to XML
         FhirContext ctx = FhirContext.forDstu2();
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
@@ -98,7 +88,7 @@ public class RawResourceRender {
         //return serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
     }
     
-    public String getResourceAsJSON(IBaseResource resource, IdDt resourceID) {
+    public String getResourceAsJSON(IBaseResource resource, IdType resourceID) {
         // Serialise it to JSON
         FhirContext ctx = FhirContext.forDstu2();
         return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);

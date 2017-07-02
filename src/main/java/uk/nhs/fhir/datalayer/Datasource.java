@@ -18,7 +18,7 @@ package uk.nhs.fhir.datalayer;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hl7.fhir.instance.model.IdType;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.primitive.IdDt;

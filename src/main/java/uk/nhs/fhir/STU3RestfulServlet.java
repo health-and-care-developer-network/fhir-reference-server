@@ -39,7 +39,7 @@ import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
-import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -120,7 +120,7 @@ public class STU3RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = DataSourceFactory.getDataSource();
-        webber = new ResourceWebHandler(dataSource);
+        webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
         // Pass our resource handler to the other servlets
@@ -139,7 +139,7 @@ public class STU3RestfulServlet extends RestfulServer {
         //resourceProviders.add(new ImplementationGuideProvider(dataSource));
         //resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
-        registerInterceptor(new PlainContent(webber));
+        registerInterceptor(new STU3PlainContent(webber));
         LOG.info("resourceProviders added");
         
         setServerConformanceProvider(new CustomServerConformanceProvider());

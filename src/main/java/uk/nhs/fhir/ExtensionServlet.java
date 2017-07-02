@@ -30,7 +30,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.resourcehandlers.dstu2.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
@@ -44,7 +44,7 @@ public class ExtensionServlet extends javax.servlet.http.HttpServlet {
 	private static ResourceWebHandler myWebHandler = null;
 	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 	
-	protected static void setResourceHandler(ResourceWebHandler webHandler) {
+	public static void setResourceHandler(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
 	}
 	
