@@ -15,6 +15,9 @@
  */
 package uk.nhs.fhir.resourcehandlers.dstu2;
 
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,9 +43,12 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -196,5 +202,21 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     	return ((ValueSet)resource).getText().getDivAsString();
     }
 
+    public ResourceEntity getMetadataFromResource(File thisFile) {
+    	String displayGroup = "Code List";
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	String resourceName = profile.getName();
+    	String url = profile.getUrl();
+    	String resourceID = getResourceIDFromURL(url, resourceName);
+    	if (FHIRUtils.isValueSetSNOMED(profile)) {
+    		displayGroup = "SNOMED CT Code List";
+    	}
+    	VersionNumber versionNo = new VersionNumber(profile.getVersion());
+    	String status = profile.getStatus();
+    	
+    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+				false, null, displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null);
+    }
 
 }

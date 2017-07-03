@@ -26,6 +26,8 @@ import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FHIRUtils;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
@@ -45,138 +47,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
 	
-	/**
-	 * Extract the metadata from the resource file
-	 * @param fhirVersion
-	 * @param resource
-	 */
-	public ResourceEntity(ResourceType resourceType, FHIRVersion fhirVersion, File thisFile) {
-		
-		this.resourceType = resourceType;
-		this.resourceFile = thisFile;
-		
-		// Different parsing for different FHIR versions...
-		if (fhirVersion.equals(FHIRVersion.DSTU2)) {
-            if (resourceType == STRUCTUREDEFINITION) {
-            	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = profile.getName();
-            	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-                
-            	if (!extension) {
-            		baseType = profile.getConstrainedType();
-            	} else {
-            		// Extra metadata for extensions
-            		int min = profile.getSnapshot().getElementFirstRep().getMin();
-            		String max = profile.getSnapshot().getElementFirstRep().getMax();
-            		extensionCardinality = min + ".." + max;
-            		
-            		extensionContexts = new ArrayList<String>();
-            		List<StringDt> contextList = profile.getContext();
-            		for (StringDt context : contextList) {
-            			extensionContexts.add(context.getValueAsString());
-            		}
-            		
-            		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
-            		
-            		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
-            		boolean isSimple = false;
-            		if (diffElements.size() == 3) {
-            			if (diffElements.get(1).getPath().equals("Extension.url")) {
-            				isSimple = true;
-            				// It is a simple extension, so we can also find a type
-            				List<Type> typeList = diffElements.get(2).getType();
-            				if (typeList.size() == 1) {
-            					baseType = typeList.get(0).getCode();
-            				} else {
-            					baseType = "(choice)";
-            				}
-            			}
-            		}
-            		if (!isSimple) {
-            			baseType = "(complex)";
-            		}
-            	
-            	}
-                String url = profile.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = baseType;
-                versionNo = new VersionNumber(profile.getVersion());
-                status = profile.getStatus();
-            } else if (resourceType == VALUESET) {
-            	displayGroup = "Code List";
-            	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = profile.getName();
-            	String url = profile.getUrl();
-            	resourceID = getResourceIDFromURL(url, resourceName);
-            	if (FHIRUtils.isValueSetSNOMED(profile)) {
-            		displayGroup = "SNOMED CT Code List";
-            	}
-            	versionNo = new VersionNumber(profile.getVersion());
-            	status = profile.getStatus();
-            } else if (resourceType == OPERATIONDEFINITION) {
-            	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = operation.getName();
-            	String url = operation.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = "Operations";
-                versionNo = new VersionNumber(operation.getVersion());
-                status = operation.getStatus();
-            } else if (resourceType == IMPLEMENTATIONGUIDE) {
-            	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = guide.getName();
-            	String url = guide.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = "Implementation Guides";
-                versionNo = new VersionNumber(guide.getVersion());
-                status = guide.getStatus();
-            }
-		} else if (fhirVersion.equals(FHIRVersion.STU3)) {
-            if (resourceType == STRUCTUREDEFINITION) {
-            	org.hl7.fhir.dstu3.model.StructureDefinition profile =
-            			(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = profile.getName();
-            	extension = (profile.getBaseDefinition().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-                
-            	if (!extension) {
-            		baseType = profile.getType();
-            	} else {
-            		// Extra metadata for extensions
-            		int min = profile.getSnapshot().getElementFirstRep().getMin();
-            		String max = profile.getSnapshot().getElementFirstRep().getMax();
-            		extensionCardinality = min + ".." + max;
-            		
-            		extensionContexts = new ArrayList<String>();
-            		List<StringType> contextList = profile.getContext();
-            		for (StringType context : contextList) {
-            			extensionContexts.add(context.getValueAsString());
-            		}
-            		
-            		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
-            		
-            		List<ElementDefinition> diffElements = profile.getDifferential().getElement();
-            		boolean isSimple = false;
-            		if (diffElements.size() == 3) {
-            			if (diffElements.get(1).getPath().equals("Extension.url")) {
-            				isSimple = true;
-            				// It is a simple extension, so we can also find a type
-            				List<TypeRefComponent> typeList = diffElements.get(2).getType();
-            				if (typeList.size() == 1) {
-            					baseType = typeList.get(0).getCode();
-            				} else {
-            					baseType = "(choice)";
-            				}
-            			}
-            		}
-            		if (!isSimple) {
-            			baseType = "(complex)";
-            		}
-            	
-            	}
-                String url = profile.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = baseType;
-                versionNo = new VersionNumber(profile.getVersion());
-                status = profile.getStatus().name();
+/*
             } else if (resourceType == VALUESET) {
             	displayGroup = "Code List";
             	org.hl7.fhir.dstu3.model.ValueSet profile =
@@ -208,8 +79,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
                 versionNo = new VersionNumber(guide.getVersion());
                 status = guide.getStatus().name();
             }
-		}
-	}
+*/
 	
 	/**
 	 * Create some metadata for the resource

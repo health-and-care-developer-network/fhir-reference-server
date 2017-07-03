@@ -29,6 +29,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
@@ -74,7 +75,7 @@ public class ExtensionServlet extends javax.servlet.http.HttpServlet {
     	
     	// Put content into template
     	context.put( "baseURL", baseURL );
-    	context.put( "extensions", myWebHandler.getExtensions() );
+    	context.put( "extensions", myWebHandler.getExtensions(FHIRVersion.DSTU2) );
     	
     	StringWriter sw = new StringWriter();
     	template.merge( context, sw );

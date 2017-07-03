@@ -5,6 +5,9 @@
  */
 package uk.nhs.fhir.resourcehandlers.dstu2;
 
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+
+import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,9 +32,12 @@ import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -144,5 +150,18 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
     	return ((OperationDefinition)resource).getText().getDivAsString();
     }
 
+    public ResourceEntity getMetadataFromResource(File thisFile) {
+    	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	String resourceName = operation.getName();
+    	String url = operation.getUrl();
+        String resourceID = getResourceIDFromURL(url, resourceName);
+        String displayGroup = "Operations";
+        VersionNumber versionNo = new VersionNumber(operation.getVersion());
+        String status = operation.getStatus();
+        
+        return new ResourceEntity(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
+				false, null, displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null);
+    }
 
 }

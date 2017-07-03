@@ -80,7 +80,7 @@ public class RawResourceRender {
     
     public String getResourceAsXML(IBaseResource resource, IdType resourceID) {
         // Serialise it to XML
-        FhirContext ctx = FhirContext.forDstu2();
+        FhirContext ctx = FhirContext.forDstu3();
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
         // Encode it for HTML output
         serialised = syntaxHighlight(serialised);
@@ -90,7 +90,7 @@ public class RawResourceRender {
     
     public String getResourceAsJSON(IBaseResource resource, IdType resourceID) {
         // Serialise it to JSON
-        FhirContext ctx = FhirContext.forDstu2();
+        FhirContext ctx = FhirContext.forDstu3();
         return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
     }	
 }

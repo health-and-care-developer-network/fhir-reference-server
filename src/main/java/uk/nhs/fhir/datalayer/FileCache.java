@@ -54,6 +54,8 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
@@ -271,7 +273,8 @@ public class FileCache {
 	                LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
 	                
 	                try {
-	                	ResourceEntity newEntity = new ResourceEntity(resourceType, fhirVersion, thisFile);           
+	                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
+	                	ResourceEntity newEntity = helper.getMetadataFromResource(thisFile);           
 	                	LOG.info("Entity metadata: " + newEntity);
 	                	// Load into the main cache for profiles
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);

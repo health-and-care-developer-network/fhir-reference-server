@@ -89,7 +89,7 @@ public class ResourceWebHandler {
         return myResourceList;
     }
     
-    public List<ResourceEntity> getExtensions() {
+    public List<ResourceEntity> getExtensions(FHIRVersion fhirVersion) {
         LOG.fine("Called: ResourceWebHandler.getExtensions()");
         return myDataSource.getExtensions(fhirVersion);
     }

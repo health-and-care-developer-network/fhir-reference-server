@@ -31,6 +31,8 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
@@ -68,11 +70,17 @@ public class VersionedFilePreprocessor {
 	            if (thisFile.isFile()) {
 	                LOG.fine("Pre-processing " + resourceType + " resource from file: " + thisFile.getName());
 	                
-	                String name = null;
 	                String resourceID = null;
-	                VersionNumber versionNo = null;
-	                
+	                VersionNumber versionNo = null; 
+	                		
 	                try {
+	                	
+	                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
+	                	ResourceEntity newEntity = helper.getMetadataFromResource(thisFile);
+	                	resourceID = newEntity.getResourceID();
+	                	versionNo = newEntity.getVersionNo();
+	                	
+	                	/*
 	                	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
 			                if (resourceType == STRUCTUREDEFINITION) {
 			                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
@@ -121,7 +129,9 @@ public class VersionedFilePreprocessor {
 			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
 			                    versionNo = new VersionNumber(guide.getVersion());
 			                }
-	                	}
+			                
+			                
+	                	}*/
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
 	                	ex.printStackTrace();

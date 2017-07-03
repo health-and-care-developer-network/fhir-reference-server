@@ -5,6 +5,7 @@
  */
 package uk.nhs.fhir.resourcehandlers.dstu2;
 
+import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,10 +22,14 @@ import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 /**
  *
@@ -98,5 +103,19 @@ public class ConformanceProvider implements IResourceProvider, IResourceHelper  
 
     public String getTextSection(IBaseResource resource) {
     	return ((Conformance)resource).getText().getDivAsString();
+    }
+    
+    public ResourceEntity getMetadataFromResource(File thisFile) {
+    	Conformance operation = (Conformance)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	String resourceName = operation.getName();
+    	String url = operation.getUrl();
+        String resourceID = getResourceIDFromURL(url, resourceName);
+        String displayGroup = "Conformance";
+        VersionNumber versionNo = new VersionNumber(operation.getVersion());
+        String status = operation.getStatus();
+        
+        return new ResourceEntity(resourceName, thisFile, ResourceType.CONFORMANCE,
+				false, null, displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null);
     }
 }
