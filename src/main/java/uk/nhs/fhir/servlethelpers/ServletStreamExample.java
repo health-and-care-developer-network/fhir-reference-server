@@ -14,7 +14,6 @@ import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 

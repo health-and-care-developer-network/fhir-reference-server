@@ -46,10 +46,10 @@ import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.servlethelpers.dstu2.RawResourceRender;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**

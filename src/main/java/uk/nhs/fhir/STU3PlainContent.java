@@ -59,7 +59,7 @@ import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.servlethelpers.stu3.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
@@ -208,9 +208,9 @@ public class STU3PlainContent extends CORSInterceptor {
     	LOG.info("Attempting to render conformance statement");
     	String resourceContent = null;
     	if (mimeType == JSON) {
-    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, null);
+    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, new IdType(), fhirVersion);
     	} else {
-    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, null);
+    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, new IdType(), fhirVersion);
     	}
     	myRawResourceRenderer.renderSingleWrappedRAWResource(resourceContent, content, mimeType);
     }
