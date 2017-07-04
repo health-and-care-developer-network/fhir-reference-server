@@ -77,6 +77,10 @@ public enum FhirIcon {
 		return "url('data:image/" + extension + ";base64," + base64 + "')";
 	}
 
+	/*
+	 * This whole process should be happening based on tree nodes, not (FHIR-Version dependent) definition time
+	 * In that case, we have already done the legwork to work out whether the node is an extension (and whether it is simple/complex)
+	 */
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
 		List<Type> types = definition.getType();
 		
@@ -90,9 +94,6 @@ public enum FhirIcon {
 				if (typeName != null) {
 					
 					if (typeName.equals("Extension")) {
-						/*
-						KGM 25/Apr/2017
-						*/
                         return lookupExtension(type, definition);
                     } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
