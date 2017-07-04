@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir;
+package uk.nhs.fhir.servlethelpers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,33 +28,21 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.PropertyReader;
 
-@WebServlet(urlPatterns = {"/Extensions"}, displayName = "FHIR Extensions Registry", loadOnStartup = 1)
-public class ExtensionServlet extends javax.servlet.http.HttpServlet {
+public class ExtensionsList {
 	
 	private static final long serialVersionUID = 2388212531827651285L;
-	private static final Logger LOG = Logger.getLogger(ExtensionServlet.class.getName());
-	PageTemplateHelper templateHelper = null;
-	private static ResourceWebHandler myWebHandler = null;
+	private static final Logger LOG = Logger.getLogger(ExtensionsList.class.getName());
+	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
 	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
 	
-	protected static void setResourceHandler(ResourceWebHandler webHandler) {
-		myWebHandler = webHandler;
-	}
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		templateHelper = new PageTemplateHelper();
-	}
-
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
+								FHIRVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
+		
 		PrintWriter outputStream = null;
 		String baseURL = req.getContextPath();
 		StringBuffer content = new StringBuffer();
@@ -74,7 +61,7 @@ public class ExtensionServlet extends javax.servlet.http.HttpServlet {
     	
     	// Put content into template
     	context.put( "baseURL", baseURL );
-    	context.put( "extensions", myWebHandler.getExtensions() );
+    	context.put( "extensions", webHandler.getExtensions() );
     	
     	StringWriter sw = new StringWriter();
     	template.merge( context, sw );

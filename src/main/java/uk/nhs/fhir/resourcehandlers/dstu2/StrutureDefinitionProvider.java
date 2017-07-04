@@ -13,11 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.dstu2;
+
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
@@ -28,13 +43,14 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -42,7 +58,7 @@ import uk.nhs.fhir.validator.ValidateAny;
  *
  * @author Tim Coates
  */
-public class StrutureDefinitionProvider implements IResourceProvider {
+public class StrutureDefinitionProvider implements IResourceProvider, IResourceHelper {
     private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
@@ -113,7 +129,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
      */
     @Read(version=true)
     public StructureDefinition getResourceById(@IdParam IdDt theId) {
-        StructureDefinition foundItem = (StructureDefinition)myDatasource.getResourceByID(theId);
+        StructureDefinition foundItem = (StructureDefinition)myDatasource.getResourceByID(FHIRVersion.DSTU2, theId);
         return foundItem;
     }
 
@@ -126,7 +142,7 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<IBaseResource> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
     	LOG.info("Request for StructureDefinition objects matching name: " + theNamePart);
-    	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
+    	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
 
@@ -138,9 +154,85 @@ public class StrutureDefinitionProvider implements IResourceProvider {
     @Search
     public List<IBaseResource> getAllStructureDefinitions() {
         LOG.info("Request for ALL StructureDefinition objects");
-        List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(ResourceType.STRUCTUREDEFINITION);
+        List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.STRUCTUREDEFINITION);
         return foundList;
     }
 //</editor-fold>
 
+    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    	// Clear out the generated text
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv("");
+    	StructureDefinition output = (StructureDefinition)resource;
+    	output.setText(textElement);
+    	return output;
+    }
+    
+    public String getTextSection(IBaseResource resource) {
+    	return ((StructureDefinition)resource).getText().getDivAsString();
+    }
+    
+    public ResourceEntity getMetadataFromResource(File thisFile) {
+    	String resourceName = null;
+    	String baseType = null;
+    	boolean extension = false;
+    	String extensionCardinality = null;
+    	ArrayList<String> extensionContexts = new ArrayList<String>();
+    	String extensionDescription = null;
+    	
+    	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	resourceName = profile.getName();
+    	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+        
+    	if (!extension) {
+    		baseType = profile.getConstrainedType();
+    	} else {
+    		// Extra metadata for extensions
+    		int min = profile.getSnapshot().getElementFirstRep().getMin();
+    		String max = profile.getSnapshot().getElementFirstRep().getMax();
+    		extensionCardinality = min + ".." + max;
+    		
+    		extensionContexts = new ArrayList<String>();
+    		List<StringDt> contextList = profile.getContext();
+    		for (StringDt context : contextList) {
+    			extensionContexts.add(context.getValueAsString());
+    		}
+    		
+    		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+    		if (extensionDescription == null) {
+    			extensionDescription = profile.getDifferential().getElementFirstRep().getDefinition();
+    		}
+    		
+    		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
+    		boolean isSimple = false;
+    		if (diffElements.size() == 3) {
+    			if (diffElements.get(1).getPath().equals("Extension.url")) {
+    				isSimple = true;
+    				// It is a simple extension, so we can also find a type
+    				List<Type> typeList = diffElements.get(2).getType();
+    				if (typeList.size() == 1) {
+    					baseType = typeList.get(0).getCode();
+    				} else {
+    					baseType = "(choice)";
+    				}
+    			}
+    		}
+    		if (!isSimple) {
+    			baseType = "(complex)";
+    		}
+    	
+    	}
+        String url = profile.getUrl();
+        String resourceID = getResourceIDFromURL(url, resourceName);
+        String displayGroup = baseType;
+        VersionNumber versionNo = new VersionNumber(profile.getVersion());
+        String status = profile.getStatus();
+        
+        return new ResourceEntity(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
+							extension, baseType, displayGroup, false,
+							resourceID, versionNo, status, null, extensionCardinality,
+							extensionContexts, extensionDescription, FHIRVersion.DSTU2);
+    }
+    
 }

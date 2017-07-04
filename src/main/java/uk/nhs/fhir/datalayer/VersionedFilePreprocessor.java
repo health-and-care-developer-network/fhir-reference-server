@@ -29,7 +29,10 @@ import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ArtefactType;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
@@ -41,20 +44,20 @@ public class VersionedFilePreprocessor {
 	private static String fileExtension = PropertyReader.getProperty("fileExtension");
 	
 
-	protected static void copyFHIRResourcesIntoVersionedDirectory(ResourceType resourceType) throws IOException {
+	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
 		
 		//profileLoadMessages.clear();
-		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server");
+		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 		
 		// Check the versioned directory exists, and create it if not
-		String versioned_path = resourceType.getVersionedFilesystemPath();
+		String versioned_path = resourceType.getVersionedFilesystemPath(fhirVersion);
 		FileUtils.forceMkdir(new File(versioned_path));
 		
 		// Now, look in the root path for this resource type to see if we have any files to process
         ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
-        String path = resourceType.getFilesystemPath();
+        String path = resourceType.getFilesystemPath(fhirVersion);
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -67,32 +70,68 @@ public class VersionedFilePreprocessor {
 	            if (thisFile.isFile()) {
 	                LOG.fine("Pre-processing " + resourceType + " resource from file: " + thisFile.getName());
 	                
-	                String name = null;
 	                String resourceID = null;
-	                VersionNumber versionNo = null;
-	                
+	                VersionNumber versionNo = null; 
+	                		
 	                try {
-		                if (resourceType == STRUCTUREDEFINITION) {
-		                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(thisFile);
-		                    name = profile.getName();
-		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-		                    versionNo = new VersionNumber(profile.getVersion());
-		                } else if (resourceType == VALUESET) {
-		                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(thisFile);
-		                	name = profile.getName();
-		                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-		                	versionNo = new VersionNumber(profile.getVersion());
-		                } else if (resourceType == OPERATIONDEFINITION) {
-		                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(thisFile);
-		                	name = operation.getName();
-		                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
-		                    versionNo = new VersionNumber(operation.getVersion());
-		                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-		                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(thisFile);
-		                	name = guide.getName();
-		                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
-		                    versionNo = new VersionNumber(guide.getVersion());
-		                }
+	                	
+	                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
+	                	ResourceEntity newEntity = helper.getMetadataFromResource(thisFile);
+	                	resourceID = newEntity.getResourceID();
+	                	versionNo = newEntity.getVersionNo();
+	                	
+	                	/*
+	                	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+			                if (resourceType == STRUCTUREDEFINITION) {
+			                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                    name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                    versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == VALUESET) {
+			                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                	versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == OPERATIONDEFINITION) {
+			                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = operation.getName();
+			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
+			                    versionNo = new VersionNumber(operation.getVersion());
+			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+			                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = guide.getName();
+			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
+			                    versionNo = new VersionNumber(guide.getVersion());
+			                }
+	                	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+	                		if (resourceType == STRUCTUREDEFINITION) {
+	                			org.hl7.fhir.dstu3.model.StructureDefinition profile =
+	                					(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                    name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                    versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == VALUESET) {
+			                	org.hl7.fhir.dstu3.model.ValueSet profile =
+			                			(org.hl7.fhir.dstu3.model.ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = profile.getName();
+			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
+			                	versionNo = new VersionNumber(profile.getVersion());
+			                } else if (resourceType == OPERATIONDEFINITION) {
+			                	org.hl7.fhir.dstu3.model.OperationDefinition operation =
+			                			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = operation.getName();
+			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
+			                    versionNo = new VersionNumber(operation.getVersion());
+			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
+			                	org.hl7.fhir.dstu3.model.ImplementationGuide guide =
+			                			(org.hl7.fhir.dstu3.model.ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
+			                	name = guide.getName();
+			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
+			                    versionNo = new VersionNumber(guide.getVersion());
+			                }
+			                
+			                
+	                	}*/
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
 	                	ex.printStackTrace();

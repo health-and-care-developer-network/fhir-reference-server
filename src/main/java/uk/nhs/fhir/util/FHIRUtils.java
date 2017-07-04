@@ -18,6 +18,7 @@ package uk.nhs.fhir.util;
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.ConfigurationException;
@@ -29,6 +30,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.parser.DataFormatException;
+import uk.nhs.fhir.enums.FHIRVersion;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -52,7 +54,8 @@ public class FHIRUtils {
 
     private static final Logger LOG = Logger.getLogger(FHIRUtils.class.getName());
 
-    private static FhirContext ctx = FhirContext.forDstu2();
+    private static FhirContext ctxDSTU2 = FhirContext.forDstu2();
+    private static FhirContext ctxSTU3 = FhirContext.forDstu3();
     
     private static String profilePath = PropertyReader.getProperty("profilePath");
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
@@ -68,12 +71,19 @@ public class FHIRUtils {
      * @param file File object pointing to the file we want to load
      * @return A resource object
      */
-    public static IBaseResource loadResourceFromFile(final File file) {
+    public static IBaseResource loadResourceFromFile(FHIRVersion fhirVersion, final File file) {
         String resourceFile = FileLoader.loadFile(file);
         IBaseResource resource = null;
         try {
-            resource = ctx.newXmlParser().parseResource(resourceFile);
+            
+        	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+        		resource = ctxDSTU2.newXmlParser().parseResource(resourceFile);
+        	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+        		resource = ctxSTU3.newXmlParser().parseResource(resourceFile);
+        	}
             String url = null;
+            
+            LOG.info("Parsed resource and identified it's class as: " + resource.getClass().getName());
 
             // To get the URL we need to cast this to a concrete type
             if (resource instanceof StructureDefinition) {
@@ -84,6 +94,14 @@ public class FHIRUtils {
             	url = ((OperationDefinition)resource).getUrl();
             } else if (resource instanceof Conformance) {
             	url = ((Conformance)resource).getUrl();
+            } else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
+            	url = ((org.hl7.fhir.dstu3.model.StructureDefinition)resource).getUrl();
+            } else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
+            	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
+            } else if (resource instanceof org.hl7.fhir.dstu3.model.OperationDefinition) {
+            	url = ((org.hl7.fhir.dstu3.model.OperationDefinition)resource).getUrl();
+            } else if (resource instanceof org.hl7.fhir.dstu3.model.Conformance) {
+            	url = ((org.hl7.fhir.dstu3.model.Conformance)resource).getUrl();
             }
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
@@ -105,6 +123,22 @@ public class FHIRUtils {
     		if (vs.getCompose().getInclude() != null) {
     			List<ComposeInclude> includeList = vs.getCompose().getInclude();
 				for (ComposeInclude includeEntry : includeList) {
+					if (includeEntry.getSystem() != null) {
+						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+							return true;
+						}
+					}
+				}
+    		}
+    	}
+    	return false;
+    }
+    
+    public static boolean isValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
+    	if (vs.getCompose() != null) {
+    		if (vs.getCompose().getInclude() != null) {
+    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
+				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
 						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
 							return true;

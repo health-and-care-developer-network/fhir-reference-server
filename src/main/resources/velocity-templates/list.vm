@@ -15,7 +15,8 @@
 						<h3>$group</h3>
 						<ul>
 							#foreach( $resource in $list )
-								<li><a href="$resourceType/$resource.getResourceID()">$resource.getResourceName()</a></li>
+								<li><a href="$resource.getFhirVersion().getUrlPrefix()$resourceType/$resource.getResourceID()">$resource.getResourceName()</a> 
+										$resource.getFhirVersion().getLabel()</li>
 							#end
 						</ul>
 					</section>
