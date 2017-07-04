@@ -1,21 +1,23 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.resourcehandlers.stu3;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import ca.uhn.fhir.model.dstu2.resource.Conformance;
-import ca.uhn.fhir.model.dstu2.resource.Conformance.Rest;
-import ca.uhn.fhir.model.dstu2.resource.Conformance.RestResource;
-import ca.uhn.fhir.model.dstu2.resource.Conformance.RestResourceInteraction;
+import org.hl7.fhir.dstu3.hapi.rest.server.ServerConformanceProvider;
+import org.hl7.fhir.dstu3.model.Conformance;
+import org.hl7.fhir.dstu3.model.Conformance.ConformanceRestComponent;
+import org.hl7.fhir.dstu3.model.Conformance.ConformanceRestResourceComponent;
+import org.hl7.fhir.dstu3.model.Conformance.ResourceInteractionComponent;
+
 
 /**
  * Allows us to customise the server Conformance resoure returned for a metadata request
  * @author adam
  *
  */
-public class CustomServerConformanceProvider extends ca.uhn.fhir.rest.server.provider.dstu2.ServerConformanceProvider {
+public class CustomServerConformanceProvider extends ServerConformanceProvider {
 	
 	public CustomServerConformanceProvider() {
 		super.setCache(false);
@@ -23,13 +25,13 @@ public class CustomServerConformanceProvider extends ca.uhn.fhir.rest.server.pro
 	
 	public Conformance getServerConformance(HttpServletRequest request) {
 		Conformance conformance = super.getServerConformance(request);
-		List<Rest> restList = conformance.getRest();
-		for (Rest rest : restList) {
-			List<RestResource> resourceList = rest.getResource();
-			List<RestResource> newResourceList = new ArrayList<RestResource>();
+		List<ConformanceRestComponent> restList = conformance.getRest();
+		for (ConformanceRestComponent rest : restList) {
+			List<ConformanceRestResourceComponent> resourceList = rest.getResource();
+			List<ConformanceRestResourceComponent> newResourceList = new ArrayList<ConformanceRestResourceComponent>();
 			
-			for (RestResource resource : resourceList) {
-				List<RestResourceInteraction> interactions = resource.getInteraction();
+			for (ConformanceRestResourceComponent resource : resourceList) {
+				List<ResourceInteractionComponent> interactions = resource.getInteraction();
 				if (interactions.isEmpty()) {
 					// We've found a problem - an empty list of interactions - this isn't valid!
 					// This seems to happen because the HAPI library isn't adding the validate interaction

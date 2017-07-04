@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.DocumentReference;
+import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
@@ -29,13 +29,12 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
-
 /**
  *
  * @author Tim Coates
  */
-public class DocumentReferenceProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
+public class PractitionerProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(PractitionerProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
@@ -47,7 +46,7 @@ public class DocumentReferenceProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public DocumentReferenceProvider(Datasource dataSource) {
+    public PractitionerProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -61,18 +60,18 @@ public class DocumentReferenceProvider implements IResourceProvider {
         }
         myDataSource = dataSource;
         ctx = FhirContext.forDstu2();
-        
-        LOG.fine("Created DocumentReferenceProvider handler to respond to requests for DocumentReference resource types.");
+        LOG.fine("Created PractitionerProvider handler to respond to requests for Practitioner resource types.");
     }
 
     /**
-     * Get the Type that this IResourceProvider handles, so that the servlet can say it handles that type.
+     * Get the Type that this IResourceProvider handles, so that the servlet can
+     * say it handles that type.
      *
      * @return Class type, used in generating Conformance profile resource.
      */
     @Override
     public Class<? extends IBaseResource> getResourceType() {
-        return DocumentReference.class;
+        return Practitioner.class;
     }
 //</editor-fold>
 
@@ -88,13 +87,13 @@ public class DocumentReferenceProvider implements IResourceProvider {
      * @return
      */
     @Validate
-    public MethodOutcome validateStructureDefinition(@ResourceParam DocumentReference resourceToTest,
+    public MethodOutcome validateStructureDefinition(@ResourceParam Practitioner resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-
+        
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
     }
 //</editor-fold>
-    
+
 }

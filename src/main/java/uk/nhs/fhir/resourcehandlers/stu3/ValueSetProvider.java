@@ -13,12 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.stu3;
+
+import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
+
+import java.io.File;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.hl7.fhir.dstu3.model.IdType;
+import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
+import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
@@ -29,14 +39,13 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.ValueSetCodesCache;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -44,8 +53,8 @@ import uk.nhs.fhir.validator.ValidateAny;
  *
  * @author Tim Coates
  */
-public class ValueSetProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(PatientProvider.class.getName());
+public class ValueSetProvider implements IResourceProvider, IResourceHelper {
+    private static final Logger LOG = Logger.getLogger(ValueSetProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
@@ -70,7 +79,7 @@ public class ValueSetProvider implements IResourceProvider {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu2();
+        ctx = FhirContext.forDstu3();
         LOG.fine("Created ValueSetProvider handler to respond to requests for ValueSet resource types.");
     }
 
@@ -99,7 +108,7 @@ public class ValueSetProvider implements IResourceProvider {
      */
     @Validate
     public MethodOutcome validateStructureDefinition(
-            @ResourceParam Patient resourceToTest,
+            @ResourceParam ValueSet resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) { 
         
@@ -121,8 +130,8 @@ public class ValueSetProvider implements IResourceProvider {
      *    Returns a resource matching this identifier, or null if none exists.
      */
     @Read(version=true)
-    public ValueSet getValueSetById(@IdParam IdDt theId) {
-        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(theId);
+    public ValueSet getValueSetById(@IdParam IdType theId) {
+        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(FHIRVersion.STU3, theId);
         return foundItem;
     }
     
@@ -142,37 +151,46 @@ public class ValueSetProvider implements IResourceProvider {
     @Search()
     public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
     	LOG.info("Request for ValueSet objects matching name: " + theName);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(ResourceType.VALUESET, theName.getValue());
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.VALUESET, theName.getValue());
         return foundList;
-    }
-    
-    /**
-     * The "@Search" annotation indicates that this method supports the
-     * search operation.
-     *
-     * @param theCode
-     *    This operation takes one parameter which is the search criteria. It is
-     *    annotated with the "@Required" annotation. This annotation takes one argument,
-     *    a string containing the code of the search criteria.
-     * @return
-     *    This method returns a list of ValueSets which contain the supplied code.
-     */
-    @Search()
-    public List<ValueSet> getValueSetsByCode(@RequiredParam(name = ValueSet.SP_CODE) StringParam theCode) {
-        List<ValueSet> results = new ArrayList<ValueSet>();
-        ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
-        
-        List<String> ids = codeCache.findCode(theCode.getValue());
-        for(String theID : ids) {
-            results.add((ValueSet)myDataSource.getResourceByID(theID));
-        }
-        return results;
     }
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(ResourceType.VALUESET);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
         return results;
     }
 //</editor-fold>
+    
+    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    	// Clear out the generated text
+    	Narrative textElement = new Narrative();
+        textElement.setStatus(NarrativeStatus.GENERATED);
+        textElement.setDivAsString("");
+    	ValueSet output = (ValueSet)resource;
+    	output.setText(textElement);
+    	return output;
+    }
+    
+    public String getTextSection(IBaseResource resource) {
+    	return ((ValueSet)resource).getText().getDivAsString();
+    }
+
+    public ResourceEntity getMetadataFromResource(File thisFile) {
+    	String displayGroup = "Code List";
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	String resourceName = profile.getName();
+    	String url = profile.getUrl();
+    	String resourceID = getResourceIDFromURL(url, resourceName);
+    	if (FHIRUtils.isValueSetSNOMED(profile)) {
+    		displayGroup = "SNOMED CT Code List";
+    	}
+    	VersionNumber versionNo = new VersionNumber(profile.getVersion());
+    	String status = profile.getStatus().name();
+    	
+    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+				false, null, displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
+    }
+
 }
