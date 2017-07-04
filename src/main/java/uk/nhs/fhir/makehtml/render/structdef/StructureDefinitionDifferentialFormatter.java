@@ -25,7 +25,11 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		
 		FhirTreeTable differentialTreeData = new FhirTreeTable(dataProvider.getDifferentialTreeData());
+		
+		differentialTreeData.stripComplexExtensionChildren();
+		
 		Table differentialTable = differentialTreeData.asTable();
+		
 		Element differentialHtmlTable = differentialTable.makeTable();
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);

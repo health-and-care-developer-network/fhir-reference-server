@@ -418,4 +418,8 @@ public class FhirTreeTable {
 	public void stripRemovedElements() {
 		data.stripRemovedElements();
 	}
+
+	public void stripComplexExtensionChildren() {
+		data.stripComplexExtensionChildren();
+	}
 }

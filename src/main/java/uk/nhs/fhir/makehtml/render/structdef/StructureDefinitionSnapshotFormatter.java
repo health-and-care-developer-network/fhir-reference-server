@@ -35,6 +35,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 		}
 		
 		snapshotTree.stripRemovedElements();
+		snapshotTree.stripComplexExtensionChildren();
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();

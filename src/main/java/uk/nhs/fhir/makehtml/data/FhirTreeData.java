@@ -57,6 +57,10 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 		}
 	}
 	
+	public void stripComplexExtensionChildren() {
+		stripComplexExtensionChildren(root);
+	}
+	
 	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
 		boolean isComplexExtension = node.getExtensionType().isPresent() 
 		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)

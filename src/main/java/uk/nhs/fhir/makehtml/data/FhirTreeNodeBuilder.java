@@ -202,16 +202,12 @@ public class FhirTreeNodeBuilder {
 			node.setAliases(aliases);
 		}
 		
-		ExtensionType extensionType = null;
 		for (Type type : elementDefinition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
-				extensionType = lookupExtensionType(type);
+				node.setExtensionType(lookupExtensionType(type));
 				break;
 			}
-		}
-		if (extensionType != null) {
-			node.setExtensionType(extensionType);
 		}
 		
 		return node;
