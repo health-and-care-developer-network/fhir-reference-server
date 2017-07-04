@@ -200,6 +200,9 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
     		}
     		
     		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+    		if (extensionDescription == null) {
+    			extensionDescription = profile.getDifferential().getElementFirstRep().getDefinition();
+    		}
     		
     		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
     		boolean isSimple = false;
@@ -229,7 +232,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
         return new ResourceEntity(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 							extension, baseType, displayGroup, false,
 							resourceID, versionNo, status, null, extensionCardinality,
-							extensionContexts, extensionDescription);
+							extensionContexts, extensionDescription, FHIRVersion.DSTU2);
     }
     
 }

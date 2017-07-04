@@ -212,12 +212,12 @@ public class MongoIF implements Datasource {
         return list;
     }*/
     
-    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
     	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 	@Override
-	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(FHIRVersion fhirVersion, ResourceType resourceType) {
+	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
@@ -252,12 +252,12 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public HashMap<String, Integer> getResourceTypeCounts(FHIRVersion fhirVersion) {
+	public HashMap<String, Integer> getResourceTypeCounts() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public List<ResourceEntity> getExtensions(FHIRVersion fhirVersion) {
+	public List<ResourceEntity> getExtensions() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

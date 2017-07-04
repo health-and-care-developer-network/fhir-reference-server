@@ -46,6 +46,7 @@ import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
@@ -91,6 +92,8 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
         } else if (request.getRequestURI().startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
+        } else if (request.getRequestURI().startsWith("/Extensions")) {
+        	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
@@ -129,9 +132,8 @@ public class RestfulServlet extends RestfulServer {
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
-        // Pass our resource handler to the other servlets
+        // Pass our resource handler to the other servlet
         IndexServlet.setResourceHandler(webber);
-        ExtensionServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));

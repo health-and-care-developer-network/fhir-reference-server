@@ -46,20 +46,9 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String extensionCardinality = null;
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
+	private FHIRVersion fhirVersion = null;
 	
 /*
-            } else if (resourceType == VALUESET) {
-            	displayGroup = "Code List";
-            	org.hl7.fhir.dstu3.model.ValueSet profile =
-            			(org.hl7.fhir.dstu3.model.ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = profile.getName();
-            	String url = profile.getUrl();
-            	resourceID = getResourceIDFromURL(url, resourceName);
-            	if (FHIRUtils.isValueSetSNOMED(profile)) {
-            		displayGroup = "SNOMED CT Code List";
-            	}
-            	versionNo = new VersionNumber(profile.getVersion());
-            	status = profile.getStatus().name();
             } else if (resourceType == OPERATIONDEFINITION) {
             	org.hl7.fhir.dstu3.model.OperationDefinition operation =
             			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
@@ -102,7 +91,8 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,
 							ArrayList<SupportingArtefact> artefacts, String cardinality,
-							ArrayList<String> extensionContexts, String extensionDescription) {
+							ArrayList<String> extensionContexts, String extensionDescription,
+							FHIRVersion fhirVersion) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -117,7 +107,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.extensionCardinality = cardinality;
 		this.extensionContexts = extensionContexts;
 		this.extensionDescription = extensionDescription;
-		
+		this.fhirVersion = fhirVersion;
 	}
 	
 	public String getResourceName() {
@@ -261,5 +251,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 
 	public void setExtensionDescription(String extensionDescription) {
 		this.extensionDescription = extensionDescription;
+	}
+
+	public FHIRVersion getFhirVersion() {
+		return fhirVersion;
+	}
+
+	public void setFhirVersion(FHIRVersion fhirVersion) {
+		this.fhirVersion = fhirVersion;
 	}
 }

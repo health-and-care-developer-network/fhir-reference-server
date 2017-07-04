@@ -120,7 +120,7 @@ public class FileCache {
      * @param resourceType
      * @return
      */
-    public static HashMap<String, List<ResourceEntity>> getGroupedNameList(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public static HashMap<String, List<ResourceEntity>> getGroupedNameList(ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
@@ -128,23 +128,25 @@ public class FileCache {
         LOG.info("Creating HashMap");
         HashMap<String, List<ResourceEntity>> result = new HashMap<String, List<ResourceEntity>>();
         try {
-            for(ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
-            	if (entry.getLatest().getResourceType() == resourceType) {
-	            	boolean isExtension = entry.getLatest().isExtension();
-	                String group = entry.getLatest().getDisplayGroup();
-	                
-	                // Don't include extensions
-	                if (!isExtension) {
-		                if(result.containsKey(group)) {
-		                    List<ResourceEntity> resultEntry = result.get(group);
-		                    resultEntry.add(entry.getLatest());
-		                } else {
-		                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
-		                    resultEntry.add(entry.getLatest());
-		                    result.put(group, resultEntry);
+            for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+	        	for(ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
+	            	if (entry.getLatest().getResourceType() == resourceType) {
+		            	boolean isExtension = entry.getLatest().isExtension();
+		                String group = entry.getLatest().getDisplayGroup();
+		                
+		                // Don't include extensions
+		                if (!isExtension) {
+			                if(result.containsKey(group)) {
+			                    List<ResourceEntity> resultEntry = result.get(group);
+			                    resultEntry.add(entry.getLatest());
+			                } else {
+			                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
+			                    resultEntry.add(entry.getLatest());
+			                    result.put(group, resultEntry);
+			                }
 		                }
-	                }
-            	}
+	            	}
+	            }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -352,7 +354,7 @@ public class FileCache {
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
 	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
-	            								null, true, resourceID, null, null, null, null, null, null);
+	            								null, true, resourceID, null, null, null, null, null, null, fhirVersion);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
 	            	                    	examplesList.get(profileResourceID).add(newEntity);

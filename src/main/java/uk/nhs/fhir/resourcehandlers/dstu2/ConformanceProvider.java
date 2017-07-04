@@ -116,6 +116,6 @@ public class ConformanceProvider implements IResourceProvider, IResourceHelper  
         
         return new ResourceEntity(resourceName, thisFile, ResourceType.CONFORMANCE,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2);
     }
 }

@@ -179,9 +179,16 @@ public class FilesystemIF implements Datasource {
      * Get a list of all extensions to show in the extensions registry
      * @return
      */
-    public List<ResourceEntity> getExtensions(FHIRVersion fhirVersion)  {
+    public List<ResourceEntity> getExtensions()  {
     	LOG.info("Getting all Extensions");
-        return FileCache.getExtensions(fhirVersion);
+        
+    	List<ResourceEntity> result = new ArrayList<ResourceEntity>();
+    	
+    	for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+    		result.addAll(FileCache.getExtensions(fhirVersion));
+    	}
+    	
+    	return result;
     }
     
     /**
@@ -190,9 +197,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType) {
         LOG.info("Getting all Resource Names by base resource");
-        return FileCache.getGroupedNameList(fhirVersion, resourceType);
+        return FileCache.getGroupedNameList(resourceType);
     }
     
     /**
@@ -200,9 +207,9 @@ public class FilesystemIF implements Datasource {
      * for the web view of /[ResourceType] requests.
      */
     @Override
-	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(FHIRVersion fhirVersion, ResourceType resourceType) {
+	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
     	LOG.info("Getting all Resource Names by category");
-        return FileCache.getGroupedNameList(fhirVersion, resourceType);
+        return FileCache.getGroupedNameList(resourceType);
 	}
     
 
@@ -251,19 +258,21 @@ public class FilesystemIF implements Datasource {
 	}
 
 	@Override
-	public HashMap<String, Integer> getResourceTypeCounts(FHIRVersion fhirVersion) {
+	public HashMap<String, Integer> getResourceTypeCounts() {
 		HashMap<String, Integer> results = new HashMap<String, Integer>();
-		List<ResourceEntity> list = FileCache.getResourceList(fhirVersion);
-		for (ResourceEntity entry : list) {
-			String type = entry.getResourceType().toString();
-			if (entry.isExtension()) {
-				type = "Extension";
-			}
-			if (results.containsKey(type)) {
-				Integer i = results.get(type);
-				results.put(type, i + 1);
-			} else {
-				results.put(type, new Integer(1));
+		for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+			List<ResourceEntity> list = FileCache.getResourceList(fhirVersion);
+			for (ResourceEntity entry : list) {
+				String type = entry.getResourceType().toString();
+				if (entry.isExtension()) {
+					type = "Extension";
+				}
+				if (results.containsKey(type)) {
+					Integer i = results.get(type);
+					results.put(type, i + 1);
+				} else {
+					results.put(type, new Integer(1));
+				}
 			}
 		}
 		return results;

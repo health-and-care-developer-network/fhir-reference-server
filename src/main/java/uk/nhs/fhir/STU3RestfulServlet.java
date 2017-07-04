@@ -35,6 +35,8 @@ import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
+import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
@@ -69,20 +71,25 @@ public class STU3RestfulServlet extends RestfulServer {
             throws ServletException, IOException {
         LOG.info("Requested URI: " + request.getRequestURI());
 
-        if(request.getRequestURI().endsWith(".css")) {
+        String requestedPath = request.getRequestURI().substring(6);
+        LOG.info("Request path: " + requestedPath);
+        
+        if(requestedPath.endsWith(".css")) {
             // Stylesheets
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
-        } else if (request.getRequestURI().endsWith("favicon.ico")) {
+        } else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
-        } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
+        } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
-        } else if (request.getRequestURI().startsWith("/artefact")) {
+        } else if (requestedPath.startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
-        } else if (request.getRequestURI().startsWith("/Examples/")) {
+        } else if (requestedPath.startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
-        } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
+        } else if (requestedPath.startsWith("/Extensions")) {
+        	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
+        } else if (requestedPath.equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
 			PrintWriter outputStream = response.getWriter();
@@ -125,7 +132,6 @@ public class STU3RestfulServlet extends RestfulServer {
         
         // Pass our resource handler to the other servlets
         IndexServlet.setResourceHandler(webber);
-        ExtensionServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StrutureDefinitionProvider(dataSource));
@@ -134,7 +140,7 @@ public class STU3RestfulServlet extends RestfulServer {
         //resourceProviders.add(new PractitionerProvider(dataSource));
         //resourceProviders.add(new OrganizationProvider(dataSource));
         //resourceProviders.add(new BundleProvider(dataSource));
-        //resourceProviders.add(new ValueSetProvider(dataSource));
+        resourceProviders.add(new ValueSetProvider(dataSource));
         //resourceProviders.add(new OperationDefinitionProvider(dataSource));
         //resourceProviders.add(new ImplementationGuideProvider(dataSource));
         //resourceProviders.add(new ConformanceProvider(dataSource));

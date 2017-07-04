@@ -113,7 +113,7 @@ public interface Datasource {
      * Get a list of all extensions to show in the extensions registry
      * @return
      */
-    List<ResourceEntity> getExtensions(FHIRVersion fhirVersion);
+    List<ResourceEntity> getExtensions();
     
     /**
      * Gets a full list of names, grouped by base resource for the web view of
@@ -121,7 +121,7 @@ public interface Datasource {
      *
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(FHIRVersion fhirVersion, ResourceType resourceType);
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByBaseResource(ResourceType resourceType);
 
     /**
      * This is the method to search by name, e.g. name:contains=Patient
@@ -137,7 +137,7 @@ public interface Datasource {
      * @param resourceType
      * @return
      */
-    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(FHIRVersion fhirVersion, ResourceType resourceType);
+    HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType);
     
     /**
      * Gets any example resources we know about for the specified resource type and resource ID
@@ -157,5 +157,5 @@ public interface Datasource {
      * Gets a count of how many resources we have of each type
      * @return
      */
-    HashMap<String,Integer> getResourceTypeCounts(FHIRVersion fhirVersion);
+    HashMap<String,Integer> getResourceTypeCounts();
 }

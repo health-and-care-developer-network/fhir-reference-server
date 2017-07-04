@@ -1,3 +1,19 @@
+span.stu3, span.dstu2 {
+    border-radius: 8px;
+    font-size: 8pt;
+    color: white;
+}
+
+span.dstu2 {
+    background: #8ae234;
+    border: solid #8ae234;
+}
+
+span.stu3 {
+    background: #ad7fa8;
+    border: solid #ad7fa8;
+}
+
 #metadataFromGenerator .fhir-table tbody:before {
 	display:none;
 }

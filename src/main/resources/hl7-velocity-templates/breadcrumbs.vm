@@ -2,11 +2,11 @@
 		  #if($resourceType)
 		    #if($resourceName)
 		    	<li class="breadcrumb-item"><a href="/">Home</a></li>
-		    	<li class="breadcrumb-item"><a href="$baseURL/$resourceType">$resourceType</a></li>
+		    	<li class="breadcrumb-item"><a href="/$resourceType">$resourceType</a></li>
 		    	<li class="breadcrumb-item active"><a href="#">$resourceName</a></li>
 		    #else
 		    	<li class="breadcrumb-item"><a href="/">Home</a></li>
-		    	<li class="breadcrumb-item active"><a href="$baseURL/$resourceType">$resourceType</a></li>
+		    	<li class="breadcrumb-item active"><a href="/$resourceType">$resourceType</a></li>
 		    #end
 		  #else
 		  	<li class="breadcrumb-item active"><a href="/">Home</a></li>

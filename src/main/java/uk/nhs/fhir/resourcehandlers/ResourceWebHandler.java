@@ -75,9 +75,9 @@ public class ResourceWebHandler {
         		|| resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
             HashMap<String, List<ResourceEntity>> myNames = null;
             if(resourceType == STRUCTUREDEFINITION) {
-            	return myDataSource.getAllResourceNamesByBaseResource(fhirVersion, resourceType);
+            	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
-            	return myDataSource.getAllResourceNamesByCategory(fhirVersion, resourceType);
+            	return myDataSource.getAllResourceNamesByCategory(resourceType);
             }
         }
         return null;
@@ -89,9 +89,9 @@ public class ResourceWebHandler {
         return myResourceList;
     }
     
-    public List<ResourceEntity> getExtensions(FHIRVersion fhirVersion) {
+    public List<ResourceEntity> getExtensions() {
         LOG.fine("Called: ResourceWebHandler.getExtensions()");
-        return myDataSource.getExtensions(fhirVersion);
+        return myDataSource.getExtensions();
     }
     
     public ResourceEntityWithMultipleVersions getVersionsForID(IdDt id) {
@@ -133,7 +133,7 @@ public class ResourceWebHandler {
     }
     
     public HashMap<String,Integer> getResourceTypeCounts() {
-    	return myDataSource.getResourceTypeCounts(fhirVersion);
+    	return myDataSource.getResourceTypeCounts();
     }
 
 	public Datasource getMyDataSource() {

@@ -20,7 +20,7 @@
 				<li>
 					<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
 						<span typeof="v:Breadcrumb">
-							<a href="$baseURL/$resourceType" rel="v:url" property="v:title">$resourceType</a>
+							<a href="/$resourceType" rel="v:url" property="v:title">$resourceType</a>
 							<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
 				</li>
 				<li>

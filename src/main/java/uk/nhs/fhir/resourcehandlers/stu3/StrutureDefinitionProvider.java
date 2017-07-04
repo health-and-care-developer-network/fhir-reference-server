@@ -24,12 +24,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
+import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -200,6 +200,9 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
     		}
     		
     		extensionDescription = profile.getDifferential().getElementFirstRep().getShort();
+    		if (extensionDescription == null) {
+    			extensionDescription = profile.getDifferential().getElementFirstRep().getDefinition();
+    		}
     		
     		List<ElementDefinition> diffElements = profile.getDifferential().getElement();
     		boolean isSimple = false;
@@ -229,7 +232,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
         return new ResourceEntity(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 				extension, baseType, displayGroup, false,
 				resourceID, versionNo, status, null, extensionCardinality,
-				extensionContexts, extensionDescription);
+				extensionContexts, extensionDescription, FHIRVersion.STU3);
     }
 
 }

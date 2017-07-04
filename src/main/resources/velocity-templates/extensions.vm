@@ -3,6 +3,7 @@
 
 	<table id="extensionTable">
 		<tr>
+			<th>Version</th>
 			<th>ID</th>
 			<th>Description</th>
 			<th><a href="https://www.hl7.org/fhir/defining-extensions.html#cardinality">Card.</a></th>
@@ -12,10 +13,11 @@
 		
 		#foreach( $extension in $extensions )
 		<tr>
-			<td><a href="/StructureDefinition/$extension.getResourceID()">$extension.getResourceName()</a></td>
-			<td>$extension.getExtensionDescription()</td>
-			<td>$extension.getExtensionCardinality()</td>
-			<td>$extension.getBaseType()</td>
+			<td>$extension.getFhirVersion().getLabel()</td>
+			<td><a href="/$extension.getFhirVersion().getUrlPrefix()StructureDefinition/$extension.getResourceID()">$extension.getResourceName()</a></td>
+			<td>$!extension.getExtensionDescription()</td>
+			<td>$!extension.getExtensionCardinality()</td>
+			<td>$!extension.getBaseType()</td>
 			<td>
 				#foreach( $extensionContext in $extension.getExtensionContexts() )
 					<p>$extensionContext</p>
