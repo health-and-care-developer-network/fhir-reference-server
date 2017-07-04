@@ -116,13 +116,13 @@ public class NewMain {
 	        for (File thisFile : allProfiles) {
 	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
 	        }
+	        
+	        if (TEST_LINK_URLS) {
+	        	new UrlTester().testUrls(FhirURL.getLinkUrls());
+	            UrlTester.logSuccessAndFailures();
+	        }
         } catch (Exception e) {
         	e.printStackTrace();
-        }
-        
-        if (TEST_LINK_URLS) {
-        	new UrlTester().testUrls(FhirURL.getLinkUrls());
-            UrlTester.logSuccessAndFailures();
         }
     }
 }

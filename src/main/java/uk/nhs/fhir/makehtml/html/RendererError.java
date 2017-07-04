@@ -25,7 +25,8 @@ public class RendererError {
 		CONSTRAINT_WITHOUT_CONDITION, 
 		HL7_URL_WITHOUT_DSTU2, 
 		LINK_WITH_LOGICAL_URL, 
-		HL7_ORG_UK_HOST;
+		HL7_ORG_UK_HOST,
+		COMPLEX_EXTENSION_WITH_CHILDREN;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -35,6 +36,7 @@ public class RendererError {
 		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 		responses.put(Key.HL7_ORG_UK_HOST, ErrorResponse.IGNORE);
+		responses.put(Key.COMPLEX_EXTENSION_WITH_CHILDREN, ErrorResponse.IGNORE);
 
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
 		

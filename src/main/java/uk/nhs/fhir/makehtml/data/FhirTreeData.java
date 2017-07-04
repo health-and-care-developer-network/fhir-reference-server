@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 
 import com.google.common.base.Preconditions;
 
+import uk.nhs.fhir.makehtml.html.RendererError;
+
 public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	private final FhirTreeTableContent root;
 	
@@ -58,10 +60,13 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 	
 	public void stripComplexExtensionChildren() {
-		stripComplexExtensionChildren(root);
+		boolean strippedAny = stripComplexExtensionChildren(root, false);
+		if (strippedAny) {
+			RendererError.handle(RendererError.Key.COMPLEX_EXTENSION_WITH_CHILDREN, "Found complex extension with inlined children in the tree");
+		}
 	}
 	
-	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
+	private boolean stripComplexExtensionChildren(FhirTreeTableContent node, boolean strippedAny) {
 		boolean isComplexExtension = node.getExtensionType().isPresent() 
 		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
 		  // exclude root node
@@ -74,10 +79,13 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			FhirTreeTableContent child = children.get(i);
 			if (isComplexExtension) {
 				children.remove(i);
+				strippedAny = true;
 			} else {
-				stripComplexExtensionChildren(child);
+				strippedAny |= stripComplexExtensionChildren(child, strippedAny);
 			}
 		}
+		
+		return strippedAny;
 	}
 }
 
