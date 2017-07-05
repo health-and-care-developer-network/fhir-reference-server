@@ -15,10 +15,11 @@
  */
 package uk.nhs.fhir.datalayer;
 
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
 import java.util.ArrayList;
 import java.util.List;
+
+import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
 
 /**
  * A singleton object which holds a cached set of all codes in all ValueSets

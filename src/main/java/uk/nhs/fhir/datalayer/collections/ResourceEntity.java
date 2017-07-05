@@ -1,34 +1,10 @@
 package uk.nhs.fhir.datalayer.collections;
 
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
-import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
-
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import org.hl7.fhir.dstu3.model.ElementDefinition;
-import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
-import org.hl7.fhir.dstu3.model.StringType;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.resourcehandlers.IResourceHelper;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
-import uk.nhs.fhir.util.FHIRUtils;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String resourceName = null;
@@ -48,28 +24,6 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String extensionDescription = null;
 	private FHIRVersion fhirVersion = null;
 	
-/*
-            } else if (resourceType == OPERATIONDEFINITION) {
-            	org.hl7.fhir.dstu3.model.OperationDefinition operation =
-            			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = operation.getName();
-            	String url = operation.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = "Operations";
-                versionNo = new VersionNumber(operation.getVersion());
-                status = operation.getStatus().name();
-            } else if (resourceType == IMPLEMENTATIONGUIDE) {
-            	org.hl7.fhir.dstu3.model.ImplementationGuide guide =
-            			(org.hl7.fhir.dstu3.model.ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-            	resourceName = guide.getName();
-            	String url = guide.getUrl();
-                resourceID = getResourceIDFromURL(url, resourceName);
-                displayGroup = "Implementation Guides";
-                versionNo = new VersionNumber(guide.getVersion());
-                status = guide.getStatus().name();
-            }
-*/
-	
 	/**
 	 * Create some metadata for the resource
 	 * @param resourceName
@@ -86,6 +40,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	 * @param cardinality
 	 * @param extensionContexts
 	 * @param extensionDescription
+	 * @param fhirVersion
 	 */
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,

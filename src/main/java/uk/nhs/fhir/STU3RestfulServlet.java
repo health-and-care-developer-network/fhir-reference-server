@@ -43,6 +43,8 @@ import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -141,8 +143,8 @@ public class STU3RestfulServlet extends RestfulServer {
         //resourceProviders.add(new OrganizationProvider(dataSource));
         //resourceProviders.add(new BundleProvider(dataSource));
         resourceProviders.add(new ValueSetProvider(dataSource));
-        //resourceProviders.add(new OperationDefinitionProvider(dataSource));
-        //resourceProviders.add(new ImplementationGuideProvider(dataSource));
+        resourceProviders.add(new OperationDefinitionProvider(dataSource));
+        resourceProviders.add(new ImplementationGuideProvider(dataSource));
         //resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new STU3PlainContent(webber));
