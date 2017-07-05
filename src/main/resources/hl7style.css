@@ -1,3 +1,69 @@
+span.stu3, span.dstu2 {
+    border-radius: 8px;
+    font-size: 8pt;
+    color: white;
+}
+
+span.dstu2 {
+    background: #8ae234;
+    border: solid #8ae234;
+}
+
+span.stu3 {
+    background: #ad7fa8;
+    border: solid #ad7fa8;
+}
+
+.fhir-metadata-label {
+    color: #808080;
+    font-weight: bold;
+    font-size: 13;
+}
+.fhir-panel * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.metadataSection tr, .metadataSection fhir-table-title, .metadataSection td,
+.metadataSection tr, .metadataSection fhir-table-title, .metadataSection td {
+    text-align: left;
+    text-align: left;
+}
+.metadataSection tr {
+    padding: 3px;
+    line-height: 1.66em;
+}
+.metadataSection tr, .metadataSection .fhir-table-title {
+    font-size: 11px;
+    font-family: verdana;
+    vertical-align: top;
+    border: 0;
+}
+.metadataSection .fhir-metadata-cell {
+    border: 1px solid #f0f0f0;
+}
+.metadataSection table {
+    width: 100%;
+    font-family: sans-serif;
+    border-collapse: collapse;
+}
+
+.metadataSection .fhir-panel {
+    padding: 15px;
+    margin-bottom: 20;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.metadataSection .fhir-table tbody:before {
+    content: '-';
+    display: block;
+    line-height: 1em;
+    color: transparent;
+}
+
 #metadataFromGenerator .fhir-table tbody:before {
 	display:none;
 }
