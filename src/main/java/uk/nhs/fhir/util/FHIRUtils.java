@@ -16,24 +16,20 @@
 package uk.nhs.fhir.util;
 
 import java.io.File;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import ca.uhn.fhir.parser.DataFormatException;
 import uk.nhs.fhir.enums.FHIRVersion;
-
-import java.util.List;
-import java.util.logging.Level;
 
 public class FHIRUtils {
 
@@ -100,8 +96,8 @@ public class FHIRUtils {
             	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.OperationDefinition) {
             	url = ((org.hl7.fhir.dstu3.model.OperationDefinition)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.Conformance) {
-            	url = ((org.hl7.fhir.dstu3.model.Conformance)resource).getUrl();
+            } else if (resource instanceof org.hl7.fhir.instance.model.Conformance) {
+            	url = ((org.hl7.fhir.instance.model.Conformance)resource).getUrl();
             }
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID

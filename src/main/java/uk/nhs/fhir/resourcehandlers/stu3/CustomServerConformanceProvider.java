@@ -1,15 +1,10 @@
 package uk.nhs.fhir.resourcehandlers.stu3;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.hl7.fhir.dstu3.hapi.rest.server.ServerConformanceProvider;
-import org.hl7.fhir.dstu3.model.Conformance;
-import org.hl7.fhir.dstu3.model.Conformance.ConformanceRestComponent;
-import org.hl7.fhir.dstu3.model.Conformance.ConformanceRestResourceComponent;
-import org.hl7.fhir.dstu3.model.Conformance.ResourceInteractionComponent;
+import org.hl7.fhir.dstu3.hapi.rest.server.ServerCapabilityStatementProvider;
+import org.hl7.fhir.dstu3.model.CapabilityStatement;
+
 
 
 /**
@@ -17,14 +12,15 @@ import org.hl7.fhir.dstu3.model.Conformance.ResourceInteractionComponent;
  * @author adam
  *
  */
-public class CustomServerConformanceProvider extends ServerConformanceProvider {
+public class CustomServerConformanceProvider extends ServerCapabilityStatementProvider {
 	
 	public CustomServerConformanceProvider() {
 		super.setCache(false);
 	}
 	
-	public Conformance getServerConformance(HttpServletRequest request) {
-		Conformance conformance = super.getServerConformance(request);
+	public CapabilityStatement getServerConformance(HttpServletRequest request) {
+		CapabilityStatement conformance = super.getServerConformance(request);
+		/*
 		List<ConformanceRestComponent> restList = conformance.getRest();
 		for (ConformanceRestComponent rest : restList) {
 			List<ConformanceRestResourceComponent> resourceList = rest.getResource();
@@ -39,11 +35,10 @@ public class CustomServerConformanceProvider extends ServerConformanceProvider {
 					// I'm not entirely sure whether we should also see an interaction for it or not..
 					
 					// If we wanted to add the interaction we could do this:
-					/*
-					RestResourceInteraction validateInteraction = new RestResourceInteraction();
-					validateInteraction.setCode(TypeRestfulInteractionEnum.VALIDATE);
-					interactions.add(validateInteraction);
-					*/
+					
+					//RestResourceInteraction validateInteraction = new RestResourceInteraction();
+					//validateInteraction.setCode(TypeRestfulInteractionEnum.VALIDATE);
+					//interactions.add(validateInteraction);
 					
 					// Otherwise we could just remove the resource from the list...
 					
@@ -54,6 +49,7 @@ public class CustomServerConformanceProvider extends ServerConformanceProvider {
 			}
 			rest.setResource(newResourceList);
 		}
+		*/
 		return conformance;
 	}
 }
