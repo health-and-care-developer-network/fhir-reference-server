@@ -28,7 +28,7 @@ public class ServletStreamArtefact {
     	String resourceID = request.getParameter("resourceID");
     	String resourceVersion = request.getParameter("resourceVersion");
     	String artefactType = request.getParameter("artefactType");
-    	LOG.info("Request to stream artefact: " + artefactType);
+    	LOG.fine("Request to stream artefact: " + artefactType);
     	
     	if (resourceID != null && artefactType != null) {
     		IdDt theId = new IdDt(resourceID);

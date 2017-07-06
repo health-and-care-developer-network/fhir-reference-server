@@ -36,7 +36,7 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 	
 	public ResourceEntity getSpecificVersion(VersionNumber version) {
 		if (versionList.containsKey(version)) {
-			LOG.info("Found requested version - returning");
+			LOG.fine("Found requested version - returning");
 			return versionList.get(version);
 		} else {
 			LOG.warning("Could not find requested version - asked for version:"+version+" - versions we have are:");

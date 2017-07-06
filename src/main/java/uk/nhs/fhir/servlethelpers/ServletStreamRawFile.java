@@ -27,11 +27,11 @@ public class ServletStreamRawFile {
 			if (mimeType == null) {
 				if (filename.endsWith(".js")) {
 					mimeType = "application/javascript";
-					LOG.info("Using Javascript mimeType: " + mimeType);
+					LOG.fine("Using Javascript mimeType: " + mimeType);
 				} else {
 					// Now, try to guess from the file extension
 					mimeType = URLConnection.guessContentTypeFromName(filename);
-					LOG.info("Detected mimeType using guessContentTypeFromName: " + mimeType);
+					LOG.fine("Detected mimeType using guessContentTypeFromName: " + mimeType);
 				}
 			}
 			

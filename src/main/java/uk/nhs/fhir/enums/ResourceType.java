@@ -61,7 +61,7 @@ public enum ResourceType {
 	
     public static ResourceType getTypeFromRequest(RequestDetails theRequestDetails) {
     	String typeInRequest = theRequestDetails.getResourceName();
-    	LOG.info("Detecting type of resource: " + typeInRequest);
+    	LOG.fine("Detecting type of resource: " + typeInRequest);
     	return getTypeFromHAPIName(typeInRequest);
     }
     

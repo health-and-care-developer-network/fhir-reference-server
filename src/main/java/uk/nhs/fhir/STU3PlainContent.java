@@ -96,8 +96,7 @@ public class STU3PlainContent extends CORSInterceptor {
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
         ResourceType resourceType = ResourceType.getTypeFromRequest(theRequestDetails);
         
-        LOG.info("Request received - operation: " + operation.toString());
-        LOG.info("Resource type: " + resourceType.toString());
+        LOG.info("Request received - operation: " + operation.toString() + ", type: " + resourceType.toString());
         
         // First, check if this is a request for a markdown or text file from the ImplementationGuide directory..
         if ((operation == READ || operation == VREAD) && resourceType == IMPLEMENTATIONGUIDE) {
@@ -113,7 +112,7 @@ public class STU3PlainContent extends CORSInterceptor {
             return true;
         }
 
-        LOG.info("This appears to be a browser, generate some HTML to return.");
+        LOG.fine("This appears to be a browser, generate some HTML to return.");
         
         // If they have asked for the conformance profile then let this one through - it
         // will be caught and handled by the outgoingResponse handler instead
@@ -126,8 +125,8 @@ public class STU3PlainContent extends CORSInterceptor {
         StringBuffer content = new StringBuffer();
         
 
-        LOG.info("FHIR Operation: " + operation);
-        LOG.info("Format to return to browser: " + mimeType.toString());
+        LOG.fine("FHIR Operation: " + operation);
+        LOG.fine("Format to return to browser: " + mimeType.toString());
         
         boolean showList = true;
         String resourceName = null;
@@ -164,7 +163,7 @@ public class STU3PlainContent extends CORSInterceptor {
      * @param filename
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
-    	LOG.info("Request for a file from the ImplementationGuide path: " + filename);
+    	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
 		try {
 	    	// Initialise the output
 	    	PrintWriter outputStream = null;
@@ -192,7 +191,6 @@ public class STU3PlainContent extends CORSInterceptor {
         	if (operation == METADATA && clientType == BROWSER) {
 	    		StringBuffer content = new StringBuffer();
 	    		renderConformance(content, theResponseObject, mimeType);
-	    		LOG.info(content.toString());
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE.toString(), null, content, baseURL);
 	    		return false;
@@ -205,7 +203,7 @@ public class STU3PlainContent extends CORSInterceptor {
 	}
     
     private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
-    	LOG.info("Attempting to render conformance statement");
+    	LOG.fine("Attempting to render conformance statement");
     	String resourceContent = null;
     	if (mimeType == JSON) {
     		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, new IdType(), fhirVersion);
@@ -294,7 +292,7 @@ public class STU3PlainContent extends CORSInterceptor {
     			hasGeneratedMetadataFromRenderer = true;
     		}
     	}
-    	LOG.info("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
+    	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
     	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
     	
     	// Tree view

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
 
@@ -60,7 +61,7 @@ public class DocumentReferenceProvider implements IResourceProvider {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu2();
+        ctx = FHIRVersion.DSTU2.getContext();
         
         LOG.fine("Created DocumentReferenceProvider handler to respond to requests for DocumentReference resource types.");
     }

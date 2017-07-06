@@ -46,17 +46,17 @@ public enum ArtefactType {
 	 */
     public static ArtefactType getFromFilename(ResourceType resourceType, String filename) {
     	if (filename == null || resourceType == null) { 
-    		LOG.info("Found artefact - can't determine type");
+    		LOG.fine("Found artefact - can't determine type - filename: " + filename);
     		return null;
     	} else {
     		for (ArtefactType type : ArtefactType.values()) {
     			if (type.relatesToResourceType.equals(resourceType) && type.filename.equalsIgnoreCase(filename)) {
-    				LOG.info("Detected artefact of type: " + type);
+    				LOG.fine("Detected artefact of type: " + type);
     				return type;
     			}
     		}
     	}
-    	LOG.info("Found artefact - can't determine type");
+    	LOG.fine("Found artefact - can't determine type - filename: " + filename);
     	return null;
     }
 	

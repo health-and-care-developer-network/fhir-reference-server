@@ -63,7 +63,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu3();
+        ctx = FHIRVersion.STU3.getContext();
         LOG.fine("Created OperationDefinitionProvider handler to respond to requests for OperationDefinition resource types.");
 
     }
@@ -86,7 +86,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
      * @param theProfile
      * @return
      */
-    @Validate
+    /*@Validate
     public MethodOutcome validateOperationDefinition(
             @ResourceParam OperationDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
@@ -94,7 +94,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
         
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
-    }
+    }*/
 //</editor-fold>
 
     /**
@@ -115,7 +115,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
      */
     @Search
     public List<IBaseResource> getAllOperationDefinitions() {
-        LOG.info("Request for ALL OperationDefinition objects");
+        LOG.fine("Request for ALL OperationDefinition objects");
         List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.OPERATIONDEFINITION);
         return foundList;
     }
@@ -128,7 +128,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
      */
     @Search
     public List<IBaseResource> searchByNamePart(@RequiredParam(name = OperationDefinition.SP_NAME) StringParam theNamePart) {
-    	LOG.info("Request for OperationDefinition objects matching name: " + theNamePart);
+    	LOG.fine("Request for OperationDefinition objects matching name: " + theNamePart);
     	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3,
     										ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
         return foundList;

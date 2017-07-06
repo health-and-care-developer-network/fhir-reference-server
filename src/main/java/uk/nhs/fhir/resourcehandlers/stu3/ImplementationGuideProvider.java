@@ -61,7 +61,7 @@ public class ImplementationGuideProvider implements IResourceProvider, IResource
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu3();
+        ctx = FHIRVersion.STU3.getContext();
         LOG.fine("Created ImplementationGuideProvider handler to respond to requests for ImplementationGuide resource types.");
 
     }
@@ -84,7 +84,7 @@ public class ImplementationGuideProvider implements IResourceProvider, IResource
      * @param theProfile
      * @return
      */
-    @Validate
+    /*@Validate
     public MethodOutcome validateImplementationGuide(
             @ResourceParam ImplementationGuide resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
@@ -92,7 +92,7 @@ public class ImplementationGuideProvider implements IResourceProvider, IResource
         
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
-    }
+    }*/
 //</editor-fold>
 
     /**
@@ -113,7 +113,7 @@ public class ImplementationGuideProvider implements IResourceProvider, IResource
      */
     @Search
     public List<IBaseResource> getAllImplementationGuides() {
-        LOG.info("Request for ALL ImplementationGuide objects");
+        LOG.fine("Request for ALL ImplementationGuide objects");
         List<IBaseResource> foundList = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.IMPLEMENTATIONGUIDE);
         return foundList;
     }

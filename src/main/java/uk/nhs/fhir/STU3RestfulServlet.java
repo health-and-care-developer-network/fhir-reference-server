@@ -74,7 +74,7 @@ public class STU3RestfulServlet extends RestfulServer {
         LOG.info("Requested URI: " + request.getRequestURI());
 
         String requestedPath = request.getRequestURI().substring(6);
-        LOG.info("Request path: " + requestedPath);
+        LOG.fine("Request path: " + requestedPath);
         
         if(requestedPath.endsWith(".css")) {
             // Stylesheets
@@ -111,7 +111,7 @@ public class STU3RestfulServlet extends RestfulServer {
     protected void initialize() throws ServletException {
     	
     	// Explicitly set this as an STU3 FHIR server
-    	super.setFhirContext(FhirContext.forDstu3());
+    	super.setFhirContext(FHIRVersion.STU3.getContext());
 
         // We set our logging level based on the config file property.
         LOG.setLevel(Level.INFO);
@@ -148,9 +148,9 @@ public class STU3RestfulServlet extends RestfulServer {
         //resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new STU3PlainContent(webber));
-        LOG.info("resourceProviders added");
+        LOG.fine("resourceProviders added");
         
         setServerConformanceProvider(new CustomServerConformanceProvider());
-        LOG.info("Custom Conformance provider added");
+        LOG.fine("Custom Conformance provider added");
     }
 }
