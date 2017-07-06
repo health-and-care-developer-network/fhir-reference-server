@@ -1,5 +1,18 @@
 package uk.nhs.fhir.makehtml.data;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.base.Strings;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
@@ -10,14 +23,9 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
-import com.google.common.base.Strings;
-import uk.nhs.fhir.makehtml.HTMLConstants;
-import uk.nhs.fhir.makehtml.NewMain;
-import uk.nhs.fhir.util.SharedFhirContext;
-
-import java.io.*;
-import java.util.List;
-import java.util.Optional;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.util.HAPIUtils;
 
 public enum FhirIcon {
 	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
@@ -41,6 +49,12 @@ public enum FhirIcon {
 	private final String extension;
 	private final String base64;
 	
+	// Set on startup. Path to folder containing extension files.
+	static String suppliedResourcesFolderPath = null;
+	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
+		FhirIcon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
+	}
+	
 	FhirIcon(String name, String extension, String base64) {
 		this.name = name;
 		this.extension = extension;
@@ -52,7 +66,7 @@ public enum FhirIcon {
 	}
 	
 	public String getUrl() {
-		return HTMLConstants.NHS_IMAGES_DIR + name + "." + extension;
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + "/" + name + "." + extension;
 	}
 	
 	public String getBase64() {
@@ -66,22 +80,20 @@ public enum FhirIcon {
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
 		List<Type> types = definition.getType();
 		
-		boolean foundExtension = false;
+		if (definition.getPath().endsWith("[x]")) {
+			return FhirIcon.CHOICE;
+		}
+		
 		if (!types.isEmpty()) {
 			for (Type type : types) {
 				String typeName = type.getCode();
 				if (typeName != null) {
 					
 					if (typeName.equals("Extension")) {
-						foundExtension = true;
-
 						/*
 						KGM 25/Apr/2017
 						*/
-                        Optional<FhirIcon> lookupExtension = lookupExtension(type, definition);
-						if (lookupExtension.isPresent()) {
-							return lookupExtension.get();
-						}
+                        return lookupExtension(type, definition);
                     } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 						
@@ -109,10 +121,6 @@ public enum FhirIcon {
 			return FhirIcon.SLICE;
 		}
 		
-		if (foundExtension) {
-			return FhirIcon.EXTENSION_COMPLEX;
-		}
-		
 		String path = definition.getPath();
 		if (!Strings.isNullOrEmpty(path)) {
 			
@@ -122,99 +130,78 @@ public enum FhirIcon {
 		
 		return FhirIcon.ELEMENT;
 	}
-	/*
-	private static Optional<FhirIcon> maybeForExtension(Type type, ElementDefinitionDt definition) {
-		
-		List<UriDt> profiles = type.getProfile();
-		if (profiles.isEmpty()) {
-			return Optional.empty();
-		}
 
-		boolean hasPrimitiveExtension = false;
-		boolean hasNonPrimitiveExtension = false;
-		
-		for (UriDt uri : profiles) {
-			String[] tokens = uri.getValue().split("/");
-			String uriTypeName = tokens[tokens.length - 1];
-			Optional<Class<?>> implementingType = FhirDataTypes.getImplementingType(uriTypeName);
-			if (implementingType.isPresent()) {
-				Class<?> implementingClass = implementingType.get();
-				if (BasePrimitive.class.isAssignableFrom(implementingClass)) {
-					hasPrimitiveExtension = true;
-				} else {
-					hasNonPrimitiveExtension = true;
-				}
-			}
-		}
-		
-		if (hasNonPrimitiveExtension) {
-			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
-		} else if (hasPrimitiveExtension) {
-			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
-		} else {
-			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
-			return Optional.empty();
-		}
-	}
-*/
+	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
 
-
-	private static Optional<FhirIcon> lookupExtension(Type type, ElementDefinitionDt definition)  {
-
-		FhirContext ctx = SharedFhirContext.get();
+		FhirContext ctx = HAPIUtils.sharedFhirContext();
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {
 		    // Extension isn't profiled. So using base type and is simple
-			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+			return FhirIcon.EXTENSION_SIMPLE;
 		}
 
 		boolean hasPrimitiveExtension = true;
 
-		for (UriDt uri : profiles) {
+		for (UriDt uriDt : profiles) {
 
-			String[] tokens = uri.getValue().split("/");
-			String[] args = NewMain.getArgs();
-			if (tokens.length>0 && args != null && args.length >0) {
-				StructureDefinition extension = null;
-				// Failed to retrieve from http request, try file access
-
-				String pathName = args[0] + "/" + tokens[tokens.length - 1] + ".xml";
-				File file = new File(pathName);
-				try (FileInputStream fis = new FileInputStream(file)){
-					Reader reader = new InputStreamReader(fis);
-					IParser parser = ctx.newXmlParser();
-					extension = parser.parseResource(StructureDefinition.class, reader);
-					System.out.println(extension.getFhirVersion());
-
-					for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
-						if (element.getPath().contains("Extension.extension.url")) {
-
-							hasPrimitiveExtension = false;
-						}
+			String fileName;
+			try {
+				URI uri = new URI(uriDt.getValue());
+				fileName = uri.toURL().getFile() + ".xml";
+			} catch (URISyntaxException | MalformedURLException e) {
+				throw new IllegalStateException("URI/URL error for uri " + uriDt.getValue(), e);
+			}
+			
+			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+			
+			String pathName = suppliedResourcesFolderPath + fileName;
+			File file = new File(pathName);
+			
+			if (!file.exists()) {
+				// case insensitive search
+				for (File f : new File(suppliedResourcesFolderPath).listFiles()) {
+					if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
+						file = f;
+						break;
 					}
-
-				} catch (IOException ie) {
-					throw new IllegalStateException(ie);
 				}
 			}
-		}
-		/*
-		if (hasNonPrimitiveExtension) {
-            System.out.println("* - "+definition.getPath());
-        } else {
-            System.out.println("0 - "+definition.getPath());
-        }
-        */
-		if (!hasPrimitiveExtension) {
 
-			return Optional.of(FhirIcon.EXTENSION_COMPLEX);
-		} else if (hasPrimitiveExtension) {
-			return Optional.of(FhirIcon.EXTENSION_SIMPLE);
+			if (!file.exists()) {
+				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
+					// fix up for known incorrectly named file
+					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
+					fileName = newFileName;
+					file = new File(suppliedResourcesFolderPath + fileName);
+				} else {
+					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
+				}
+			}
+			
+			try (FileInputStream fis = new FileInputStream(file)){
+				Reader reader = new InputStreamReader(fis);
+				IParser parser = ctx.newXmlParser();
+				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
+				// KGM 8/May/2017 System.out.println(extension.getFhirVersion());
+
+				for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
+					if (element.getPath().contains("Extension.extension.url")) {
+
+						hasPrimitiveExtension = false;
+					}
+				}
+
+			} catch (IOException ie) {
+				throw new IllegalStateException(ie);
+			}
+		}
+
+		if (hasPrimitiveExtension) {
+			return FhirIcon.EXTENSION_SIMPLE;
 		} else {
-			// Unknown whether it is simple or complex. Probably refers to external types. Hold out for a better match
-			// KGM 25/Apr/2017 believe this is defunct
-            return Optional.empty();
+			return FhirIcon.EXTENSION_COMPLEX;
 		}
 	}
 

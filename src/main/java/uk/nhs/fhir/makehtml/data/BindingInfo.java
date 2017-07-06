@@ -1,17 +1,18 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.net.URL;
 import java.util.Optional;
 
-import com.google.common.base.Preconditions;
+import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class BindingInfo {
 
+	public static final String STAND_IN_DESCRIPTION = "STAND IN STRING BECAUSE IT'S MISSING FROM THE SNAPSHOT";
+	
 	private final Optional<String> description;
-	private final Optional<URL> url;
+	private final Optional<FhirURL> url;
 	private final String strength;
 
-	public BindingInfo(Optional<String> description, Optional<URL> url, String strength) {
+	public BindingInfo(Optional<String> description, Optional<FhirURL> url, String strength) {
 		this.description = description;
 		this.url = url;
 		this.strength = strength;
@@ -21,7 +22,7 @@ public class BindingInfo {
 		return description;
 	}
 	
-	public Optional<URL> getUrl() {
+	public Optional<FhirURL> getUrl() {
 		return url;
 	}
 	
@@ -31,19 +32,41 @@ public class BindingInfo {
 
 	public static BindingInfo resolveWithBackupData(BindingInfo binding, BindingInfo backup) {
 		Optional<String> bindingDescription = binding.getDescription();
-		Optional<URL> bindingUrl = binding.getUrl();
+		Optional<FhirURL> bindingUrl = binding.getUrl();
 		String bindingStrength = binding.getStrength();
 		
 		Optional<String> backupDescription = backup.getDescription();
-		Optional<URL> backupUrl = backup.getUrl();
+		Optional<FhirURL> backupUrl = backup.getUrl();
 		String backupStrength = backup.getStrength();
 
 		Optional<String> resolvedDescription = bindingDescription.isPresent() ? bindingDescription : backupDescription;
-		Optional<URL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
+		Optional<FhirURL> resolvedUrl = bindingUrl.isPresent() ? bindingUrl : backupUrl;
 		String resolvedStrength = !bindingStrength.isEmpty() ? bindingStrength : backupStrength; 
 		
-		Preconditions.checkArgument(resolvedDescription.isPresent() || resolvedUrl.isPresent(), "Description or URL must be present");
+		if (!resolvedDescription.isPresent() 
+		  && !resolvedUrl.isPresent()) {
+			RendererError.handle(RendererError.Key.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
+			resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
+		}
 		
 		return new BindingInfo(resolvedDescription, resolvedUrl, resolvedStrength);
+	}
+	
+	public int hashCode() {
+		return description.hashCode() + url.hashCode() + strength.hashCode();
+	}
+	
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof BindingInfo)) {
+			return false;
+		}
+		
+		BindingInfo otherBindingInfo = (BindingInfo)other;
+		return description.equals(otherBindingInfo.getDescription())
+			&& url.equals(otherBindingInfo.getUrl())
+			&& strength.equals(otherBindingInfo.getStrength());
 	}
 }

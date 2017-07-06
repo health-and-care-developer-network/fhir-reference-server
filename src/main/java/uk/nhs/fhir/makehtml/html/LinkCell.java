@@ -13,11 +13,12 @@ import org.jdom2.Text;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public class LinkCell extends TableCell {
 	private final List<LinkData> linkDatas;
@@ -140,10 +141,10 @@ public class LinkCell extends TableCell {
 	
 	Element makeDataCell(List<Content> children) {
 		if (getFaded()) {
-			cellClasses.add("fhir-text-faded");
+			cellClasses.add(FhirCSS.TEXT_FADED);
 		}
 		if (getStrikethrough()) {
-			cellClasses.add("fhir-text-strikethrough");
+			cellClasses.add(FhirCSS.TEXT_STRIKETHROUGH);
 		}
 		
 		return Elements.addClasses(
@@ -156,8 +157,8 @@ public class LinkCell extends TableCell {
 			Elements.addClasses(
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
-						new Attribute("class", "fhir-link"),
-						new Attribute("href", linkData.getURL())),
+						new Attribute("class", FhirCSS.LINK),
+						new Attribute("href", linkData.getURL().toLinkString())),
 					linkData.getText()),
 				linkClasses);
 		return link;
@@ -167,18 +168,18 @@ public class LinkCell extends TableCell {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-link"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LINK), 
 				Lists.newArrayList(
 					new CSSRule("text-decoration", "none"),
 					new CSSRule("color", "#005EB8"))));
 
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-text-faded"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_FADED),
 				Lists.newArrayList(
 					new CSSRule("opacity", "0.4"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-text-strikethrough"),
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_STRIKETHROUGH),
 				Lists.newArrayList(
 					new CSSRule("text-decoration", "line-through"))));
 		

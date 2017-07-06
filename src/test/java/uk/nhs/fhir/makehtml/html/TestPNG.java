@@ -1,27 +1,25 @@
 package uk.nhs.fhir.makehtml.html;
 
 import java.io.IOException;
-import java.util.zip.DataFormatException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
-import uk.nhs.fhir.makehtml.html.CSSRule;
-import uk.nhs.fhir.makehtml.html.Style;
-import uk.nhs.fhir.makehtml.html.TablePNGGenerator;
-import uk.nhs.fhir.util.Elements;
-import uk.nhs.fhir.util.HTMLUtil;
-import uk.nhs.fhir.util.SectionedHTMLDoc;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 
 public class TestPNG {
 	
+	@Ignore
 	@Test
 	public void testWritePNG() {
 		TablePNGGenerator png = new TablePNGGenerator();
@@ -29,6 +27,7 @@ public class TestPNG {
 		System.out.println(base64);
 	}
 	
+	@Ignore
 	@Test
 	public void displayGenerated() throws ParserConfigurationException, IOException {
 		// one of the backgrounds from the HL7 FHIR website

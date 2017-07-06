@@ -19,7 +19,7 @@ public class StructureDefinitionPreparer implements ResourcePreparer<StructureDe
         	if (newBaseURL.endsWith("/")) {
         		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
         	}
-        	//structureDefinitionResource.setBase(newBaseURL);
+
         	structureDefinitionResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
         }
 	}

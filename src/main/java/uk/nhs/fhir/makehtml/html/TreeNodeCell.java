@@ -7,10 +7,11 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 
 public class TreeNodeCell extends TableCell {
 
@@ -19,13 +20,21 @@ public class TreeNodeCell extends TableCell {
 	private final String name;
 	private final String backgroundClass;
 	private final boolean strikethrough;
+	private final String nodeKey;
 	
-	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough) {
+	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey) {
+		Preconditions.checkNotNull(name);
+		Preconditions.checkNotNull(fhirIcon);
+		Preconditions.checkNotNull(treeIcons);
+		Preconditions.checkNotNull(backgroundClass);
+		Preconditions.checkNotNull(nodeKey);
+		
 		this.name = name;
 		this.fhirIcon = fhirIcon;
 		this.treeIcons = treeIcons;
 		this.backgroundClass = backgroundClass;
 		this.strikethrough = strikethrough;
+		this.nodeKey = nodeKey;
 	}
 	
 	@Override
@@ -37,19 +46,24 @@ public class TreeNodeCell extends TableCell {
 				Elements.withAttributes("img", 
 					Lists.newArrayList(
 						new Attribute("src", icon.getNhsSrc()),
-						new Attribute("class", "fhir-tree-icon"))));
+						new Attribute("class", FhirCSS.TREE_ICON))));
 		}
 		contents.add(Elements.withAttributes("img", 
 			Lists.newArrayList(
 				new Attribute("src", fhirIcon.getUrl()),
-				new Attribute("class", "fhir-tree-resource-icon"))));
+				new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
 		contents.add(
 			strikethrough
-				? Elements.withAttributeAndText("span", new Attribute("class", "fhir-text-strikethrough"), name)
-				: new Text(name));
+				? Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TEXT_STRIKETHROUGH), name)
+				: Elements.withAttributesAndChild(
+					"a",
+					Lists.newArrayList(
+						new Attribute("class", String.join(" ", Lists.newArrayList(FhirCSS.LINK, "tabLink"))),
+						new Attribute("href", "details.html#" + nodeKey)), 
+					new Text(name)));
 		
 		return Elements.withAttributeAndChildren("td", 
-			new Attribute("class", backgroundClass + " fhir-tree-icons"), 
+			new Attribute("class", String.join(" ", backgroundClass, FhirCSS.TREE_ICONS)), 
 			contents);
 	}
 

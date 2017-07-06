@@ -33,7 +33,7 @@ publishResources.sh github_url branch path url_to_replace new_url_to_insert regi
  - new_url_to_insert: This is the URL that will be substituted for the URL matched above
  - registryhostname: Hostname of private docker registry to pull image from (pass in an empty string "" if not using a private registry)
  - targethostname: Hostname of Docker server to run the container on if using the Docker API to run remotely (use an empty string "" if not)
- - out_path: Output directory to write to (this will be a subdirectory of /docker-data/fhir-profiles currently)
+ - out_path: Output directory to write to (this will be a subdirectory of /docker-data/fhir-profiles currently) - the renderer will create subdirectories for the resource types.
 
 For example:
 
@@ -47,18 +47,7 @@ For example:
 	http://fhir-test.nhs.uk/ \
         "" \
 	"" \
-	profiles/
-
-# Generate Extensions
-./publishResources.sh \
-	https://github.com/nhsconnect/gpconnect-fhir.git \
-	develop \
-	Extensions \
-	http://fhir.nhs.net/ \
-	http://fhir-test.nhs.uk/ \
-        "" \
-	"" \
-	profiles/
+	""
 
 # Generate ValueSets
 ./publishResources.sh \
@@ -69,6 +58,6 @@ For example:
 	http://fhir-test.nhs.uk/ \
         "" \
 	"" \
-	valuesets/
+	""
 ```
 

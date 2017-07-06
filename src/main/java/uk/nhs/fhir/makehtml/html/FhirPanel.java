@@ -7,8 +7,9 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
-import uk.nhs.fhir.util.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public class FhirPanel {
 	
@@ -34,7 +35,7 @@ public class FhirPanel {
 		panelContents.add(makeBody());
 		
 		return Elements.withAttributeAndChildren("div",
-			new Attribute("class", "fhir-panel"),
+			new Attribute("class", FhirCSS.PANEL),
 			panelContents);
 	}
 
@@ -44,15 +45,15 @@ public class FhirPanel {
 	
 	private Element makeHeadingBox() {
 		return Elements.withAttributeAndChild("div", 
-					new Attribute("class", "fhir-panel-heading-box"), 
+					new Attribute("class", FhirCSS.PANEL_HEADING_BOX), 
 					Elements.withAttributeAndText("h3",
-						new Attribute("class", "fhir-panel-heading-text"), 
+						new Attribute("class", FhirCSS.PANEL_HEADING_TEXT), 
 						headingText));
 	}
 
 	private Element makeBody() {
 		return Elements.withAttributeAndChild("div",
-					new Attribute("class", "fhir-panel-body"),
+					new Attribute("class", FhirCSS.PANEL_BODY),
 					contents);
 	}
 	
@@ -60,7 +61,7 @@ public class FhirPanel {
 		List<CSSStyleBlock> styles = Lists.newArrayList();
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-panel"), //html
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL), //html
 				Lists.newArrayList(
 					new CSSRule("font-family", "Helvetica Neue, Helvetica, Arial, sans-serif"),
 					new CSSRule("font-size", "14px"),
@@ -70,7 +71,7 @@ public class FhirPanel {
 					new CSSRule("word-wrap", "break-word"))));
 		
 		styles.add(
-			new CSSStyleBlock(Lists.newArrayList(".fhir-panel"), 
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL), 
 				Lists.newArrayList(
 					new CSSRule("padding", "15px"),
 					new CSSRule("margin-bottom", "20"),

@@ -33,12 +33,30 @@ public class NestedLinkData implements LinkData {
 	}
 
 	@Override
-	public String getURL() {
+	public FhirURL getURL() {
 		return outerLink.getURL();
 	}
 
 	@Override
 	public String getText() {
 		return outerLink.getText();
+	}
+	
+	@Override
+	public int hashCode() {
+		return outerLink.hashCode() + nestedLinks.hashCode();
+	}
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof NestedLinkData)) {
+			return false;
+		}
+		
+		NestedLinkData otherLinkData = (NestedLinkData)other;
+		return outerLink.equals(otherLinkData.getPrimaryLinkData())
+			&& nestedLinks.stream().allMatch(link -> otherLinkData.getNestedLinks().contains(link));
 	}
 }

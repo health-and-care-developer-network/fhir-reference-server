@@ -1,5 +1,6 @@
 package ca.uhn.fhir.context;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,8 +15,12 @@ import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.util.SharedFhirContext;
+import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.util.HAPIUtils;
 
 /**
  * Uses the HAPI FHIR package-protected ModelScanner to gather information about the data types defined by HL7, according
@@ -30,7 +35,7 @@ public class FhirDataTypes {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
 		// implementing classes appropriately.
-		FhirContext fhirContext = SharedFhirContext.get();
+		FhirContext fhirContext = HAPIUtils.sharedFhirContext();
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {
@@ -69,6 +74,8 @@ public class FhirDataTypes {
 			return FhirDataType.RESOURCE;
 		} else if (typeName.equals("domainresource")) {
 			return FhirDataType.DOMAIN_RESOURCE;
+		} else if (typeName.equals("element")) {
+			return FhirDataType.ELEMENT;
 		}
 		
 		if (nameToDefinition.containsKey(typeName)) {
@@ -96,5 +103,13 @@ public class FhirDataTypes {
 	
 	private static boolean implementsOrExtends(Class<?> implementor, Class<?> implementee) {
 		return implementee.isAssignableFrom(implementor);
+	}
+	
+	public static LinkData openTypeLink() {
+		try {
+			return new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }
