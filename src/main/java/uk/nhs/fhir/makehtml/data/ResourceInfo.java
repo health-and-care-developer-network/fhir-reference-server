@@ -32,7 +32,9 @@ public class ResourceInfo {
 	public ResourceInfo(String constraintName, Optional<String> description, Optional<FhirURL> descriptionLink, ResourceInfoType type, boolean textualLink) {
 		Preconditions.checkArgument(description.isPresent() || descriptionLink.isPresent(), "Constraint without description or link");
 		
-		if (!textualLink && descriptionLink.isPresent() && FhirURL.isLogicalUrl(descriptionLink.get().toLinkString())) {
+		if (!textualLink 
+		  && descriptionLink.isPresent() 
+		  && FhirURL.isLogicalUrl(descriptionLink.get().toLinkString())) {
 			throw new IllegalStateException("Storing logical URL as link data");
 		}
 		

@@ -20,8 +20,8 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;

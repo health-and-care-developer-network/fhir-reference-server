@@ -46,6 +46,8 @@ public class StructureDefinitionTreeDataProvider {
 		
 		FhirTreeData tree = fhirTreeBuilder.getTree();
 		
+		tree.resolveLinkedNodes();
+		
 		return tree;
 	}
 	
@@ -65,6 +67,8 @@ public class StructureDefinitionTreeDataProvider {
 		//differentialTree.dumpTreeStructure();
 		
 		addBackupNodes(differentialTree, backupTreeData);
+		
+		differentialTree.resolveLinkedNodes();
 		
 		return differentialTree;
 	}

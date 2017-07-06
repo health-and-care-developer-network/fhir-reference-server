@@ -94,7 +94,7 @@ public enum FhirIcon {
 				if (typeName != null) {
 					
 					if (typeName.equals("Extension")) {
-                        return lookupExtension(type, definition);
+                        return lookupExtension(type);
                     } else {
 						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 						
@@ -122,6 +122,10 @@ public enum FhirIcon {
 			return FhirIcon.SLICE;
 		}
 		
+		if (!Strings.isNullOrEmpty(definition.getNameReference())) {
+			return FhirIcon.REUSE;
+		}
+		
 		String path = definition.getPath();
 		if (!Strings.isNullOrEmpty(path)) {
 			
@@ -132,7 +136,7 @@ public enum FhirIcon {
 		return FhirIcon.ELEMENT;
 	}
 
-	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
+	private static FhirIcon lookupExtension(Type type)  {
 
 		FhirContext ctx = HAPIUtils.sharedFhirContext();
 
@@ -170,15 +174,7 @@ public enum FhirIcon {
 			}
 
 			if (!file.exists()) {
-				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
-					// fix up for known incorrectly named file
-					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
-					fileName = newFileName;
-					file = new File(suppliedResourcesFolderPath + fileName);
-				} else {
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-				}
+				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 			}
 			
 			try (FileInputStream fis = new FileInputStream(file)){

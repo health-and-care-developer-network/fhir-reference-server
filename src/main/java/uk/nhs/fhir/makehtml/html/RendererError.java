@@ -18,7 +18,6 @@ public class RendererError {
 		DUPLICATE_CONSTRAINT_KEYS,
 		MISSING_CARDINALITY,
 		MISSING_TYPE_LINK,
-		EXTENSION_FILE_MISNAMED,
 		EXTENSION_FILE_NOT_FOUND,
 		BINDING_WITHOUT_DESC_OR_URL,
 		STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
@@ -26,7 +25,11 @@ public class RendererError {
 		HL7_URL_WITHOUT_DSTU2, 
 		LINK_WITH_LOGICAL_URL, 
 		HL7_ORG_UK_HOST,
-		COMPLEX_EXTENSION_WITH_CHILDREN;
+		COMPLEX_EXTENSION_WITH_CHILDREN,
+		LINK_REFERENCES_ITSELF,
+		MISSING_REFERENCED_NODE,
+		FIXEDVALUE_WITH_LINKED_NODE,
+		MISSING_TYPE_LINKS_KNOWN_ISSUE;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -41,14 +44,16 @@ public class RendererError {
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
 		
 		responses.put(Key.BINDING_WITHOUT_DESC_OR_URL, ErrorResponse.LOG_WARNING);
-		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.LOG_WARNING);
 		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.LOG_WARNING);
+		responses.put(Key.MISSING_TYPE_LINKS_KNOWN_ISSUE, ErrorResponse.LOG_WARNING);
 
+		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.THROW);
 		responses.put(Key.LINK_WITH_LOGICAL_URL, ErrorResponse.THROW);
 		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.THROW);
-		responses.put(Key.EXTENSION_FILE_MISNAMED, ErrorResponse.THROW);
 		responses.put(Key.EXTENSION_FILE_NOT_FOUND, ErrorResponse.THROW);
 		responses.put(Key.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, ErrorResponse.THROW);
+		responses.put(Key.LINK_REFERENCES_ITSELF, ErrorResponse.THROW);
+		responses.put(Key.MISSING_REFERENCED_NODE, ErrorResponse.THROW);
 	}
 	
 	public static void handle(Key errorType, String logInfo) {

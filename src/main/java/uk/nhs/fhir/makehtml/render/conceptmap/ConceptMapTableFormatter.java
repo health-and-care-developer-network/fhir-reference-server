@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.render.conceptmap;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,16 +52,12 @@ public class ConceptMapTableFormatter {
 				Optional<String> comments = Optional.ofNullable(target.getComments());
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
 				
-				try {
-					tableContent.add(
-							Elements.withChildren("tr",
-								labelledValueCell(BLANK, element.getCode(), 1, true, true),
-								labelledHttpCell(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/valueset-concept-map-equivalence.html"), target.getEquivalence(),  1, true, false),
-								labelledValueCell(BLANK, target.getCode(), 1, true),
-								labelledValueCell(BLANK, displayComments, 1, true)));
-				} catch (MalformedURLException e) {
-					throw new IllegalStateException(e);
-				}
+				tableContent.add(
+					Elements.withChildren("tr",
+						labelledValueCell(BLANK, element.getCode(), 1, true, true),
+						labelledHttpCell(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/valueset-concept-map-equivalence.html"), target.getEquivalence(),  1, true, false),
+						labelledValueCell(BLANK, target.getCode(), 1, true),
+						labelledValueCell(BLANK, displayComments, 1, true)));
 			}
 		}
         Element table =
@@ -157,17 +152,13 @@ public class ConceptMapTableFormatter {
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
-			try {
-				return Elements.withAttributeAndChild("span", 
-					new Attribute("class", fhirMetadataClass), 
-					Elements.withAttributesAndText("a", 
-						Lists.newArrayList(
-							new Attribute("class", FhirCSS.LINK), 
-							new Attribute("href", new FhirURL(value).toLinkString())), 
-					value));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
-			}
+			return Elements.withAttributeAndChild("span", 
+				new Attribute("class", fhirMetadataClass), 
+				Elements.withAttributesAndText("a", 
+					Lists.newArrayList(
+						new Attribute("class", FhirCSS.LINK), 
+						new Attribute("href", FhirURL.buildOrThrow(value).toLinkString())), 
+				value));
 			
 		} else {
 			return Elements.withAttributeAndText("span", 

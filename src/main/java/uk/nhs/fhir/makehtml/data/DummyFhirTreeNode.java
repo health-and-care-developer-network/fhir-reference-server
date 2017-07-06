@@ -212,6 +212,11 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
+	public Optional<String> getLinkedNodeName() {
+		return backup.getLinkedNodeName();
+	}
+	
+	@Override
 	public Optional<ExtensionType> getExtensionType() {
 		return backup.getExtensionType();
 	}

@@ -26,15 +26,16 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
-		
-		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
-		
+
 		if (!isExtension) {
 			FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
-			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTree.getData());
+			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);
 		}
 		
-		snapshotTree.stripRemovedElements();
+		snapshotTreeData.stripRemovedElements();
+		snapshotTreeData.tidyData();
+		
+		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();

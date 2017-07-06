@@ -57,6 +57,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
 		snapshotTreeData.stripRemovedElements();
+		snapshotTreeData.tidyData();
 		
 		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();
 		
@@ -73,13 +74,17 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			List<String> aliases = fhirTreeNode.getAliases();
 			ResourceFlags resourceFlags = fhirTreeNode.getResourceFlags();
 			Optional<String> comments = fhirTreeNode.getComments();
+			Optional<String> linkedNodeKey = fhirTreeNode.getLinkedNode().isPresent() ? 
+				Optional.of(fhirTreeNode.getLinkedNode().get().getPath()) : 
+				Optional.empty();
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
 			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
-				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints);
+				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
+				linkedNodeKey);
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -108,7 +109,8 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
             Optional<String> description = node.getDefinition();
             String displayDescription = description.isPresent() ? description.get() : BLANK;
            
-            Optional<FhirURL> url = node.getBinding().get().getUrl();
+            BindingInfo bindingInfo = node.getBinding().get();
+			Optional<FhirURL> url = bindingInfo.getUrl();
 
             //String displayValueSet = url.isPresent() ? url.get().toString() : "";
             Element valueSetCell;
@@ -119,8 +121,9 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
             }
             
             String path = node.getPath() + displayDescription;
-            if (isElementIsActive(node) && !done.stream().anyMatch(str -> str.trim().equals(path))) {
-            	String bindingStrength = node.getBinding().get().getStrength();
+            if (!node.isRemovedByProfile() 
+              && !done.stream().anyMatch(str -> str.trim().equals(path))) {
+            	String bindingStrength = bindingInfo.getStrength();
             	String anchorStrength = bindingStrength.equals("required") ? "code" : bindingStrength;
             	
                 foundBinding = true;
@@ -136,19 +139,10 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
 
         }
     }
-
-    Boolean isElementIsActive(FhirTreeTableContent node)
-    {
-        if (node.isRemovedByProfile())
-        {
-            return false;
-        }
-        if (node.getParent() != null) { return isElementIsActive(node.getParent()); }
-        return true;
-    }
     
     private Element labelledValueCell(String label, FhirURL url, int colspan) {
-    	return labelledValueCell(label, url.toFullString(), colspan, url.toLinkString());
+    	
+    	return labelledValueCell(label, url.toFullString(), colspan, FhirURL.isLogicalUrl(url.toFullString()) ? null : url.toLinkString());
     }
 
     private Element labelledValueCell(String label, String value, int colspan, String uriOverride) {

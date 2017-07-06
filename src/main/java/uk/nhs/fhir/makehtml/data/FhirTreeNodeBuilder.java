@@ -46,11 +46,7 @@ public class FhirTreeNodeBuilder {
 
 		List<LinkData> typeLinks = Lists.newArrayList();
 		if (elementDefinition.getPath().split("\\.").length == 1) {
-			try {
-				typeLinks.add(new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
-			}
+			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
 		} else {
 			List<Type> snapshotElementTypes = elementDefinition.getType();
 			if (!snapshotElementTypes.isEmpty()) {
@@ -103,7 +99,6 @@ public class FhirTreeNodeBuilder {
 		
 		String path = elementDefinition.getPath();
 
-		// KGM Added Element 9/May/2017
 		FhirTreeNode node = new FhirTreeNode(
 			icon,
 			name,
@@ -173,11 +168,7 @@ public class FhirTreeNodeBuilder {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveDatatypeValue(valueSet);
-				try {
-					url = Optional.of(new FhirURL(Dstu2Fix.fixValuesetLink(urlString)));
-				} catch (MalformedURLException e) {
-					throw new IllegalStateException(e);
-				}
+				url = Optional.of(FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(urlString)));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -208,6 +199,11 @@ public class FhirTreeNodeBuilder {
 				node.setExtensionType(lookupExtensionType(type));
 				break;
 			}
+		}
+		
+		String nameReference = elementDefinition.getNameReference();
+		if (!Strings.isNullOrEmpty(nameReference)) {
+			node.setLinkedNodeName(nameReference);
 		}
 		
 		return node;
@@ -241,15 +237,7 @@ public class FhirTreeNodeBuilder {
 			}
 
 			if (extensionFile == null) {
-				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml")) {
-					// fix up for known incorrectly named file
-					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
-					fileName = newFileName;
-					extensionFile = new File(FhirIcon.suppliedResourcesFolderPath + fileName);
-				} else {
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-				}
+				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 			}
 			
 			try (FileInputStream fis = new FileInputStream(extensionFile);

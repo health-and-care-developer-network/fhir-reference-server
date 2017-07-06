@@ -1,6 +1,5 @@
 package ca.uhn.fhir.context;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -106,10 +105,6 @@ public class FhirDataTypes {
 	}
 	
 	public static LinkData openTypeLink() {
-		try {
-			return new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(e);
-		}
+		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
 	}
 }

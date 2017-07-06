@@ -35,6 +35,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> requirements = Optional.empty();
 	private Optional<String> comments = Optional.empty();
 	private List<String> aliases = Lists.newArrayList();
+	private Optional<String> linkedNodeName = Optional.empty();
+	private Optional<FhirTreeTableContent> linkedNode = Optional.empty();
 
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -166,12 +168,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (useBackupTypeLinks()) {
 			return backupNode.getTypeLinks();
 		}
-
+		
 		if (typeLinks.isEmpty()
-		  && FhirTypeByPath.recognisedPath(path)) {
-
-			LinkData linkForPath = FhirTypeByPath.forPath(path);
-			typeLinks.add(linkForPath);
+		  && linkedNodeName.isPresent()) {
+			String linkedContentKey = getLinkedNode().get().getNodeKey();
+			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey), "see " + linkedContentKey));
 		}
 
 		if (typeLinks.isEmpty()) {
@@ -181,9 +182,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (getPathName().endsWith("[x]")
 		  && hasAllTypes()) {
 			return Lists.newArrayList(FhirDataTypes.openTypeLink());
+		} else {
+			return typeLinks;
 		}
-		
-		return typeLinks;
 	}
 	
 	private boolean hasAllTypes() {
@@ -274,8 +275,18 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return children.size() > 0;
 	}
 
-	public boolean isRemovedByProfile() {
+	private boolean isDirectlyRemovedByProfile() {
 		return max.equals(Optional.of("0"));
+	}
+	
+	public boolean isRemovedByProfile() {
+		if (isDirectlyRemovedByProfile()) {
+			return true;
+		} else if (parent != null) {
+			return parent.isRemovedByProfile();
+		} else {
+			return false;
+		}
 	}
 
 	public String getPath() {
@@ -379,11 +390,37 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.aliases = aliases;
 	}
 	
+	public Optional<String> getLinkedNodeName() {
+		return linkedNodeName;
+	}
+	
+	public void setLinkedNodeName(String nameLink) {
+		this.linkedNodeName = Optional.of(nameLink);
+	}
+	
 	public void setExtensionType(ExtensionType extensionType) {
 		this.extensionType = Optional.of(extensionType);
 	}
 	
 	public Optional<ExtensionType> getExtensionType() {
 		return extensionType;
+	}
+	
+	public void setLinkedNode(FhirTreeTableContent linkedNode) {
+		this.linkedNode = Optional.of(linkedNode);
+	}
+	
+	public Optional<FhirTreeTableContent> getLinkedNode() {
+		if (linkedNodeName.isPresent()
+		  && !linkedNode.isPresent()) {
+			throw new IllegalStateException("Requesting linked node before it has been resolved");
+		}
+		
+		if (!linkedNodeName.isPresent()
+		  && linkedNode.isPresent()) {
+			throw new IllegalStateException("Found linked node but wasn't expecting one");
+		}
+		
+		return linkedNode;
 	}
 }
