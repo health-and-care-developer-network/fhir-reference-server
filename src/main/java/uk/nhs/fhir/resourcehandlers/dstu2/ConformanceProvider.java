@@ -55,7 +55,7 @@ public class ConformanceProvider implements IResourceProvider, IResourceHelper  
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu2();
+        ctx = FHIRVersion.DSTU2.getContext();
         LOG.fine("Created ConformanceProvider handler to respond to requests for Conformance resource types.");
 
     }

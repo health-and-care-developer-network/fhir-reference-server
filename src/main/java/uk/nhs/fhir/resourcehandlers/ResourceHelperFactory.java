@@ -1,6 +1,5 @@
 package uk.nhs.fhir.resourcehandlers;
 
-import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 

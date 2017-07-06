@@ -50,8 +50,8 @@ public class FHIRUtils {
 
     private static final Logger LOG = Logger.getLogger(FHIRUtils.class.getName());
 
-    private static FhirContext ctxDSTU2 = FhirContext.forDstu2();
-    private static FhirContext ctxSTU3 = FhirContext.forDstu3();
+    private static FhirContext ctxDSTU2 = FHIRVersion.DSTU2.getContext();
+    private static FhirContext ctxSTU3 = FHIRVersion.STU3.getContext();
     
     private static String profilePath = PropertyReader.getProperty("profilePath");
     private static String valueSetPath = PropertyReader.getProperty("valusetPath");
@@ -79,7 +79,7 @@ public class FHIRUtils {
         	}
             String url = null;
             
-            LOG.info("Parsed resource and identified it's class as: " + resource.getClass().getName());
+            LOG.fine("Parsed resource and identified it's class as: " + resource.getClass().getName());
 
             // To get the URL we need to cast this to a concrete type
             if (resource instanceof StructureDefinition) {
@@ -110,7 +110,7 @@ public class FHIRUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.info("Resource loaded - size: " + resourceFile.length() + " from file: " + file.getName());
+        LOG.fine("Resource loaded - size: " + resourceFile.length() + " from file: " + file.getName());
         return resource;
     }
     

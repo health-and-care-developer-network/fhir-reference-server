@@ -117,7 +117,7 @@ public class FileCache {
             updateCache();
         }
         
-        LOG.info("Creating HashMap");
+        LOG.fine("Creating HashMap");
         HashMap<String, List<ResourceEntity>> result = new HashMap<String, List<ResourceEntity>>();
         try {
             for (FHIRVersion fhirVersion : FHIRVersion.values()) {
@@ -144,7 +144,7 @@ public class FileCache {
             e.printStackTrace();
             LOG.severe("ERROR: " + e.getMessage());
         }
-        LOG.info("Generated HashMap: " + result.toString());
+        LOG.fine("Generated HashMap: " + result.toString());
         return result;
     }
     
@@ -175,7 +175,7 @@ public class FileCache {
             LOG.fine("Cache needs updating");
             return true;
         }
-        LOG.info("Using Cache");
+        LOG.fine("Using Cache");
         return false;
     }
     
@@ -218,7 +218,7 @@ public class FileCache {
         }
         examplesListByName.put(fhirVersion, buildExampleListByName(newExamplesList));
         
-        printCacheContent(fhirVersion);
+        //printCacheContent(fhirVersion);
     }
     
     /**
@@ -247,13 +247,13 @@ public class FileCache {
     		LOG.severe("Unable to pre-process files into versioned directory! - error: " + e.getMessage());
     	}
     	
-    	LOG.info("Started loading resources into cache");
+    	LOG.fine("Started loading resources into cache");
 		addMessage("Started loading " + resourceType + " resources into cache");
     	
         // Now, read the resources from the versioned path into our cache
     	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<ResourceEntityWithMultipleVersions>();
     	String path = resourceType.getVersionedFilesystemPath(fhirVersion);
-    	LOG.info("Reading pre-processed files from path: " + path);
+    	LOG.fine("Reading pre-processed files from path: " + path);
         File folder = new File(path);
             File[] fileList = folder.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -269,7 +269,6 @@ public class FileCache {
 	                try {
 	                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
 	                	ResourceEntity newEntity = helper.getMetadataFromResource(thisFile);           
-	                	LOG.info("Entity metadata: " + newEntity);
 	                	// Load into the main cache for profiles
 		                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
 		                // Sort artefacts by weight so they display in the correct order
@@ -297,7 +296,7 @@ public class FileCache {
     
     private static HashMap<String, ExampleResources> cacheExamples(FHIRVersion fhirVersion){
     	
-    	LOG.info("Started loading example resources into cache");
+    	LOG.fine("Started loading example resources into cache");
 		addMessage("Started loading example resources into cache");
     	
         // Now, read the resources into our cache
@@ -360,7 +359,7 @@ public class FileCache {
 	                    			}
 	                    		}
 	                    	} else {
-	                    		LOG.severe("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - no profile was specified in the example!");
+	                    		LOG.warning("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - no profile was specified in the example!");
 	                    		addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " no profile was specified in the example!");
 	                    	}
 	                    }
@@ -382,7 +381,7 @@ public class FileCache {
 		String resourceFilename = FileLoader.removeFileExtension(resourceFile.getName());
 		File dir = new File(resourceFile.getParent());
 		File artefactDir = new File(dir.getAbsolutePath() + "/" + resourceFilename);
-		LOG.info("Lookging for artefacts in directory:" + artefactDir.getAbsolutePath());
+		LOG.fine("Looking for artefacts in directory:" + artefactDir.getAbsolutePath());
 		
 		if(artefactDir.exists() && artefactDir.isDirectory()) { 
 			// Now, loop through and find any artefact files
@@ -411,14 +410,14 @@ public class FileCache {
     			// This is a new version of an existing resource - add the version
     			listItem.add(entry);
     			found = true;
-    			LOG.info("Added new version to resource: " + entry.getResourceID());
+    			LOG.fine("Added new version to resource: " + entry.getResourceID());
     		}
     	}
 		if (!found) {
 			// This is a new resource we haven't seen before
 			ResourceEntityWithMultipleVersions newEntry = new ResourceEntityWithMultipleVersions(entry);
 			list.add(newEntry);
-			LOG.info("Added new resource (first version found): " + entry.getResourceID());
+			LOG.fine("Added new resource (first version found): " + entry.getResourceID());
 		}
     }
     
@@ -432,7 +431,7 @@ public class FileCache {
     			if (versionPart != null) {
     				// Get a specific version
     				VersionNumber version = new VersionNumber(versionPart);
-    				LOG.info("Getting versioned resource with ID="+idPart + " and version="+version);
+    				LOG.fine("Getting versioned resource with ID="+idPart + " and version="+version);
     				return entry.getSpecificVersion(version);
     			} else {
     				// Get the latest
@@ -497,19 +496,19 @@ public class FileCache {
     
     private static void printCacheContent(FHIRVersion fhirVersion) {
     	addMessage(" ===  ===  ===   Cache Contents for "+fhirVersion+"   === === ===");
-    	LOG.info("Cache loaded - entries:");
+    	LOG.fine("Cache loaded - entries:");
     	for (ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
-    		LOG.info("  -> " + entry);
+    		LOG.fine("  -> " + entry);
     		addMessage(entry.toString());
     	}
     	
-    	LOG.info("Examples:");
+    	LOG.fine("Examples:");
     	addMessage("Examples:");
     	for (String exampleOfProfile : examplesList.get(fhirVersion).keySet()) {
     		ExampleResources entries = examplesList.get(fhirVersion).get(exampleOfProfile);
     		addMessage("Examples for profile: " + exampleOfProfile);
     		for (ResourceEntity entry : entries) {
-	    		LOG.info("  -> " + entry);
+	    		LOG.fine("  -> " + entry);
 	    		addMessage(entry.toString());
     		}
     	}

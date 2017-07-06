@@ -77,7 +77,7 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.info("Requested URI: " + request.getRequestURI());
+        LOG.fine("Requested URI: " + request.getRequestURI());
 
         if(request.getRequestURI().endsWith(".css")) {
             // Stylesheets
@@ -148,9 +148,9 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new PlainContent(webber));
-        LOG.info("resourceProviders added");
+        LOG.fine("resourceProviders added");
         
         setServerConformanceProvider(new CustomServerConformanceProvider());
-        LOG.info("Custom Conformance provider added");
+        LOG.fine("Custom Conformance provider added");
     }
 }

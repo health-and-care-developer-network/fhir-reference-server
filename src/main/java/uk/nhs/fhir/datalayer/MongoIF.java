@@ -72,7 +72,7 @@ public class MongoIF implements Datasource {
         db = mongoClient.getDB("mydb");
         profiles = db.getCollection("profiles");
         examples = db.getCollection("examples");
-        ctx = FhirContext.forDstu2();
+        ctx = FHIRVersion.DSTU2.getContext();
     }
 
     /* (non-Javadoc)

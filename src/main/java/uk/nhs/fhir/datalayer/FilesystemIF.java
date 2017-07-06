@@ -222,10 +222,10 @@ public class FilesystemIF implements Datasource {
     public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
-        LOG.info("Getting full list of profiles first");
+        // Get full list of profiles first
         List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
         
-        LOG.info("Now filtering the list to those matching our criteria");
+        // Now filter the list to those matching our criteria
         ArrayList<ResourceEntity> matches = new ArrayList<ResourceEntity>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
@@ -243,7 +243,7 @@ public class FilesystemIF implements Datasource {
                matches.add(entry);
             }
         }
-        LOG.info("Returning matches");
+        LOG.fine("Returning matches");
         return matches;
     }
     
