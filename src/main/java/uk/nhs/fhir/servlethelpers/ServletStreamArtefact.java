@@ -16,24 +16,26 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
+import uk.nhs.fhir.enums.FHIRVersion;
 
 public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
 	
-	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response, Datasource dataSource) throws IOException {
+	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response,
+										FHIRVersion fhirVersion, Datasource dataSource) throws IOException {
     	
 		// Load a supporting artefact
     	String resourceID = request.getParameter("resourceID");
     	String resourceVersion = request.getParameter("resourceVersion");
     	String artefactType = request.getParameter("artefactType");
-    	LOG.info("Request to stream artefact: " + artefactType);
+    	LOG.fine("Request to stream artefact: " + artefactType);
     	
     	if (resourceID != null && artefactType != null) {
     		IdDt theId = new IdDt(resourceID);
     		if (resourceVersion != null) {
     			theId = theId.withVersion(resourceVersion);
     		}
-    		ResourceEntity entity = dataSource.getResourceEntityByID(theId);
+    		ResourceEntity entity = dataSource.getResourceEntityByID(fhirVersion, theId);
     		for (SupportingArtefact artefact : entity.getArtefacts()) {
     			if (artefact.getArtefactType().name().equals(artefactType)) {
     				// We've found a matching artefact - stream it back

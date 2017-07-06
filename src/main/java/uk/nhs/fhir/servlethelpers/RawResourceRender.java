@@ -1,29 +1,24 @@
 package uk.nhs.fhir.servlethelpers;
 
 import static uk.nhs.fhir.enums.MimeType.JSON;
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.StringWriter;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.method.RequestDetails;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
+import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -36,12 +31,23 @@ public class RawResourceRender {
 		myWebHandler = webHandler;
 	}
 
-    public String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType, MimeType mimeType) {
-    	IdDt resourceID = (IdDt)theRequestDetails.getId();
-    	String rawResource = getResourceContent(resourceID, mimeType, resourceType);
-    	renderSingleWrappedRAWResource(rawResource, content, mimeType);
-    	// Return resource name (for breadcrumb)
-        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
+    public String renderSingleWrappedRAWResource(RequestDetails theRequestDetails, StringBuffer content,
+    									FHIRVersion fhirVersion, ResourceType resourceType, MimeType mimeType) {
+    	
+    	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+	    	IdDt resourceID = (IdDt)theRequestDetails.getId();
+	    	String rawResource = getResourceContent(resourceID, mimeType, fhirVersion, resourceType);
+	    	renderSingleWrappedRAWResource(rawResource, content, mimeType);
+	    	// Return resource name (for breadcrumb)
+	        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
+    	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+	    	IdType resourceID = (IdType)theRequestDetails.getId();
+	    	String rawResource = getResourceContent(resourceID, mimeType, fhirVersion, resourceType);
+	    	renderSingleWrappedRAWResource(rawResource, content, mimeType);
+	    	// Return resource name (for breadcrumb)
+	        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
+    	}
+    	return null;
     }
     
     public void renderSingleWrappedRAWResource(String rawResource, StringBuffer content, MimeType mimeType) {
@@ -68,69 +74,63 @@ public class RawResourceRender {
     	content.append(sw.toString());
     }
 
-    private String getResourceContent(IdDt resourceID, MimeType mimeType, ResourceType resourceType) {
+    private String getResourceContent(IdDt resourceID, MimeType mimeType, FHIRVersion fhirVersion, ResourceType resourceType) {
     	
-    	IBaseResource resource = null;
+    	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
     	
     	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	
-    	if (resourceType == STRUCTUREDEFINITION) {
-    		StructureDefinition sd = myWebHandler.getSDByID(resourceID);
-    		sd.setText(textElement);
-    		resource = sd;
-    	} else if (resourceType == VALUESET) {
-    		ValueSet vs = myWebHandler.getVSByID(resourceID);
-    		vs.setText(textElement);
-    		resource = vs;
-    	} else if (resourceType == OPERATIONDEFINITION) {
-     		OperationDefinition od = myWebHandler.getOperationByID(resourceID);
-     		od.setText(textElement);
-     		resource = od;
-    	} else if (resourceType == IMPLEMENTATIONGUIDE) {
-     		ImplementationGuide ig = myWebHandler.getImplementationGuideByID(resourceID);
-     		ig.setText(textElement);
-     		resource = ig;
-     	}
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+        resource = helper.getResourceWithoutTextSection(resource);
         
         if (mimeType == JSON) {
-        	return getResourceAsJSON(resource, resourceID);
+        	return getResourceAsJSON(resource, resourceID, fhirVersion);
         } else {
-        	return getResourceAsXML(resource, resourceID);
+        	return getResourceAsXML(resource, resourceID, fhirVersion);
         }
     }
     
-    public String getResourceAsXML(IBaseResource resource, IdDt resourceID) {
+    private String getResourceContent(IdType resourceID, MimeType mimeType, FHIRVersion fhirVersion, ResourceType resourceType) {
+    	
+    	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
+    	
+    	// Clear out the generated text
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+        resource = helper.getResourceWithoutTextSection(resource);
+        
+        if (mimeType == JSON) {
+        	return getResourceAsJSON(resource, resourceID, fhirVersion);
+        } else {
+        	return getResourceAsXML(resource, resourceID, fhirVersion);
+        }
+    }
+    
+    public String getResourceAsXML(IBaseResource resource, IdDt resourceID, FHIRVersion fhirVersion) {
         // Serialise it to XML
-        FhirContext ctx = FhirContext.forDstu2();
+        FhirContext ctx = fhirVersion.getContext();
         String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
         // Encode it for HTML output
         serialised = syntaxHighlight(serialised);
         return serialised;
-        //return serialised.trim().replaceAll("<","&lt;").replaceAll(">","&gt;");
     }
     
-    public String getResourceAsJSON(IBaseResource resource, IdDt resourceID) {
+    public String getResourceAsXML(IBaseResource resource, IdType resourceID, FHIRVersion fhirVersion) {
+        // Serialise it to XML
+        FhirContext ctx = fhirVersion.getContext();
+        String serialised = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource);
+        // Encode it for HTML output
+        serialised = syntaxHighlight(serialised);
+        return serialised;
+    }
+    
+    public String getResourceAsJSON(IBaseResource resource, IdDt resourceID, FHIRVersion fhirVersion) {
         // Serialise it to JSON
-        FhirContext ctx = FhirContext.forDstu2();
-        return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
+        FhirContext ctx = fhirVersion.getContext();
+    	return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
     }
     
-    /**
-     * Simple XML syntax highlight
-	 * @see https://coderwall.com/p/rjwkma/simple-java-html-syntax-highlighter-for-xml-code
-     * @param source
-     * @return syntax highlighted source
-     */
-    public final String syntaxHighlight(String source) {
-        source = source.replaceAll("<([^>/]*)/>", "&lt;~blue~$1~/~/&gt;");
-        source = source.replaceAll("<([^>]*)>", "&lt;~blue~$1~/~&gt;");
-        source = source.replaceAll("([\\w]+)=\"([^\"]*)\"", "~red~$1~/~~black~=\"~/~~green~$2~/~~black~\"~/~");
-        source = source.replaceAll("~([a-z]+)~", "<span style=\"color: $1;\">");
-        source = source.replace("~/~", "</span>");
-        return source;
+    public String getResourceAsJSON(IBaseResource resource, IdType resourceID, FHIRVersion fhirVersion) {
+        // Serialise it to JSON
+        FhirContext ctx = fhirVersion.getContext();
+    	return ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(resource);
     }
-	
 }

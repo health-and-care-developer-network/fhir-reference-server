@@ -1,5 +1,6 @@
 package uk.nhs.fhir.enums;
 
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,25 +15,32 @@ import uk.nhs.fhir.util.PropertyReader;
  */
 public enum ResourceType {
 	
-	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition", PropertyReader.getProperty("profilePath")),
-	VALUESET("ValueSet", "ValueSet", PropertyReader.getProperty("valusetPath")),
-	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition", PropertyReader.getProperty("operationsPath")),
-	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide", PropertyReader.getProperty("guidesPath")),
-	CONFORMANCE("Conformance", "Conformance", PropertyReader.getProperty("conformancePath")),
-	EXAMPLES("Examples", "Examples", PropertyReader.getProperty("examplesPath")),
-	OTHER("Other", "Other", null);
+	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition"),
+	VALUESET("ValueSet", "ValueSet"),
+	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition"),
+	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide"),
+	CONFORMANCE("Conformance", "Conformance"),
+	EXAMPLES("Examples", "Examples"),
+	OTHER("Other", "Other");
 	
 	private static final Logger LOG = Logger.getLogger(ResourceType.class.getName());
 	
-	private ResourceType(String displayName, String hapiName, String filesystemPath) {
+	private ResourceType(String displayName, String hapiName) {
 		this.displayName = displayName;
 		this.hapiName = hapiName;
-		this.filesystemPath = filesystemPath;
+		
+		// Lookup the relevant path for the FHIR version and resource type
+		for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+			if (this.filesystemPath == null) {
+				this.filesystemPath = new HashMap<FHIRVersion, String>();
+			}
+			this.filesystemPath.put(fhirVersion, PropertyReader.getProperty("Path-"+displayName+"-"+fhirVersion));
+		}
 	}
 	
 	private String displayName = null;
 	private String hapiName = null;
-	private String filesystemPath = null;
+	private HashMap<FHIRVersion, String> filesystemPath = null;
 	
 	@Override
 	public String toString() {
@@ -43,17 +51,17 @@ public enum ResourceType {
 		return this.hapiName;
 	}
 	
-	public String getFilesystemPath() {
-		return this.filesystemPath;
+	public String getFilesystemPath(FHIRVersion fhirVersion) {
+		return this.filesystemPath.get(fhirVersion);
 	}
 	
-	public String getVersionedFilesystemPath() {
-		return this.filesystemPath + "/versioned";
+	public String getVersionedFilesystemPath(FHIRVersion fhirVersion) {
+		return getFilesystemPath(fhirVersion) + "/versioned";
 	}
 	
     public static ResourceType getTypeFromRequest(RequestDetails theRequestDetails) {
     	String typeInRequest = theRequestDetails.getResourceName();
-    	LOG.info("Detecting type of resource: " + typeInRequest);
+    	LOG.fine("Detecting type of resource: " + typeInRequest);
     	return getTypeFromHAPIName(typeInRequest);
     }
     

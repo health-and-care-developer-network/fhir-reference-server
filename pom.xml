@@ -47,25 +47,30 @@
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-validation-resources-dstu2</artifactId>
-            <version>2.1</version>
+            <version>2.5</version>
         </dependency>
         
         
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-            <version>2.0</version>
+            <version>2.5</version>
         </dependency>
+        <dependency>
+	  		<groupId>ca.uhn.hapi.fhir</groupId>
+	  		<artifactId>hapi-fhir-structures-dstu3</artifactId>
+	  		<version>2.5</version>
+	  	</dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
-            <version>2.0</version>
+            <version>2.5</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-structures-dstu2</artifactId>
-            <version>2.0</version>
+            <version>2.5</version>
             <type>jar</type>
         </dependency>
         <!-- MongoDB libraries in case we opt to store files in MongoDB instead of file system -->

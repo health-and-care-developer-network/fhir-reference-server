@@ -60,7 +60,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		String baseURL = req.getContextPath();
 		StringBuffer content = new StringBuffer();
 		
-		LOG.info("Requested URL: " + req.getRequestURL());
+		LOG.fine("Requested URL: " + req.getRequestURL());
 		
 		// Load home page template
 		VelocityContext context = new VelocityContext();

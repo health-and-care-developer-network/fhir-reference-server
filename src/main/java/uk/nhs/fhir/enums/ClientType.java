@@ -19,11 +19,11 @@ public enum ClientType {
     	String mimes = theRequest.getHeader("accept");
     	// Check if this has come from a browser
         if (mimes == null) {
-            LOG.info("No accept header set, assume a non-browser client.");
+            LOG.fine("No accept header set, assume a non-browser client.");
             return NON_BROWSER;
         } else {
             if (mimes.contains("html") == false) {
-                LOG.info("Accept header set, but without html, so assume a non-browser client.");
+                LOG.fine("Accept header set, but without html, so assume a non-browser client.");
                 return NON_BROWSER;
             }
         }

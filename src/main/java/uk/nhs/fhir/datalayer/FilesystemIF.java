@@ -15,31 +15,27 @@
  */
 package uk.nhs.fhir.datalayer;
 
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.IdDt;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PropertyReader;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+
+import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.datalayer.collections.ExampleResources;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.PropertyReader;
 
 /**
  *
@@ -67,35 +63,67 @@ public class FilesystemIF implements Datasource {
     }
 
     /**
-     * Gets a specific one, optionally also with a specific version
+     * Gets a specific one, optionally also with a specific version (DSTU2 variant)
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(IdDt theId) {
-    	ResourceEntity entry = FileCache.getSingleResourceByID(theId);
+    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdDt theId) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
 	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
-	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(path);
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;
     	} else {
     		return null;
     	}
     }
     
-    public ResourceEntity getResourceEntityByID(IdDt theId) {
+    /**
+     * Gets a specific one, optionally also with a specific version
+     * @param id
+     * @return 
+     */
+    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdType theId) {
+    	ResourceEntity entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    	if (entry != null) {
+	    	File path = entry.getResourceFile();
+	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
+	        
+	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
+	        return foundResource;
+    	} else {
+    		return null;
+    	}
+    }
+    
+    public ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdDt theId) {
     	if (theId.hasVersionIdPart()) {
     		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
-    		return FileCache.getversionsByID(theId).getSpecificVersion(version);
+    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getSpecificVersion(version);
     	} else {
-    		return FileCache.getversionsByID(theId).getLatest();
+    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getLatest();
     	}
     	
     }
     
-    public ResourceEntityWithMultipleVersions getVersionsByID(IdDt id) {
-    	return FileCache.getversionsByID(id);
+    public ResourceEntity getResourceEntityByID(FHIRVersion fhirVersion, IdType theId) {
+    	if (theId.hasVersionIdPart()) {
+    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getSpecificVersion(version);
+    	} else {
+    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getLatest();
+    	}
+    	
+    }
+    
+    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdDt theId) {
+    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    }
+    
+    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId) {
+    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     }
 
     /**
@@ -103,24 +131,10 @@ public class FilesystemIF implements Datasource {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(String id) {
-    	return getResourceByID(new IdDt(id));
+    public IBaseResource getResourceByID(FHIRVersion fhirVersion, String id) {
+    	return getResourceByID(fhirVersion, new IdDt(id));
     }
     
-    /**
-     * Get a single resource back by name
-     * @param name
-     * @return
-     */
-    public StructureDefinition getSingleStructureDefinitionByName(String name) {
-    	ResourceEntity entry = FileCache.getSingleResourceByName(name);
-    	File path = entry.getResourceFile();
-    	LOG.info("Getting StructureDefinition with id=" + name + " looking for file: " + path.getAbsolutePath());
-        
-    	StructureDefinition foundProfile = (StructureDefinition)FHIRUtils.loadResourceFromFile(path);
-        return foundProfile;
-    }
-
     /**
      * This is the method to do a search based on name, ie to find where
      * name:contains=[parameter]
@@ -128,14 +142,14 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return 
      */
-    public List<IBaseResource> getResourceMatchByName(ResourceType resourceType, String theNamePart) {
+    public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
-        List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(resourceType, theNamePart);
+        List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
 
         for(ResourceEntity entity : matchingIDs) {
-        	list.add(getResourceByID(entity.getResourceID()));
+        	list.add(getResourceByID(fhirVersion, entity.getResourceID()));
         }
         return list;
     }
@@ -146,9 +160,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<IBaseResource> getAllResourcesOfType(ResourceType resourceType) {
+    public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType) {
         LOG.info("Getting all resources of type: " + resourceType.name());
-        return FileCache.getResources(resourceType);
+        return FileCache.getResources(fhirVersion, resourceType);
     }
     
     /**
@@ -156,9 +170,9 @@ public class FilesystemIF implements Datasource {
      * 
      * @return 
      */
-    public List<String> getAllResourceNames(ResourceType resourceType) {
+    public List<String> getAllResourceNames(FHIRVersion fhirVersion, ResourceType resourceType) {
         LOG.info("Getting all Resource Names for type: " + resourceType.name());
-        return FileCache.getResourceNameList(resourceType);
+        return FileCache.getResourceNameList(fhirVersion, resourceType);
     }
     
     /**
@@ -167,7 +181,14 @@ public class FilesystemIF implements Datasource {
      */
     public List<ResourceEntity> getExtensions()  {
     	LOG.info("Getting all Extensions");
-        return FileCache.getExtensions();
+        
+    	List<ResourceEntity> result = new ArrayList<ResourceEntity>();
+    	
+    	for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+    		result.addAll(FileCache.getExtensions(fhirVersion));
+    	}
+    	
+    	return result;
     }
     
     /**
@@ -198,13 +219,13 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return a list of IDs of matching resources
      */
-    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(ResourceType resourceType, String theNamePart) {
+    public List<ResourceEntity> getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
-        LOG.info("Getting full list of profiles first");
-        List<ResourceEntity> resourceList = FileCache.getResourceList();
+        // Get full list of profiles first
+        List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
         
-        LOG.info("Now filtering the list to those matching our criteria");
+        // Now filter the list to those matching our criteria
         ArrayList<ResourceEntity> matches = new ArrayList<ResourceEntity>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
@@ -222,34 +243,36 @@ public class FilesystemIF implements Datasource {
                matches.add(entry);
             }
         }
-        LOG.info("Returning matches");
+        LOG.fine("Returning matches");
         return matches;
     }
     
 	@Override
-	public ExampleResources getExamples(String resourceTypeAndID) {
-		return FileCache.getExamples(resourceTypeAndID);
+	public ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID) {
+		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	
 	@Override
-	public ResourceEntity getExampleByName(String resourceFilename) {
-		return FileCache.getExampleByName(resourceFilename);
+	public ResourceEntity getExampleByName(FHIRVersion fhirVersion, String resourceFilename) {
+		return FileCache.getExampleByName(fhirVersion, resourceFilename);
 	}
 
 	@Override
 	public HashMap<String, Integer> getResourceTypeCounts() {
 		HashMap<String, Integer> results = new HashMap<String, Integer>();
-		List<ResourceEntity> list = FileCache.getResourceList();
-		for (ResourceEntity entry : list) {
-			String type = entry.getResourceType().toString();
-			if (entry.isExtension()) {
-				type = "Extension";
-			}
-			if (results.containsKey(type)) {
-				Integer i = results.get(type);
-				results.put(type, i + 1);
-			} else {
-				results.put(type, new Integer(1));
+		for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+			List<ResourceEntity> list = FileCache.getResourceList(fhirVersion);
+			for (ResourceEntity entry : list) {
+				String type = entry.getResourceType().toString();
+				if (entry.isExtension()) {
+					type = "Extension";
+				}
+				if (results.containsKey(type)) {
+					Integer i = results.get(type);
+					results.put(type, i + 1);
+				} else {
+					results.put(type, new Integer(1));
+				}
 			}
 		}
 		return results;

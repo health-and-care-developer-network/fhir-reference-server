@@ -3,6 +3,7 @@ package uk.nhs.fhir.datalayer.collections;
 import java.io.File;
 import java.util.ArrayList;
 
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
@@ -21,12 +22,32 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String extensionCardinality = null;
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
+	private FHIRVersion fhirVersion = null;
 	
+	/**
+	 * Create some metadata for the resource
+	 * @param resourceName
+	 * @param resourceFile
+	 * @param resourceType
+	 * @param extension
+	 * @param baseType
+	 * @param displayGroup
+	 * @param example
+	 * @param resourceID
+	 * @param versionNo
+	 * @param status
+	 * @param artefacts
+	 * @param cardinality
+	 * @param extensionContexts
+	 * @param extensionDescription
+	 * @param fhirVersion
+	 */
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,
 							ArrayList<SupportingArtefact> artefacts, String cardinality,
-							ArrayList<String> extensionContexts, String extensionDescription) {
+							ArrayList<String> extensionContexts, String extensionDescription,
+							FHIRVersion fhirVersion) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -41,7 +62,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.extensionCardinality = cardinality;
 		this.extensionContexts = extensionContexts;
 		this.extensionDescription = extensionDescription;
-		
+		this.fhirVersion = fhirVersion;
 	}
 	
 	public String getResourceName() {
@@ -185,5 +206,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 
 	public void setExtensionDescription(String extensionDescription) {
 		this.extensionDescription = extensionDescription;
+	}
+
+	public FHIRVersion getFhirVersion() {
+		return fhirVersion;
+	}
+
+	public void setFhirVersion(FHIRVersion fhirVersion) {
+		this.fhirVersion = fhirVersion;
 	}
 }

@@ -15,33 +15,18 @@
  */
 package uk.nhs.fhir;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.TagList;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.Conformance;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
-import ca.uhn.fhir.rest.method.RequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
-import ca.uhn.fhir.rest.server.provider.dstu2.ServerConformanceProvider;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.NotImplementedException;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PageTemplateHelper;
-import uk.nhs.fhir.util.PropertyReader;
+
+import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.api.TagList;
+import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 
 /**
  * Class used to add CORS headers for responses to allow them to be used across origins

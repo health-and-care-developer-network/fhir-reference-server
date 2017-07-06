@@ -50,7 +50,7 @@ public class FileLoader {
      * @return String containing content of specified file
      */
     public static String loadFile(final File file) {
-    	logger.info("Loading file: " + file.getAbsolutePath());
+    	logger.fine("Loading file: " + file.getAbsolutePath());
         String defaultEncoding = PropertyReader.getProperty("fileEncoding");
     	InputStream inputStream;
     	Reader inputStreamReader;
@@ -66,7 +66,7 @@ public class FileLoader {
 			    charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
 			}
 			
-		    logger.info("Loading file using encoding: " + charsetName);
+		    logger.fine("Loading file using encoding: " + charsetName);
 		    
 	    	inputStreamReader = new InputStreamReader(bOMInputStream, charsetName);
 	    	int data = inputStreamReader.read();

@@ -12,7 +12,8 @@ import ca.uhn.fhir.rest.method.RequestDetails;
  */
 public enum ArtefactType {
 	
-	//METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata"),
+	// Note: To stop an artefact being displayed, use a weight of -1
+	METADATA("metadata.html", ResourceType.STRUCTUREDEFINITION, "Metadata", -1),
 	//SNAPSHOT("snapshot.html", ResourceType.STRUCTUREDEFINITION, "Snapshot"),
 	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings", 30),
 	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions", 20),
@@ -45,17 +46,17 @@ public enum ArtefactType {
 	 */
     public static ArtefactType getFromFilename(ResourceType resourceType, String filename) {
     	if (filename == null || resourceType == null) { 
-    		LOG.info("Found artefact - can't determine type");
+    		LOG.fine("Found artefact - can't determine type - filename: " + filename);
     		return null;
     	} else {
     		for (ArtefactType type : ArtefactType.values()) {
     			if (type.relatesToResourceType.equals(resourceType) && type.filename.equalsIgnoreCase(filename)) {
-    				LOG.info("Detected artefact of type: " + type);
+    				LOG.fine("Detected artefact of type: " + type);
     				return type;
     			}
     		}
     	}
-    	LOG.info("Found artefact - can't determine type");
+    	LOG.fine("Found artefact - can't determine type - filename: " + filename);
     	return null;
     }
 	

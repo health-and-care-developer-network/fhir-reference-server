@@ -22,35 +22,29 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.CustomServerConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.DocumentReferenceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.OrganizationProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -60,11 +54,11 @@ import uk.nhs.fhir.util.PropertyReader;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
-public class RestfulServlet extends RestfulServer {
+@WebServlet(urlPatterns = {"/3.0.1/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
+public class STU3RestfulServlet extends RestfulServer {
 
-    private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
-    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
+    private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
+    private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
     private static String logLevel = PropertyReader.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     private static Datasource dataSource = null;
@@ -77,24 +71,27 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.fine("Requested URI: " + request.getRequestURI());
+        LOG.info("Requested URI: " + request.getRequestURI());
 
-        if(request.getRequestURI().endsWith(".css")) {
+        String requestedPath = request.getRequestURI().substring(6);
+        LOG.fine("Request path: " + requestedPath);
+        
+        if(requestedPath.endsWith(".css")) {
             // Stylesheets
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
-        } else if (request.getRequestURI().endsWith("favicon.ico")) {
+        } else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
-        } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
+        } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
-        } else if (request.getRequestURI().startsWith("/artefact")) {
+        } else if (requestedPath.startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
-        } else if (request.getRequestURI().startsWith("/Examples/")) {
+        } else if (requestedPath.startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
-        } else if (request.getRequestURI().startsWith("/Extensions")) {
+        } else if (requestedPath.startsWith("/Extensions")) {
         	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
-        } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
+        } else if (requestedPath.equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
 			PrintWriter outputStream = response.getWriter();
@@ -112,6 +109,9 @@ public class RestfulServlet extends RestfulServer {
      */
     @Override
     protected void initialize() throws ServletException {
+    	
+    	// Explicitly set this as an STU3 FHIR server
+    	super.setFhirContext(FHIRVersion.STU3.getContext());
 
         // We set our logging level based on the config file property.
         LOG.setLevel(Level.INFO);
@@ -132,7 +132,7 @@ public class RestfulServlet extends RestfulServer {
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
-        // Pass our resource handler to the other servlet
+        // Pass our resource handler to the other servlets
         IndexServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
@@ -145,9 +145,9 @@ public class RestfulServlet extends RestfulServer {
         resourceProviders.add(new ValueSetProvider(dataSource));
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
         resourceProviders.add(new ImplementationGuideProvider(dataSource));
-        resourceProviders.add(new ConformanceProvider(dataSource));
+        //resourceProviders.add(new ConformanceProvider(dataSource));
         setResourceProviders(resourceProviders);
-        registerInterceptor(new PlainContent(webber));
+        registerInterceptor(new STU3PlainContent(webber));
         LOG.fine("resourceProviders added");
         
         setServerConformanceProvider(new CustomServerConformanceProvider());

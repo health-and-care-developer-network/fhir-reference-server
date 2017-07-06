@@ -1,4 +1,4 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import java.util.ArrayList;
 import java.util.List;

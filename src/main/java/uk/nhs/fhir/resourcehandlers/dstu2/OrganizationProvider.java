@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.resourcehandlers;
+package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Practitioner;
+import ca.uhn.fhir.model.dstu2.resource.Organization;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Validate;
 import ca.uhn.fhir.rest.api.MethodOutcome;
@@ -27,14 +27,16 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.util.PropertyReader;
 import uk.nhs.fhir.validator.ValidateAny;
+
 /**
  *
  * @author Tim Coates
  */
-public class PractitionerProvider implements IResourceProvider {
-    private static final Logger LOG = Logger.getLogger(PractitionerProvider.class.getName());
+public class OrganizationProvider implements IResourceProvider {
+    private static final Logger LOG = Logger.getLogger(BundleProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
@@ -46,7 +48,7 @@ public class PractitionerProvider implements IResourceProvider {
      *
      * @param dataSource
      */
-    public PractitionerProvider(Datasource dataSource) {
+    public OrganizationProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -59,8 +61,8 @@ public class PractitionerProvider implements IResourceProvider {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu2();
-        LOG.fine("Created PractitionerProvider handler to respond to requests for Practitioner resource types.");
+        ctx = FHIRVersion.DSTU2.getContext();
+        LOG.fine("Created OrganizationProvider handler to respond to requests for Organization resource types.");
     }
 
     /**
@@ -71,7 +73,7 @@ public class PractitionerProvider implements IResourceProvider {
      */
     @Override
     public Class<? extends IBaseResource> getResourceType() {
-        return Practitioner.class;
+        return Organization.class;
     }
 //</editor-fold>
 
@@ -87,10 +89,10 @@ public class PractitionerProvider implements IResourceProvider {
      * @return
      */
     @Validate
-    public MethodOutcome validateStructureDefinition(@ResourceParam Practitioner resourceToTest,
+    public MethodOutcome validateStructureDefinition(@ResourceParam Organization resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
-        
+
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
     }
