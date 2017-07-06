@@ -26,7 +26,6 @@ public class ServletStreamExample {
     	
 		// Parse the URL
 		String exampleName = request.getRequestURI().substring(10);
-		System.out.println("Example="+exampleName);
 		
 		ResourceEntity exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
 		
@@ -44,6 +43,9 @@ public class ServletStreamExample {
 			myRawResourceRenderer.renderSingleWrappedRAWResource(fileContent, sb, MimeType.XML);
 			
 			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES.toString(), exampleName, sb, request.getContextPath());
+		} else {
+			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
+			response.setStatus(404);
 		}
 	}
 }

@@ -80,7 +80,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
             LOG.setLevel(Level.OFF);
         }
         myDatasource = dataSource;
-        ctx = FhirContext.forDstu2();
+        ctx = FHIRVersion.STU3.getContext();
         LOG.fine("Created StrutureDefinitionProvider handler to respond to requests for StrutureDefinition resource types.");
     }
 
@@ -106,14 +106,14 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
      * @param theProfile
      * @return
      */
-    @Validate
+    /*@Validate
     public MethodOutcome validateStructureDefinition(@ResourceParam StructureDefinition resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
             @Validate.Profile String theProfile) {
 
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
-    }
+    }*/
 //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="RESTFul operations">
@@ -140,7 +140,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
      */
     @Search
     public List<IBaseResource> searchByStructureDefinitionName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-    	LOG.info("Request for StructureDefinition objects matching name: " + theNamePart);
+    	LOG.fine("Request for StructureDefinition objects matching name: " + theNamePart);
     	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
@@ -152,7 +152,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
      */
     @Search
     public List<IBaseResource> getAllStructureDefinitions() {
-        LOG.info("Request for ALL StructureDefinition objects");
+        LOG.fine("Request for ALL StructureDefinition objects");
         List<IBaseResource> foundList = myDatasource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.STRUCTUREDEFINITION);
         return foundList;
     }

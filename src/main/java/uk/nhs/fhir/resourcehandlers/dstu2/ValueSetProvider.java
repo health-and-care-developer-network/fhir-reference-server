@@ -82,7 +82,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
             LOG.setLevel(Level.OFF);
         }
         myDataSource = dataSource;
-        ctx = FhirContext.forDstu2();
+        ctx = FHIRVersion.DSTU2.getContext();
         LOG.fine("Created ValueSetProvider handler to respond to requests for ValueSet resource types.");
     }
 
@@ -109,7 +109,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      * @param theProfile
      * @return
      */
-    @Validate
+    /*@Validate
     public MethodOutcome validateStructureDefinition(
             @ResourceParam Patient resourceToTest,
             @Validate.Mode ValidationModeEnum theMode,
@@ -117,7 +117,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
         
         MethodOutcome retval = ValidateAny.validateStructureDefinition(ctx, resourceToTest);
         return retval;
-    }
+    }*/
 //</editor-fold>
     
 //<editor-fold defaultstate="collapsed" desc="RESTFul request handlers">
@@ -153,7 +153,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      */
     @Search()
     public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
-    	LOG.info("Request for ValueSet objects matching name: " + theName);
+    	LOG.fine("Request for ValueSet objects matching name: " + theName);
     	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.VALUESET, theName.getValue());
         return foundList;
     }

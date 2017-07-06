@@ -1,40 +1,22 @@
 package uk.nhs.fhir.datalayer;
 
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
-import static uk.nhs.fhir.enums.ResourceType.EXAMPLES;
-import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
-import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PropertyReader;
 
@@ -47,7 +29,7 @@ public class VersionedFilePreprocessor {
 	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
 		
 		//profileLoadMessages.clear();
-		LOG.info("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
+		LOG.fine("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 		
@@ -80,58 +62,6 @@ public class VersionedFilePreprocessor {
 	                	resourceID = newEntity.getResourceID();
 	                	versionNo = newEntity.getVersionNo();
 	                	
-	                	/*
-	                	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
-			                if (resourceType == STRUCTUREDEFINITION) {
-			                	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                    name = profile.getName();
-			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-			                    versionNo = new VersionNumber(profile.getVersion());
-			                } else if (resourceType == VALUESET) {
-			                	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = profile.getName();
-			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-			                	versionNo = new VersionNumber(profile.getVersion());
-			                } else if (resourceType == OPERATIONDEFINITION) {
-			                	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = operation.getName();
-			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
-			                    versionNo = new VersionNumber(operation.getVersion());
-			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-			                	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = guide.getName();
-			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
-			                    versionNo = new VersionNumber(guide.getVersion());
-			                }
-	                	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
-	                		if (resourceType == STRUCTUREDEFINITION) {
-	                			org.hl7.fhir.dstu3.model.StructureDefinition profile =
-	                					(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                    name = profile.getName();
-			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-			                    versionNo = new VersionNumber(profile.getVersion());
-			                } else if (resourceType == VALUESET) {
-			                	org.hl7.fhir.dstu3.model.ValueSet profile =
-			                			(org.hl7.fhir.dstu3.model.ValueSet)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = profile.getName();
-			                	resourceID = getResourceIDFromURL(profile.getUrl(), name);
-			                	versionNo = new VersionNumber(profile.getVersion());
-			                } else if (resourceType == OPERATIONDEFINITION) {
-			                	org.hl7.fhir.dstu3.model.OperationDefinition operation =
-			                			(org.hl7.fhir.dstu3.model.OperationDefinition)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = operation.getName();
-			                    resourceID = getResourceIDFromURL(operation.getUrl(), name);
-			                    versionNo = new VersionNumber(operation.getVersion());
-			                } else if (resourceType == IMPLEMENTATIONGUIDE) {
-			                	org.hl7.fhir.dstu3.model.ImplementationGuide guide =
-			                			(org.hl7.fhir.dstu3.model.ImplementationGuide)FHIRUtils.loadResourceFromFile(fhirVersion, thisFile);
-			                	name = guide.getName();
-			                    resourceID = getResourceIDFromURL(guide.getUrl(), name);
-			                    versionNo = new VersionNumber(guide.getVersion());
-			                }
-			                
-			                
-	                	}*/
 	                } catch (Exception ex) {
 	                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
 	                	ex.printStackTrace();
@@ -150,7 +80,7 @@ public class VersionedFilePreprocessor {
 		                // Now, try to build a new versioned filename and copy the file to it
                     	String newFilename = resourceID + "-versioned-" + versionNo + ".xml";
                     	
-                    	LOG.info("Copying new profile into versioned directory with new filename: " + newFilename);
+                    	LOG.fine("Copying new profile into versioned directory with new filename: " + newFilename);
                     	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
                     	File newFile = new File(versioned_path + "/" + newFilename);
                     	FileUtils.copyFile(thisFile, newFile);
