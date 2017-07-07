@@ -47,8 +47,8 @@ function loadMetadata() {
 }
 
 function addExpandCollapseForMetadata() {
-	$('.fhir-panel-heading-text').prepend("<span class='ui-accordion-header-icon ui-icon ui-icon-triangle-1-s'/>");
-	$('.fhir-panel-heading-text').click(function(){
+	$('.metadataSection .fhir-panel-heading-text').prepend("<span class='ui-accordion-header-icon ui-icon ui-icon-triangle-1-s'/>");
+	$('.metadataSection .fhir-panel-heading-text').click(function(){
 	    $('.metadataSection .fhir-panel-body').slideToggle('slow');
 	    $('.metadataSection .ui-icon').toggleClass("ui-icon-triangle-1-s");
 	    $('.metadataSection .ui-icon').toggleClass("ui-icon-triangle-1-e");
