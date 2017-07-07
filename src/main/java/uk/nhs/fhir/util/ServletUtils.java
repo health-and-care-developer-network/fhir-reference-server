@@ -1,5 +1,18 @@
 package uk.nhs.fhir.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 public class ServletUtils {
 	
     /**
@@ -16,6 +29,19 @@ public class ServletUtils {
         target = target.replaceAll("~([a-z]+)~", "<span style=\"color: $1;\">");
         target = target.replace("~/~", "</span>");
         return target;
+    }
+    
+    public static String prettyPrintXML(String xml) throws UnsupportedEncodingException, TransformerFactoryConfigurationError, TransformerException {
+    	Transformer transformer = TransformerFactory.newInstance().newTransformer();
+    	transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    	transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+    	transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    	//initialize StreamResult with File object to save to file
+    	StreamResult result = new StreamResult(new StringWriter());
+    	Source source = new StreamSource(new ByteArrayInputStream(xml.getBytes("utf-8")));;
+    	transformer.transform(source, result);
+    	String xmlString = result.getWriter().toString();
+    	return xmlString;
     }
 
 }
