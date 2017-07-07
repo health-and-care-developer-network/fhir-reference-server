@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Usage:
-# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path
+# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path copy_only
+
+# Note: If copy_only is passed as "true" then the renderer will not be called, the specified files will just be copied directly to
+# the output directory. This would typically be used to copy examples across.
 
 GITHUB_URL=$1
 BRANCH=$2
@@ -11,6 +14,7 @@ NEW_URL=$5
 REGISTRY_HOST=$6
 TARGET_HOST=$7
 OUT_PATH=$8
+COPY_ONLY=$9
 
 IMAGE_NAME="nhsd/fhir-make-html"
 
@@ -39,5 +43,5 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
-	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH
+	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH $COPY_ONLY
 
