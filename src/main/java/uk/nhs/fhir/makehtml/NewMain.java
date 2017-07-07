@@ -20,19 +20,29 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
+import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 
 /**
- *
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+    
+    // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
+	
+	// convert any links with host fhir.hl7.org.uk into relative links
+	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
+	
+	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
+	public static final boolean TEST_LINK_URLS = true;
 
     private final File inputDirectory;
     private final String outPath;
@@ -44,27 +54,33 @@ public class NewMain {
     	this.newBaseURL = newBaseURL;
     }
 
-    private static String[] savedArgs;
-    public static String[] getArgs() {
-        return savedArgs;
-    }
-
     /**
      * Main entry point.
      *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        savedArgs= args;
-
+        
     	if((args.length == 2) || (args.length == 3)) {
-            String inputDir = args[0];
+			String inputDir = args[0];
             String outputDir = args[1];
             String newBaseURL = null;
             if (args.length == 3) {
             	LOG.log(Level.INFO, "Using new base URL: " + newBaseURL);
             	newBaseURL = args[2];
+            }
+
+            String resourcesPath = args[0];
+            if (!resourcesPath.endsWith(File.separator)) {
+            	resourcesPath += File.separator;
+            }
+            FhirIcon.setSuppliedResourcesFolderPath(resourcesPath);
+            
+            if (!inputDir.endsWith(File.separator)) {
+            	inputDir += File.separator;
+            }
+            if (!outputDir.endsWith(File.separator)) {
+            	outputDir += File.separator;
             }
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
@@ -102,6 +118,11 @@ public class NewMain {
 	        }
         } catch (Exception e) {
         	e.printStackTrace();
+        }
+        
+        if (TEST_LINK_URLS) {
+        	new UrlTester().testUrls(FhirURL.getLinkUrls());
+            UrlTester.logSuccessAndFailures();
         }
     }
 }

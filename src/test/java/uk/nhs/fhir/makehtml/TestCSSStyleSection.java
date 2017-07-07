@@ -5,8 +5,9 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.html.CSSRule;
-import uk.nhs.fhir.makehtml.html.CSSStyleSection;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleSection;
 
 public class TestCSSStyleSection {
 

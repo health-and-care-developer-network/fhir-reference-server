@@ -3,7 +3,7 @@ package uk.nhs.fhir.makehtml.html;
 import org.junit.Test;
 
 import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.html.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
 
 public class TestCSSRule {
 	@Test

@@ -55,4 +55,14 @@ public interface FhirTreeTableContent {
 	Optional<FhirTreeNode> getBackupNode();
 
 	void setFhirIcon(FhirIcon icon);
+	
+	public List<ConstraintInfo> getConstraints();
+	
+	public String getNodeKey();
+
+	Optional<String> getName();
+
+	public Optional<String> getDefinition();
+	
+	public Optional<ExtensionType> getExtensionType();
 }

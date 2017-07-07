@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 
 public class DummyFhirTreeNode implements FhirTreeTableContent {
 
+	public static final boolean DISPLAY_DUMMY_NODE_TYPES = true;
+	
 	private FhirTreeNode backup = null;
 	private FhirTreeTableContent parent;
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
@@ -79,12 +81,20 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public List<LinkData> getTypeLinks() {
-		return Lists.newArrayList();
+		if (DISPLAY_DUMMY_NODE_TYPES) {
+			return backup.getTypeLinks();
+		} else {
+			return Lists.newArrayList();
+		}
 	}
 
 	@Override
 	public boolean useBackupTypeLinks() {
 		return true;
+	}
+	
+	public List<ConstraintInfo> getConstraints() {
+		return Lists.newArrayList();
 	}
 
 	@Override
@@ -184,5 +194,25 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public String toString() {
 		return "{" + getPath() + "}";
+	}
+
+	@Override
+	public String getNodeKey() {
+		return backup.getNodeKey();
+	}
+
+	@Override
+	public Optional<String> getName() {
+		return backup.getName();
+	}
+
+	@Override
+	public Optional<String> getDefinition() {
+		return backup.getDefinition();
+	}
+
+	@Override
+	public Optional<ExtensionType> getExtensionType() {
+		return backup.getExtensionType();
 	}
 }

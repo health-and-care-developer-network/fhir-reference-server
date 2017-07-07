@@ -18,7 +18,7 @@ public class ValueSetPreparer  implements ResourcePreparer<ValueSet> {
         	if (newBaseURL.endsWith("/")) {
         		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
         	}
-        	//structureDefinitionResource.setBase(newBaseURL);
+
         	vsResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
         }
 	}

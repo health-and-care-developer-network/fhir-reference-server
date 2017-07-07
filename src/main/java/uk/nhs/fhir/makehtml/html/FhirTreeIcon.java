@@ -4,8 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.CSSStyleBlock;
-import uk.nhs.fhir.makehtml.HTMLConstants;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.html.style.CSSRule;
+import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 /**
  * Icons used to display the type of an element in a FHIR tree
@@ -17,8 +18,6 @@ public enum FhirTreeIcon {
 	VJOIN("tbl_vjoin.png", FhirTreeIcon.vjoinBase64, FhirTreeIcon.VJOIN_CLASS),
 	VJOIN_END("tbl_vjoin_end.png", FhirTreeIcon.vjoinEndBase64, FhirTreeIcon.VJOIN_END_CLASS),
 	VLINE("tbl_vline.png", FhirTreeIcon.vlineBase64, FhirTreeIcon.VLINE_CLASS);
-	
-	private static final String NHS_CONTAINING_FOLDER = "http://data.developer.nhs.uk/fhir/candidaterelease-170816-getrecord/dist/images/";
 	
 	private final String filename;
 	private final String base64;
@@ -74,7 +73,7 @@ public enum FhirTreeIcon {
 		
 		rules.add(
 			new CSSStyleBlock(
-				Lists.newArrayList("img." + "fhir-tree-icon"), 
+				Lists.newArrayList("img." + FhirCSS.TREE_ICON), 
 				Lists.newArrayList(
 					new CSSRule("background-color", "white"),
 					new CSSRule("border", "0"),
@@ -99,6 +98,6 @@ public enum FhirTreeIcon {
 	private static final String VLINE_CLASS = "vline-fhir-tree-icon";
 
 	public String getNhsSrc() {
-		return HTMLConstants.NHS_IMAGES_DIR + getFileName();
+		return FhirURLConstants.NHS_FHIR_IMAGES_DIR + "/" + getFileName();
 	}
 }

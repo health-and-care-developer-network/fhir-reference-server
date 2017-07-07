@@ -11,9 +11,10 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.util.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 
 public class TestFhirTreeTable {
 	@Test
@@ -24,12 +25,15 @@ public class TestFhirTreeTable {
 			new ResourceFlags(),
 			0,
 			"1",
-			Lists.newArrayList(new SimpleLinkData("#", "testlink")),
+			Lists.newArrayList(new SimpleLinkData(FhirURL.buildOrThrow("http://www.example.com"), "testlink")),
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource");
 		FhirTreeData data = new FhirTreeData(node);
-		Table table = new FhirTreeTable(data).asTable(false, Optional.empty());
+		
+		FhirTreeTable fhirTreeTable = new FhirTreeTable(data);
+		fhirTreeTable.stripRemovedElements();
+		Table table = fhirTreeTable.asTable();
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);
 		System.out.println(output);

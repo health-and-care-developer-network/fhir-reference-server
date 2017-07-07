@@ -12,7 +12,7 @@ public class OperationDefinitionPreparer implements ResourcePreparer<OperationDe
         	if (newBaseURL.endsWith("/")) {
         		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
         	}
-        	//structureDefinitionResource.setBase(newBaseURL);
+
         	opDefResource.setUrl(newBaseURL+"/StructureDefinition/"+resourceName);
         }
 		

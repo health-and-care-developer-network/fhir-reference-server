@@ -3,6 +3,7 @@ package uk.nhs.fhir.makehtml.data;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.google.common.base.Preconditions;
@@ -31,6 +32,47 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 				System.out.write('\t');
 			}
 			System.out.println(node.getDisplayName());
+		}
+	}
+
+	public void stripRemovedElements() {
+		stripRemovedElements(root);
+	}
+	
+	/**
+	 * Remove all nodes that have cardinality max = 0 (and their children)
+	 */
+	private void stripRemovedElements(FhirTreeTableContent node) {
+		List<? extends FhirTreeTableContent> children = node.getChildren();
+		
+		for (int i=children.size()-1; i>=0; i--) {
+			
+			FhirTreeTableContent child = children.get(i);
+			
+			if (child.isRemovedByProfile()) {
+				children.remove(i);
+			} else {
+				stripRemovedElements(child);
+			}
+		}
+	}
+	
+	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
+		boolean isComplexExtension = node.getExtensionType().isPresent() 
+		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
+		  // exclude root node
+		  && node.getPath().contains(".");
+		
+		List<? extends FhirTreeTableContent> children = node.getChildren();
+		
+		for (int i=children.size()-1; i>=0; i--) {
+			
+			FhirTreeTableContent child = children.get(i);
+			if (isComplexExtension) {
+				children.remove(i);
+			} else {
+				stripComplexExtensionChildren(child);
+			}
 		}
 	}
 }
