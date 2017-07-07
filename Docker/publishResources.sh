@@ -15,7 +15,7 @@ REGISTRY_HOST=$6
 TARGET_HOST=$7
 OUT_PATH=$8
 COPY_ONLY=$9
-
+ 
 IMAGE_NAME="nhsd/fhir-make-html"
 
 if [ -z $REGISTRY_HOST ]
