@@ -33,14 +33,21 @@
 		#end
 		#if( $examples )
 			<div id="tabs-examples">
-				<b>Examples implementing this profile:</b>
-				<p>
-					<ul>
-					#foreach( $example in $examples )
-						<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
-					#end
-					</ul>
-				</p>
+				<div class="fhir-panel">
+			      <div class="fhir-panel-heading-box">
+			        <h3 class="fhir-panel-heading-text">Examples</h3>
+			      </div>
+			      <div class="fhir-panel-body">
+					<b>Examples implementing this profile:</b>
+					<p>
+						<ul id="exampleBullets">
+						#foreach( $example in $examples )
+							<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+						#end
+						</ul>
+					</p>
+	        	  </div>
+	            </div>
 			</div>
 		#end
 	</div>

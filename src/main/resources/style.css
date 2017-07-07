@@ -212,3 +212,7 @@ h2.resourceType {
 .guideContent .nameCol {
 	width: 300px;
 }
+
+ul#exampleBullets {
+    margin-left: 25px;
+}
