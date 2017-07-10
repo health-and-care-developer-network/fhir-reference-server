@@ -47,23 +47,18 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	public void tidyData() {
+		stripNodesWithoutTypeLinks(root);
+		
 		removeExtensionsSlicingNodes(root);
 		stripChildlessDummyNodes(root);
 		addSlicingIcons(root);
 		addLinkIcons(root);
 		removeUnwantedConstraints(root);
 		stripComplexExtensionChildren(root);
-		stripNodesWithoutTypeLinks(root);
 	}
 	
+	// Remove inlined child nodes of complex extensions
 	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
-		boolean strippedAny = stripComplexExtensionChildren(node, false);
-		if (strippedAny) {
-			RendererError.handle(RendererError.Key.COMPLEX_EXTENSION_WITH_CHILDREN, "Found complex extension with inlined children in the tree");
-		}
-	}
-	
-	private boolean stripComplexExtensionChildren(FhirTreeTableContent node, boolean strippedAny) {
 		boolean isComplexExtension = node.getExtensionType().isPresent() 
 		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
 		  // exclude root node
@@ -76,13 +71,10 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			FhirTreeTableContent child = children.get(i);
 			if (isComplexExtension) {
 				children.remove(i);
-				strippedAny = true;
 			} else {
-				strippedAny |= stripComplexExtensionChildren(child, strippedAny);
+				stripComplexExtensionChildren(child);
 			}
 		}
-		
-		return strippedAny;
 	}
 
 	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
@@ -241,18 +233,14 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			String expectedName = expectedNameEntry.getKey();
 			List<FhirTreeTableContent> nodesWithLink = expectedNameEntry.getValue();
 			
-			if (namedNodes.size() > 1) {
-				System.out.println("Found " + namedNodes.size() + " nodes linking to named node (name=\"" + expectedName + "\")");
-			}
-			
 			if (namedNodes.containsKey(expectedName)) {
 				for (FhirTreeTableContent nodeWithLink : nodesWithLink) {
 					if (nodeWithLink instanceof FhirTreeNode) {
 						((FhirTreeNode)nodeWithLink).setLinkedNode(namedNodes.get(expectedName));
 					}
+					// If we are in a dummy node, we don't need to do anything since the backup node
+					// should contain this information
 				}
-				// If we are in a dummy node, we don't need to do anything since the backup node
-				// should contain this information
 			} else {
 				String nodesWithMissingLinkTarget = String.join(", ", 
 					expectedNames.get(expectedName)
@@ -262,6 +250,15 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 				
 				RendererError.handle(RendererError.Key.MISSING_REFERENCED_NODE, 
 					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedName + ")");
+			}
+		}
+	}
+
+	public void cacheSlicingDiscriminators() {
+		for (FhirTreeTableContent content : this) {
+			if (content instanceof FhirTreeNode) {
+				FhirTreeNode node = (FhirTreeNode)content;
+				node.cacheSlicingDiscriminator();
 			}
 		}
 	}

@@ -117,7 +117,11 @@ public class FhirTreeNodeBuilder {
 		
 		Slicing slicing = elementDefinition.getSlicing();
 		if (!slicing.isEmpty()) {
-			node.setSlicingInfo(new SlicingInfo(slicing));
+
+			if (slicing.getDiscriminator().isEmpty()) {
+				RendererError.handle(RendererError.Key.SLICING_WITHOUT_DISCRIMINATOR, "Element " + node.getPath() + " has slicing without any discriminator");
+			}
+			node.setSlicingInfo(new SlicingInfo(slicing));	
 		}
 		
 		IDatatype fixed = elementDefinition.getFixed();

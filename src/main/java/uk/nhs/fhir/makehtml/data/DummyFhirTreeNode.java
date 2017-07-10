@@ -220,4 +220,19 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public Optional<ExtensionType> getExtensionType() {
 		return backup.getExtensionType();
 	}
+
+	@Override
+	public boolean hasSlicingSibling() {
+		return backup.hasSlicingSibling();
+	}
+
+	@Override
+	public FhirTreeTableContent getSlicingSibling() {
+		return backup.getSlicingSibling();
+	}
+
+	@Override
+	public String getKeySegment() {
+		return backup.getKeySegment();
+	}
 }

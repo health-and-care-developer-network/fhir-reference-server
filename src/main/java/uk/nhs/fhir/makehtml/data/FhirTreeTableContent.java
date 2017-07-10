@@ -67,4 +67,10 @@ public interface FhirTreeTableContent {
 	public Optional<String> getLinkedNodeName();
 	
 	public Optional<ExtensionType> getExtensionType();
+
+	boolean hasSlicingSibling();
+
+	FhirTreeTableContent getSlicingSibling();
+
+	String getKeySegment();
 }
