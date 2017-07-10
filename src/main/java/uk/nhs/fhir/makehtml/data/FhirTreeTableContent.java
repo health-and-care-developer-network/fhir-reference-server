@@ -73,4 +73,8 @@ public interface FhirTreeTableContent {
 	FhirTreeTableContent getSlicingSibling();
 
 	String getKeySegment();
+
+	boolean isPrimitive();
+
+	FhirDataType getDataType();
 }

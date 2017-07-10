@@ -82,36 +82,33 @@ public enum FhirIcon {
 	 * In that case, we have already done the legwork to work out whether the node is an extension (and whether it is simple/complex)
 	 */
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
-		List<Type> types = definition.getType();
 		
 		if (definition.getPath().endsWith("[x]")) {
 			return FhirIcon.CHOICE;
 		}
 		
-		if (!types.isEmpty()) {
-			for (Type type : types) {
-				String typeName = type.getCode();
-				if (typeName != null) {
+		for (Type type : definition.getType()) {
+			String typeName = type.getCode();
+			if (typeName != null) {
+				
+				if (typeName.equals("Extension")) {
+                    return lookupExtension(type);
+                } else {
+					Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 					
-					if (typeName.equals("Extension")) {
-                        return lookupExtension(type);
-                    } else {
-						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
+					if (maybeImplementingType.isPresent()) {
+						Class<?> implementingType = maybeImplementingType.get();
 						
-						if (maybeImplementingType.isPresent()) {
-							Class<?> implementingType = maybeImplementingType.get();
-							
-							if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.REFERENCE;
-							}
-							
-							if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.DATATYPE;
-							}
-							
-							if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.PRIMITIVE;
-							}
+						if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.REFERENCE;
+						}
+						
+						if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.DATATYPE;
+						}
+						
+						if (BasePrimitive.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.PRIMITIVE;
 						}
 					}
 				}

@@ -57,6 +57,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
 		snapshotTreeData.stripRemovedElements();
+		new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
 		snapshotTreeData.tidyData();
 		
 		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();

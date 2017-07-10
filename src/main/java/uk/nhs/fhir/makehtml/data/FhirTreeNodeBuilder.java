@@ -48,10 +48,20 @@ public class FhirTreeNodeBuilder {
 		if (elementDefinition.getPath().split("\\.").length == 1) {
 			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
 		} else {
-			List<Type> snapshotElementTypes = elementDefinition.getType();
-			if (!snapshotElementTypes.isEmpty()) {
-				typeLinks.addAll(getTypeLinks(snapshotElementTypes));
-			}
+			typeLinks.addAll(getTypeLinks(elementDefinition.getType()));
+		}
+		
+		Set<FhirDataType> dataTypes = FhirDataTypes.getTypes(elementDefinition.getType());
+		FhirDataType dataType;
+		if (dataTypes.isEmpty()) {
+			dataType = FhirDataType.DELEGATED_TYPE; 
+		} else if (dataTypes.size() == 1) {
+			dataType = dataTypes.iterator().next();
+		} else if (dataTypes.size() > 1
+		  && elementDefinition.getPath().endsWith("[x]")) {
+			dataType = FhirDataType.CHOICE;
+		} else {
+			throw new IllegalStateException("Found " + dataTypes.size() + " data types for node " + elementDefinition.getPath());
 		}
 
 		ResourceFlags flags = ResourceFlags.forDefinition(elementDefinition);
@@ -108,7 +118,8 @@ public class FhirTreeNodeBuilder {
 			typeLinks, 
 			shortDescription,
 			constraints,
-			path);
+			path,
+			dataType);
 
 		String definition = elementDefinition.getDefinition();
 		if (!Strings.isNullOrEmpty(definition)) {

@@ -47,8 +47,6 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	public void tidyData() {
-		stripNodesWithoutTypeLinks(root);
-		
 		removeExtensionsSlicingNodes(root);
 		stripChildlessDummyNodes(root);
 		addSlicingIcons(root);
@@ -109,26 +107,6 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	private static final Set<String> toleratedMissingTypeLinkPaths = Sets.newHashSet();
 	static {
 		toleratedMissingTypeLinkPaths.add("Patient.birthDate.value");
-	}
-	
-	private void stripNodesWithoutTypeLinks(FhirTreeTableContent node) {
-		for (int i=node.getChildren().size()-1; i>=0; i--) {
-			FhirTreeTableContent child = node.getChildren().get(i);
-
-			if (child.getTypeLinks().isEmpty()
-			  && !child.getLinkedNodeName().isPresent()) {
-				if (toleratedMissingTypeLinkPaths.contains(child.getPath())) {
-					RendererError.handle(RendererError.Key.MISSING_TYPE_LINKS_KNOWN_ISSUE, 
-						"Removing node without type links (probably shouldn't be in the profile anyway): " + child.getPath());
-					node.getChildren().remove(i);
-				} else {
-					throw new IllegalStateException("Should " + child.getPath() + " be included without any type links?"
-						+ " If so, add to toleratedMissingTypeLinkPaths");
-				}
-			} else {
-				stripNodesWithoutTypeLinks(child);
-			}
-		}
 	}
 
 	private void addLinkIcons(FhirTreeTableContent node) {

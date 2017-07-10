@@ -16,6 +16,8 @@ import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
 public class FhirDocLinkFactory {
 	
+	public static final String PRIMITIVE_TYPE_LINK_PREFIX = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#";
+	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
 		String typeURL;
@@ -85,6 +87,6 @@ public class FhirDocLinkFactory {
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
+		return PRIMITIVE_TYPE_LINK_PREFIX + dataTypeName.toLowerCase();
 	}
 }

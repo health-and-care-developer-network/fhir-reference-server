@@ -20,16 +20,16 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
 		StructureDefinition structureDefinition = (StructureDefinition)source;
 
-		boolean isExtension = structureDefinition.getConstrainedType().equals("Extension");
-		
 		HTMLDocSection section = new HTMLDocSection();
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 
+		boolean isExtension = structureDefinition.getConstrainedType().equals("Extension");
 		if (!isExtension) {
 			FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
 			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);
+			new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
 		}
 		
 		snapshotTreeData.stripRemovedElements();

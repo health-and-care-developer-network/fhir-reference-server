@@ -48,10 +48,6 @@ public class RendererError {
 		responses.put(Key.BINDING_WITHOUT_DESC_OR_URL, ErrorResponse.LOG_WARNING);
 		responses.put(Key.NO_DISCRIMINATORS_FOUND, ErrorResponse.LOG_WARNING);
 		
-		// Error type needs changing
-		//TODO change this behaviour - it's an expanded primitive value constraint, which we can remove more generally
-		responses.put(Key.MISSING_TYPE_LINKS_KNOWN_ISSUE, ErrorResponse.LOG_WARNING);
-		
 		// Unsorted
 		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);

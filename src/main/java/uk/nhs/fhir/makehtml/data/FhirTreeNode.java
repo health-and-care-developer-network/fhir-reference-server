@@ -26,6 +26,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final String information;
 	private final List<ConstraintInfo> constraints;
 	private final String path;
+	private final FhirDataType dataType;
 
 	private Optional<ExtensionType> extensionType = Optional.empty();
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
@@ -55,7 +56,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			List<LinkData> typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
-			String path) {
+			String path,
+			FhirDataType dataType) {
 		this.icon = icon;
 		this.name = name;
 		this.resourceFlags = flags;
@@ -65,6 +67,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.information = information;
 		this.constraints = constraints;
 		this.path = path;
+		this.dataType = dataType;
 	}
 	
 	/**
@@ -82,7 +85,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public FhirIcon getFhirIcon() {
 		// If using default and we have a backup, use the backup icon
 		if (icon.equals(FhirIcon.ELEMENT)
-				&& hasBackupNode()) {
+		  && hasBackupNode()) {
 			return backupNode.getFhirIcon();
 		}
 
@@ -595,6 +598,21 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			} else {
 				setDiscriminatorValue(discriminators.get(0));
 			}
+		}
+	}
+
+	@Override
+	public boolean isPrimitive() {
+		return getDataType().equals(FhirDataType.PRIMITIVE);
+	}
+	
+	@Override
+	public FhirDataType getDataType() {
+		if (dataType.equals(FhirDataType.DELEGATED_TYPE)
+		  && hasBackupNode()) {
+			return backupNode.getDataType();
+		} else {
+			return dataType;
 		}
 	}
 }

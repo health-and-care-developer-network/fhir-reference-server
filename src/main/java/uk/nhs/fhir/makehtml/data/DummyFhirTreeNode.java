@@ -235,4 +235,14 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public String getKeySegment() {
 		return backup.getKeySegment();
 	}
+
+	@Override
+	public boolean isPrimitive() {
+		return backup.isPrimitive();
+	}
+
+	@Override
+	public FhirDataType getDataType() {
+		return backup.getDataType();
+	}
 }
