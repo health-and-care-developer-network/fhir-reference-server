@@ -41,6 +41,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<String> linkedNodeName = Optional.empty();
 	private Optional<FhirTreeTableContent> linkedNode = Optional.empty();
 	private Optional<String> discriminatorValue = Optional.empty();
+	private List<FhirElementMapping> mappings = Lists.newArrayList();
 
 	private FhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
@@ -614,5 +615,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		} else {
 			return dataType;
 		}
+	}
+
+	public void addMapping(FhirElementMapping fhirElementMapping) {
+		mappings.add(fhirElementMapping);
+	}
+	
+	public List<FhirElementMapping> getMappings() {
+		return mappings;
 	}
 }

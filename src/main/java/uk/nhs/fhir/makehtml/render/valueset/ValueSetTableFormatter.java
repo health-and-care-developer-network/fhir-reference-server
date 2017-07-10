@@ -17,7 +17,7 @@ import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.UrlTester;
+import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.FullFhirURL;
@@ -406,7 +406,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 	
 	private Element valueSpan(String value, boolean alwaysLargeText, boolean reference , boolean internal, String hint) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"))
-		  && new UrlTester().testSingleUrl(value);
+		  && new UrlValidator().testSingleUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 20;
 		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;

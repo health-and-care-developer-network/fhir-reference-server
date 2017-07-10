@@ -47,15 +47,17 @@ public class RendererError {
 		responses.put(Key.UNRESOLVED_DISCRIMINATOR, ErrorResponse.LOG_WARNING);
 		responses.put(Key.BINDING_WITHOUT_DESC_OR_URL, ErrorResponse.LOG_WARNING);
 		responses.put(Key.NO_DISCRIMINATORS_FOUND, ErrorResponse.LOG_WARNING);
+		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.LOG_WARNING);
+		responses.put(Key.FIX_MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
+		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
+		
+		// Perhaps valid?
+		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 		
 		// Unsorted
-		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
-		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 		responses.put(Key.HL7_ORG_UK_HOST, ErrorResponse.IGNORE);
 
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
-		responses.put(Key.FIX_MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
-		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.LOG_WARNING);
 		
 		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.THROW);
 		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.THROW);

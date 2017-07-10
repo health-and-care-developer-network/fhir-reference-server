@@ -26,7 +26,7 @@ public class RedundantValueNodeRemover {
 	 * added as a birthDate.value node.
 	 * 
 	 * We should remove these nodes since the information is redundant (should probably appear as a constraint on the element if anything?)
-	 * and there isn't a sensible 'type' to assign to them, so they look wrong in the tree.
+	 * and there isn't a sensible 'type' to assign to them, so they look peculiar in the tree. Simplifier seems not to display them.
 	 */
 	private void stripExpandedPrimitiveValueNodes(FhirTreeTableContent node) {
 		for (int i=node.getChildren().size()-1; i>=0; i--) {

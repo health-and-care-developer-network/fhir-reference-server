@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
@@ -42,11 +43,12 @@ public class StructureDefinitionDetails {
 	private final List<ConstraintInfo> inheritedConstraints;
 	private final List<ConstraintInfo> profileConstraints;
 	private final Optional<String> linkedNodeKey;
+	private final List<FhirElementMapping> mappings;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			List<LinkData> typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
-			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey) {
+			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings) {
 		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
@@ -61,6 +63,7 @@ public class StructureDefinitionDetails {
 		this.inheritedConstraints = inheritedConstraints;
 		this.profileConstraints = profileConstraints;
 		this.linkedNodeKey = linkedNodeKey;
+		this.mappings = mappings;
 		// add any new fields to assertEqualTo below
 	}
 
@@ -78,6 +81,7 @@ public class StructureDefinitionDetails {
 		addDataIfPresent(tableContent, "Comments", comments);
 		addConstraints(tableContent);
 		addSlicing(tableContent);
+		addMappings(tableContent);
 	}
 
 	private void addChoiceNoteIfPresent(List<Element> tableContent) {
@@ -299,6 +303,39 @@ public class StructureDefinitionDetails {
 		}
 	}
 
+	private void addMappings(List<Element> tableContent) {
+		List<Content> mappingInfos = Lists.newArrayList();
+		
+		for (FhirElementMapping mapping : getMappings()) {
+			
+			String value = mapping.getMap();
+			
+			if (value.equals("n/a")
+			  || value.equals("N/A")) {
+				continue;
+			}
+			
+			if (!mappingInfos.isEmpty()) {
+				mappingInfos.add(Elements.newElement("br"));
+			}
+			mappingInfos.add(Elements.withText("b", mapping.getIdentity() + ": "));
+			mappingInfos.add(new Text(value));
+			
+			if (mapping.getLanguage().isPresent()) {
+				throw new IllegalStateException("How should we display mapping language?");
+			}
+		}
+		
+		if (!mappingInfos.isEmpty()) {
+			tableContent.add(
+				getDataRow(
+					dataCell("Mappings", FhirCSS.DETAILS_DATA_CELL),
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
+						mappingInfos)));
+		}
+	}
+
 	public Optional<String> getDefinition() {
 		return definition;
 	}
@@ -343,6 +380,10 @@ public class StructureDefinitionDetails {
 		return linkedNodeKey;
 	}
 
+	private List<FhirElementMapping> getMappings() {
+		return mappings;
+	}
+
 	public void assertEqualTo(StructureDefinitionDetails detail) {
 
 		if (!getDefinition().equals(detail.getDefinition())) {
@@ -377,6 +418,9 @@ public class StructureDefinitionDetails {
 		}
 		if (!getLinkedNodeKey().equals(detail.getLinkedNodeKey())) {
 			throw new IllegalStateException("Same key, different linked node key info (" + key + ").");
+		}
+		if (!getMappings().stream().allMatch(mapping -> detail.getMappings().contains(mapping))) {
+			throw new IllegalStateException("Same key, different mappings (" + key + ").");
 		}
 	}
 

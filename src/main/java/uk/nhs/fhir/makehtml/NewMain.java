@@ -118,8 +118,8 @@ public class NewMain {
 	        }
 	        
 	        if (TEST_LINK_URLS) {
-	        	new UrlTester().testUrls(FhirURL.getLinkUrls());
-	            UrlTester.logSuccessAndFailures();
+	        	new UrlValidator().testUrls(FhirURL.getLinkUrls());
+	            UrlValidator.logSuccessAndFailures();
 	        }
         } catch (Exception e) {
         	e.printStackTrace();

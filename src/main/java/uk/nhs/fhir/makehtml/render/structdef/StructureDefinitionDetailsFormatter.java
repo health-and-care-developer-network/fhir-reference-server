@@ -85,7 +85,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey);
+				linkedNodeKey, fhirTreeNode.getMappings());
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

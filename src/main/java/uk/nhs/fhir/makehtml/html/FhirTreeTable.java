@@ -8,7 +8,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.UrlTester;
+import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
@@ -175,7 +175,7 @@ public class FhirTreeTable {
 			
 			if (maybeLogicalUrl
 			  && looksLikeUrl(description)
-			  && !new UrlTester().testSingleUrl(description)) {
+			  && !new UrlValidator().testSingleUrl(description)) {
 				resourceInfos.add(new ResourceInfo("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
 			} else {
 				resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));

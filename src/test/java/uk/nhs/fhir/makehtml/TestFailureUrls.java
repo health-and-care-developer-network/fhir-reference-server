@@ -15,6 +15,6 @@ public class TestFailureUrls {
 
 	@Test
 	public void testUrls() {
-		new UrlTester().testUrls(urls);
+		new UrlValidator().testUrls(urls);
 	}
 }

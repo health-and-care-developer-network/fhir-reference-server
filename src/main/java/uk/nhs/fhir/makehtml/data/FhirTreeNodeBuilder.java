@@ -23,6 +23,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Mapping;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
@@ -219,6 +220,15 @@ public class FhirTreeNodeBuilder {
 		String nameReference = elementDefinition.getNameReference();
 		if (!Strings.isNullOrEmpty(nameReference)) {
 			node.setLinkedNodeName(nameReference);
+		}
+		
+		
+		for (Mapping mapping : elementDefinition.getMapping()) {
+			String identity = mapping.getIdentity();
+			Optional<String> language = Optional.ofNullable(mapping.getLanguage());
+			String map = mapping.getMap();
+			
+			node.addMapping(new FhirElementMapping(identity, map, language));
 		}
 		
 		return node;
