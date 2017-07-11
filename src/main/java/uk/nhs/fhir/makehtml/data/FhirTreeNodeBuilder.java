@@ -35,6 +35,7 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.makehtml.valid.NodeMappingValidator;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
@@ -221,8 +222,7 @@ public class FhirTreeNodeBuilder {
 		if (!Strings.isNullOrEmpty(nameReference)) {
 			node.setLinkedNodeName(nameReference);
 		}
-		
-		
+			
 		for (Mapping mapping : elementDefinition.getMapping()) {
 			String identity = mapping.getIdentity();
 			Optional<String> language = Optional.ofNullable(mapping.getLanguage());
@@ -230,6 +230,7 @@ public class FhirTreeNodeBuilder {
 			
 			node.addMapping(new FhirElementMapping(identity, map, language));
 		}
+		NodeMappingValidator.validate(node);
 		
 		return node;
 	}

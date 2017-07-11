@@ -33,7 +33,10 @@ public class RendererError {
 		UNRESOLVED_DISCRIMINATOR,
 		SLICING_WITHOUT_DISCRIMINATOR,
 		NO_DISCRIMINATORS_FOUND,
-		FIX_MISSING_TYPE_LINK;
+		FIX_MISSING_TYPE_LINK,
+		MULTIPLE_MAPPINGS_SAME_KEY,
+		IGNORABLE_MAPPING_ID,
+		MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -43,6 +46,7 @@ public class RendererError {
 		responses.put(Key.MISNAMED_SNAPSHOT_CHOICE_NODE, ErrorResponse.IGNORE);
 		
 		// Error in profile
+		responses.put(Key.HL7_ORG_UK_HOST, ErrorResponse.IGNORE);
 		responses.put(Key.SLICING_WITHOUT_DISCRIMINATOR, ErrorResponse.LOG_WARNING);
 		responses.put(Key.UNRESOLVED_DISCRIMINATOR, ErrorResponse.LOG_WARNING);
 		responses.put(Key.BINDING_WITHOUT_DESC_OR_URL, ErrorResponse.LOG_WARNING);
@@ -50,15 +54,17 @@ public class RendererError {
 		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.LOG_WARNING);
 		responses.put(Key.FIX_MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
 		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
+		responses.put(Key.IGNORABLE_MAPPING_ID, ErrorResponse.IGNORE);
 		
 		// Perhaps valid?
+		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
+		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY, ErrorResponse.IGNORE);
+		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 		
 		// Unsorted
-		responses.put(Key.HL7_ORG_UK_HOST, ErrorResponse.IGNORE);
 
-		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
-		
+		// Currently not reached
 		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.THROW);
 		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.THROW);
 		responses.put(Key.LINK_WITH_LOGICAL_URL, ErrorResponse.THROW);

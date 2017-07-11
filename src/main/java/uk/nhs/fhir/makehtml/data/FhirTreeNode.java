@@ -617,8 +617,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 	}
 
-	public void addMapping(FhirElementMapping fhirElementMapping) {
-		mappings.add(fhirElementMapping);
+	public void addMapping(FhirElementMapping newMapping) {
+		mappings.add(newMapping);
 	}
 	
 	public List<FhirElementMapping> getMappings() {

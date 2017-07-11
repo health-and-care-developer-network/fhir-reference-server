@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import uk.nhs.fhir.makehtml.SkipRenderGenerationException;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
@@ -142,7 +141,7 @@ public class StructureDefinitionTreeDataProvider {
 			if (choiceSuffix.isPresent()) {
 				
 			}
-			throw new SkipRenderGenerationException("No nodes matched for differential element path " + differentialNode.getPath());
+			throw new IllegalStateException("No nodes matched for differential element path " + differentialNode.getPath());
 		} else {
 			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + differentialNode.getPath() + ", but first wasn't a slicing node");
 		}
