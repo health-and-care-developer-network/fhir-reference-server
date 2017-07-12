@@ -103,8 +103,10 @@ public class FileProcessor {
 		
 		if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
 			return FhirRelease.forString(((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource).getFhirVersion()).getVersion();
+		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.OperationDefinition) {
+			return FhirVersion.DSTU2;
 		} else {
-			throw new IllegalStateException("Need to support STU3 class " + resource.getClass().getCanonicalName());
+			throw new IllegalStateException("Need to support DSTU2 class " + resource.getClass().getCanonicalName());
 		}
 	}
 	

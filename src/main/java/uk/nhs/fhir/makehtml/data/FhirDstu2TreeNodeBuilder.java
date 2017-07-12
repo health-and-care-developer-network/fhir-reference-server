@@ -36,11 +36,11 @@ import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.makehtml.valid.NodeMappingValidator;
-import uk.nhs.fhir.util.FhirDocLinkFactory;
+import uk.nhs.fhir.util.Dstu2FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
 public class FhirDstu2TreeNodeBuilder {
-	private static final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
+	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
 	
 	public FhirTreeNode fromElementDefinition(ElementDefinitionDt elementDefinition) {
 		

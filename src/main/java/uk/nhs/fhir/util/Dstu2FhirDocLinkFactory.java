@@ -14,7 +14,7 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
-public class FhirDocLinkFactory {
+public class Dstu2FhirDocLinkFactory {
 	
 	public static final String PRIMITIVE_TYPE_LINK_PREFIX = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#";
 	

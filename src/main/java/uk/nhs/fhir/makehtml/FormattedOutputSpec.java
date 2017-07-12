@@ -61,7 +61,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		}
 	}
 	
-	public ResourceFormatter getFormatter() {
+	public ResourceFormatter<T> getFormatter() {
 		return formatter;
 	}
 }

@@ -10,10 +10,9 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
+import uk.nhs.fhir.makehtml.data.FhirOperationParameter;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -22,7 +21,6 @@ import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.util.FhirDocLinkFactory;
 
 public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
@@ -30,38 +28,19 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedOperationDefinition operationDefinition) throws ParserConfigurationException {
-		
-		List<Parameter> inputParameters = Lists.newArrayList();
-		List<Parameter> outputParameters = Lists.newArrayList();
-		populateParameters(operationDefinition, inputParameters, outputParameters);
-		
 		Element renderedOperationDefinition =
 			Elements.withAttributeAndChildren("div",
 				new Attribute("id", "fhir-ref-operation-definition-structure"),
 				Lists.newArrayList(
 					buildMetaDataPanel(operationDefinition),
-					buildParameterPanel("Input Parameters", inputParameters, fhirDocLinkFactory),
-					buildParameterPanel("Output Parameters", outputParameters, fhirDocLinkFactory)));
+					buildParameterPanel("Input Parameters", operationDefinition.getInputParameters()),
+					buildParameterPanel("Output Parameters", operationDefinition.getOutputParameters())));
 		
 		HTMLDocSection section = new HTMLDocSection();
 		addStyles(section);
 		section.addBodyElement(renderedOperationDefinition);
 		
 		return section;
-	}
-
-	private void populateParameters(WrappedOperationDefinition source, List<Parameter> inputParameters,
-			List<Parameter> outputParameters) {
-		for (Parameter parameter : source.getParameter()) {
-			switch (parameter.getUseElement().getValueAsEnum()) {
-			case IN:
-				inputParameters.add(parameter);
-				break;
-			case OUT:
-				outputParameters.add(parameter);
-				break;
-			}
-		}
 	}
 
 	private Element buildMetaDataPanel(WrappedOperationDefinition source) {
@@ -75,8 +54,8 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 		return new FhirPanel("Meta", metaDataTable).makePanel();
 	}
 
-	private Element buildParameterPanel(String panelTitle, List<Parameter> parameters, FhirDocLinkFactory fhirDocLinkFactory) {
-		OperationDefinitionParameterTableDataProvider tableData = new OperationDefinitionParameterTableDataProvider(parameters, fhirDocLinkFactory);
+	private Element buildParameterPanel(String panelTitle, List<FhirOperationParameter> parameters) {
+		OperationDefinitionParameterTableDataProvider tableData = new OperationDefinitionParameterTableDataProvider(parameters);
 		List<OperationDefinitionParameterTableData> rows = tableData.getRows();
 		OperationDefinitionParameterRowFormatter rowFormatter = new OperationDefinitionParameterRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();
