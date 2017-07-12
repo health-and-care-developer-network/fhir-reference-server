@@ -135,7 +135,7 @@ public enum FhirIcon {
 
 	private static FhirIcon lookupExtension(Type type)  {
 
-		FhirContext ctx = HAPIUtils.sharedFhirContext();
+		FhirContext ctx = HAPIUtils.dstu2Context();
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {

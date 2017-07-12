@@ -4,16 +4,16 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.Table;
@@ -24,13 +24,12 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 
-public class OperationDefinitionFormatter extends ResourceFormatter {
+public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
 	public OperationDefinitionFormatter() { this.resourceSectionType = ResourceSectionType.TREEVIEW;  }
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		OperationDefinition operationDefinition = (OperationDefinition)source;
+	public HTMLDocSection makeSectionHTML(WrappedOperationDefinition operationDefinition) throws ParserConfigurationException {
 		
 		List<Parameter> inputParameters = Lists.newArrayList();
 		List<Parameter> outputParameters = Lists.newArrayList();
@@ -51,7 +50,7 @@ public class OperationDefinitionFormatter extends ResourceFormatter {
 		return section;
 	}
 
-	private void populateParameters(OperationDefinition source, List<Parameter> inputParameters,
+	private void populateParameters(WrappedOperationDefinition source, List<Parameter> inputParameters,
 			List<Parameter> outputParameters) {
 		for (Parameter parameter : source.getParameter()) {
 			switch (parameter.getUseElement().getValueAsEnum()) {
@@ -65,7 +64,7 @@ public class OperationDefinitionFormatter extends ResourceFormatter {
 		}
 	}
 
-	private Element buildMetaDataPanel(OperationDefinition source) {
+	private Element buildMetaDataPanel(WrappedOperationDefinition source) {
 		OperationDefinitionMetaDataTableDataProvider tableData = new OperationDefinitionMetaDataTableDataProvider(source);
 		List<OperationDefinitionMetaDataRowData> rows = tableData.getRows();
 		OperationDefinitionMetaDataRowFormatter rowFormatter = new OperationDefinitionMetaDataRowFormatter();

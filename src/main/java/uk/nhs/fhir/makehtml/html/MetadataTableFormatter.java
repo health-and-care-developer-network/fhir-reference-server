@@ -1,10 +1,8 @@
 package uk.nhs.fhir.makehtml.html;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -12,15 +10,14 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.util.StringUtil;
 
-public abstract class MetadataTableFormatter extends ResourceFormatter {
+public abstract class MetadataTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
 	protected static final String VERSION_DATE = "Version date";
 	
@@ -74,36 +71,6 @@ public abstract class MetadataTableFormatter extends ResourceFormatter {
 		return Elements.withAttributeAndText("span", 
 			new Attribute("class", cssClass), 
 			label);
-	}
-	
-	protected Optional<String> getVersionId(BaseResource source) {
-		Optional<IBaseMetaType> metaInfo = getMeta(source);
-		if (metaInfo.isPresent()) {
-			return Optional.ofNullable(metaInfo.get().getVersionId());
-		} else {
-			return Optional.empty();
-		}
-	}
-	
-	protected Optional<String> getLastUpdated(BaseResource source) {
-		Optional<IBaseMetaType> metaInfo = getMeta(source);
-		if (metaInfo.isPresent()) {
-			Date lastUpdated = metaInfo.get().getLastUpdated();
-			if (lastUpdated != null) {
-				return Optional.of(StringUtil.dateToString(lastUpdated));
-			}
-		}
-		
-		return Optional.empty();
-	}
-	
-	private Optional<IBaseMetaType> getMeta(BaseResource source) {
-		IBaseMetaType metaInfo = source.getMeta();
-		if (!metaInfo.isEmpty()) {
-			return Optional.of(metaInfo);
-		} else {
-			return Optional.empty();
-		}
 	}
 	
 	protected Element valueSpan(String value, boolean alwaysLargeText) {

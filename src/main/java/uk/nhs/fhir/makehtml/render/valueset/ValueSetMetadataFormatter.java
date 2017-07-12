@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
@@ -14,8 +13,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.api.ExtensionDt;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
@@ -23,11 +23,10 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 
-public class ValueSetMetadataFormatter extends MetadataTableFormatter {
+public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedValueSet> {
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		ValueSet valueSet = (ValueSet)source;
+	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
 		Element metadataPanel = getMetadataTable(valueSet);
@@ -36,7 +35,7 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 		return section;
 	}
 
-	public Element getMetadataTable(ValueSet source) {
+	public Element getMetadataTable(WrappedValueSet source) {
 
 		Optional<String>  url = Optional.ofNullable(source.getUrl());
 		Optional<String>  name = Optional.ofNullable(source.getName());
@@ -83,7 +82,7 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 						Optional.of(StringUtil.dateToString(date));
         if (!displayDate.isPresent())
         {
-            Date lastUpdated = source.getMeta().getLastUpdated();
+            Date lastUpdated = source.getSourceMeta().getLastUpdated();
             if (lastUpdated != null)
             displayDate = Optional.of(StringUtil.dateToString(lastUpdated));
         }

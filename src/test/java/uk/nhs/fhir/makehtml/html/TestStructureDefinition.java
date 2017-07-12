@@ -18,6 +18,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
@@ -33,7 +34,7 @@ public class TestStructureDefinition {
 	@Ignore
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
-		IParser parser = HAPIUtils.sharedFhirContext().newXmlParser();
+		IParser parser = HAPIUtils.dstu2Context().newXmlParser();
 		try (
 				// TODO KGM 9/May/2017 moved to older strucutre definition example.
 			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition3.xml").getFile()));
@@ -48,8 +49,9 @@ public class TestStructureDefinition {
 			StructureDefinition structureDefinition = (StructureDefinition)parser.parseResource(reader);
 			new StructureDefinitionPreparer().prepare(structureDefinition, null);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
-			for (FormattedOutputSpec formatter : ResourceFormatter.formattersForResource(structureDefinition, "this/path/isnt/used")) {
-				HTMLDocSection sectionHTML = formatter.getFormatter().makeSectionHTML(structureDefinition);
+			WrappedResource wrappedStructureDefinition = WrappedResource.fromBaseResource(structureDefinition);
+			for (FormattedOutputSpec formatter : ResourceFormatter.formattersForResource(wrappedStructureDefinition, "this/path/isnt/used")) {
+				HTMLDocSection sectionHTML = formatter.getFormatter().makeSectionHTML(wrappedStructureDefinition);
 				if (sectionHTML != null) {
 					doc.addSection(sectionHTML);
 				}

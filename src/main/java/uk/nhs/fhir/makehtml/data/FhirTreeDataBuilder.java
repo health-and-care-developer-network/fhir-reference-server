@@ -4,43 +4,29 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-
 /**
- * Takes each ElementDefinition from a snapshot and builds up a tree structure from that data, 
- * based primarily on their 'path' attributes.
+ * Builds up a tree structure from a list of FhirTreeNodes, based primarily on their 'path' attributes.
  * @author jon
  */
 public class FhirTreeDataBuilder {
-
-	protected final FhirTreeNodeBuilder nodeBuilder;
 	
 	private List<String> path = Lists.newArrayList();
 	private FhirTreeTableContent rootNode = null;
 	private FhirTreeTableContent currentNode = null;
 	private boolean allowDummyNodes = false;
 	
-	public FhirTreeDataBuilder() {
-		this(new FhirTreeNodeBuilder());
-	}
-	public FhirTreeDataBuilder(FhirTreeNodeBuilder nodeBuilder) {
-		this.nodeBuilder = nodeBuilder;
-	}
-	
 	public void permitDummyNodes() {
 		this.allowDummyNodes = true;
 	}
 	
-	private void addElementDefinition(ElementDefinitionDt elementDefinition) {
-		String newElementPath = elementDefinition.getPath();
-		List<String> pathElements = Lists.newArrayList(newElementPath.split("\\."));
+	public void addFhirTreeNode(FhirTreeNode node) {
+		String nodePath = node.getPath();
+		List<String> pathElements = Lists.newArrayList(nodePath.split("\\."));
 		String elementPathName = pathElements.remove(pathElements.size() - 1);
 		
 		stepOutTo(pathElements);
 		
-		FhirTreeNode newNode = nodeBuilder.fromElementDefinition(elementDefinition);
-		
-		appendNode(newNode);
+		appendNode(node);
 		path.add(elementPathName);
 	}
 	
@@ -54,7 +40,6 @@ public class FhirTreeDataBuilder {
 		}
 	}
 	private void stepOutTo(List<String> targetPath) {
-		//System.out.println("stepping out to " + String.join(".", targetPath));
 		if (pathIsSubpath(path, targetPath)) {
 			int stepOutCount = path.size() - targetPath.size();
 			for (int i=0; i<stepOutCount; i++) {
@@ -90,7 +75,6 @@ public class FhirTreeDataBuilder {
 	}
 	
 	private static boolean pathIsSubpath(List<String> path, List<String> ancestorPath) {
-		//System.out.println("Checking path is subpath: " + String.join(".", path) + ", " + String.join(".", ancestorPath));
 		if (ancestorPath.size() > path.size()) {
 			return false;
 		}
@@ -103,15 +87,7 @@ public class FhirTreeDataBuilder {
 		return true;
 	}
 	
-	private FhirTreeData getTree() {
+	public FhirTreeData getTree() {
 		return new FhirTreeData(rootNode); 
-	}
-	
-	public FhirTreeData build(List<ElementDefinitionDt> elements) {
-		for (ElementDefinitionDt element : elements) {
-			addElementDefinition(element);
-		}
-		
-		return getTree();
 	}
 }

@@ -7,40 +7,32 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class StructureDefinitionTreeDataProvider {
 	
-	private final StructureDefinition source;
+	private final WrappedStructureDefinition source;
 	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
 			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
 			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
-	public StructureDefinitionTreeDataProvider(StructureDefinition source) {
+	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source) {
 		this.source = source;
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-
-		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder();
+		FhirTreeData snapshotTree = source.getSnapshotTree();
 		
-		List<ElementDefinitionDt> snapshotElements = source.getSnapshot().getElement();
+		snapshotTree.resolveLinkedNodes();
+		snapshotTree.cacheSlicingDiscriminators();
 		
-		FhirTreeData tree = fhirTreeBuilder.build(snapshotElements);
-		
-		tree.resolveLinkedNodes();
-		tree.cacheSlicingDiscriminators();
-		
-		return tree;
+		return snapshotTree;
 	}
 	
 	public FhirTreeData getDifferentialTreeData() {
@@ -48,11 +40,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder(new FhirTreeNodeBuilder());
-		fhirTreeBuilder.permitDummyNodes();
-		
-		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
-		FhirTreeData differentialTree = fhirTreeBuilder.build(differentialElements);
+		FhirTreeData differentialTree = source.getDifferentialTree();
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		

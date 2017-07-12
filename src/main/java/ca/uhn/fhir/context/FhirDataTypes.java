@@ -36,7 +36,7 @@ public class FhirDataTypes {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
 		// implementing classes appropriately.
-		FhirContext fhirContext = HAPIUtils.sharedFhirContext();
+		FhirContext fhirContext = HAPIUtils.dstu2Context();
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {

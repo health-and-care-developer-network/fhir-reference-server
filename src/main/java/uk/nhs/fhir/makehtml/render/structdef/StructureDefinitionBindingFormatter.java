@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -16,13 +15,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
@@ -34,7 +33,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
-public class StructureDefinitionBindingFormatter extends ResourceFormatter {
+public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
 	public StructureDefinitionBindingFormatter() { this.resourceSectionType = ResourceSectionType.BINDING; }
 
@@ -46,8 +45,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     Boolean foundBinding = false;
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		StructureDefinition structureDefinition = (StructureDefinition)source;
+	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
 		
 		HTMLDocSection section = new HTMLDocSection();
 

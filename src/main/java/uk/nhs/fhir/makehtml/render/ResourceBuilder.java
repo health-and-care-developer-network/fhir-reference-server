@@ -54,7 +54,7 @@ public class ResourceBuilder {
 	}
 	
 	protected String addTextSection(String resourceXML, String textSection, String newBaseURL) throws Exception {
-		FhirContext ctx = HAPIUtils.sharedFhirContext();
+		FhirContext ctx = HAPIUtils.dstu2Context();
 		BaseResource resource = parseResource(ctx, resourceXML);
 		addHumanReadableText(resource, textSection);
         prepareResource(resource, newBaseURL);

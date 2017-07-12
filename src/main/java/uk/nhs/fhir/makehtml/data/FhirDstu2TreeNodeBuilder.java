@@ -39,8 +39,8 @@ import uk.nhs.fhir.makehtml.valid.NodeMappingValidator;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
-public class FhirTreeNodeBuilder {
-	private final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
+public class FhirDstu2TreeNodeBuilder {
+	private static final FhirDocLinkFactory typeLinkFactory = new FhirDocLinkFactory();
 	
 	public FhirTreeNode fromElementDefinition(ElementDefinitionDt elementDefinition) {
 		
@@ -269,7 +269,7 @@ public class FhirTreeNodeBuilder {
 			try (FileInputStream fis = new FileInputStream(extensionFile);
 				Reader reader = new InputStreamReader(fis)) {
 				
-				IParser parser = HAPIUtils.newXmlParser();
+				IParser parser = HAPIUtils.dstu2XmlParser();
 				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
 
 				if (extension.getSnapshot().getElement().stream().anyMatch(element -> element.getPath().contains("Extension.extension.url"))) {

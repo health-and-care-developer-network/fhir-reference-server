@@ -5,12 +5,12 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
 import uk.nhs.fhir.makehtml.html.TableTitle;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.StringUtil;
@@ -19,14 +19,14 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class OperationDefinitionMetaDataTableDataProvider {
 	
-	private final OperationDefinition source;
+	private final WrappedOperationDefinition source;
 	private final FhirDocLinkFactory fhirDocLinkFactory;
 
-	public OperationDefinitionMetaDataTableDataProvider(OperationDefinition source) {
+	public OperationDefinitionMetaDataTableDataProvider(WrappedOperationDefinition source) {
 		this(source, new FhirDocLinkFactory());
 	}
 	
-	public OperationDefinitionMetaDataTableDataProvider(OperationDefinition source, FhirDocLinkFactory linkDataFactory) {
+	public OperationDefinitionMetaDataTableDataProvider(WrappedOperationDefinition source, FhirDocLinkFactory linkDataFactory) {
 		this.source = source;
 		this.fhirDocLinkFactory = linkDataFactory;
 	}

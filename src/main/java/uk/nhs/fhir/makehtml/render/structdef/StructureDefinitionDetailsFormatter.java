@@ -7,14 +7,12 @@ import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
@@ -22,6 +20,7 @@ import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
@@ -32,11 +31,10 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
-public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
+public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		StructureDefinition structureDefinition = (StructureDefinition)source;
+	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
 		Element metadataPanel = getDetailsPanel(structureDefinition);
@@ -51,7 +49,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter {
 		return section;
 	}
 
-	private Element getDetailsPanel(StructureDefinition structureDefinition) {
+	private Element getDetailsPanel(WrappedStructureDefinition structureDefinition) {
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);

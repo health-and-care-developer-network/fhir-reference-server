@@ -1,17 +1,11 @@
 package uk.nhs.fhir.makehtml.render;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.render.opdef.OperationDefinitionFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
-import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.FileUtils;
 
@@ -23,8 +17,8 @@ public class ResourceTextSectionInserter {
 		this.resourceBuilder = resourceBuilder;
 	}
 
-	public void augmentResource(IBaseResource source, String inFile, String outFilePath, String newBaseURL) throws Exception {
-		ResourceFormatter defaultViewFormatter = getDefaultViewFormatter(source); 
+	public <T extends WrappedResource<T>> void augmentResource(T source, String inFile, String outFilePath, String newBaseURL) throws Exception {
+		ResourceFormatter<T> defaultViewFormatter = source.getDefaultViewFormatter();
 		
 		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML(source);
 		SectionedHTMLDoc defaultView = new SectionedHTMLDoc();
@@ -39,17 +33,4 @@ public class ResourceTextSectionInserter {
         String augmentedResource = resourceBuilder.addTextSection(FileLoader.loadFile(inFile), renderedTextSection, newBaseURL);
         FileUtils.writeFile(outFilePath, augmentedResource.getBytes("UTF-8"));
 	}
-
-	private ResourceFormatter getDefaultViewFormatter(IBaseResource source) {
-		if (source instanceof StructureDefinition) {
-			return new StructureDefinitionSnapshotFormatter();
-		} else if (source instanceof OperationDefinition) {
-			return new OperationDefinitionFormatter();
-		} else if (source instanceof ValueSet) {
-			return new ValueSetFormatter();
-		} else {
-			throw new IllegalArgumentException(source.getClass().getSimpleName());
-		}
-	}
-
 }

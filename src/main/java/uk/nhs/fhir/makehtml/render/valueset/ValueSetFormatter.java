@@ -4,16 +4,12 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.dstu3.hapi.validation.FhirInstanceValidator;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Element;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.SingleValidationMessage;
-import ca.uhn.fhir.validation.ValidationResult;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
@@ -24,35 +20,15 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapTableFormatter;
-import uk.nhs.fhir.util.HAPIUtils;
 
-public class ValueSetFormatter extends ResourceFormatter {
+public class ValueSetFormatter extends ResourceFormatter<WrappedValueSet> {
 
     private static final Logger LOG = Logger.getLogger(ValueSetFormatter.class.getName());
 
 	TablePNGGenerator backgrounds = new TablePNGGenerator();
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		ValueSet valueSet = (ValueSet)source;
-		
-        FhirValidator validator = HAPIUtils.sharedFhirContext().newValidator();
-        FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
-        validator.registerValidatorModule(instanceValidator);
-
-        // Validate - Check resource is valid
-        ValidationResult result = validator.validateWithResult(valueSet);
-
-        // Do we have any errors or fatal errors?
-        if (result.isSuccessful()) {
-            LOG.info("FHIR Validator: Result: " + result.isSuccessful()); // true
-        } else {
-            LOG.warning("FHIR Validator: Result: " + result.isSuccessful()); // false
-        }
-        // Show the issues
-        for (SingleValidationMessage next : result.getMessages()) {
-            LOG.warning(" FHIR Validator: Next issue: " + next.getSeverity() + " - " + next.getLocationString() + " - " + next.getMessage());
-        }
+	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
 
 		Element metadataPanel = new ValueSetMetadataFormatter().getMetadataTable(valueSet);
 		HTMLDocSection section = new HTMLDocSection();

@@ -14,16 +14,22 @@ import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.parser.IParser;
 
 public class HAPIUtils {
-	private static final FhirContext context = FhirContext.forDstu2();
+	private static final FhirContext DSTU2_CONTEXT = FhirContext.forDstu2();
+	private static final FhirContext DSTU3_CONTEXT = FhirContext.forDstu3();
 	
+	// never instantiated
 	private HAPIUtils(){}
 	
-	public static FhirContext sharedFhirContext() {
-		return context;
+	public static FhirContext dstu2Context() {
+		return DSTU2_CONTEXT;
 	}
 	
-	public static IParser newXmlParser() {
-		return context.newXmlParser();
+	public static IParser dstu2XmlParser() {
+		return DSTU2_CONTEXT.newXmlParser();
+	}
+
+	public static IParser dstu3XmlParser() {
+		return DSTU3_CONTEXT.newXmlParser();
 	}
 	
 	public static String resolveDatatypeValue(IDatatype datatype) {
@@ -48,5 +54,4 @@ public class HAPIUtils {
 		wrappedStrings.forEach((StringDt wrapped) -> unwrappedStrings.add(wrapped.getValue()));
 		return String.join(delimiter, unwrappedStrings);
 	}
-
 }

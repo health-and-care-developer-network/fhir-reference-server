@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Text;
@@ -21,6 +20,8 @@ import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.FullFhirURL;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
@@ -28,15 +29,14 @@ import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
-public class ValueSetTableFormatter extends MetadataTableFormatter {
+public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueSet> {
 
 	private static final String BLANK = "";
 
     private ConceptMap conceptMap = null;
 	
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		ValueSet valueSet = (ValueSet)source;
+	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
 		Element metadataPanel = getConceptDataTable(valueSet);
@@ -45,7 +45,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 		return section;
 	}
 
-	public Element getConceptDataTable(ValueSet source) {
+	public Element getConceptDataTable(WrappedValueSet source) {
 
 
 		int columns = 4;
