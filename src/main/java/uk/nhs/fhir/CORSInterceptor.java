@@ -68,5 +68,6 @@ public class CORSInterceptor extends InterceptorAdapter {
 	
 	protected void addCORSResponseHeaders(HttpServletResponse resp) {
 		resp.addHeader("Access-Control-Allow-Origin", "*");
+		resp.addHeader("Access-Control-Expose-Headers", "Content-Location,Location");
 	}
 }
