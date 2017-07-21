@@ -20,13 +20,8 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
-import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
-import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
-import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
-import uk.nhs.fhir.makehtml.render.ResourceBuilder;
 
 /**
  * @author tim.coates@hscic.gov.uk
@@ -74,7 +69,7 @@ public class NewMain {
             if (!resourcesPath.endsWith(File.separator)) {
             	resourcesPath += File.separator;
             }
-            FhirIcon.setSuppliedResourcesFolderPath(resourcesPath);
+            FhirDstu2Icon.setSuppliedResourcesFolderPath(resourcesPath);
             
             if (!inputDir.endsWith(File.separator)) {
             	inputDir += File.separator;
@@ -85,17 +80,7 @@ public class NewMain {
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
             
-            ResourceBuilder resourceBuilder =
-            	new ResourceBuilder(
-            		new StructureDefinitionPreparer(),
-            		new ValueSetPreparer(),
-            		new OperationDefinitionPreparer(),
-            		new ImplementationGuidePreparer());	
-            
-            FileProcessor fileProcessor =
-    	    	new FileProcessor(resourceBuilder);
-            
-            instance.process(fileProcessor);
+            instance.process();
         }
     }
 
@@ -104,7 +89,7 @@ public class NewMain {
      *
      * @param directoryPath
      */
-    private void process(FileProcessor fileProcessor) {
+    private void process() {
     	
         File[] allProfiles = inputDirectory.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -112,6 +97,7 @@ public class NewMain {
             }
         });
 
+        FileProcessor fileProcessor = new FileProcessor();
         try {
 	        for (File thisFile : allProfiles) {
 	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);

@@ -17,6 +17,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
@@ -29,14 +30,14 @@ import uk.nhs.fhir.util.HAPIUtils;
  * @author jon
  *
  */
-public class FhirDataTypes {
+public class FhirDstu2DataTypes {
 	
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
 	static {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
 		// implementing classes appropriately.
-		FhirContext fhirContext = HAPIUtils.dstu2Context();
+		FhirContext fhirContext = HAPIUtils.fhirContext(FhirVersion.DSTU2);
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {

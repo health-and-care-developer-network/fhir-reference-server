@@ -1,21 +1,46 @@
 package uk.nhs.fhir.makehtml.data.wrap;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.jdom2.Document;
+import org.jdom2.Element;
 
+import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.prep.ResourcePreparerv2;
+import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
+import uk.nhs.fhir.util.FileUtils;
+import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {
 
+	public abstract IBaseResource getWrappedResource();
 	public abstract IBaseMetaType getSourceMeta();
 	public abstract FhirVersion getImplicitFhirVersion();
+	public abstract String getOutputFolderName();
+	public abstract void setUrl(String url);
+	
+	// Name as used in the resource's URL
+	public abstract String getName();
+	
+	// Update any fields which may need entities escaping
+	public abstract void fixHtmlEntities();
+	
+	public abstract void addHumanReadableText(String textSection);
 	
 	/**
 	 * Returns the formatter which will be used to generate the <Text/> section in the profile when supplied as a raw profile
@@ -83,5 +108,49 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		else {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}
+	}
+	public void saveAugmentedResource(File inFile, WrappedResource<?> parsedResource, String outPath, String newBaseURL) throws Exception {
+		// Persist a copy of the xml file with a rendered version embedded in the text section
+	    String outputDirectoryName = getOutputFolderName();
+	    String outDirPath = outPath + outputDirectoryName; 
+		new File(outDirPath).mkdirs();
+		
+		String outFilePath = outDirPath + File.separatorChar + inFile.getName();
+		System.out.println("Generating " + outFilePath);
+	    
+	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL);
+	}
+	
+	public void saveFormattedOutputs(File inFile, String outPath, String newBaseURL) throws ParserConfigurationException, IOException {
+		List<FormattedOutputSpec<T>> formatters = getFormatSpecs(outPath);
+		
+		String inFilePath = inFile.getPath();
+		
+	    for (FormattedOutputSpec<T> formatter : formatters) {
+			System.out.println("Generating " + formatter.getOutputPath(inFilePath));
+	    	formatter.formatAndSave(inFilePath);
+	    }
+	}
+	
+	public void augmentAndWriteResource(WrappedResource<?> parsedResource, String outFilePath, String newBaseURL) throws Exception {
+		ResourceFormatter<T> defaultViewFormatter = getDefaultViewFormatter();
+		
+		@SuppressWarnings("unchecked")
+		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML((T)this);
+		SectionedHTMLDoc defaultView = new SectionedHTMLDoc();
+		defaultView.addSection(defaultViewSection);
+		
+		Element textSection = Elements.withChildren("div", 
+			defaultView.createStyleSection(),
+			Elements.withChildren("div", defaultView.getBodyElements()));
+		    
+	    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
+	    
+        String augmentedResource = new ResourcePreparerv2(parsedResource).prepareAndSerialise(renderedTextSection, newBaseURL);
+        FileUtils.writeFile(outFilePath, augmentedResource.getBytes("UTF-8"));
+	}
+	
+	public IParser newXmlParser() {
+		return HAPIUtils.xmlParser(getImplicitFhirVersion());
 	}
 }

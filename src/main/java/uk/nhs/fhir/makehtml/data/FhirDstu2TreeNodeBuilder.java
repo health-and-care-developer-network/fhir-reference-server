@@ -17,7 +17,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirDataTypes;
+import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -53,7 +53,7 @@ public class FhirDstu2TreeNodeBuilder {
 			typeLinks.addAll(getTypeLinks(elementDefinition.getType()));
 		}
 		
-		Set<FhirDataType> dataTypes = FhirDataTypes.getTypes(elementDefinition.getType());
+		Set<FhirDataType> dataTypes = FhirDstu2DataTypes.getTypes(elementDefinition.getType());
 		FhirDataType dataType;
 		if (dataTypes.isEmpty()) {
 			dataType = FhirDataType.DELEGATED_TYPE; 
@@ -71,7 +71,7 @@ public class FhirDstu2TreeNodeBuilder {
 		Integer min = elementDefinition.getMin();
 		String max = elementDefinition.getMax();
 		
-		FhirIcon icon = FhirIcon.forElementDefinition(elementDefinition);
+		FhirDstu2Icon icon = FhirDstu2Icon.forElementDefinition(elementDefinition);
 		
 		String shortDescription = elementDefinition.getShort();
 		if (shortDescription == null) {
@@ -255,7 +255,7 @@ public class FhirDstu2TreeNodeBuilder {
 			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
 			// case insensitive search
 			File extensionFile = null;
-			for (File f : new File(FhirIcon.suppliedResourcesFolderPath).listFiles()) {
+			for (File f : new File(FhirDstu2Icon.suppliedResourcesFolderPath).listFiles()) {
 				if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
 					extensionFile = f;
 					break;
@@ -286,7 +286,7 @@ public class FhirDstu2TreeNodeBuilder {
 	private List<LinkData> getTypeLinks(List<Type> snapshotElementTypes) {
 		List<LinkData> typeLinks = Lists.newArrayList();
 		
-		List<Type> knownTypes = FhirDataTypes.knownTypes(snapshotElementTypes);
+		List<Type> knownTypes = FhirDstu2DataTypes.knownTypes(snapshotElementTypes);
 		if (!knownTypes.isEmpty()) {
 			for (Type type : knownTypes) {
 				String code = type.getCode();

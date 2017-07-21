@@ -13,11 +13,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirDataTypes;
+import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
-	private FhirIcon icon;
+	private FhirDstu2Icon icon;
 	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
@@ -49,7 +49,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
 
 	public FhirTreeNode(
-			FhirIcon icon,
+			FhirDstu2Icon icon,
 			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
@@ -83,9 +83,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public FhirIcon getFhirIcon() {
+	public FhirDstu2Icon getFhirIcon() {
 		// If using default and we have a backup, use the backup icon
-		if (icon.equals(FhirIcon.ELEMENT)
+		if (icon.equals(FhirDstu2Icon.ELEMENT)
 		  && hasBackupNode()) {
 			return backupNode.getFhirIcon();
 		}
@@ -94,7 +94,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public void setFhirIcon(FhirIcon icon) {
+	public void setFhirIcon(FhirDstu2Icon icon) {
 		this.icon = icon;
 	}
 
@@ -199,7 +199,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		
 		if (getPathName().endsWith("[x]")
 		  && hasAllTypes()) {
-			return Lists.newArrayList(FhirDataTypes.openTypeLink());
+			return Lists.newArrayList(FhirDstu2DataTypes.openTypeLink());
 		} else {
 			return typeLinks;
 		}

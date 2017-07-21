@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -21,7 +21,7 @@ public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			FhirIcon.ELEMENT,
+			FhirDstu2Icon.ELEMENT,
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,

@@ -17,7 +17,7 @@ import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.makehtml.UrlValidator;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.FullFhirURL;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
@@ -424,7 +424,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueS
                             new Text(value),
                             Elements.withAttributes("img",
                                 Lists.newArrayList(
-                                    new Attribute("src", FhirIcon.REFERENCE.getUrl()),
+                                    new Attribute("src", FhirDstu2Icon.REFERENCE.getUrl()),
                                     new Attribute("class", FhirCSS.TREE_RESOURCE_ICON)))))); //value +
             } else if (internal) {
                 return Elements.withAttributeAndChildren("span",

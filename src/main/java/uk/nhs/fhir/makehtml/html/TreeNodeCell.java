@@ -11,20 +11,20 @@ import org.jdom2.Text;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 
 public class TreeNodeCell extends TableCell {
 
 	private final List<FhirTreeIcon> treeIcons;
-	private final FhirIcon fhirIcon;
+	private final FhirDstu2Icon fhirIcon;
 	private final String name;
 	private final String backgroundClass;
 	private final boolean strikethrough;
 	private final String nodeKey;
 	private final Optional<String> mouseOverText;
 	
-	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey, Optional<String> mouseOverText) {
+	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirDstu2Icon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey, Optional<String> mouseOverText) {
 		Preconditions.checkNotNull(name);
 		Preconditions.checkNotNull(fhirIcon);
 		Preconditions.checkNotNull(treeIcons);

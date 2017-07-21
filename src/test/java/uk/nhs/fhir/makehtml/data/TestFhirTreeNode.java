@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
 		return new FhirTreeNode(
-			FhirIcon.ELEMENT,
+			FhirDstu2Icon.ELEMENT,
 			Optional.of(id), 
 			new ResourceFlags(), 
 			0, 

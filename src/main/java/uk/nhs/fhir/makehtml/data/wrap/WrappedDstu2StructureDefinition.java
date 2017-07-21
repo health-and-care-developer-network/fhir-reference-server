@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -14,10 +15,11 @@ import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirContact;
@@ -33,6 +35,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	
 	public WrappedDstu2StructureDefinition(StructureDefinition definition) {
 		this.definition = definition;
+	}
+	
+	@Override
+	public IBaseResource getWrappedResource() {
+		return definition;
 	}
 
 	@Override
@@ -157,8 +164,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	@Override
 	public void checkUnimplementedFeatures() {
 		//List<List<Content>> identifierCells = Lists.newArrayList();
-		for (IdentifierDt identifier : definition.getIdentifier()) {
-			/*List<Content> identifierCell = Lists.newArrayList();
+		if (!definition.getIdentifier().isEmpty()) {
+			throw new NotImplementedException("Identifier");
+		}
+		/*for (IdentifierDt identifier : definition.getIdentifier()) {
+			List<Content> identifierCell = Lists.newArrayList();
 			identifierCells.add(identifierCell);
 			
 			Optional<String> use = Optional.ofNullable(identifier.getUse());
@@ -166,17 +176,16 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 			Optional<String> system = Optional.ofNullable(identifier.getSystem());
 			Optional<String> value = Optional.ofNullable(identifier.getValue());
 			Optional<PeriodDt> period = Optional.ofNullable(identifier.getPeriod());
-			ResourceReferenceDt assigner = identifier.getAssigner();*/
-			
-			throw new NotImplementedException("Identifier");
-		}
+			ResourceReferenceDt assigner = identifier.getAssigner();
+		}*/
 		
 		//List<String> indexingCodes = Lists.newArrayList();
-		for (CodingDt code : definition.getCode()) {
-			//indexingCodes.add(code.getCode());
-			
+		if (!definition.getCode().isEmpty()) {
 			throw new NotImplementedException("Code");
 		}
+		/*for (CodingDt code : definition.getCode()) {
+			//indexingCodes.add(code.getCode());
+		}*/
 		
 		if (!definition.getRequirements().isEmpty()) {
 			throw new NotImplementedException("NHS Digital StructureDefinitions shouldn't contain requirements");
@@ -236,5 +245,23 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 		}
 
 		return fhirTreeDataBuilder.getTree();
+	}
+
+	@Override
+	protected void setCopyright(String copyRight) {
+		definition.setCopyright(copyRight);
+	}
+
+	@Override
+	public void setUrl(String url) {
+		definition.setUrl(url);
+	}
+
+	@Override
+	public void addHumanReadableText(String textSection) {
+		NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv(textSection);
+        definition.setText(textElement);
 	}
 }

@@ -14,7 +14,7 @@ import java.util.Optional;
 import com.google.common.base.Strings;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirDataTypes;
+import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.ICompositeDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -24,26 +24,27 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.HAPIUtils;
 
-public enum FhirIcon {
-	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
-	DATATYPE("icon_datatype", "gif", FhirIcon.datatypeBase64),
-	ELEMENT("icon_element", "gif", FhirIcon.elementBase64),
-	EXTENSION("icon_extension", "png", FhirIcon.extensionBase64),
-	EXTENSION_COMPLEX("icon_extension_complex", "png", FhirIcon.extensionComplexBase64),
-	EXTENSION_SIMPLE("icon_extension_simple", "png", FhirIcon.extensionSimpleBase64),
-	EXTERNAL("icon_external", "png", FhirIcon.externalBase64),
-	PRIMITIVE("icon_primitive", "png", FhirIcon.primitiveBase64),
-	PROFILE("icon_profile", "png", FhirIcon.profileBase64),
-	REFERENCE("icon_reference", "png", FhirIcon.referenceBase64),
-	RESOURCE("icon_resource", "png", FhirIcon.resourceBase64),
-	REUSE("icon_reuse", "png", FhirIcon.reuseBase64),
-	SLICE("icon_slice", "png", FhirIcon.sliceBase64),
-	TARGET("target", "png", FhirIcon.targetBase64),
+public enum FhirDstu2Icon {
+	CHOICE("icon_choice", "gif", FhirDstu2Icon.choiceBase64),
+	DATATYPE("icon_datatype", "gif", FhirDstu2Icon.datatypeBase64),
+	ELEMENT("icon_element", "gif", FhirDstu2Icon.elementBase64),
+	EXTENSION("icon_extension", "png", FhirDstu2Icon.extensionBase64),
+	EXTENSION_COMPLEX("icon_extension_complex", "png", FhirDstu2Icon.extensionComplexBase64),
+	EXTENSION_SIMPLE("icon_extension_simple", "png", FhirDstu2Icon.extensionSimpleBase64),
+	EXTERNAL("icon_external", "png", FhirDstu2Icon.externalBase64),
+	PRIMITIVE("icon_primitive", "png", FhirDstu2Icon.primitiveBase64),
+	PROFILE("icon_profile", "png", FhirDstu2Icon.profileBase64),
+	REFERENCE("icon_reference", "png", FhirDstu2Icon.referenceBase64),
+	RESOURCE("icon_resource", "png", FhirDstu2Icon.resourceBase64),
+	REUSE("icon_reuse", "png", FhirDstu2Icon.reuseBase64),
+	SLICE("icon_slice", "png", FhirDstu2Icon.sliceBase64),
+	TARGET("target", "png", FhirDstu2Icon.targetBase64),
 	// Note this one won't work until we host our icons ourselves, since the NHS Digital site doesn't have this icon
-	MODIFIER_EXTENSION_SIMPLE("icon_modifier_extension_simple", "png", FhirIcon.modifierExtensionSimpleBase64);
+	MODIFIER_EXTENSION_SIMPLE("icon_modifier_extension_simple", "png", FhirDstu2Icon.modifierExtensionSimpleBase64);
 	
 	private final String name;
 	private final String extension;
@@ -52,10 +53,10 @@ public enum FhirIcon {
 	// Set on startup. Path to folder containing extension files.
 	static String suppliedResourcesFolderPath = null;
 	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
-		FhirIcon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
+		FhirDstu2Icon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
 	}
 	
-	FhirIcon(String name, String extension, String base64) {
+	FhirDstu2Icon(String name, String extension, String base64) {
 		this.name = name;
 		this.extension = extension;
 		this.base64 = base64;
@@ -80,11 +81,13 @@ public enum FhirIcon {
 	/*
 	 * This whole process should be happening based on tree nodes, not (FHIR-Version dependent) definition time
 	 * In that case, we have already done the legwork to work out whether the node is an extension (and whether it is simple/complex)
+	 * 
+	 * Now that we need to support STU3, even more reason to push this to later in the pipeline
 	 */
-	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
+	public static FhirDstu2Icon forElementDefinition(ElementDefinitionDt definition) {
 		
 		if (definition.getPath().endsWith("[x]")) {
-			return FhirIcon.CHOICE;
+			return FhirDstu2Icon.CHOICE;
 		}
 		
 		for (Type type : definition.getType()) {
@@ -94,21 +97,21 @@ public enum FhirIcon {
 				if (typeName.equals("Extension")) {
                     return lookupExtension(type);
                 } else {
-					Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
+					Optional<Class<?>> maybeImplementingType = FhirDstu2DataTypes.getImplementingType(typeName);
 					
 					if (maybeImplementingType.isPresent()) {
 						Class<?> implementingType = maybeImplementingType.get();
 						
 						if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-							return FhirIcon.REFERENCE;
+							return FhirDstu2Icon.REFERENCE;
 						}
 						
 						if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-							return FhirIcon.DATATYPE;
+							return FhirDstu2Icon.DATATYPE;
 						}
 						
 						if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-							return FhirIcon.PRIMITIVE;
+							return FhirDstu2Icon.PRIMITIVE;
 						}
 					}
 				}
@@ -116,11 +119,11 @@ public enum FhirIcon {
 		}
 		
 		if (!definition.getSlicing().isEmpty()) {
-			return FhirIcon.SLICE;
+			return FhirDstu2Icon.SLICE;
 		}
 		
 		if (!Strings.isNullOrEmpty(definition.getNameReference())) {
-			return FhirIcon.REUSE;
+			return FhirDstu2Icon.REUSE;
 		}
 		
 		String path = definition.getPath();
@@ -130,17 +133,17 @@ public enum FhirIcon {
 			System.out.println("Null or empty path");
 		}
 		
-		return FhirIcon.ELEMENT;
+		return FhirDstu2Icon.ELEMENT;
 	}
 
-	private static FhirIcon lookupExtension(Type type)  {
+	private static FhirDstu2Icon lookupExtension(Type type)  {
 
-		FhirContext ctx = HAPIUtils.dstu2Context();
+		FhirContext ctx = HAPIUtils.fhirContext(FhirVersion.DSTU2);
 
 		List<UriDt> profiles = type.getProfile();
 		if (profiles.isEmpty()) {
 		    // Extension isn't profiled. So using base type and is simple
-			return FhirIcon.EXTENSION_SIMPLE;
+			return FhirDstu2Icon.EXTENSION_SIMPLE;
 		}
 
 		boolean hasPrimitiveExtension = true;
@@ -193,9 +196,9 @@ public enum FhirIcon {
 		}
 
 		if (hasPrimitiveExtension) {
-			return FhirIcon.EXTENSION_SIMPLE;
+			return FhirDstu2Icon.EXTENSION_SIMPLE;
 		} else {
-			return FhirIcon.EXTENSION_COMPLEX;
+			return FhirDstu2Icon.EXTENSION_COMPLEX;
 		}
 	}
 

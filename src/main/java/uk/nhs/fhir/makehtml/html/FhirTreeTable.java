@@ -12,7 +12,7 @@ import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
@@ -61,7 +61,7 @@ public class FhirTreeTable {
 		
 		// Dummy nodes don't store icon info. If it is a dummy node, it will inherit the correct icon anyway.
 		if (root instanceof FhirTreeData) {
-			root.setFhirIcon(FhirIcon.RESOURCE);
+			root.setFhirIcon(FhirDstu2Icon.RESOURCE);
 		}
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
@@ -105,10 +105,10 @@ public class FhirTreeTable {
 			if (childNode instanceof FhirTreeNode
 			  && childNode.hasChildren()) {
 				FhirTreeNode fhirTreeNode = (FhirTreeNode)childNode;
-				FhirIcon currentIcon = fhirTreeNode.getFhirIcon();
+				FhirDstu2Icon currentIcon = fhirTreeNode.getFhirIcon();
 				// update default icon to folder icon
-				if (currentIcon.equals(FhirIcon.DATATYPE)) {
-					fhirTreeNode.setFhirIcon(FhirIcon.ELEMENT);
+				if (currentIcon.equals(FhirDstu2Icon.DATATYPE)) {
+					fhirTreeNode.setFhirIcon(FhirDstu2Icon.ELEMENT);
 				}
 			}
 

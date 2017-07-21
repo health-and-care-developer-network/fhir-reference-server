@@ -23,6 +23,10 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
 		specs.add(new FormattedOutputSpec<WrappedOperationDefinition>(this, new OperationDefinitionFormatter(), outputDirectory, "render.html"));
 		return specs;
 	}
+	
+	public String getOutputFolderName() {
+		return "OperationDefinition";
+	}
 
 	public abstract String getName();
 	public abstract LinkData getNameTypeLink();

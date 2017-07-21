@@ -12,6 +12,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.makehtml.FhirVersion;
 
 public class HAPIUtils {
 	private static final FhirContext DSTU2_CONTEXT = FhirContext.forDstu2();
@@ -20,8 +21,19 @@ public class HAPIUtils {
 	// never instantiated
 	private HAPIUtils(){}
 	
-	public static FhirContext dstu2Context() {
-		return DSTU2_CONTEXT;
+	public static FhirContext fhirContext(FhirVersion fhirVersion) {
+		switch (fhirVersion) {
+		case DSTU2:
+			return DSTU2_CONTEXT;
+		case STU3:
+			return DSTU3_CONTEXT;
+		default:
+			throw new IllegalStateException("No context/parser available for " + fhirVersion.toString());
+		}
+	}
+
+	public static IParser xmlParser(FhirVersion fhirVersion) {
+		return fhirContext(fhirVersion).newXmlParser();
 	}
 	
 	public static IParser dstu2XmlParser() {

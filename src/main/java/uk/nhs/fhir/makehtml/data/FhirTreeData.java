@@ -110,7 +110,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	private void addLinkIcons(FhirTreeTableContent node) {
-		addIconIfRequired(content -> content.getLinkedNodeName().isPresent(), node, FhirIcon.REUSE);
+		addIconIfRequired(content -> content.getLinkedNodeName().isPresent(), node, FhirDstu2Icon.REUSE);
 		
 		for (FhirTreeTableContent child : node.getChildren()) {
 			addLinkIcons(child);
@@ -118,14 +118,14 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	private void addSlicingIcons(FhirTreeTableContent node) {
-		addIconIfRequired(content -> content.hasSlicingInfo(), node, FhirIcon.SLICE);
+		addIconIfRequired(content -> content.hasSlicingInfo(), node, FhirDstu2Icon.SLICE);
 		
 		for (FhirTreeTableContent child : node.getChildren()) {
 			addSlicingIcons(child);
 		}
 	}
 	
-	private void addIconIfRequired(Predicate<? super FhirTreeTableContent> predicate, FhirTreeTableContent node, FhirIcon icon) {
+	private void addIconIfRequired(Predicate<? super FhirTreeTableContent> predicate, FhirTreeTableContent node, FhirDstu2Icon icon) {
 		if ((node instanceof FhirTreeNode) 
 		  && predicate.test(node)) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;

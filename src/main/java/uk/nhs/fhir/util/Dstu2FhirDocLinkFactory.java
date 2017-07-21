@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirDataTypes;
+import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
@@ -57,7 +57,7 @@ public class Dstu2FhirDocLinkFactory {
 	}
 
 	private String urlForDataTypeName(String dataTypeName) {
-		switch (FhirDataTypes.forType(dataTypeName)) {
+		switch (FhirDstu2DataTypes.forType(dataTypeName)) {
 			case EXTENSION:
 				return FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension";
 			case RESOURCE:

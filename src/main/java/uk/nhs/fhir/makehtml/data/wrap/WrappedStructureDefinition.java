@@ -47,6 +47,8 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract FhirTreeData getSnapshotTree();
 	public abstract FhirTreeData getDifferentialTree();
 	
+	protected abstract void setCopyright(String updatedCopyRight);
+	
 	@Override
 	public ResourceFormatter<WrappedStructureDefinition> getDefaultViewFormatter() {
 		return new StructureDefinitionSnapshotFormatter();
@@ -67,5 +69,18 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		}
 		
 		return specs;
+	}
+	
+	public String getOutputFolderName() {
+		return "StructureDefinition";
+	}
+	
+	public void fixHtmlEntities() {
+		Optional<String> copyRight = getCopyright();
+	    if(copyRight.isPresent()) {
+	        String updatedCopyRight = copyRight.get().replace("©", "&#169;");
+	        updatedCopyRight = updatedCopyRight.replace("\\u00a9", "&#169;");
+	        setCopyright(updatedCopyRight);
+	    }
 	}
 }

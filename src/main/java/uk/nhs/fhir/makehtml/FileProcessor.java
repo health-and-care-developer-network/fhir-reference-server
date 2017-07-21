@@ -3,36 +3,24 @@ package uk.nhs.fhir.makehtml;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.data.FhirRelease;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.render.ResourceBuilder;
-import uk.nhs.fhir.makehtml.render.ResourceTextSectionInserter;
 import uk.nhs.fhir.util.HAPIUtils;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
-
-    private final ResourceBuilder resourceBuilder;
     
-    public FileProcessor(ResourceBuilder resourceBuilder) {
-    	Preconditions.checkNotNull(resourceBuilder);
-    	
-    	this.resourceBuilder = resourceBuilder;
-    }
-    
-	public <T extends WrappedResource<T>> void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
+	public void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
 		if (thisFile.isFile()) {
 			
 		    String inFilePath = thisFile.getPath();
@@ -40,31 +28,23 @@ public class FileProcessor {
 
 		    IBaseResource resource = parseFile(thisFile);
 		    
-		    @SuppressWarnings("unchecked")
-			T wrappedResource = (T) WrappedResource.fromBaseResource(resource);
+			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(resource);
 
-		    // Persist a copy of the xml file with a rendered version embedded in the text section
-		    String outputDirectoryName = resource.getClass().getSimpleName();
-		    String outDirPath = outPath + outputDirectoryName; 
-			new File(outDirPath).mkdirs();
-			
-			String outFilePath = outDirPath + File.separatorChar + thisFile.getName();
-			System.out.println("Generating " + outFilePath);
-		    ResourceTextSectionInserter textSectionInserter = new ResourceTextSectionInserter(resourceBuilder);
-		    textSectionInserter.augmentResource(wrappedResource, inFilePath, outFilePath, newBaseURL);
-		    
-		    List<FormattedOutputSpec<T>> formatters = wrappedResource.getFormatSpecs(outPath);
-		    for (FormattedOutputSpec<T> formatter : formatters) {
-				System.out.println("Generating " + formatter.getOutputPath(inFilePath));
-		    	formatter.formatAndSave(inFilePath);
-		    }
+		    wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL);
+		    wrappedResource.saveFormattedOutputs(thisFile, outPath, newBaseURL);
 		}
 	}
 
+	/*
+	 * We can't inspect a resource's reported version until it has been parsed, but we can't guarantee that parsing will succeed.
+	 * Also, some resources may not report their own version.
+	 * 
+	 * TODO support parsing the file name to calculate expected version.
+	 */
 	IBaseResource parseFile(File thisFile) throws IOException {
 		IBaseResource resource;
 		
-		resource = parseFile(HAPIUtils.dstu3XmlParser(), thisFile, FhirVersion.STU3);
+		resource = parseFile(HAPIUtils.xmlParser(FhirVersion.STU3), thisFile, FhirVersion.STU3);
 		
 		//return resource;
 		
@@ -73,7 +53,7 @@ public class FileProcessor {
 			return resource;
 		}
 		
-		resource = parseFile(HAPIUtils.dstu2XmlParser(), thisFile, FhirVersion.DSTU2);
+		resource = parseFile(HAPIUtils.xmlParser(FhirVersion.DSTU2), thisFile, FhirVersion.DSTU2);
 		if (resource != null
 		  && getDstu2ResourceVersion(resource).equals(FhirVersion.DSTU2)) {
 			return resource;

@@ -6,13 +6,16 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.Parameter;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition.ParameterBinding;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.OperationKindEnum;
 import ca.uhn.fhir.model.dstu2.valueset.OperationParameterUseEnum;
 import uk.nhs.fhir.makehtml.FhirVersion;
@@ -155,5 +158,28 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 		}
 		
 		return resourceFlags;
+	}
+
+	@Override
+	public IBaseResource getWrappedResource() {
+		return definition;
+	}
+
+	@Override
+	public void setUrl(String url) {
+		definition.setUrl(url);
+	}
+
+	@Override
+	public void fixHtmlEntities() {
+		// nothing to do
+	}
+
+	@Override
+	public void addHumanReadableText(String textSection) {
+		NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv(textSection);
+        definition.setText(textElement);
 	}
 }
