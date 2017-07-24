@@ -21,7 +21,7 @@ public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			FhirDstu2Icon.ELEMENT,
+			Optional.of(FhirDstu2Icon.ELEMENT),
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,

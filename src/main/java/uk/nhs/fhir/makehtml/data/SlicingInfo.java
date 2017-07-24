@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
+import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class SlicingInfo {
 
@@ -33,6 +34,11 @@ public class SlicingInfo {
 		this.discriminatorPaths.addAll(discriminatorPaths);
 		this.ordered = ordered;
 		this.rules = rules;
+
+		if (discriminatorPaths.isEmpty()) {
+			RendererError.handle(RendererError.Key.SLICING_WITHOUT_DISCRIMINATOR, 
+				"Slicing " + description + " doesn't have a discriminator");
+		}
 	}
 
 	public Set<String> getDiscriminatorPaths() {

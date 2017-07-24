@@ -17,7 +17,7 @@ import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
-	private FhirDstu2Icon icon;
+	private Optional<FhirDstu2Icon> icon;
 	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
@@ -30,6 +30,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	private Optional<ExtensionType> extensionType = Optional.empty();
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
+	private Optional<String> sliceName = Optional.empty();
 	private Optional<String> fixedValue = Optional.empty();
 	private Optional<String> example = Optional.empty();
 	private Optional<String> defaultValue = Optional.empty();
@@ -49,7 +50,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
 
 	public FhirTreeNode(
-			FhirDstu2Icon icon,
+			Optional<FhirDstu2Icon> icon,
 			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
@@ -83,7 +84,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public FhirDstu2Icon getFhirIcon() {
+	public Optional<FhirDstu2Icon> getFhirIcon() {
 		// If using default and we have a backup, use the backup icon
 		if (icon.equals(FhirDstu2Icon.ELEMENT)
 		  && hasBackupNode()) {
@@ -95,7 +96,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public void setFhirIcon(FhirDstu2Icon icon) {
-		this.icon = icon;
+		this.icon = Optional.of(icon);
 	}
 
 	public Optional<String> getName() {
@@ -129,8 +130,12 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return slicingInfo;
 	}
 
-	public void setSlicingInfo(SlicingInfo slicingInfo) {
-		this.slicingInfo = Optional.ofNullable(slicingInfo);
+	public void setSlicingInfo(Optional<SlicingInfo> slicingInfo) {
+		this.slicingInfo = slicingInfo;
+	}
+
+	public void setSliceName(Optional<String> sliceName) {
+		this.sliceName = sliceName;
 	}
 
 	public Optional<Integer> getMin() {
@@ -236,7 +241,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			// Name is generally more readable and shorter than resolved slicing info, so prioritise that.
 			// Slicing discriminator information should always be available as a backup.
 			String alias;
-			if (getName().isPresent()) {
+			if (sliceName.isPresent()) {
+				alias = sliceName.get();
+			} else if (name.isPresent()) {
 				alias = name.get();
 			} else {
 				alias = discriminatorValue.get();
@@ -356,8 +363,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return fixedValue;
 	}
 
-	public void setFixedValue(String fixedValue) {
-		this.fixedValue = Optional.of(fixedValue);
+	public void setFixedValue(Optional<String> fixedValue) {
+		this.fixedValue = fixedValue;
 	}
 	
 	public boolean hasExample() {
@@ -368,8 +375,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return example;
 	}
 
-	public void setExample(String exampleValue) {
-		this.example = Optional.of(exampleValue);
+	public void setExample(Optional<String> exampleValue) {
+		this.example = exampleValue;
 	}
 
 	public boolean hasDefaultValue() {
@@ -380,8 +387,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return defaultValue;
 	}
 
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = Optional.of(defaultValue);
+	public void setDefaultValue(Optional<String> defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 
 	public boolean hasBinding() {
@@ -392,8 +399,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return binding;
 	}
 
-	public void setBinding(BindingInfo binding) {
-		this.binding = Optional.of(binding);
+	public void setBinding(Optional<BindingInfo> binding) {
+		this.binding = binding;
 	}
 
 	public void setBackupNode(FhirTreeNode backupNode) {
@@ -420,16 +427,16 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return requirements;
 	}
 
-	public void setRequirements(String requirements) {
-		this.requirements = Optional.of(requirements);
+	public void setRequirements(Optional<String> requirements) {
+		this.requirements = requirements;
 	}
 
 	public Optional<String> getComments() {
 		return comments;
 	}
 
-	public void setComments(String comments) {
-		this.comments = Optional.of(comments);
+	public void setComments(Optional<String> comments) {
+		this.comments = comments;
 	}
 
 	public List<String> getAliases() {
@@ -444,12 +451,12 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return linkedNodeName;
 	}
 	
-	public void setLinkedNodeName(String nameLink) {
-		this.linkedNodeName = Optional.of(nameLink);
+	public void setLinkedNodeName(Optional<String> nameLink) {
+		this.linkedNodeName = nameLink;
 	}
 	
-	public void setExtensionType(ExtensionType extensionType) {
-		this.extensionType = Optional.of(extensionType);
+	public void setExtensionType(Optional<ExtensionType> extensionType) {
+		this.extensionType = extensionType;
 	}
 	
 	public Optional<ExtensionType> getExtensionType() {
@@ -617,8 +624,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		}
 	}
 
-	public void addMapping(FhirElementMapping newMapping) {
-		mappings.add(newMapping);
+	public void setMappings(List<FhirElementMapping> mappings) {
+		this.mappings = mappings;
 	}
 	
 	public List<FhirElementMapping> getMappings() {

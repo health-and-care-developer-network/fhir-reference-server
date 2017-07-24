@@ -7,7 +7,7 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.data.FhirContact;
+import uk.nhs.fhir.makehtml.data.FhirContacts;
 import uk.nhs.fhir.makehtml.data.FhirMapping;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
@@ -18,8 +18,6 @@ import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionMetadataFormatte
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
 
 public abstract class WrappedStructureDefinition extends WrappedResource<WrappedStructureDefinition> {
-	
-	public abstract boolean isExtension();
 	
 	public abstract void checkUnimplementedFeatures();
 
@@ -39,7 +37,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract Optional<String> getFhirVersion();
 	public abstract Optional<String> getContextType();
 
-	public abstract List<FhirContact> getContacts();
+	public abstract List<FhirContacts> getContacts();
 	public abstract List<String> getUseContexts();
 	public abstract List<FhirMapping> getMappings();
 	public abstract List<String> getUseLocationContexts();
@@ -54,6 +52,14 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		return new StructureDefinitionSnapshotFormatter();
 	}
 
+	public boolean isExtension() {
+		if (getConstrainedType().isPresent()) {
+			return getConstrainedType().equals("Extension");
+		} else {
+			throw new IllegalStateException("Not sure whether this is an extension - no constrained type present");
+		}
+	}
+	
 	@Override
 	public List<FormattedOutputSpec<WrappedStructureDefinition>> getFormatSpecs(String outputDirectory) {
 		List<FormattedOutputSpec<WrappedStructureDefinition>> specs = Lists.newArrayList();

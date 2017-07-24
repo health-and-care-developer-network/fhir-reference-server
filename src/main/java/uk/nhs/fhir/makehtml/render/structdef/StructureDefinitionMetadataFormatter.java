@@ -3,6 +3,7 @@ package uk.nhs.fhir.makehtml.render.structdef;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -16,6 +17,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.FhirContact;
+import uk.nhs.fhir.makehtml.data.FhirContacts;
 import uk.nhs.fhir.makehtml.data.FhirMapping;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
@@ -208,9 +210,9 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 
 	List<Content> getPublishingOrgContactsContents(WrappedStructureDefinition source) {
 		List<Content> publishingOrgContacts = Lists.newArrayList();
-		for (FhirContact contact : source.getContacts()) {
+		for (FhirContacts contact : source.getContacts()) {
 			Optional<String> individualName  = contact.getName();
-			List<String> individualTelecoms = contact.getTelecoms();
+			List<FhirContact> individualTelecoms = contact.getTelecoms();
 			if (!individualTelecoms.isEmpty()) {
 				if (!publishingOrgContacts.isEmpty()) {
 					publishingOrgContacts.add(Elements.newElement("br"));
@@ -220,11 +222,23 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), telecomDesc));
 				if (individualTelecoms.size() == 1) {
 					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), ": "));
-					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), individualTelecoms.get(0)));
+					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), individualTelecoms.get(0).getContactData()));
 				} else {
-					for (String individualTelecom : individualTelecoms) {
+					List<FhirContact> contactsByPrecedence = 
+						individualTelecoms
+							.stream()
+							// Precedence is more important if number is lower
+							// so if precedence is not present, treat it as a very big number (i.e. less important)
+							.sorted((contact1, contact2) -> 
+							!contact1.getPrecedence().isPresent() && !contact2.getPrecedence().isPresent() ? 0 :
+								!contact1.getPrecedence().isPresent() ? 1 : 
+								!contact2.getPrecedence().isPresent() ? -1 : 
+								Integer.compare(contact1.getPrecedence().get(), contact2.getPrecedence().get()))
+							.collect(Collectors.toList()); 
+					
+					for (FhirContact individualTelecom : contactsByPrecedence) {
 						publishingOrgContacts.add(Elements.newElement("br"));
-						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), "\t" + individualTelecom));
+						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), "\t" + individualTelecom.getContactData()));
 					}
 				}
 			}

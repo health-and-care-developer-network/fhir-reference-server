@@ -24,7 +24,7 @@ public interface FhirTreeTableContent {
 	public boolean useBackupTypeLinks();
 	List<LinkData> getTypeLinks();
 
-	FhirDstu2Icon getFhirIcon();
+	Optional<FhirDstu2Icon> getFhirIcon();
 
 	String getDisplayName();
 

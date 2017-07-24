@@ -25,6 +25,8 @@ import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedDstu2ElementDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.HAPIUtils;
 
@@ -51,7 +53,7 @@ public enum FhirDstu2Icon {
 	private final String base64;
 	
 	// Set on startup. Path to folder containing extension files.
-	static String suppliedResourcesFolderPath = null;
+	public static String suppliedResourcesFolderPath = null;
 	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
 		FhirDstu2Icon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
 	}
@@ -84,10 +86,17 @@ public enum FhirDstu2Icon {
 	 * 
 	 * Now that we need to support STU3, even more reason to push this to later in the pipeline
 	 */
-	public static FhirDstu2Icon forElementDefinition(ElementDefinitionDt definition) {
+	public static Optional<FhirDstu2Icon> forElementDefinition(WrappedElementDefinition wrappedDefinition) {
+		
+		ElementDefinitionDt definition;
+		if (wrappedDefinition instanceof WrappedDstu2ElementDefinition) {
+			definition = ((WrappedDstu2ElementDefinition)wrappedDefinition).getWrappedDefinition();
+		} else {
+			return Optional.empty();
+		}
 		
 		if (definition.getPath().endsWith("[x]")) {
-			return FhirDstu2Icon.CHOICE;
+			return Optional.of(FhirDstu2Icon.CHOICE);
 		}
 		
 		for (Type type : definition.getType()) {
@@ -95,7 +104,7 @@ public enum FhirDstu2Icon {
 			if (typeName != null) {
 				
 				if (typeName.equals("Extension")) {
-                    return lookupExtension(type);
+                    return Optional.of(lookupExtension(type));
                 } else {
 					Optional<Class<?>> maybeImplementingType = FhirDstu2DataTypes.getImplementingType(typeName);
 					
@@ -103,15 +112,15 @@ public enum FhirDstu2Icon {
 						Class<?> implementingType = maybeImplementingType.get();
 						
 						if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-							return FhirDstu2Icon.REFERENCE;
+							return Optional.of(FhirDstu2Icon.REFERENCE);
 						}
 						
 						if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-							return FhirDstu2Icon.DATATYPE;
+							return Optional.of(FhirDstu2Icon.DATATYPE);
 						}
 						
 						if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-							return FhirDstu2Icon.PRIMITIVE;
+							return Optional.of(FhirDstu2Icon.PRIMITIVE);
 						}
 					}
 				}
@@ -119,11 +128,11 @@ public enum FhirDstu2Icon {
 		}
 		
 		if (!definition.getSlicing().isEmpty()) {
-			return FhirDstu2Icon.SLICE;
+			return Optional.of(FhirDstu2Icon.SLICE);
 		}
 		
 		if (!Strings.isNullOrEmpty(definition.getNameReference())) {
-			return FhirDstu2Icon.REUSE;
+			return Optional.of(FhirDstu2Icon.REUSE);
 		}
 		
 		String path = definition.getPath();
@@ -133,7 +142,7 @@ public enum FhirDstu2Icon {
 			System.out.println("Null or empty path");
 		}
 		
-		return FhirDstu2Icon.ELEMENT;
+		return Optional.of(FhirDstu2Icon.ELEMENT);
 	}
 
 	private static FhirDstu2Icon lookupExtension(Type type)  {

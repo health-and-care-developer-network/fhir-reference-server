@@ -105,9 +105,10 @@ public class FhirTreeTable {
 			if (childNode instanceof FhirTreeNode
 			  && childNode.hasChildren()) {
 				FhirTreeNode fhirTreeNode = (FhirTreeNode)childNode;
-				FhirDstu2Icon currentIcon = fhirTreeNode.getFhirIcon();
+				Optional<FhirDstu2Icon> currentIcon = fhirTreeNode.getFhirIcon();
 				// update default icon to folder icon
-				if (currentIcon.equals(FhirDstu2Icon.DATATYPE)) {
+				if (!currentIcon.isPresent() 
+				  || currentIcon.get().equals(FhirDstu2Icon.DATATYPE)) {
 					fhirTreeNode.setFhirIcon(FhirDstu2Icon.ELEMENT);
 				}
 			}

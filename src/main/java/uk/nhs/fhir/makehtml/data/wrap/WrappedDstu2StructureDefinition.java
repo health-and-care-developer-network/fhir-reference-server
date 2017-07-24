@@ -23,12 +23,13 @@ import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirContact;
-import uk.nhs.fhir.makehtml.data.FhirDstu2TreeNodeBuilder;
+import uk.nhs.fhir.makehtml.data.FhirContacts;
 import uk.nhs.fhir.makehtml.data.FhirMapping;
 import uk.nhs.fhir.makehtml.data.FhirRelease;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
 
 public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition {
 	private final StructureDefinition definition;
@@ -45,11 +46,6 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	@Override
 	public FhirVersion getImplicitFhirVersion() {
 		return FhirVersion.DSTU2;
-	}
-
-	@Override
-	public boolean isExtension() {
-		return definition.getConstrainedType().equals("Extension");
 	}
 
 	@Override
@@ -129,14 +125,16 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
-	public List<FhirContact> getContacts() {
-		List<FhirContact> contacts = Lists.newArrayList();
+	public List<FhirContacts> getContacts() {
+		List<FhirContacts> contacts = Lists.newArrayList();
 		
 		for (Contact contact : definition.getContact()) {
-			FhirContact fhirContact = new FhirContact(contact.getName());
+			FhirContacts fhirContact = new FhirContacts(contact.getName());
 			
 			for (ContactPointDt telecom : contact.getTelecom()){
-				fhirContact.addTelecom(telecom.getValue());
+				String value = telecom.getValue();
+				Integer rank = telecom.getRank();
+				fhirContact.addTelecom(new FhirContact(value, rank));
 			}
 			
 			contacts.add(fhirContact);
@@ -220,14 +218,14 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 		return definition.getMeta();
 	}
 
-	private static final FhirDstu2TreeNodeBuilder treeNodeBuilder = new FhirDstu2TreeNodeBuilder();
+	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
 	
 	@Override
 	public FhirTreeData getSnapshotTree() {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		
 		for (ElementDefinitionDt element : definition.getSnapshot().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(element);
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 		
@@ -240,7 +238,7 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 		fhirTreeDataBuilder.permitDummyNodes();
 		
 		for (ElementDefinitionDt element : definition.getDifferential().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(element);
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 

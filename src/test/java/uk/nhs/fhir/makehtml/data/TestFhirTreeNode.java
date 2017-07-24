@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
 		return new FhirTreeNode(
-			FhirDstu2Icon.ELEMENT,
+			Optional.of(FhirDstu2Icon.ELEMENT),
 			Optional.of(id), 
 			new ResourceFlags(), 
 			0, 
@@ -22,7 +22,7 @@ public class TestFhirTreeNode {
 	
 	public static FhirTreeNode testSlicingNode(String id, String path, Set<String> discriminators) {
 		FhirTreeNode node = testNode(id, path);
-		node.setSlicingInfo(new SlicingInfo("Test desc", discriminators, Boolean.FALSE, "Test rules"));
+		node.setSlicingInfo(Optional.of(new SlicingInfo("Test desc", discriminators, Boolean.FALSE, "Test rules")));
 		return node;
 	}
 }

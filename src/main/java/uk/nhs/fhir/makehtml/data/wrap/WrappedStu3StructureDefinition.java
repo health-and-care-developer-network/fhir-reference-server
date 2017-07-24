@@ -1,35 +1,37 @@
 package uk.nhs.fhir.makehtml.data.wrap;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.hl7.fhir.dstu3.model.ContactDetail;
+import org.hl7.fhir.dstu3.model.ContactPoint;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.Factory;
+import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
+import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionMappingComponent;
+import org.hl7.fhir.dstu3.model.UsageContext;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirContact;
+import uk.nhs.fhir.makehtml.data.FhirContacts;
 import uk.nhs.fhir.makehtml.data.FhirMapping;
 import uk.nhs.fhir.makehtml.data.FhirRelease;
-import uk.nhs.fhir.makehtml.data.FhirStu3TreeNodeBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
 
 public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
@@ -50,11 +52,6 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	}
 
 	@Override
-	public boolean isExtension() {
-		return definition.getConstrainedType().equals("Extension");
-	}
-
-	@Override
 	public String getName() {
 		return definition.getName();
 	}
@@ -66,12 +63,12 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public String getKind() {
-		return definition.getKind();
+		return definition.getKind().getDisplay();
 	}
 
 	@Override
 	public String getStatus() {
-		return definition.getStatus();
+		return definition.getStatus().getDisplay();
 	}
 
 	@Override
@@ -81,12 +78,12 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public Optional<String> getConstrainedType() {
-		return Optional.of(definition.getConstrainedType());
+		return Optional.of(definition.getType());
 	}
 
 	@Override
 	public String getBase() {
-		return definition.getBase();
+		return definition.getBaseDefinition();
 	}
 
 	@Override
@@ -96,7 +93,7 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public Optional<String> getDisplay() {
-		return Optional.ofNullable(definition.getDisplay());
+		return Optional.ofNullable(definition.getName());
 	}
 
 	@Override
@@ -127,18 +124,20 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public Optional<String> getContextType() {
-		return Optional.ofNullable(definition.getContextType());
+		return Optional.ofNullable(definition.getContextType().getDisplay());
 	}
 
 	@Override
-	public List<FhirContact> getContacts() {
-		List<FhirContact> contacts = Lists.newArrayList();
+	public List<FhirContacts> getContacts() {
+		List<FhirContacts> contacts = Lists.newArrayList();
 		
-		for (Contact contact : definition.getContact()) {
-			FhirContact fhirContact = new FhirContact(contact.getName());
+		for (ContactDetail contact : definition.getContact()) {
+			FhirContacts fhirContact = new FhirContacts(contact.getName());
 			
-			for (ContactPointDt telecom : contact.getTelecom()){
-				fhirContact.addTelecom(telecom.getValue());
+			for (ContactPoint telecom : contact.getTelecom()){
+				String value = telecom.getValue();
+				int rank = telecom.getRank();
+				fhirContact.addTelecom(new FhirContact(value, rank));
 			}
 			
 			contacts.add(fhirContact);
@@ -151,12 +150,12 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	public List<String> getUseContexts() {
 		List<String> useContexts = Lists.newArrayList();
 		
-		for (CodeableConceptDt useContext : definition.getUseContext()) {
-			for (CodingDt coding : useContext.getCoding()) {
-				throw new NotImplementedException("Don't know what to do with use context code: " + coding.toString());
+		for (UsageContext useContext : definition.getUseContext()) {
+			if (useContext.getValue() != null) {
+				throw new NotImplementedException("Don't know what to do with use context value: " + useContext.getValue().toString());
 			}
 			
-			String text = useContext.getText();
+			String text = useContext.getCode().getDisplay();
 			useContexts.add(text);
 		}
 		
@@ -181,17 +180,6 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 			ResourceReferenceDt assigner = identifier.getAssigner();
 		}*/
 		
-		//List<String> indexingCodes = Lists.newArrayList();
-		if (!definition.getCode().isEmpty()) {
-			throw new NotImplementedException("Code");
-		}
-		/*for (CodingDt code : definition.getCode()) {
-			//indexingCodes.add(code.getCode());
-		}*/
-		
-		if (!definition.getRequirements().isEmpty()) {
-			throw new NotImplementedException("NHS Digital StructureDefinitions shouldn't contain requirements");
-		}
 				
 	}
 
@@ -199,8 +187,8 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	public List<FhirMapping> getMappings() {
 		List<FhirMapping> mappings = Lists.newArrayList();
 		
-		for (Mapping mapping : definition.getMapping()) {
-			mappings.add(new FhirMapping(mapping.getIdentity(), mapping.getUri(), mapping.getName(), mapping.getComments()));
+		for (StructureDefinitionMappingComponent mapping : definition.getMapping()) {
+			mappings.add(new FhirMapping(mapping.getIdentity(), mapping.getUri(), mapping.getName(), mapping.getComment()));
 		}
 		
 		return mappings;
@@ -210,7 +198,7 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	public List<String> getUseLocationContexts() {
 		List<String> useLocationContexts = Lists.newArrayList();
 		
-		for (StringDt context : definition.getContext()) {
+		for (StringType context : definition.getContext()) {
 			useLocationContexts.add(context.getValue());
 		}
 		
@@ -222,14 +210,14 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 		return definition.getMeta();
 	}
 
-	private static final FhirStu3TreeNodeBuilder treeNodeBuilder = new FhirStu3TreeNodeBuilder();
+	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
 	
 	@Override
 	public FhirTreeData getSnapshotTree() {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		
 		for (ElementDefinition element : definition.getSnapshot().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(element);
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 		
@@ -242,7 +230,7 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 		fhirTreeDataBuilder.permitDummyNodes();
 		
 		for (ElementDefinition element : definition.getDifferential().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(element);
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 
@@ -261,10 +249,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public void addHumanReadableText(String textSection) {
-		NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv(textSection);
-        definition.setText(textElement);
+		try {
+			Narrative textElement = Factory.newNarrative(NarrativeStatus.GENERATED, textSection);
+	        definition.setText(textElement);
+		} catch (IOException | FHIRException e) {
+			throw new IllegalStateException(e);
+		}
 	}
-
 }

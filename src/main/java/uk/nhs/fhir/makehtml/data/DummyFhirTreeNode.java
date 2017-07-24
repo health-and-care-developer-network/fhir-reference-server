@@ -103,7 +103,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 	
 	@Override
-	public FhirDstu2Icon getFhirIcon() {
+	public Optional<FhirDstu2Icon> getFhirIcon() {
 		return backup.getFhirIcon();
 	}
 
