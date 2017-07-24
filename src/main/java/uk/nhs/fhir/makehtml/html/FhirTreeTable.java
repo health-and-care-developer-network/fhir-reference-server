@@ -183,10 +183,9 @@ public class FhirTreeTable {
 			}
 		}
 		
-		// Example
-		if (node.hasExample()) {
-			// never display as an actual link
-			resourceInfos.add(new ResourceInfo("Example Value", node.getExample().get(), ResourceInfoType.EXAMPLE_VALUE));
+		// Examples
+		for (String example : node.getExamples()) {
+			resourceInfos.add(new ResourceInfo("Example Value", example, ResourceInfoType.EXAMPLE_VALUE));
 		}
 		
 		if (node.hasDefaultValue()

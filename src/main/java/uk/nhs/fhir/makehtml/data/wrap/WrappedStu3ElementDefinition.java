@@ -13,20 +13,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.ElementDefinition.AggregationMode;
+import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionBindingComponent;
+import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionConstraintComponent;
+import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionSlicingComponent;
+import org.hl7.fhir.dstu3.model.ElementDefinition.ReferenceVersionRules;
+import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
+import org.hl7.fhir.dstu3.model.Enumeration;
+import org.hl7.fhir.dstu3.model.PrimitiveType;
+import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind;
+import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.utilities.Utilities;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
-import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.UriDt;
+import ca.uhn.fhir.context.FhirStu3DataTypes;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
@@ -41,22 +45,21 @@ import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
-import uk.nhs.fhir.util.Dstu2FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
-public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
+public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
-	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
+	private static final Stu3FhirDocLinkFactory typeLinkFactory = new Stu3FhirDocLinkFactory();
+	
+	private final ElementDefinition definition;
 
-	private final ElementDefinitionDt definition;
-
-	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition) {
+	public WrappedStu3ElementDefinition(ElementDefinition definition) {
 		this.definition = definition;
 	}
 
 	@Override
 	public String getName() {
-		return definition.getName();
+		return definition.getLabel();
 	}
 
 	@Override
@@ -68,19 +71,29 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public List<LinkData> getTypeLinks() {
 		List<LinkData> typeLinks = Lists.newArrayList();
 		
-		List<Type> knownTypes = FhirDstu2DataTypes.knownTypes(definition.getType());
+		List<TypeRefComponent> knownTypes = FhirStu3DataTypes.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
-			for (Type type : knownTypes) {
+			for (TypeRefComponent type : knownTypes) {
+
 				String code = type.getCode();
 				
-				List<UriDt> profileUris = type.getProfile();
-				if (profileUris.isEmpty()) {
-					typeLinks.add(typeLinkFactory.forDataTypeName(code));
-				} else {
-					List<String> uris = Lists.newArrayList();
-					profileUris.forEach((UriDt uri) -> uris.add(uri.getValue()));
-					typeLinks.add(typeLinkFactory.withNestedLinks(code, uris));
+				if (type.hasProfile() && !type.getCode().equals("Extension")) {
+					String profile = type.getProfile();
+					throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
+				} else if (type.hasTargetProfile()) {
+					if (type.getCode().equals("Reference")) {
+						typeLinkFactory.forDataTypeName(type.getCode());
+						typeLinks.add(typeLinkFactory.withNestedLinks(code, Lists.newArrayList(type.getTargetProfile())));
+					} else {
+						String targetProfile = type.getTargetProfile();
+						throw new IllegalStateException("should we be incorporating target profile (" + targetProfile + ") into type links? " + getPath());
+					}
+				} else if (type.hasAggregation()) {
+					String aggregation = String.join(", ", type.getAggregation().stream().map(aggregationMode -> aggregationMode.asStringValue()).collect(Collectors.toList()));
+					throw new IllegalStateException("should we be incorporating profile (" + aggregation + ") into type links? " + getPath());
 				}
+				
+				typeLinks.add(typeLinkFactory.forDataTypeName(code));
 			}
 		}
 		
@@ -89,12 +102,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Set<FhirDataType> getDataTypes() {
-		return FhirDstu2DataTypes.getTypes(definition.getType());
+		return FhirStu3DataTypes.getTypes(definition.getType());
 	}
 
 	@Override
 	public ResourceFlags getResourceFlags() {
-		
 		boolean isSummary = Boolean.TRUE.equals(definition.getIsSummary());
 		boolean isModifier = Boolean.TRUE.equals(definition.getIsModifier());
 		boolean isConstrained = !definition.getConstraint().isEmpty();
@@ -127,10 +139,6 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 		return definition.getMax();
 	}
 
-	public ElementDefinitionDt getWrappedDefinition() {
-		return definition;
-	}
-
 	@Override
 	public String getShortDescription() {
 		return definition.getShort();
@@ -151,10 +159,10 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public List<ConstraintInfo> getConstraintInfos() {
 		List<ConstraintInfo> constraints = Lists.newArrayList();
 		
-		for (Constraint constraint : definition.getConstraint()) {
+		for (ElementDefinitionConstraintComponent constraint : definition.getConstraint()) {
 			String key = constraint.getKey();
 			String description = constraint.getHuman();
-			String severity = constraint.getSeverity();
+			String severity = constraint.getSeverity().getDisplay();
 			String requirementsString = constraint.getRequirements();
 			Optional<String> requirements = Strings.isNullOrEmpty(requirementsString) ? Optional.empty() : Optional.of(requirementsString);
 			String xpath = constraint.getXpath();
@@ -175,93 +183,66 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 		if (definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		} else {
-			Slicing slicing = definition.getSlicing();
+			ElementDefinitionSlicingComponent slicing = definition.getSlicing();
 			SlicingInfo slicingInfo = new SlicingInfo(
 				slicing.getDescription(),
 				slicing.getDiscriminator().stream()
-					.map(stringDt -> stringDt.getValue())
+					.map(discriminator -> discriminator.getPath())
 					.collect(Collectors.toSet()),
 				slicing.getOrdered(),
-				slicing.getRules());
+				slicing.getRules().getDisplay());
 			return Optional.of(slicingInfo);
 		}
 	}
 
 	@Override
 	public Optional<String> getFixedValue() {
-		IDatatype fixed = definition.getFixed();
-		if (fixed != null) {
-			if (fixed instanceof BasePrimitive) {
-				BasePrimitive<?> fixedPrimitive = (BasePrimitive<?>)fixed;
-				String fixedValueAsString = fixedPrimitive.getValueAsString();
-				
-				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
-					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
-					RendererError.handle(RendererError.Key.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
-					fixedValueAsString = correctedUrl;
-				}
-				
-				return Optional.of(fixedValueAsString);
+		Type fixed = definition.getFixed();
+		if (fixed == null) {
+			return Optional.empty();
+		} else {
+			if (fixed instanceof PrimitiveType) {
+				return Optional.ofNullable(((PrimitiveType<?>)fixed).asStringValue());
 			} else {
-				throw new IllegalStateException("Unhandled type for fixed value: " + fixed.getClass().getName());
+				throw new IllegalStateException("Unhandled type for default value: " + fixed.getClass().getCanonicalName());
 			}
 		}
-		
-		return Optional.empty();
 	}
 
 	@Override
 	public List<String> getExamples() {
-		List<String> examples = Lists.newArrayList();
-		
-		IDatatype example = definition.getExample();
-		
-		if (example != null) {
-			if (example instanceof BasePrimitive) {
-				BasePrimitive<?> examplePrimitive = (BasePrimitive<?>)example;
-				examples.add(examplePrimitive.getValueAsString());
-			} else if (example instanceof PeriodDt) {
-				PeriodDt examplePeriod = (PeriodDt)example;
-				examples.add(HAPIUtils.periodToString(examplePeriod));
-			} else {
-				throw new IllegalStateException("Unhandled type for example value: " + example.getClass().getName());
-			}
-		}
-		
-		return examples;
+		return definition.getExample().stream().map(example -> example.getValue().toString()).collect(Collectors.toList());
 	}
 
 	@Override
-	public Optional<String> getDefaultValue() {		
-		IDatatype defaultValue = definition.getDefaultValue();
-		
-		if (defaultValue != null) {
-			if (defaultValue instanceof BasePrimitive) {
-				BasePrimitive<?> defaultValuePrimitive = (BasePrimitive<?>)defaultValue;
-				return Optional.of(defaultValuePrimitive.getValueAsString());
+	public Optional<String> getDefaultValue() {
+		Type defaultValue = definition.getDefaultValue();
+		if (defaultValue == null) {
+			return Optional.empty();
+		} else {
+			if (defaultValue instanceof PrimitiveType) {
+				return Optional.ofNullable(((PrimitiveType<?>)defaultValue).asStringValue());
 			} else {
-				throw new IllegalStateException("Unhandled type for default value: " + defaultValue.getClass().getName());
+				throw new IllegalStateException("Unhandled type for default value: " + defaultValue.getClass().getCanonicalName());
 			}
 		}
-		
-		return Optional.empty();
 	}
 
 	@Override
 	public Optional<BindingInfo> getBinding() {
-		Binding binding = definition.getBinding();
+		ElementDefinitionBindingComponent binding = definition.getBinding();
 		
 		if (!binding.isEmpty()) {
 			
-			IDatatype valueSet = binding.getValueSet();
+			Type valueSet = binding.getValueSet();
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
-				String urlString = HAPIUtils.resolveDstu2DatatypeValue(valueSet);
+				String urlString = HAPIUtils.resolveStu3DatatypeValue(valueSet);
 				url = Optional.of(FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(urlString)));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
-			String strength = binding.getStrength();
+			String strength = binding.getStrength().getDisplay();
 			
 			return Optional.of(new BindingInfo(description, url, strength));
 		}
@@ -276,22 +257,21 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<String> getComments() {
-		return Optional.ofNullable(definition.getComments());
+		return Optional.ofNullable(definition.getComment());
 	}
 
 	@Override
 	public List<String> getAliases() {
 		return definition
-				.getAlias()
-				.stream()
-				.map(stringDt -> stringDt.getValue())
-				.collect(Collectors.toList());
+			.getAlias()
+			.stream()
+			.map(stringType -> stringType.getValue())
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public Optional<ExtensionType> getExtensionType() {
-		
-		for (Type type : definition.getType()) {
+		for (TypeRefComponent type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
 				return Optional.of(lookupExtensionType(type));
@@ -301,26 +281,33 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 		return Optional.empty();
 	}
 
-	@Override
-	public Optional<String> getLinkedNodeName() {
-		return Optional.ofNullable(definition.getNameReference());
-	}
-	
-	/**
-	 * Consider the extension complex iff it has an element with path "Extension.extension.url"
-	 */
-	private static ExtensionType lookupExtensionType(Type type)  {
+	private ExtensionType lookupExtensionType(TypeRefComponent type) {
+		
+		String profile = type.getProfile();
+		
+		String targetProfile = type.getTargetProfile();
+		List<Enumeration<AggregationMode>> aggregation = type.getAggregation();
+		ReferenceVersionRules versioning = type.getVersioning();
 
-		List<UriDt> profiles = type.getProfile();
+		if (!Utilities.noString(targetProfile)) {
+			throw new IllegalStateException("Don't know how to handle target profile for Extension");
+		}
+		if (!aggregation.isEmpty()) {
+			throw new IllegalStateException("Don't know how to handle aggregation for Extension");
+		}
+		if (versioning != null) {
+			throw new IllegalStateException("Don't know how to handle versioning for Extension");
+		}
 
-		for (UriDt uriDt : profiles) {
-
+		if (Utilities.noString(profile)) {
+			return ExtensionType.SIMPLE;
+		} else {
 			String filePath;
 			try {
-				URI uri = new URI(uriDt.getValue());
+				URI uri = new URI(profile);
 				filePath = uri.toURL().getFile() + ".xml";
 			} catch (URISyntaxException | MalformedURLException e) {
-				throw new IllegalStateException("URI/URL error for uri " + uriDt.getValue(), e);
+				throw new IllegalStateException("URI/URL error for uri " + profile, e);
 			}
 			
 			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
@@ -335,23 +322,32 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 			if (extensionFile == null) {
 				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-			}
+			} 
 			
 			try (FileInputStream fis = new FileInputStream(extensionFile);
 				Reader reader = new InputStreamReader(fis)) {
 				
-				IParser parser = HAPIUtils.xmlParser(FhirVersion.DSTU2);
+				IParser parser = HAPIUtils.xmlParser(FhirVersion.STU3);
 				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
-
-				if (extension.getSnapshot().getElement().stream().anyMatch(element -> element.getPath().contains("Extension.extension.url"))) {
+				
+				org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind kind = extension.getKind();
+				if (kind.equals(StructureDefinitionKind.COMPLEXTYPE)) {
 					return ExtensionType.COMPLEX;
+				} else if (kind.equals(StructureDefinitionKind.PRIMITIVETYPE)) {
+					return ExtensionType.SIMPLE;
+				} else {
+					throw new IllegalStateException("Not sure whether extension " + extensionFile.getAbsolutePath() 
+						+ " is simple or complex - kind is " + kind.getDisplay());
 				}
 			} catch (IOException ie) {
 				throw new IllegalStateException(ie);
 			}
 		}
+	}
 
-		return ExtensionType.SIMPLE;
+	@Override
+	public Optional<String> getLinkedNodeName() {
+		return Optional.ofNullable(definition.getContentReference());
 	}
 
 	@Override
@@ -370,7 +366,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<String> getSliceName() {
-		return Optional.empty();
+		return Optional.ofNullable(definition.getSliceName());
 	}
-	
+
 }

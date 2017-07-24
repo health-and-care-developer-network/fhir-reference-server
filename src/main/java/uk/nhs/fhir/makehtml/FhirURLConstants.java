@@ -4,6 +4,7 @@ public interface FhirURLConstants {
 	public static final String HL7_ROOT = "hl7.org";
 	public static final String HL7_FHIR = HL7_ROOT + "/fhir";
 	public static final String HL7_DSTU2 = HL7_FHIR + "/DSTU2";
+	public static final String HL7_STU3 = HL7_FHIR + "/stu3";
 	public static final String HL7_VALUESET = HL7_FHIR + "/ValueSet";
 	public static final String HL7_VALUESET_V3 = HL7_VALUESET + "/v3-";
 	public static final String HL7_DSTU2_VALUESET = HL7_DSTU2 + "/ValueSet";
@@ -14,6 +15,7 @@ public interface FhirURLConstants {
 	public static final String HTTP_HL7_ROOT = "http://" + HL7_ROOT;
 	public static final String HTTP_HL7_FHIR = "http://" + HL7_FHIR;
 	public static final String HTTP_HL7_DSTU2 = "http://" + HL7_DSTU2;
+	public static final String HTTP_HL7_STU3 = "http://" + HL7_STU3;
 	public static final String HTTP_HL7_VALUESET_V3 = "http://" + HL7_VALUESET_V3;
 	public static final String HTTP_HL7_V3 = "http://" + HL7_V3;
 	public static final String HTTP_HL7_DSTU2_V3 = "http://" + HL7_DSTU2_V3;

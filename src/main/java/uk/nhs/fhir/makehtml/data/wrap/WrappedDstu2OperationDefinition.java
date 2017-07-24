@@ -50,7 +50,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	}
 	
 	private ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
-		String choice = HAPIUtils.resolveDatatypeValue(binding.getValueSet());
+		String choice = HAPIUtils.resolveDstu2DatatypeValue(binding.getValueSet());
 		String strength = binding.getStrength();
 		
 		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice)), strength);

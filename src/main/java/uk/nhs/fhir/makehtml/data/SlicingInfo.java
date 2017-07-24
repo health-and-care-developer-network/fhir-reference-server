@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionSlicingComponent;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -18,16 +20,6 @@ public class SlicingInfo {
 	private final Set<String> discriminatorPaths = Sets.newHashSet();
 	private final Boolean ordered;
 	private final String rules;
-	
-	public SlicingInfo(Slicing slicing) {
-		this(
-			slicing.getDescription(),
-			slicing.getDiscriminator().stream()
-				.map(stringDt -> stringDt.getValue())
-				.collect(Collectors.toSet()),
-			slicing.getOrdered(),
-			slicing.getRules());
-	}
 	
 	public SlicingInfo(String description, Set<String> discriminatorPaths, Boolean ordered, String rules) {
 		this.description = description;

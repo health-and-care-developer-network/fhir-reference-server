@@ -31,7 +31,7 @@ public abstract class WrappedElementDefinition {
 	public abstract Optional<String> getDefinition();
 	public abstract Optional<SlicingInfo> getSlicing();
 	public abstract Optional<String> getFixedValue();
-	public abstract Optional<String> getExample();
+	public abstract List<String> getExamples();
 	public abstract Optional<String> getDefaultValue();
 	public abstract Optional<BindingInfo> getBinding();
 	public abstract Optional<String> getRequirements();
@@ -49,7 +49,7 @@ public abstract class WrappedElementDefinition {
 		if (definition instanceof ElementDefinitionDt) {
 			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition);
 		} else if (definition instanceof ElementDefinition) {
-			return new WrappedDstu3ElementDefinition((ElementDefinition)definition);
+			return new WrappedStu3ElementDefinition((ElementDefinition)definition);
 		} else {
 			throw new IllegalStateException("Can't wrap element definition class " + definition.getClass().getCanonicalName());
 		}

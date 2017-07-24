@@ -41,8 +41,7 @@ public interface FhirTreeTableContent {
 	boolean isFixedValue();
 	Optional<String> getFixedValue();
 
-	boolean hasExample();
-	Optional<String> getExample();
+	List<String> getExamples();
 
 	boolean hasDefaultValue();
 	Optional<String> getDefaultValue();

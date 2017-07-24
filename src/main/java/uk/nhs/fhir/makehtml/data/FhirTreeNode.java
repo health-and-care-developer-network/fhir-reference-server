@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.context.FhirDstu2DataTypes;
+import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -32,7 +33,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<SlicingInfo> slicingInfo = Optional.empty();
 	private Optional<String> sliceName = Optional.empty();
 	private Optional<String> fixedValue = Optional.empty();
-	private Optional<String> example = Optional.empty();
+	private List<String> examples = Lists.newArrayList();
 	private Optional<String> defaultValue = Optional.empty();
 	private Optional<BindingInfo> binding = Optional.empty();
 	private Optional<String> definition = Optional.empty();
@@ -178,7 +179,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	private static final Map<String, LinkData> fixableTypes = new HashMap<>();
 	static {
-		fixableTypes.put("extension", new SimpleLinkData(FullFhirURL.buildOrThrow("http://hl7.org/fhir/DSTU2/extensibility.html#Extension"), "Extension"));
+		fixableTypes.put("extension", new SimpleLinkData(FullFhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension"), "Extension"));
 	}
 	
 	public List<LinkData> getTypeLinks() {
@@ -366,17 +367,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public void setFixedValue(Optional<String> fixedValue) {
 		this.fixedValue = fixedValue;
 	}
-	
-	public boolean hasExample() {
-		return example.isPresent();
+
+	public List<String> getExamples() {
+		return examples;
 	}
 
-	public Optional<String> getExample() {
-		return example;
-	}
-
-	public void setExample(Optional<String> exampleValue) {
-		this.example = exampleValue;
+	public void setExamples(List<String> examples) {
+		this.examples = examples;
 	}
 
 	public boolean hasDefaultValue() {

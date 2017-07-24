@@ -1,10 +1,10 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.makehtml.data.wrap;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
+import ca.uhn.fhir.context.FhirStu3DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
@@ -13,9 +13,9 @@ import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.util.StringUtil;
 
-public class Dstu2FhirDocLinkFactory {
-	
+public class Stu3FhirDocLinkFactory {
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
 		String typeURL;
@@ -23,7 +23,7 @@ public class Dstu2FhirDocLinkFactory {
 			return forCodedType((CodeDt)fhirData);
 		} else {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
-			typeURL = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
+			typeURL = FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName;
 			
 			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL), StringUtil.capitaliseLowerCase(dataTypeName));
 		}
@@ -55,7 +55,7 @@ public class Dstu2FhirDocLinkFactory {
 	}
 
 	private String urlForDataTypeName(String dataTypeName) {
-		switch (FhirDstu2DataTypes.forType(dataTypeName)) {
+		switch (FhirStu3DataTypes.forType(dataTypeName)) {
 			case EXTENSION:
 				return urlForExtension();
 			case RESOURCE:
@@ -81,18 +81,18 @@ public class Dstu2FhirDocLinkFactory {
 	}
 
 	private String urlForDomainResource() {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/domainresource.html";
+		return FhirURLConstants.HTTP_HL7_STU3 + "/domainresource.html";
 	}
 
 	private String urlForExtension() {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension";
+		return FhirURLConstants.HTTP_HL7_STU3 + "/extensibility.html#Extension";
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/" + complexTypeName.toLowerCase() + ".html";
+		return FhirURLConstants.HTTP_HL7_STU3 + "/" + complexTypeName.toLowerCase() + ".html";
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
+		return FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName.toLowerCase();
 	}
 }

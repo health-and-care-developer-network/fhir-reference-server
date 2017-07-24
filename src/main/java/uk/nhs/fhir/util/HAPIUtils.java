@@ -3,6 +3,10 @@ package uk.nhs.fhir.util;
 import java.util.Date;
 import java.util.List;
 
+import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.Type;
+
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -44,7 +48,7 @@ public class HAPIUtils {
 		return DSTU3_CONTEXT.newXmlParser();
 	}
 	
-	public static String resolveDatatypeValue(IDatatype datatype) {
+	public static String resolveDstu2DatatypeValue(IDatatype datatype) {
 		if (datatype instanceof BasePrimitive) {
 			return ((BasePrimitive<?>) datatype).getValueAsString();
 		} else if (datatype instanceof ResourceReferenceDt) {
@@ -52,6 +56,21 @@ public class HAPIUtils {
 		} else {
 			throw new IllegalStateException("Unhandled type for datatype: " + datatype.getClass().getName());
 		}
+	}
+	
+	public static String resolveStu3DatatypeValue(Type dataType) {
+		String value;
+		if (dataType instanceof Reference) {
+			value = ((Reference)dataType).getReference();
+		} else {
+			throw new IllegalStateException("Unhandled type for datatype: " + dataType.getClass().getName());
+		}
+		
+		if(Strings.isNullOrEmpty(value)) {
+			throw new IllegalStateException("Got empty or null value string for: " + dataType.getClass().getName());
+		}
+		
+		return value;
 	}
 	
 	public static String periodToString(PeriodDt period) {

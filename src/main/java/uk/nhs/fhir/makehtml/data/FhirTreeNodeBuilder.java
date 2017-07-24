@@ -96,7 +96,7 @@ public class FhirTreeNodeBuilder {
 		}
 		
 		node.setFixedValue(elementDefinition.getFixedValue());
-		node.setExample(elementDefinition.getExample());
+		node.setExamples(elementDefinition.getExamples());
 		node.setDefaultValue(elementDefinition.getDefaultValue());
 		node.setBinding(elementDefinition.getBinding());
 		

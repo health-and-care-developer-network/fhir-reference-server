@@ -147,12 +147,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public boolean hasExample() {
-		return false;
-	}
-
-	@Override
-	public Optional<String> getExample() {
+	public List<String> getExamples() {
 		throw new IllegalStateException("Dummy node cannot have fixed example info");
 	}
 
