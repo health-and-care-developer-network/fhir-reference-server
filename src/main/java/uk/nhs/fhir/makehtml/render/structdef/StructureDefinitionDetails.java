@@ -17,7 +17,7 @@ import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
@@ -34,7 +34,7 @@ public class StructureDefinitionDetails {
 	private final Optional<String> definition;
 	private final String cardinality;
 	private final Optional<BindingInfo> binding;
-	private final List<LinkData> typeLinks;
+	private final LinkDatas typeLinks;
 	private final Optional<String> requirements;
 	private final List<String> aliases;
 	private final ResourceFlags resourceFlags;
@@ -46,7 +46,7 @@ public class StructureDefinitionDetails {
 	private final List<FhirElementMapping> mappings;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
-			List<LinkData> typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
+			LinkDatas typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
 			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings) {
 		this.pathName = pathName;
@@ -210,7 +210,7 @@ public class StructureDefinitionDetails {
 						typeLinkCell)));
 	}
 	
-	private Element linkCell(List<LinkData> linkDatas) {
+	private Element linkCell(LinkDatas linkDatas) {
 		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet(), false, false).makeCell();
 	}
 
@@ -348,7 +348,7 @@ public class StructureDefinitionDetails {
 		return binding;
 	}
 
-	public List<LinkData> getTypeLinks() {
+	public LinkDatas getTypeLinks() {
 		return typeLinks;
 	}
 
@@ -395,8 +395,8 @@ public class StructureDefinitionDetails {
 		if (!getBindingInfo().equals(detail.getBindingInfo())) {
 			throw new IllegalStateException("Same key, different binding info (" + key + ").");
 		}
-		if (!getTypeLinks().stream().allMatch(link -> detail.getTypeLinks().contains(link))) {
-			throw new IllegalStateException("Same key, different types info (" + key + ").");
+		if (!getTypeLinks().equals(detail.getTypeLinks())) {
+			throw new IllegalStateException("Same key, different type links info (" + key + ").");
 		}
 		if (!getRequirements().equals(detail.getRequirements())) {
 			throw new IllegalStateException("Same key, different requirements info (" + key + ").");

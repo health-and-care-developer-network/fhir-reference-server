@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
 	private final Optional<String> max;
-	private final List<LinkData> typeLinks;
+	private final LinkDatas typeLinks;
 	private final String information;
 	private final List<ConstraintInfo> constraints;
 	private final String path;
@@ -49,6 +50,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private FhirTreeNode backupNode = null;
 
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
+	
+	private Optional<ExtensionUrlDiscriminatorResolver> extensionUrlDiscriminatorResolver = Optional.empty();
 
 	public FhirTreeNode(
 			Optional<FhirDstu2Icon> icon,
@@ -56,7 +59,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			ResourceFlags flags,
 			Integer min,
 			String max,
-			List<LinkData> typeLinks,
+			LinkDatas typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
 			String path,
@@ -139,6 +142,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.sliceName = sliceName;
 	}
 
+	public Optional<String> getSliceName() {
+		return sliceName;
+	}
+
 	public Optional<Integer> getMin() {
 		return min;
 	}
@@ -177,12 +184,12 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return resourceFlags;
 	}
 
-	private static final Map<String, LinkData> fixableTypes = new HashMap<>();
+	private static final Map<String, SimpleLinkData> fixableTypes = new HashMap<>();
 	static {
 		fixableTypes.put("extension", new SimpleLinkData(FullFhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension"), "Extension"));
 	}
 	
-	public List<LinkData> getTypeLinks() {
+	public LinkDatas getTypeLinks() {
 		if (useBackupTypeLinks()) {
 			return backupNode.getTypeLinks();
 		}
@@ -190,13 +197,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (typeLinks.isEmpty()
 		  && linkedNodeName.isPresent()) {
 			String linkedContentKey = getLinkedNode().get().getNodeKey();
-			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey), "see " + linkedContentKey));
+			typeLinks.addSimpleLink(new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey), "see " + linkedContentKey));
 		}
 		
 		if (typeLinks.isEmpty()
 		  && fixableTypes.containsKey(getPathName())) {
 			RendererError.handle(RendererError.Key.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
-			typeLinks.add(fixableTypes.get(getPathName()));
+			typeLinks.addSimpleLink(fixableTypes.get(getPathName()));
 		} 
 
 		if (typeLinks.isEmpty()) {
@@ -205,7 +212,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		
 		if (getPathName().endsWith("[x]")
 		  && hasAllTypes()) {
-			return Lists.newArrayList(FhirDstu2DataTypes.openTypeLink());
+			return new LinkDatas(FhirDstu2DataTypes.openTypeLink());
 		} else {
 			return typeLinks;
 		}
@@ -218,7 +225,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 				"Range", "Period", "Ratio", "SampledData", "Signature", "HumanName", "Address", "ContactPoint",
 				"Timing", "Reference", "Meta");
 		
-		Set<String> containedTypes = typeLinks.stream().map(typeLink -> typeLink.getText()).collect(Collectors.toSet());
+		Set<String> containedTypes = typeLinks.links().stream().map(typeLink -> typeLink.getKey().getText()).collect(Collectors.toSet());
 		return allTypes.stream().allMatch(type -> containedTypes.contains(type));
 	}
 
@@ -417,7 +424,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public String toString() {
-		return getPath();
+		return getNodeKey();
 	}
 
 	public Optional<String> getRequirements() {
@@ -484,9 +491,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	public Set<FhirURL> getExtensionUrlDiscriminators() {
 		return getTypeLinks()
+			.links()
 			.stream()
-			.filter(typeLink -> typeLink.getPrimaryLinkData().getText().equals("Extension"))
-			.flatMap(typeLink -> typeLink instanceof NestedLinkData ? ((NestedLinkData)typeLink).getNestedLinks().stream() : Lists.newArrayList(typeLink.getPrimaryLinkData()).stream())
+			.filter(typeLink -> typeLink.getKey().getText().equals("Extension"))
+			.flatMap(typeLink -> typeLink.getValue().isEmpty() ? Lists.newArrayList(typeLink.getKey()).stream() : typeLink.getValue().stream())
 			.map(link -> link.getURL())
 			.collect(Collectors.toSet());
 	}
@@ -530,10 +538,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			
 			for (String discriminatorPath : discriminatorPaths) {
 				if (getPathName().equals("extension") 
-				  && discriminatorPath.equals("url")) {
+				  && discriminatorPath.equals("url")
+				  && extensionUrlDiscriminatorResolver.isPresent()) {
 					// special case
 					
-					Set<FhirURL> extensionUrlDiscriminators = getExtensionUrlDiscriminators();
+					Set<FhirURL> extensionUrlDiscriminators = extensionUrlDiscriminatorResolver.get().getExtensionUrlDiscriminators(this);
 					
 					if (extensionUrlDiscriminators.size() == 0) {
 						RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "
@@ -541,56 +550,60 @@ public class FhirTreeNode implements FhirTreeTableContent {
 						discriminators.add("<missing>");
 					} else if (extensionUrlDiscriminators.size() > 1) {
 						throw new IllegalStateException("Don't yet handle multiple extension url discriminators. Consider ordering so that keys are consistent?");
-					} else {
-						discriminators.add(extensionUrlDiscriminators.stream().findFirst().get().toFullString());
+					} else if (!extensionUrlDiscriminators.iterator().next().equals(FhirURL.buildOrThrow("http://hl7.org/fhir/stu3/extensibility.html#Extension"))){
+						discriminators.add(extensionUrlDiscriminators.iterator().next().toFullString());
 					}
-				} else if (discriminatorPath.endsWith("@type")) {
-					Optional<FhirTreeTableContent> discriminatorNode;
-					if (discriminatorPath.equals("@type")) {
-						discriminatorNode = Optional.of(this);
-					} else {
-						String relativePath = discriminatorPath.substring(0, discriminatorPath.length() - 1 - "@type".length());
-						discriminatorNode = findUniqueDescendantMatchingPath(relativePath);
-					}
-					
-					if (discriminatorNode.isPresent()) {
-						// if the element is a reference type, we need to look at the type it is a reference to. Otherwise it's just the type string.
-						List<LinkData> discriminatorNodeTypeLinks = discriminatorNode.get().getTypeLinks();
-						for (LinkData discriminatorNodeTypeLink : discriminatorNodeTypeLinks) {
-							if (discriminatorNodeTypeLink instanceof SimpleLinkData) {
-								discriminators.add(((SimpleLinkData) discriminatorNodeTypeLink).getText());
-							} else {
-								throw new IllegalStateException("Don't yet handle @type discriminator node with nested type links (" + getPath() + " -> " + discriminatorPath + ")");
-							}
-						}
-					} else {
-						throw new IllegalStateException("Couldn't resolve discriminatorPath '" + discriminatorPath + "' for node " + getPath());
-					}
-				} else {
-					// most discriminators
-					
-					Optional<FhirTreeTableContent> discriminatorNode = findUniqueDescendantMatchingPath(discriminatorPath);
-					boolean foundNode = discriminatorNode.isPresent(); 
-					boolean isFixed = foundNode && discriminatorNode.get().isFixedValue();
-					boolean hasBinding = foundNode && discriminatorNode.get().hasBinding();
-					
-					if (!foundNode) {
-						throw new IllegalStateException("Couldn't resolve discriminatorPath '" + discriminatorPath + "' for node " + getPath());
-					// fixed value is simpler, so give it priority if we have both
-					} else if (isFixed) {
-						Optional<String> discriminatorValue = discriminatorNode.get().getFixedValue();
-						discriminators.add(discriminatorValue.get());
-					} else if (hasBinding) {
-						BindingInfo bindingInfo = discriminatorNode.get().getBinding().get();
-						if (bindingInfo.getUrl().isPresent()) {
-							discriminators.add(bindingInfo.getDescription().get());
+				}
+				
+				if (discriminators.isEmpty()) {
+					if (discriminatorPath.endsWith("@type")) {
+						Optional<FhirTreeTableContent> discriminatorNode;
+						if (discriminatorPath.equals("@type")) {
+							discriminatorNode = Optional.of(this);
 						} else {
-							discriminators.add(bindingInfo.getUrl().get().toFullString());
+							String relativePath = discriminatorPath.substring(0, discriminatorPath.length() - 1 - "@type".length());
+							discriminatorNode = findUniqueDescendantMatchingPath(relativePath);
+						}
+						
+						if (discriminatorNode.isPresent()) {
+							// if the element is a reference type, we need to look at the type it is a reference to. Otherwise it's just the type string.
+							LinkDatas discriminatorNodeTypeLinks = discriminatorNode.get().getTypeLinks();
+							for (Entry<SimpleLinkData, List<SimpleLinkData>> discriminatorNodeTypeLink : discriminatorNodeTypeLinks.links()) {
+								if (discriminatorNodeTypeLink.getValue().isEmpty()) {
+									discriminators.add(discriminatorNodeTypeLink.getKey().getText());
+								} else {
+									throw new IllegalStateException("Don't yet handle @type discriminator node with nested type links (" + getPath() + " -> " + discriminatorPath + ")");
+								}
+							}
+						} else {
+							throw new IllegalStateException("Couldn't resolve discriminatorPath '" + discriminatorPath + "' for node " + getPath());
 						}
 					} else {
-						RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, 
-							"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + getPath());
-						discriminators.add("<missing>");
+						// most discriminators
+						
+						Optional<FhirTreeTableContent> discriminatorNode = findUniqueDescendantMatchingPath(discriminatorPath);
+						boolean foundNode = discriminatorNode.isPresent(); 
+						boolean isFixed = foundNode && discriminatorNode.get().isFixedValue();
+						boolean hasBinding = foundNode && discriminatorNode.get().hasBinding();
+						
+						if (!foundNode) {
+							throw new IllegalStateException("Couldn't resolve discriminatorPath '" + discriminatorPath + "' for node " + getPath());
+						// fixed value is simpler, so give it priority if we have both
+						} else if (isFixed) {
+							Optional<String> discriminatorValue = discriminatorNode.get().getFixedValue();
+							discriminators.add(discriminatorValue.get());
+						} else if (hasBinding) {
+							BindingInfo bindingInfo = discriminatorNode.get().getBinding().get();
+							if (bindingInfo.getUrl().isPresent()) {
+								discriminators.add(bindingInfo.getDescription().get());
+							} else {
+								discriminators.add(bindingInfo.getUrl().get().toFullString());
+							}
+						} else {
+							RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, 
+								"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + getPath());
+							discriminators.add("<missing>");
+						}
 					}
 				}
 			}
@@ -627,5 +640,12 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	
 	public List<FhirElementMapping> getMappings() {
 		return mappings;
+	}
+	
+	public void setExtensionUrlDiscriminatorResolver(ExtensionUrlDiscriminatorResolver resolver) {
+		this.extensionUrlDiscriminatorResolver = Optional.of(resolver);
+	}
+	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
+		return extensionUrlDiscriminatorResolver;
 	}
 }

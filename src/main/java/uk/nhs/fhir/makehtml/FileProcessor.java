@@ -15,6 +15,8 @@ import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.data.FhirRelease;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.HAPIUtils;
 
 public class FileProcessor {
@@ -29,6 +31,12 @@ public class FileProcessor {
 		    IBaseResource resource = parseFile(thisFile);
 		    
 			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(resource);
+			
+			if (wrappedResource instanceof WrappedStructureDefinition
+			  && ((WrappedStructureDefinition)wrappedResource).missingSnapshot()) {
+				RendererError.handle(RendererError.Key.RESOURCE_WITHOUT_SNAPSHOT, "Resource at " + thisFile.getAbsolutePath() + " doesn't have a snapshot element");
+				return;
+			}
 
 		    wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL);
 		    wrappedResource.saveFormattedOutputs(thisFile, outPath, newBaseURL);

@@ -35,12 +35,12 @@ public class Stu3FhirDocLinkFactory {
 		return forDataTypeName(dataTypeName);
 	}
 	
-	public LinkData forDataTypeName(String dataTypeName) {
+	public SimpleLinkData forDataTypeName(String dataTypeName) {
 		String url = urlForDataTypeName(dataTypeName);
 		return new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
 	}
 
-	public LinkData withNestedLinks(String dataTypeName, List<String> nestedLinkUris) {
+	public NestedLinkData withNestedLinks(String dataTypeName, List<String> nestedLinkUris) {
 		String url = urlForDataTypeName(dataTypeName);
 		SimpleLinkData outer = new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
 		
@@ -75,6 +75,14 @@ public class Stu3FhirDocLinkFactory {
 				return urlForDomainResource();
 			case ELEMENT:
 				return urlForComplexDataType(dataTypeName);
+			case META:
+				return FhirURLConstants.HTTP_HL7_STU3 + "/resource.html#Meta";
+			case NARRATIVE:
+				return FhirURLConstants.HTTP_HL7_STU3 + "/narrative.html#Narrative";
+			case REFERENCE:
+				return FhirURLConstants.HTTP_HL7_STU3 + "/references.html";
+			case METADATA:
+				return FhirURLConstants.HTTP_HL7_STU3 + "metadatatypes.html#" + dataTypeName;
 			default:
 				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}

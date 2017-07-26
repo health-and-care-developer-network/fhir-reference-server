@@ -13,7 +13,7 @@ public class TestFhirTreeNode {
 			new ResourceFlags(), 
 			0, 
 			"*", 
-			Lists.newArrayList(), 
+			new LinkDatas(), 
 			"", 
 			Lists.newArrayList(), 
 			path,

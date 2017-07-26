@@ -35,13 +35,16 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
+import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
@@ -68,8 +71,8 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public List<LinkData> getTypeLinks() {
-		List<LinkData> typeLinks = Lists.newArrayList();
+	public LinkDatas getTypeLinks() {
+		LinkDatas typeLinks = new LinkDatas();
 		
 		List<TypeRefComponent> knownTypes = FhirStu3DataTypes.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
@@ -77,13 +80,23 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 
 				String code = type.getCode();
 				
-				if (type.hasProfile() && !type.getCode().equals("Extension")) {
+				if (type.hasProfile()) {
 					String profile = type.getProfile();
-					throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
+					if (code.equals("Extension")
+					  || code.equals("Quantity")
+					  || code.equals("Reference")) {
+						SimpleLinkData codeLink = typeLinkFactory.forDataTypeName(type.getCode());
+						typeLinks.addNestedUri(codeLink, profile);
+					} else {
+						throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
+					}
 				} else if (type.hasTargetProfile()) {
 					if (type.getCode().equals("Reference")) {
-						typeLinkFactory.forDataTypeName(type.getCode());
-						typeLinks.add(typeLinkFactory.withNestedLinks(code, Lists.newArrayList(type.getTargetProfile())));
+						SimpleLinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
+						typeLinks.addNestedUri(referenceLink, type.getTargetProfile());
+					} else if (type.getCode().equals("string")){
+						RendererError.handle(RendererError.Key.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
+						typeLinks.addSimpleLink(typeLinkFactory.forDataTypeName(type.getCode()));
 					} else {
 						String targetProfile = type.getTargetProfile();
 						throw new IllegalStateException("should we be incorporating target profile (" + targetProfile + ") into type links? " + getPath());
@@ -91,9 +104,9 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 				} else if (type.hasAggregation()) {
 					String aggregation = String.join(", ", type.getAggregation().stream().map(aggregationMode -> aggregationMode.asStringValue()).collect(Collectors.toList()));
 					throw new IllegalStateException("should we be incorporating profile (" + aggregation + ") into type links? " + getPath());
+				} else {
+					typeLinks.addSimpleLink(typeLinkFactory.forDataTypeName(code));
 				}
-				
-				typeLinks.add(typeLinkFactory.forDataTypeName(code));
 			}
 		}
 		
@@ -369,4 +382,13 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 		return Optional.ofNullable(definition.getSliceName());
 	}
 
+	private static final ExtensionUrlDiscriminatorResolver resolver = new DSTU2ExtensionUrlDiscriminatorResolver();  
+	
+	@Override
+	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
+		//return Optional.empty();
+		
+		// thought this was only required for DSTU2, but seems inconsistent in the STU3 profiles we have. TODO To query.
+		return Optional.of(resolver);
+	}
 }

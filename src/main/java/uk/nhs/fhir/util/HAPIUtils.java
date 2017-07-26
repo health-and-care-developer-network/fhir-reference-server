@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.dstu3.model.UriType;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -62,6 +63,8 @@ public class HAPIUtils {
 		String value;
 		if (dataType instanceof Reference) {
 			value = ((Reference)dataType).getReference();
+		} else if (dataType instanceof UriType) {
+			value = ((UriType)dataType).getValue();
 		} else {
 			throw new IllegalStateException("Unhandled type for datatype: " + dataType.getClass().getName());
 		}

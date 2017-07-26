@@ -13,6 +13,7 @@ import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
@@ -26,7 +27,7 @@ public class TestFhirTreeTable {
 			new ResourceFlags(),
 			0,
 			"1",
-			Lists.newArrayList(new SimpleLinkData(FhirURL.buildOrThrow("http://www.example.com"), "testlink")),
+			new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://www.example.com"), "testlink")),
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource",

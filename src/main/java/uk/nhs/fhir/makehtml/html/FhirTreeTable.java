@@ -2,6 +2,7 @@ package uk.nhs.fhir.makehtml.html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,8 +18,7 @@ import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.NestedLinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
@@ -121,7 +121,7 @@ public class FhirTreeTable {
 	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
-		List<LinkData> typeLinks = nodeToAdd.getTypeLinks();
+		LinkDatas typeLinks = nodeToAdd.getTypeLinks();
 		
 		if (typeLinks.isEmpty()) {
 			RendererError.handle(RendererError.Key.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
@@ -224,12 +224,11 @@ public class FhirTreeTable {
 		
 		// Extensions
 		if (node.getPathName().equals("extension")) {
-			List<LinkData> typeLinks = node.getTypeLinks();
-			for (LinkData link : typeLinks) {
-				if (link instanceof NestedLinkData
-				  && link.getPrimaryLinkData().getText().equals("Extension")) {
-					NestedLinkData extensionLinkData = (NestedLinkData)link;
-					for (SimpleLinkData nestedLink : extensionLinkData.getNestedLinks()) {
+			LinkDatas typeLinks = node.getTypeLinks();
+			for (Entry<SimpleLinkData, List<SimpleLinkData>> link : typeLinks.links()) {
+				if (!link.getValue().isEmpty()
+				  && link.getKey().getText().equals("Extension")) {
+					for (SimpleLinkData nestedLink : link.getValue()) {
 						resourceInfos.add(new ResourceInfo("URL", nestedLink.getURL(), ResourceInfoType.EXTENSION_URL));
 					}
 				}

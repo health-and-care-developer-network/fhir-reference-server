@@ -20,7 +20,6 @@ import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HAPIUtils;
 
@@ -120,7 +119,7 @@ public class FhirDstu2DataTypes {
 		return implementee.isAssignableFrom(implementor);
 	}
 	
-	public static LinkData openTypeLink() {
+	public static SimpleLinkData openTypeLink() {
 		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
 	}
 }

@@ -31,13 +31,16 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
+import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
@@ -47,6 +50,7 @@ import uk.nhs.fhir.util.HAPIUtils;
 public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
+	private static final ExtensionUrlDiscriminatorResolver resolver = new DSTU2ExtensionUrlDiscriminatorResolver();
 
 	private final ElementDefinitionDt definition;
 
@@ -65,21 +69,25 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public List<LinkData> getTypeLinks() {
-		List<LinkData> typeLinks = Lists.newArrayList();
+	public LinkDatas getTypeLinks() {
+		LinkDatas typeLinks = new LinkDatas();
 		
 		List<Type> knownTypes = FhirDstu2DataTypes.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
 			for (Type type : knownTypes) {
 				String code = type.getCode();
+				SimpleLinkData codeLink = typeLinkFactory.forDataTypeName(code);
 				
 				List<UriDt> profileUris = type.getProfile();
+				
+				
 				if (profileUris.isEmpty()) {
-					typeLinks.add(typeLinkFactory.forDataTypeName(code));
+					typeLinks.addSimpleLink(codeLink);
 				} else {
-					List<String> uris = Lists.newArrayList();
-					profileUris.forEach((UriDt uri) -> uris.add(uri.getValue()));
-					typeLinks.add(typeLinkFactory.withNestedLinks(code, uris));
+					profileUris.forEach(
+						(UriDt uri) -> typeLinks.addNestedLink(
+								codeLink, 
+							typeLinkFactory.fromUri(uri.getValue())));
 				}
 			}
 		}
@@ -370,7 +378,12 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<String> getSliceName() {
-		return Optional.empty();
+		return Optional.ofNullable(definition.getName());
+	}
+
+	@Override
+	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
+		return Optional.of(resolver);
 	}
 	
 }

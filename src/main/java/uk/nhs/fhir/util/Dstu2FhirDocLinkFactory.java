@@ -1,9 +1,5 @@
 package uk.nhs.fhir.util;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
 import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
@@ -11,7 +7,6 @@ import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
 public class Dstu2FhirDocLinkFactory {
@@ -35,23 +30,15 @@ public class Dstu2FhirDocLinkFactory {
 		return forDataTypeName(dataTypeName);
 	}
 	
-	public LinkData forDataTypeName(String dataTypeName) {
+	public SimpleLinkData forDataTypeName(String dataTypeName) {
 		String url = urlForDataTypeName(dataTypeName);
 		return new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
 	}
-
-	public LinkData withNestedLinks(String dataTypeName, List<String> nestedLinkUris) {
-		String url = urlForDataTypeName(dataTypeName);
-		SimpleLinkData outer = new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
-		
-		List<SimpleLinkData> nestedLinks = Lists.newArrayList();
-		for (String nestedLinkUri : nestedLinkUris) {
-			String[] uriTokens = nestedLinkUri.split("/");
-			String linkTargetName = uriTokens[uriTokens.length - 1];
-			nestedLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri), StringUtil.capitaliseLowerCase(linkTargetName)));
-		}
-		
-		return new NestedLinkData(outer, nestedLinks);
+	
+	public SimpleLinkData fromUri(String uri) {
+		String[] uriTokens = uri.split("/");
+		String linkTargetName = uriTokens[uriTokens.length - 1];
+		return new SimpleLinkData(FhirURL.buildOrThrow(uri), StringUtil.capitaliseLowerCase(linkTargetName));
 	}
 
 	private String urlForDataTypeName(String dataTypeName) {

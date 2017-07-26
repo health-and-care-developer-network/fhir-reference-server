@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
-
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
@@ -17,11 +15,11 @@ public class FhirTreeNodeBuilder {
 		
 		Optional<String> name = Optional.ofNullable(elementDefinition.getName());
 
-		List<LinkData> typeLinks = Lists.newArrayList();
+		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
-			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
+			typeLinks = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
 		} else {
-			typeLinks.addAll(elementDefinition.getTypeLinks());
+			typeLinks = elementDefinition.getTypeLinks();
 		}
 		
 		Set<FhirDataType> dataTypes = elementDefinition.getDataTypes();
@@ -121,6 +119,14 @@ public class FhirTreeNodeBuilder {
 		
 		node.setMappings(elementDefinition.getMappings());
 		NodeMappingValidator.validate(node);
+		
+		node.setSliceName(elementDefinition.getSliceName());
+		
+		// DSTU2 extension elements sliced on url actually refer to the XML element at extension/type/profile/@value
+		Optional<ExtensionUrlDiscriminatorResolver> extensionUrlDiscriminatorResolver = elementDefinition.getExtensionUrlDiscriminatorResolver();
+		if (extensionUrlDiscriminatorResolver.isPresent()) {
+			node.setExtensionUrlDiscriminatorResolver(extensionUrlDiscriminatorResolver.get());
+		}
 		
 		return node;
 	}

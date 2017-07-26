@@ -36,7 +36,9 @@ public class RendererError {
 		FIX_MISSING_TYPE_LINK,
 		MULTIPLE_MAPPINGS_SAME_KEY,
 		IGNORABLE_MAPPING_ID,
-		MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE;
+		MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE,
+		TYPELINK_STRING_WITH_PROFILE,
+		RESOURCE_WITHOUT_SNAPSHOT;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -53,18 +55,20 @@ public class RendererError {
 		responses.put(Key.NO_DISCRIMINATORS_FOUND, ErrorResponse.LOG_WARNING);
 		responses.put(Key.MISSING_CARDINALITY, ErrorResponse.LOG_WARNING);
 		responses.put(Key.FIX_MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
+		responses.put(Key.RESOURCE_WITHOUT_SNAPSHOT, ErrorResponse.LOG_WARNING);
 		responses.put(Key.DUPLICATE_CONSTRAINT_KEYS, ErrorResponse.IGNORE);
 		responses.put(Key.IGNORABLE_MAPPING_ID, ErrorResponse.IGNORE);
 		
 		// Perhaps valid?
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
+		responses.put(Key.TYPELINK_STRING_WITH_PROFILE, ErrorResponse.LOG_WARNING);
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY, ErrorResponse.IGNORE);
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 		
 		// Unsorted
 
-		// Currently not reached
+		// Currently not hit
 		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.THROW);
 		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.THROW);
 		responses.put(Key.LINK_WITH_LOGICAL_URL, ErrorResponse.THROW);

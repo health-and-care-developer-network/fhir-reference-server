@@ -69,9 +69,10 @@ public class StructureDefinitionTreeDataProvider {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}
 		
+		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
+		
 		// Workaround for a Forge bug which means the differential node for the profiled choice is correctly renamed
 		// but the snapshot name is unchanged.
-		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
 		if (matchingNodes.size() == 0) {
 			String differentialPath = differentialNode.getPath();
 			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
@@ -157,22 +158,33 @@ public class StructureDefinitionTreeDataProvider {
 			return null;
 		}
 		
-		FhirTreeTableContent ancestorParent = ancestor.getParent();
+		while (ancestor != null) {
+			if (ancestor.hasSlicingSibling()
+			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingSibling())) {
+				if (!(ancestor instanceof FhirTreeNode)) {
+					throw new IllegalStateException("First sliced ancestor is a dummy node (" + ancestor.getPath() + " for " + node.getPath());
+				} else {
+					return (FhirTreeNode)ancestor;
+				}
+			}
+			
+			ancestor = ancestor.getParent();
+		}
+		
+		/*FhirTreeTableContent ancestorParent = ancestor.getParent();
 		
 		while (ancestorParent != null) {
-			if (ancestor instanceof FhirTreeNode) {
-				String nodePath = ancestor.getPath();
-				for (FhirTreeTableContent child : ancestorParent.getChildren()) {
-					if (child.getPath().equals(nodePath)
-					  && child.hasSlicingInfo()) {
-						return (FhirTreeNode)ancestor;
-					}
+			String ancestorPath = ancestor.getPath();
+			for (FhirTreeTableContent child : ancestorParent.getChildren()) {
+				if (child.getPath().equals(ancestorPath)
+				  && child.hasSlicingInfo()) {
+					return (FhirTreeNode)ancestor;
 				}
 			}
 			
 			ancestor = ancestorParent;
 			ancestorParent = ancestor.getParent();
-		}
+		}*/
 		
 		return null;
 	}
@@ -201,16 +213,16 @@ public class StructureDefinitionTreeDataProvider {
 
 	private List<FhirTreeNode> filterOnNameIfPresent(FhirTreeTableContent element, List<FhirTreeNode> toFilter) {
 		if (element instanceof FhirTreeNode 
-		  && ((FhirTreeNode)element).getName().isPresent()
-		  && !((FhirTreeNode)element).getName().get().isEmpty()) {
+		  && ((FhirTreeNode)element).getSliceName().isPresent()
+		  && !((FhirTreeNode)element).getSliceName().get().isEmpty()) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)element;
-			String name = fhirTreeNode.getName().get();
+			String name = fhirTreeNode.getSliceName().get();
 			
 			List<FhirTreeNode> nameMatches = Lists.newArrayList();
 			
 			for (FhirTreeNode node : toFilter) {
-				if (node.getName().isPresent()
-				  && node.getName().get().equals(name)) {
+				if (node.getSliceName().isPresent()
+				  && node.getSliceName().get().equals(name)) {
 					nameMatches.add(node);
 				}
 			}

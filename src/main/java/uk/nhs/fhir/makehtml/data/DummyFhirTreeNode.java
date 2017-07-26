@@ -72,19 +72,19 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public boolean hasSlicingInfo() {
-		return false;
+		return backup.hasSlicingInfo();
 	}
 	@Override
 	public Optional<SlicingInfo> getSlicingInfo() {
-		throw new IllegalStateException("Dummy node cannot have slicing info");
+		return backup.getSlicingInfo();
 	}
 
 	@Override
-	public List<LinkData> getTypeLinks() {
+	public LinkDatas getTypeLinks() {
 		if (DISPLAY_DUMMY_NODE_TYPES) {
 			return backup.getTypeLinks();
 		} else {
-			return Lists.newArrayList();
+			return new LinkDatas();
 		}
 	}
 
@@ -148,7 +148,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 
 	@Override
 	public List<String> getExamples() {
-		throw new IllegalStateException("Dummy node cannot have fixed example info");
+		return Lists.newArrayList();
 	}
 
 	@Override

@@ -124,7 +124,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public Optional<String> getContextType() {
-		return Optional.ofNullable(definition.getContextType().getDisplay());
+		if (definition.hasContextType()) {
+			return Optional.of(definition.getContextType().getDisplay());
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override
@@ -255,5 +259,10 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 		} catch (IOException | FHIRException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	@Override
+	public boolean missingSnapshot() {
+		return definition.getSnapshot().isEmpty();
 	}
 }

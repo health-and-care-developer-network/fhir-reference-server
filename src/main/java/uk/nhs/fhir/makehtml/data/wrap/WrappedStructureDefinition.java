@@ -44,6 +44,8 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 
 	public abstract FhirTreeData getSnapshotTree();
 	public abstract FhirTreeData getDifferentialTree();
+
+	public abstract boolean missingSnapshot();
 	
 	protected abstract void setCopyright(String updatedCopyRight);
 	

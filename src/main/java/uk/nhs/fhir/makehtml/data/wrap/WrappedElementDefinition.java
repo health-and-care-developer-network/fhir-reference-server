@@ -10,9 +10,10 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
+import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 
@@ -20,7 +21,7 @@ public abstract class WrappedElementDefinition {
 
 	public abstract String getName();
 	public abstract String getPath();
-	public abstract List<LinkData> getTypeLinks();
+	public abstract LinkDatas getTypeLinks();
 	public abstract Set<FhirDataType> getDataTypes();
 	public abstract ResourceFlags getResourceFlags();
 	public abstract Integer getCardinalityMin();
@@ -62,4 +63,5 @@ public abstract class WrappedElementDefinition {
 	public boolean isRootElement() {
 		return getPathParts().length == 1;
 	}
+	public abstract Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver();
 }

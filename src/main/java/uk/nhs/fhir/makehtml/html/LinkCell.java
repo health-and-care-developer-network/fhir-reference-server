@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.html;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,39 +12,34 @@ import org.jdom2.Text;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.NestedLinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public class LinkCell extends TableCell {
-	private final List<LinkData> linkDatas;
+	private final LinkDatas linkDatas;
 	private final Set<String> cellClasses;
 	private final Set<String> linkClasses;
 
-	public LinkCell(LinkData linkData) {
+	public LinkCell(LinkDatas linkData) {
 		this(linkData, Sets.newHashSet(), Sets.newHashSet());
 	}
 	
-	public LinkCell(List<LinkData> linkData) {
-		this(linkData, false);
-	}
-	
-	public LinkCell(List<LinkData> typeLinks, boolean faded) {
+	public LinkCell(LinkDatas typeLinks, boolean faded) {
 		this(typeLinks, faded, false);
 	}
 	
-	public LinkCell(LinkData linkData, Set<String> cellClasses, Set<String> linkClasses) {
-		this(Lists.newArrayList(linkData), cellClasses, linkClasses, false, false);
+	public LinkCell(LinkDatas linkData, Set<String> cellClasses, Set<String> linkClasses) {
+		this(linkData, cellClasses, linkClasses, false, false);
 	}
 
-	public LinkCell(List<LinkData> typeLinks, boolean faded, boolean strikethrough) {
+	public LinkCell(LinkDatas typeLinks, boolean faded, boolean strikethrough) {
 		this(typeLinks, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough);
 	}
 	
-	public LinkCell(List<LinkData> linkData, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
+	public LinkCell(LinkDatas linkData, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
 		super(faded, strikethrough);
 		this.linkDatas = linkData;
 		this.cellClasses = cellClasses;
@@ -54,7 +48,7 @@ public class LinkCell extends TableCell {
 
 	@Override
 	public Element makeCell() {
-		if (linkDatas.size() > 0) {
+		if (!linkDatas.isEmpty()) {
 			return makeMultiLinkCell();
 		} else {
 			return makeEmptyCell();
@@ -79,7 +73,7 @@ public class LinkCell extends TableCell {
 			children.add(new Text(" ("));
 			
 			boolean first = true;
-			for (LinkData nestedLink : nestedLinks) {
+			for (SimpleLinkData nestedLink : nestedLinks) {
 				if (!first) {
 					children.add(new Text(" | "));
 				}
@@ -97,28 +91,9 @@ public class LinkCell extends TableCell {
 	
 	private Element makeMultiLinkCell() {
 		List<Content> cellContents = Lists.newArrayList();
+
 		boolean addedLink = false;
-		
-		// Combine any nested links with the same outer link
-		Map<SimpleLinkData, List<SimpleLinkData>> links = new LinkedHashMap<>();
-		for (LinkData linkData : linkDatas) {
-			SimpleLinkData key = linkData.getPrimaryLinkData();
-			
-			List<SimpleLinkData> containedLinks;
-			if (!links.containsKey(key)) {
-				containedLinks = Lists.newArrayList();
-				links.put(key, containedLinks);
-			} else {
-				containedLinks = links.get(key);
-			}
-			
-			if (linkData instanceof NestedLinkData) {
-				List<SimpleLinkData> nestedLinks = ((NestedLinkData) linkData).getNestedLinks();
-				containedLinks.addAll(nestedLinks);
-			}
-		}
-		
-		for (Map.Entry<SimpleLinkData, List<SimpleLinkData>> link : links.entrySet()) {
+		for (Map.Entry<SimpleLinkData, List<SimpleLinkData>> link : linkDatas.links()) {
 			if (addedLink) {
 				cellContents.add(new Text(" | "));
 			}
@@ -152,7 +127,7 @@ public class LinkCell extends TableCell {
 			cellClasses);
 	}
 
-	Element makeLinkElement(LinkData linkData) {
+	Element makeLinkElement(SimpleLinkData linkData) {
 		Element link = 
 			Elements.addClasses(
 				Elements.withAttributesAndText("a",

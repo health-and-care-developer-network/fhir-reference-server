@@ -22,7 +22,7 @@ public interface FhirTreeTableContent {
 	String getPathName();
 
 	public boolean useBackupTypeLinks();
-	List<LinkData> getTypeLinks();
+	LinkDatas getTypeLinks();
 
 	Optional<FhirDstu2Icon> getFhirIcon();
 

@@ -262,4 +262,9 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
         textElement.setDiv(textSection);
         definition.setText(textElement);
 	}
+
+	@Override
+	public boolean missingSnapshot() {
+		return definition.getSnapshot().isEmpty();
+	}
 }

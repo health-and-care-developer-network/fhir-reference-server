@@ -6,17 +6,27 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hl7.fhir.dstu3.model.BaseReference;
+import org.hl7.fhir.dstu3.model.BaseResource;
+import org.hl7.fhir.dstu3.model.ContactDetail;
+import org.hl7.fhir.dstu3.model.Contributor;
+import org.hl7.fhir.dstu3.model.DataRequirement;
+import org.hl7.fhir.dstu3.model.Element;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
+import org.hl7.fhir.dstu3.model.Extension;
+import org.hl7.fhir.dstu3.model.Meta;
+import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.ParameterDefinition;
+import org.hl7.fhir.dstu3.model.PrimitiveType;
+import org.hl7.fhir.dstu3.model.RelatedArtifact;
+import org.hl7.fhir.dstu3.model.TriggerDefinition;
+import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.dstu3.model.UsageContext;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.api.BaseElement;
-import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.api.ExtensionDt;
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
@@ -78,11 +88,12 @@ public class FhirStu3DataTypes {
 		typeName = typeName.toLowerCase();
 		
 		// mysteriously missing any object representation - from DSTU2
-		/*if (typeName.equals("backboneelement")) {
+		if (typeName.equals("backboneelement")) {
 			return FhirDataType.COMPLEX_ELEMENT;
 		} else if (typeName.equals("resource")) {
 			return FhirDataType.RESOURCE;
-		} else if (typeName.equals("domainresource")) {
+		} 
+		/*else if (typeName.equals("domainresource")) {
 			return FhirDataType.DOMAIN_RESOURCE;
 		} else if (typeName.equals("element")) {
 			return FhirDataType.ELEMENT;
@@ -91,19 +102,26 @@ public class FhirStu3DataTypes {
 		if (nameToDefinition.containsKey(typeName)) {
 			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();
 			
-			if (implementsOrExtends(implementingClass, ExtensionDt.class)) {
+			if (isMetaDataClass(implementingClass)) {
+				return FhirDataType.METADATA;
+			} else if (implementsOrExtends(implementingClass, BaseReference.class)) {
+				return FhirDataType.REFERENCE;
+			} else if (implementsOrExtends(implementingClass, Meta.class)) {
+				return FhirDataType.META;
+			} else if (implementsOrExtends(implementingClass, Narrative.class)) {
+				return FhirDataType.NARRATIVE;
+			} else if (implementsOrExtends(implementingClass, Extension.class)) {
 				return FhirDataType.EXTENSION;
 			} else if (implementsOrExtends(implementingClass, BaseResource.class)) {
 				return FhirDataType.RESOURCE;
-			} else if (implementsOrExtends(implementingClass, BasePrimitive.class)) {
+			} else if (implementsOrExtends(implementingClass, PrimitiveType.class)) {
 				return FhirDataType.PRIMITIVE;
-			} else if (implementsOrExtends(implementingClass, IDatatype.class)) {
+			} else if (implementsOrExtends(implementingClass, Type.class)) {
 				return FhirDataType.SIMPLE_ELEMENT;
-			} else if (implementsOrExtends(implementingClass, BaseElement.class)) {
-				// should always match
+			} else if (implementsOrExtends(implementingClass, Element.class)) {
 				return FhirDataType.COMPLEX_ELEMENT;
 			} else {
-				throw new IllegalStateException("Type from properties file wasn't a resource or element");
+				throw new IllegalStateException("Type '" + typeName + "' (class " + implementingClass.getCanonicalName() + ") from properties file wasn't a resource or element");
 			}
 		} else {
 			// not present in HL7 types - probably user defined type
@@ -111,6 +129,19 @@ public class FhirStu3DataTypes {
 		}
 	}
 	
+	private static final Set<Class<?>> metadataClasses = Sets.newHashSet(
+		ContactDetail.class, 
+		Contributor.class, 
+		DataRequirement.class, 
+		ParameterDefinition.class,
+		RelatedArtifact.class,
+		TriggerDefinition.class,
+		UsageContext.class);
+	
+	private static boolean isMetaDataClass(Class<?> dataClass) {
+		return metadataClasses.contains(dataClass);
+	}
+
 	private static boolean implementsOrExtends(Class<?> implementor, Class<?> implementee) {
 		return implementee.isAssignableFrom(implementor);
 	}

@@ -18,7 +18,7 @@ import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
@@ -68,7 +68,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			Optional<String> definition = fhirTreeNode.getDefinition();
 			String cardinality = fhirTreeNode.getCardinality().toString();
 			Optional<BindingInfo> binding = fhirTreeNode.getBinding();
-			List<LinkData> typeLinks = fhirTreeNode.getTypeLinks();
+			LinkDatas typeLinks = fhirTreeNode.getTypeLinks();
 			Optional<String> requirements = fhirTreeNode.getRequirements();
 			List<String> aliases = fhirTreeNode.getAliases();
 			ResourceFlags resourceFlags = fhirTreeNode.getResourceFlags();
