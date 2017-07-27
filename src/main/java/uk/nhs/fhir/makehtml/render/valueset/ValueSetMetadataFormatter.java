@@ -25,6 +25,10 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedValueSet> {
 
+	public ValueSetMetadataFormatter(WrappedValueSet valueSet) {
+		super(valueSet);
+	}
+	
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();

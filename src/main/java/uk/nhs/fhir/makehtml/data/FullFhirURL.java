@@ -2,11 +2,9 @@ package uk.nhs.fhir.makehtml.data;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
@@ -14,20 +12,14 @@ import uk.nhs.fhir.makehtml.html.RendererError;
  * Class to wrap a URL allow corrections to URLs used as links, to make them relative.
  */
 public class FullFhirURL extends FhirURL {
-	
-	private static final Set<String> extensionStructureDefinitions = 
-		Sets.newHashSet("encounter-associatedencounter", "organization-period", "patient-cadavericdonor", "patient-birthtime");
-	
-	private static final Set<String> datatypeStructureDefinitions = Sets.newHashSet("Duration", "Age", "SimpleQuantity");
+	private static final String SCHEME_END = "://";
 	
 	private URL url;
+	private final FhirVersion version;
 	
-	public FullFhirURL(URL url) {
-		this.url = url;
-	}
-	
-	public FullFhirURL(String url) throws MalformedURLException {
+	public FullFhirURL(String url, FhirVersion version) throws MalformedURLException {
 		this.url = new URL(url);
+		this.version = version;
 	}
 	
 	public String toString() {
@@ -47,14 +39,12 @@ public class FullFhirURL extends FhirURL {
 			return fullUrl.substring(FhirURLConstants.HTTP_FHIR_HL7_ORG_UK.length());
 		}
 		
-		// split scheme off the front, if present
-		String schemeEnd = "://";
-		
+		// split scheme off the front, if present	
 		String scheme;
 		String hostAndPath;
-		int schemeEndIndex = fullUrl.indexOf(schemeEnd);
+		int schemeEndIndex = fullUrl.indexOf(SCHEME_END);
 		if (schemeEndIndex > -1) {
-			schemeEndIndex += schemeEnd.length();
+			schemeEndIndex += SCHEME_END.length();
 			scheme = fullUrl.substring(0, schemeEndIndex);
 			hostAndPath = fullUrl.substring(scheme.length());
 		} else {
@@ -64,9 +54,10 @@ public class FullFhirURL extends FhirURL {
 		
 		// fix up hl7.org/ hosts, excluding hl7.org.uk/ hosts
 		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT + "/")) {
-			hostAndPath = fixHL7URL(hostAndPath);
+			hostAndPath = HL7URLFixer.fixHL7URL(hostAndPath, version);
 		}
 		
+		// restore the scheme
 		String linkUrl = scheme + hostAndPath;
 		
 		if (isLogicalUrl(linkUrl)) {
@@ -76,62 +67,5 @@ public class FullFhirURL extends FhirURL {
 		}
 		
 		return linkUrl;
-	}
-	
-	private String fixHL7URL(String hostAndPath) {
-		// http://hl7.org/anything_else/... -> http://hl7.org/dstu2/anything_else/...
-		if (hostAndPath.startsWith(FhirURLConstants.HL7_FHIR)
-          && !hostAndPath.startsWith(FhirURLConstants.HL7_DSTU2)) {
-			hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_FHIR, FhirURLConstants.HL7_DSTU2);
-		}
-		
-		// sanity check
-		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT)
-		  && !hostAndPath.contains(FhirURLConstants.FHIR_HL7_ORG_UK) // ignore hl7.org.uk/, which doesn't need dstu2
-		  && !hostAndPath.contains("dstu2")
-		  && !hostAndPath.contains("DSTU2")) {
-			RendererError.handle(RendererError.Key.HL7_URL_WITHOUT_DSTU2, "Should " + hostAndPath + " have been modified to contain /dstu2/ ?");
-			
-			if (hostAndPath.contains(FhirURLConstants.HL7_FHIR)) {
-				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_FHIR, FhirURLConstants.HL7_DSTU2);
-			} else {
-				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_ROOT, FhirURLConstants.HL7_DSTU2);
-			}
-		}
-		
-		// fix up structure def to have .html extension (otherwise they redirect to non dstu2)
-		// fix up extensions and datatypes (otherwise they redirect to non dstu2)
-		if (hostAndPath.startsWith(FhirURLConstants.HL7_DSTU2_STRUCTURE_DEF)) {
-			String urlEnd = hostAndPath.substring(FhirURLConstants.HL7_DSTU2_STRUCTURE_DEF.length() + 1);
-			
-			if (extensionStructureDefinitions.contains(urlEnd.toLowerCase())) {
-				urlEnd = "extension-" + urlEnd.toLowerCase() + ".html";
-			} else if (datatypeStructureDefinitions.contains(urlEnd)) {
-				urlEnd = "datatypes.html#" + urlEnd.toLowerCase();
-			} else {
-				urlEnd = ensureHtmlEnd(urlEnd);
-			}
-			
-			hostAndPath = FhirURLConstants.HL7_DSTU2 + "/" + urlEnd;
-		}
-		
-		if (hostAndPath.startsWith(FhirURLConstants.HL7_DSTU2_VALUESET)) {
-			String urlEnd = hostAndPath.substring(FhirURLConstants.HL7_DSTU2_VALUESET.length() + 1);
-			hostAndPath = FhirURLConstants.HL7_DSTU2 + "/valueset-" + ensureHtmlEnd(urlEnd);
-		}
-		
-		return hostAndPath;
-	}
-	
-	private String ensureHtmlEnd(String url) {
-		if (!url.endsWith(".html")) {
-			if (url.contains(".")) {
-				throw new IllegalStateException("Unexpected extension: " + url);
-			}
-			
-			url += ".html";
-		}
-		
-		return url;
 	}
 }

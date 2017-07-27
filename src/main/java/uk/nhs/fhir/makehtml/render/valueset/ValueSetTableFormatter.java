@@ -22,7 +22,7 @@ import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.FullFhirURL;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
@@ -30,6 +30,10 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
 public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueSet> {
+
+	public ValueSetTableFormatter(WrappedValueSet wrappedResource) {
+		super(wrappedResource);
+	}
 
 	private static final String BLANK = "";
 
@@ -418,7 +422,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueS
                     Elements.withAttributesAndChildren("a",
                         Lists.newArrayList(
                             new Attribute("class", FhirCSS.LINK),
-                            new Attribute("href", FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("href", FhirURL.buildOrThrow(ValuesetLinkFix.fixValuesetLink(value)).toLinkString()),
                             new Attribute("title", hint)),
                         Lists.newArrayList(
                             new Text(value),
@@ -433,7 +437,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueS
                         Elements.withAttributesAndText("a",
                             Lists.newArrayList(
                                 new Attribute("class", FhirCSS.LINK),
-                                new Attribute("href", FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                                new Attribute("href", FhirURL.buildOrThrow(ValuesetLinkFix.fixValuesetLink(value)).toLinkString()),
                                 new Attribute("title", hint)),
                             value)
                 //        ,new Text(" (internal)") // Removed internal, using icon for external instead
@@ -444,7 +448,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueS
                     Elements.withAttributesAndText("a",
                         Lists.newArrayList(
                             new Attribute("class", FhirCSS.LINK),
-                            new Attribute("href", FullFhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("href", FullFhirURL.buildOrThrow(ValuesetLinkFix.fixValuesetLink(value)).toLinkString()),
                             new Attribute("title", hint)),
                         value));
             }

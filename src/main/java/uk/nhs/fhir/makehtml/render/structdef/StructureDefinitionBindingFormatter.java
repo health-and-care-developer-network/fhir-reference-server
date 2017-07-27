@@ -22,7 +22,7 @@ import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
@@ -34,8 +34,11 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
-
-	public StructureDefinitionBindingFormatter() { this.resourceSectionType = ResourceSectionType.BINDING; }
+	
+	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition) {
+		super(structureDefinition);
+		this.resourceSectionType = ResourceSectionType.BINDING;
+	}
 
     private static final String BLANK = "";
 
@@ -129,7 +132,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HTTP_HL7_DSTU2 + "/terminologies.html#" + anchorStrength),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HTTP_HL7_FHIR + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);
@@ -167,7 +170,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
         } else {
         	String uri = uriToDisplay.get();
         	
-        	uri = Dstu2Fix.fixValuesetLink(uri);
+        	uri = ValuesetLinkFix.fixLink(uri, wrappedResource.getImplicitFhirVersion());
         	
         	List<Content> linkContents = Lists.newArrayList();
     		linkContents.add(new Text(displayText));

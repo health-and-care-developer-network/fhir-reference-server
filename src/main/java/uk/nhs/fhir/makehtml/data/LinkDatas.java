@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class LinkDatas {
@@ -126,10 +127,10 @@ public class LinkDatas {
 		return hc;
 	}
 
-	public void addNestedUri(SimpleLinkData outerLink, String nestedLinkUri) {
+	public void addNestedUri(SimpleLinkData outerLink, String nestedLinkUri, FhirVersion version) {
 		String[] uriTokens = nestedLinkUri.split("/");
 		String linkTargetName = uriTokens[uriTokens.length - 1];
-		SimpleLinkData inner = new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri), StringUtil.capitaliseLowerCase(linkTargetName));
+		SimpleLinkData inner = new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri, version), StringUtil.capitaliseLowerCase(linkTargetName));
 		addNestedLink(outerLink, inner);
 	}
 }

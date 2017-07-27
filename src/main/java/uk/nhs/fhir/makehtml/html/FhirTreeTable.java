@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
@@ -29,9 +30,11 @@ public class FhirTreeTable {
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
+	private final FhirVersion version;
 	
-	public FhirTreeTable(FhirTreeData data) {
+	public FhirTreeTable(FhirTreeData data, FhirVersion version) {
 		this.data = data;
+		this.version = version;
 	}
 	
 	public FhirTreeData getData() {
@@ -241,7 +244,7 @@ public class FhirTreeTable {
 	private ResourceInfo makeResourceInfoWithMaybeUrl(String title, String value, ResourceInfoType type) {
 		if (looksLikeUrl(value)) {
 			try {
-				return new ResourceInfo(title, FhirURL.buildOrThrow(value), type);
+				return new ResourceInfo(title, FhirURL.buildOrThrow(value, version), type);
 			} catch (IllegalStateException e) {
 				// revert to non-link version
 			}

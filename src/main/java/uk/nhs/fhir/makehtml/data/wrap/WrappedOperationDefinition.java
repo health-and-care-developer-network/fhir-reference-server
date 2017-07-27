@@ -14,13 +14,13 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
 
 	@Override
 	public ResourceFormatter<WrappedOperationDefinition> getDefaultViewFormatter() {
-		return new OperationDefinitionFormatter();
+		return new OperationDefinitionFormatter(this);
 	}
 
 	@Override
 	public List<FormattedOutputSpec<WrappedOperationDefinition>> getFormatSpecs(String outputDirectory) {
 		List<FormattedOutputSpec<WrappedOperationDefinition>> specs = Lists.newArrayList();
-		specs.add(new FormattedOutputSpec<WrappedOperationDefinition>(this, new OperationDefinitionFormatter(), outputDirectory, "render.html"));
+		specs.add(new FormattedOutputSpec<WrappedOperationDefinition>(this, new OperationDefinitionFormatter(this), outputDirectory, "render.html"));
 		return specs;
 	}
 	

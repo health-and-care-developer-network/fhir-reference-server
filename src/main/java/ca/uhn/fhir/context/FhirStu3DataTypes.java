@@ -3,7 +3,6 @@ package ca.uhn.fhir.context;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hl7.fhir.dstu3.model.BaseReference;
@@ -35,7 +34,7 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HAPIUtils;
 
-public class FhirStu3DataTypes {
+public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
 	static {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
@@ -51,13 +50,8 @@ public class FhirStu3DataTypes {
 			nameToDefinition.put(entry.getKey().toLowerCase(), entry.getValue());
 		}
 	}
-	
-	public static Optional<Class<?>> getImplementingType(String typeName) {
-		BaseRuntimeElementDefinition<?> definition = nameToDefinition.get(typeName.toLowerCase());
-		return definition == null ? Optional.empty() : Optional.of(definition.getImplementingClass());
-	}
 
-	public static List<TypeRefComponent> knownTypes(List<TypeRefComponent> types) {
+	public List<TypeRefComponent> knownTypes(List<TypeRefComponent> types) {
 		List<TypeRefComponent> knownTypes = Lists.newArrayList();
 		
 		for (TypeRefComponent type : types) {
@@ -148,6 +142,6 @@ public class FhirStu3DataTypes {
 	}
 	
 	public static LinkData openTypeLink() {
-		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#open"), "*");
+		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#open", FhirVersion.STU3), "*");
 	}
 }

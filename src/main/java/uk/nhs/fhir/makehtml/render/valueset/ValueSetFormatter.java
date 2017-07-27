@@ -23,7 +23,11 @@ import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapTableFormatter;
 
 public class ValueSetFormatter extends ResourceFormatter<WrappedValueSet> {
 
-    private static final Logger LOG = Logger.getLogger(ValueSetFormatter.class.getName());
+    public ValueSetFormatter(WrappedValueSet wrappedResource) {
+		super(wrappedResource);
+	}
+
+	private static final Logger LOG = Logger.getLogger(ValueSetFormatter.class.getName());
 
 	TablePNGGenerator backgrounds = new TablePNGGenerator();
 

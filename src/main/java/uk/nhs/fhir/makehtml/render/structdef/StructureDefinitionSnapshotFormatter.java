@@ -15,6 +15,10 @@ import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 
 public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 	
+	public StructureDefinitionSnapshotFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
+	}
+
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
 
@@ -33,7 +37,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 		snapshotTreeData.stripRemovedElements();
 		snapshotTreeData.tidyData();
 		
-		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
+		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData, wrappedResource.getImplicitFhirVersion());
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();

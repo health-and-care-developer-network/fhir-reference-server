@@ -30,6 +30,10 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter<WrappedStructureDefinition> {
 
+	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
+	}
+
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
@@ -63,7 +67,7 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 			if (origBaseUrl.equals("http://hl7.org/fhir/StructureDefinition/Extension")) {
 				displayBaseUrl = Optional.of("http://hl7.org/fhir/extensibility.html#extension");
 			} else {
-				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
+				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_FHIR + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
 			}
 		}
 		

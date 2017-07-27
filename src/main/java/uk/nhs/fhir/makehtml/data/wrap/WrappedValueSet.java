@@ -16,14 +16,14 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	
 	@Override
 	public ResourceFormatter<WrappedValueSet> getDefaultViewFormatter() {
-		return new ValueSetFormatter();
+		return new ValueSetFormatter(this);
 	}
 
 	@Override
 	public List<FormattedOutputSpec<WrappedValueSet>> getFormatSpecs(String outputDirectory) {
 		List<FormattedOutputSpec<WrappedValueSet>> specs = Lists.newArrayList();
 		
-		specs.add(new FormattedOutputSpec<WrappedValueSet>(this, new ValueSetFormatter(), outputDirectory, "render.html"));
+		specs.add(new FormattedOutputSpec<WrappedValueSet>(this, new ValueSetFormatter(this), outputDirectory, "render.html"));
 		
 		return specs;
 	}

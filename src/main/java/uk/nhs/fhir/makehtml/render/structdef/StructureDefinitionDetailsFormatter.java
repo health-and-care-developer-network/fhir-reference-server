@@ -33,6 +33,10 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
+	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
+	}
+
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
@@ -83,7 +87,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, fhirTreeNode.getMappings());
+				linkedNodeKey, fhirTreeNode.getMappings(), structureDefinition.getImplicitFhirVersion());
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

@@ -19,6 +19,10 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public abstract class MetadataTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
+	public MetadataTableFormatter(T wrappedResource) {
+		super(wrappedResource);
+	}
+
 	protected static final String VERSION_DATE = "Version date";
 	
 	protected static final String BLANK = "";
@@ -85,7 +89,7 @@ public abstract class MetadataTableFormatter<T extends WrappedResource<T>> exten
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", FhirURL.buildOrThrow(value).toLinkString())), 
+						new Attribute("href", FhirURL.buildOrThrow(value, wrappedResource.getImplicitFhirVersion()).toLinkString())), 
 					value));
 		} else {
 			return Elements.withAttributeAndText("span", 

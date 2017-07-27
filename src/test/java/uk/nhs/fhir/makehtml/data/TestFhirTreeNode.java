@@ -5,6 +5,8 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.FhirVersion;
+
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
 		return new FhirTreeNode(
@@ -17,7 +19,8 @@ public class TestFhirTreeNode {
 			"", 
 			Lists.newArrayList(), 
 			path,
-			FhirDataType.ELEMENT);
+			FhirDataType.ELEMENT,
+			FhirVersion.DSTU2);
 	}
 	
 	public static FhirTreeNode testSlicingNode(String id, String path, Set<String> discriminators) {

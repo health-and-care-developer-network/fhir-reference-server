@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.makehtml.valid.NodeMappingValidator;
@@ -17,7 +18,10 @@ public class FhirTreeNodeBuilder {
 
 		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
-			typeLinks = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
+			typeLinks = new LinkDatas(
+				new SimpleLinkData(
+					FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_FHIR + "/profiling.html", elementDefinition.getVersion()), 
+					"Profile"));
 		} else {
 			typeLinks = elementDefinition.getTypeLinks();
 		}
@@ -70,6 +74,7 @@ public class FhirTreeNodeBuilder {
 		}
 		
 		String path = elementDefinition.getPath();
+		FhirVersion version = elementDefinition.getVersion();
 
 		FhirTreeNode node = new FhirTreeNode(
 			icon,
@@ -81,7 +86,8 @@ public class FhirTreeNodeBuilder {
 			shortDescription,
 			constraints,
 			path,
-			dataType);
+			dataType,
+			version);
 
 		Optional<String> definition = elementDefinition.getDefinition();
 		if (definition.isPresent() && !definition.get().isEmpty()) {

@@ -51,7 +51,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	
 	@Override
 	public ResourceFormatter<WrappedStructureDefinition> getDefaultViewFormatter() {
-		return new StructureDefinitionSnapshotFormatter();
+		return new StructureDefinitionSnapshotFormatter(this);
 	}
 
 	public boolean isExtension() {
@@ -66,14 +66,14 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public List<FormattedOutputSpec<WrappedStructureDefinition>> getFormatSpecs(String outputDirectory) {
 		List<FormattedOutputSpec<WrappedStructureDefinition>> specs = Lists.newArrayList();
 
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionMetadataFormatter(), outputDirectory, "metadata.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionSnapshotFormatter(), outputDirectory, "snapshot.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionBindingFormatter(), outputDirectory, "bindings.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDetailsFormatter(), outputDirectory, "details.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionMetadataFormatter(this), outputDirectory, "metadata.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionSnapshotFormatter(this), outputDirectory, "snapshot.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionBindingFormatter(this), outputDirectory, "bindings.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDetailsFormatter(this), outputDirectory, "details.html"));
 		
 		if (!getConstrainedType().equals("Extension")) {
 			specs.add(
-				new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDifferentialFormatter(), outputDirectory, "differential.html"));
+				new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDifferentialFormatter(this), outputDirectory, "differential.html"));
 		}
 		
 		return specs;

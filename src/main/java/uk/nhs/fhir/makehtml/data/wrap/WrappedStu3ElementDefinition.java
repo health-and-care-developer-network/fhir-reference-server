@@ -30,6 +30,7 @@ import org.hl7.fhir.utilities.Utilities;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.context.FhirStu3DataTypes;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
@@ -46,13 +47,15 @@ import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.Stu3FhirDocLinkFactory;
 
 public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Stu3FhirDocLinkFactory typeLinkFactory = new Stu3FhirDocLinkFactory();
+	private static final FhirDataTypes<TypeRefComponent> fhirDataTypes = new FhirStu3DataTypes(); 
 	
 	private final ElementDefinition definition;
 
@@ -74,7 +77,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	public LinkDatas getTypeLinks() {
 		LinkDatas typeLinks = new LinkDatas();
 		
-		List<TypeRefComponent> knownTypes = FhirStu3DataTypes.knownTypes(definition.getType());
+		List<TypeRefComponent> knownTypes = fhirDataTypes.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
 			for (TypeRefComponent type : knownTypes) {
 
@@ -86,14 +89,14 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 					  || code.equals("Quantity")
 					  || code.equals("Reference")) {
 						SimpleLinkData codeLink = typeLinkFactory.forDataTypeName(type.getCode());
-						typeLinks.addNestedUri(codeLink, profile);
+						typeLinks.addNestedUri(codeLink, profile, FhirVersion.STU3);
 					} else {
 						throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
 					}
 				} else if (type.hasTargetProfile()) {
 					if (type.getCode().equals("Reference")) {
 						SimpleLinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
-						typeLinks.addNestedUri(referenceLink, type.getTargetProfile());
+						typeLinks.addNestedUri(referenceLink, type.getTargetProfile(), FhirVersion.STU3);
 					} else if (type.getCode().equals("string")){
 						RendererError.handle(RendererError.Key.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
 						typeLinks.addSimpleLink(typeLinkFactory.forDataTypeName(type.getCode()));
@@ -251,7 +254,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveStu3DatatypeValue(valueSet);
-				url = Optional.of(FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(urlString)));
+				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(urlString, FhirVersion.STU3), FhirVersion.STU3));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -409,5 +412,10 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	@Override
 	public Optional<String> getId() {
 		return Optional.ofNullable(definition.getId());
+	}
+
+	@Override
+	public FhirVersion getVersion() {
+		return FhirVersion.STU3;
 	}
 }

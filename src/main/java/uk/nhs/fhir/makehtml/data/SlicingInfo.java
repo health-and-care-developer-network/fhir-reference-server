@@ -3,15 +3,11 @@ package uk.nhs.fhir.makehtml.data;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionSlicingComponent;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class SlicingInfo {

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
@@ -44,6 +45,7 @@ public abstract class WrappedElementDefinition {
 	public abstract List<FhirElementMapping> getMappings();
 	public abstract Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver();
 	public abstract Optional<String> getId();
+	public abstract FhirVersion getVersion();
 	
 	// Introduced with STU3
 	

@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 
 public abstract class FhirURL {
 	
@@ -20,9 +21,9 @@ public abstract class FhirURL {
 		linkUrls.add(url);
 	}
 
-	public static FhirURL buildOrThrow(String url) {
+	public static FhirURL buildOrThrow(String url, FhirVersion version) {
 		try {
-			return new FullFhirURL(url);
+			return new FullFhirURL(url, version);
 		} catch (MalformedURLException e) {
 			try {
 				return new RelativeFhirUrl(url);
@@ -30,6 +31,11 @@ public abstract class FhirURL {
 				throw new IllegalStateException("Not a valid FHIR URL string");
 			}
 		}
+	}
+	
+	public static FhirURL buildOrThrow(String url) {
+		//TODO delete this method once finished refactoring
+		throw new IllegalStateException("Delete this method");
 	}
 	
 	public boolean equals(Object other) {

@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml.data.wrap;
+package uk.nhs.fhir.util;
 
 import java.util.List;
 
@@ -9,13 +9,14 @@ import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.NestedLinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.util.StringUtil;
 
-public class Stu3FhirDocLinkFactory {
+public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
+	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
 		String typeURL;
@@ -25,7 +26,7 @@ public class Stu3FhirDocLinkFactory {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
 			typeURL = FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName;
 			
-			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL), StringUtil.capitaliseLowerCase(dataTypeName));
+			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL, FhirVersion.STU3), StringUtil.capitaliseLowerCase(dataTypeName));
 		}
 	}
 
@@ -37,18 +38,18 @@ public class Stu3FhirDocLinkFactory {
 	
 	public SimpleLinkData forDataTypeName(String dataTypeName) {
 		String url = urlForDataTypeName(dataTypeName);
-		return new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
+		return new SimpleLinkData(FhirURL.buildOrThrow(url, FhirVersion.STU3), StringUtil.capitaliseLowerCase(dataTypeName));
 	}
 
 	public NestedLinkData withNestedLinks(String dataTypeName, List<String> nestedLinkUris) {
 		String url = urlForDataTypeName(dataTypeName);
-		SimpleLinkData outer = new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
+		SimpleLinkData outer = new SimpleLinkData(FhirURL.buildOrThrow(url, FhirVersion.STU3), StringUtil.capitaliseLowerCase(dataTypeName));
 		
 		List<SimpleLinkData> nestedLinks = Lists.newArrayList();
 		for (String nestedLinkUri : nestedLinkUris) {
 			String[] uriTokens = nestedLinkUri.split("/");
 			String linkTargetName = uriTokens[uriTokens.length - 1];
-			nestedLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri), StringUtil.capitaliseLowerCase(linkTargetName)));
+			nestedLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri, FhirVersion.STU3), StringUtil.capitaliseLowerCase(linkTargetName)));
 		}
 		
 		return new NestedLinkData(outer, nestedLinks);

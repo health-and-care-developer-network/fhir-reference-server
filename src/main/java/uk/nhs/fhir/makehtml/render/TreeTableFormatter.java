@@ -24,6 +24,10 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
 public abstract class TreeTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 
+	public TreeTableFormatter(T wrappedResource) {
+		super(wrappedResource);
+	}
+
 	TablePNGGenerator backgrounds = new TablePNGGenerator();
 	
 	protected void addStyles(HTMLDocSection section) {

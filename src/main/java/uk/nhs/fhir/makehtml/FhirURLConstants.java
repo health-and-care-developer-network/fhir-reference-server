@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml;
 
-public interface FhirURLConstants {
+public class FhirURLConstants {
 	public static final String HL7_ROOT = "hl7.org";
 	public static final String HL7_FHIR = HL7_ROOT + "/fhir";
 	public static final String HL7_DSTU2 = HL7_FHIR + "/DSTU2";
@@ -11,6 +11,7 @@ public interface FhirURLConstants {
 	public static final String HL7_DSTU2_STRUCTURE_DEF = HL7_DSTU2 + "/StructureDefinition";
 	public static final String HL7_V3 = HL7_FHIR + "/v3";
 	public static final String HL7_DSTU2_V3 = HL7_DSTU2 + "/v3";
+	public static final String HL7_STU3_V3 = HL7_STU3 + "/v3";
 	
 	public static final String HTTP_HL7_ROOT = "http://" + HL7_ROOT;
 	public static final String HTTP_HL7_FHIR = "http://" + HL7_FHIR;
@@ -19,12 +20,14 @@ public interface FhirURLConstants {
 	public static final String HTTP_HL7_VALUESET_V3 = "http://" + HL7_VALUESET_V3;
 	public static final String HTTP_HL7_V3 = "http://" + HL7_V3;
 	public static final String HTTP_HL7_DSTU2_V3 = "http://" + HL7_DSTU2_V3;
+	public static final String HTTP_HL7_STU3_V3 = "http://" + HL7_STU3_V3;
+
+	public static final String HL7_TERMINOLOGIES = HTTP_HL7_FHIR + "/terminologies.html";
 	
-	public static final String HL7_CONFORMANCE = HTTP_HL7_DSTU2 + "/conformance-rules.html";
-	public static final String HL7_DATATYPES = HTTP_HL7_DSTU2 + "/datatypes.html";
-	public static final String HL7_TERMINOLOGIES = HTTP_HL7_DSTU2 + "/terminologies.html";
-	public static final String HL7_SEARCH = HTTP_HL7_DSTU2 + "/search.html";
-	public static final String HL7_FORMATS = HTTP_HL7_DSTU2 + "/formats.html";
+	public static final String HL7_CONFORMANCE = HTTP_HL7_FHIR + "/conformance-rules.html";
+	public static final String HL7_DATATYPES = HTTP_HL7_FHIR + "/datatypes.html";
+	public static final String HL7_SEARCH = HTTP_HL7_FHIR + "/search.html";
+	public static final String HL7_FORMATS = HTTP_HL7_FHIR + "/formats.html";
 	
 	public static final String FHIR_HL7_ORG_UK = "fhir.hl7.org.uk";
 	public static final String HTTP_FHIR_HL7_ORG_UK = "https://" + FHIR_HL7_ORG_UK;
@@ -34,4 +37,15 @@ public interface FhirURLConstants {
 	public static final String NHS_FHIR_IMAGES_DIR = FHIR_NHS_UK + "/images";
 	
 	public static final String SNOMED_ID = "http://snomed.info/sct";
+
+	public static String versionBase(FhirVersion version) {
+		switch(version) {
+			case DSTU2:
+				return HTTP_HL7_DSTU2;
+			case STU3:
+				return HTTP_HL7_STU3;
+			default:
+				throw new IllegalStateException("Base URL for version " + version.toString());
+		}
+	}
 }

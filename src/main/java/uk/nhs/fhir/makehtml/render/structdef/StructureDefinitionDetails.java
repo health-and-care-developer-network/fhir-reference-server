@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
@@ -44,11 +45,12 @@ public class StructureDefinitionDetails {
 	private final List<ConstraintInfo> profileConstraints;
 	private final Optional<String> linkedNodeKey;
 	private final List<FhirElementMapping> mappings;
+	private final FhirVersion version;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			LinkDatas typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
-			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings) {
+			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings, FhirVersion version) {
 		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
@@ -64,6 +66,7 @@ public class StructureDefinitionDetails {
 		this.profileConstraints = profileConstraints;
 		this.linkedNodeKey = linkedNodeKey;
 		this.mappings = mappings;
+		this.version = version;
 		// add any new fields to assertEqualTo below
 	}
 
@@ -71,7 +74,7 @@ public class StructureDefinitionDetails {
 		tableContent.add(getHeaderRow(key));
 		
 		addDataIfPresent(tableContent, "Definition", definition);
-		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#cardinality"), cardinality);
+		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#cardinality", version), cardinality);
 		addBindingRowIfPresent(tableContent);
 		addTypeRow(tableContent);
 		addDataIfPresent(tableContent, "Requirements", requirements);
@@ -95,7 +98,7 @@ public class StructureDefinitionDetails {
 							new Text("See "),
 							Elements.withAttributesAndText("a",
 								Lists.newArrayList(
-									new Attribute("href", FhirURL.buildOrThrow(FhirURLConstants.HL7_FORMATS + "#choice").toLinkString()),
+									new Attribute("href", FhirURL.buildOrThrow(FhirURLConstants.HL7_FORMATS + "#choice", version).toLinkString()),
 									new Attribute("class", FhirCSS.LINK)), 
 								"Choice of Data Types"),
 							new Text(" for further information about how to use [x]")))));
@@ -190,7 +193,7 @@ public class StructureDefinitionDetails {
 			
 			bindingInfo += " (" + info.getStrength() + ")";
 			
-			addLabelWithLinkDataRow(tableContent, "Binding", FhirURL.buildOrThrow(FhirURLConstants.HL7_TERMINOLOGIES), bindingInfo);
+			addLabelWithLinkDataRow(tableContent, "Binding", FhirURL.buildOrThrow(FhirURLConstants.versionBase(version) + "/terminologies.html", version), bindingInfo);
 		}
 	}
 	
@@ -206,7 +209,7 @@ public class StructureDefinitionDetails {
 			Elements.withAttributeAndChildren("tr", 
 				new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
 					Lists.newArrayList(
-						linkCell("Type", FhirURL.buildOrThrow(FhirURLConstants.HL7_DATATYPES)),
+						linkCell("Type", FhirURL.buildOrThrow(FhirURLConstants.HL7_DATATYPES, version)),
 						typeLinkCell)));
 	}
 	
@@ -221,10 +224,10 @@ public class StructureDefinitionDetails {
 	}
 
 	private void addResourceFlags(List<Element> tableContent) {
-		addDataIfTrue(tableContent, "Summary", FhirURL.buildOrThrow(FhirURLConstants.HL7_SEARCH + "#summary"), resourceFlags.isSummary());
-		addDataIfTrue(tableContent, "Modifier", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#ismodifier"), resourceFlags.isModifier());
-		//addDataIfTrue(tableContent, "Is Constrained", FhirURL.createOrThrow(HTMLConstants.HL7_CONFORMANCE + "#constraints"), resourceFlags.isConstrained()); // implied by Invariants entry
-		addDataIfTrue(tableContent, "Must-Support", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#mustSupport"), resourceFlags.isMustSupport());
+		addDataIfTrue(tableContent, "Summary", FhirURL.buildOrThrow(FhirURLConstants.HL7_SEARCH + "#summary", version), resourceFlags.isSummary());
+		addDataIfTrue(tableContent, "Modifier", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#ismodifier", version), resourceFlags.isModifier());
+		//addDataIfTrue(tableContent, "Is Constrained", FhirURL.createOrThrow(HTMLConstants.HL7_CONFORMANCE + "#constraints", version), resourceFlags.isConstrained()); // implied by Invariants entry
+		addDataIfTrue(tableContent, "Must-Support", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#mustSupport", version), resourceFlags.isMustSupport());
 	}
 
 	private void addDataIfTrue(List<Element> tableContent, String label, FhirURL url, boolean condition) {
@@ -421,6 +424,9 @@ public class StructureDefinitionDetails {
 		}
 		if (!getMappings().stream().allMatch(mapping -> detail.getMappings().contains(mapping))) {
 			throw new IllegalStateException("Same key, different mappings (" + key + ").");
+		}
+		if (!version.equals(detail.version)) {
+			throw new IllegalStateException("Same key, different FHIR version(" + key + ").");
 		}
 	}
 

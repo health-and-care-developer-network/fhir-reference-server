@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
@@ -27,7 +28,7 @@ public class TestFormatTable {
 	
 	@Test
 	public void testWriteLinkCell() throws IOException {
-		LinkDatas data = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://testURL"), "test_link_text"));
+		LinkDatas data = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://testURL", FhirVersion.DSTU2), "test_link_text"));
 		Element linkCell = new LinkCell(data).makeCell();
 		String simpleLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\">" 
@@ -40,7 +41,7 @@ public class TestFormatTable {
 	
 	@Test
 	public void testWriteFormattedLinkCell() throws IOException {
-		LinkDatas data = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://testURL"), "test_link_text"));
+		LinkDatas data = new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://testURL", FhirVersion.DSTU2), "test_link_text"));
 		Element linkCell = new LinkCell(data, Sets.newHashSet("cell-class-1", "cell-class-2"), Sets.newHashSet("link-class-1 link-class-2")).makeCell();
 		String formattedLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
 		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 cell-class-1\">" 
@@ -103,11 +104,11 @@ public class TestFormatTable {
 			new TableTitle("Link", "info3", "70px"));
 		Table table = new Table(columns, Sets.newHashSet("class1"));
 		table.addRow(new TableRow(new SimpleTextCell("Search engine"), 
-				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("https://www.google.com"), "Google")))));
+				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("https://www.google.com", FhirVersion.DSTU2), "Google")))));
 		table.addRow(new TableRow(new SimpleTextCell("News"), 
-				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://news.bbc.co.uk"), "BBC News")))));
+				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("http://news.bbc.co.uk", FhirVersion.DSTU2), "BBC News")))));
 		table.addRow(new TableRow(new SimpleTextCell("Encyclopedia"), 
-				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("https://www.wikipedia.org"), "Wikipedia")))));
+				new LinkCell(new LinkDatas(new SimpleLinkData(FhirURL.buildOrThrow("https://www.wikipedia.org", FhirVersion.DSTU2), "Wikipedia")))));
 		Element tableElement = table.makeTable();
 		String tableHTML = HTMLUtil.docToString(new Document(tableElement), false, false);
 		String expected = "<table xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-table\">"

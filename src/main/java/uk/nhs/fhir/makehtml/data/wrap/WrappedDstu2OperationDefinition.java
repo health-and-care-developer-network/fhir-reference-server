@@ -53,7 +53,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 		String choice = HAPIUtils.resolveDstu2DatatypeValue(binding.getValueSet());
 		String strength = binding.getStrength();
 		
-		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice)), strength);
+		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, getImplicitFhirVersion())), strength);
 	}
 
 	@Override
@@ -73,7 +73,9 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 
 	@Override
 	public LinkData getKindTypeLink() {
-		return new SimpleLinkData(FhirURL.buildOrThrow(definition.getKindElement().getValueAsEnum().getSystem()), OperationKindEnum.VALUESET_NAME);
+		return new SimpleLinkData(
+			FhirURL.buildOrThrow(definition.getKindElement().getValueAsEnum().getSystem(), getImplicitFhirVersion()), 
+			OperationKindEnum.VALUESET_NAME);
 	}
 
 	@Override
@@ -148,7 +150,11 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 		
 		ResourceReferenceDt profile = parameter.getProfile();
 		if (!profile.isEmpty()) {
-			resourceFlags.add(new ResourceInfo("Profile", FhirURL.buildOrThrow(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
+			resourceFlags.add(
+				new ResourceInfo(
+					"Profile", 
+					FhirURL.buildOrThrow(profile.getReferenceElement().getValue(), getImplicitFhirVersion()), 
+					ResourceInfoType.PROFILE));
 		}
 		
 		List<Parameter> parts = parameter.getPart();

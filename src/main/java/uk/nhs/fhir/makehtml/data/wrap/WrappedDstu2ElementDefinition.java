@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
@@ -42,8 +43,8 @@ import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.util.Dstu2FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
@@ -51,6 +52,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
 	private static final ExtensionUrlDiscriminatorResolver resolver = new DSTU2ExtensionUrlDiscriminatorResolver();
+	private static final FhirDataTypes<Type> fhirDataTypes = new FhirDstu2DataTypes();
 
 	private final ElementDefinitionDt definition;
 
@@ -72,7 +74,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public LinkDatas getTypeLinks() {
 		LinkDatas typeLinks = new LinkDatas();
 		
-		List<Type> knownTypes = FhirDstu2DataTypes.knownTypes(definition.getType());
+		List<Type> knownTypes = fhirDataTypes.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
 			for (Type type : knownTypes) {
 				String code = type.getCode();
@@ -265,7 +267,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveDstu2DatatypeValue(valueSet);
-				url = Optional.of(FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(urlString)));
+				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(urlString, FhirVersion.DSTU2), FhirVersion.DSTU2));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -394,6 +396,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	@Override
 	public Optional<String> getId() {
 		return Optional.ofNullable(definition.getElementSpecificId());
+	}
+
+	@Override
+	public FhirVersion getVersion() {
+		return FhirVersion.DSTU2;
 	}
 	
 }

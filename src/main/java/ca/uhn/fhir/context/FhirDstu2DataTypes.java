@@ -28,7 +28,7 @@ import uk.nhs.fhir.util.HAPIUtils;
  * to the class mapping configured in hapi-fhir-structures-dstu2-2.0!ca/uhn/fhir/model/dstu2/fhirversion.properties.
  * @author jon
  */
-public class FhirDstu2DataTypes {
+public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 	
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
 	static {
@@ -51,7 +51,7 @@ public class FhirDstu2DataTypes {
 		return definition == null ? Optional.empty() : Optional.of(definition.getImplementingClass());
 	}
 
-	public static List<Type> knownTypes(List<Type> types) {
+	public List<Type> knownTypes(List<Type> types) {
 		List<Type> knownTypes = Lists.newArrayList();
 		
 		for (Type type : types) {
@@ -117,9 +117,5 @@ public class FhirDstu2DataTypes {
 	
 	private static boolean implementsOrExtends(Class<?> implementor, Class<?> implementee) {
 		return implementee.isAssignableFrom(implementor);
-	}
-	
-	public static SimpleLinkData openTypeLink() {
-		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
 	}
 }

@@ -14,8 +14,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -29,6 +29,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private final List<ConstraintInfo> constraints;
 	private final String path;
 	private final FhirDataType dataType;
+	private final FhirVersion version;
 
 	private Optional<String> id = Optional.empty();
 	private Optional<ExtensionType> extensionType = Optional.empty();
@@ -65,7 +66,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			String information,
 			List<ConstraintInfo> constraints,
 			String path,
-			FhirDataType dataType) {
+			FhirDataType dataType,
+			FhirVersion version) {
 		this.icon = icon;
 		this.name = name;
 		this.resourceFlags = flags;
@@ -76,6 +78,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		this.constraints = constraints;
 		this.path = path;
 		this.dataType = dataType;
+		this.version = version;
 	}
 	
 	/**
@@ -186,9 +189,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return resourceFlags;
 	}
 
-	private static final Map<String, SimpleLinkData> fixableTypes = new HashMap<>();
+	private static final Map<String, String> fixableTypes = new HashMap<>();
 	static {
-		fixableTypes.put("extension", new SimpleLinkData(FullFhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/extensibility.html#Extension"), "Extension"));
+		fixableTypes.put("extension", FhirURLConstants.HTTP_HL7_FHIR + "/extensibility.html#Extension");
 	}
 	
 	public LinkDatas getTypeLinks() {
@@ -199,13 +202,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (typeLinks.isEmpty()
 		  && (linkedNodeName.isPresent() || linkedNodeId.isPresent())) {
 			String linkedContentKey = getLinkedNode().get().getNodeKey();
-			typeLinks.addSimpleLink(new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey), "see " + linkedContentKey));
+			typeLinks.addSimpleLink(
+				new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey, version), "see " + linkedContentKey));
 		}
 		
 		if (typeLinks.isEmpty()
 		  && fixableTypes.containsKey(getPathName())) {
 			RendererError.handle(RendererError.Key.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
-			typeLinks.addSimpleLink(fixableTypes.get(getPathName()));
+			typeLinks.addSimpleLink(new SimpleLinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
 		} 
 
 		if (typeLinks.isEmpty()) {
@@ -214,7 +218,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		
 		if (getPathName().endsWith("[x]")
 		  && hasAllTypes()) {
-			return new LinkDatas(FhirDstu2DataTypes.openTypeLink());
+			FhirURL openTypeUrl = FhirURL.buildOrThrow(FhirURLConstants.versionBase(version) + "/datatypes.html#open", version);
+			return new LinkDatas(new SimpleLinkData(openTypeUrl, "*"));
 		} else {
 			return typeLinks;
 		}
@@ -568,7 +573,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 						discriminators.add("<missing>");
 					} else if (extensionUrlDiscriminators.size() > 1) {
 						throw new IllegalStateException("Don't yet handle multiple extension url discriminators. Consider ordering so that keys are consistent?");
-					} else if (!extensionUrlDiscriminators.iterator().next().equals(FhirURL.buildOrThrow("http://hl7.org/fhir/stu3/extensibility.html#Extension"))){
+					} else if (!extensionUrlDiscriminators.iterator().next().equals(FhirURL.buildOrThrow("http://hl7.org/fhir/stu3/extensibility.html#Extension", version))){
 						discriminators.add(extensionUrlDiscriminators.iterator().next().toFullString());
 					}
 				}

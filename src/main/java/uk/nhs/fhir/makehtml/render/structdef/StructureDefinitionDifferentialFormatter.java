@@ -15,7 +15,10 @@ import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 
 public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionDifferentialFormatter() { this.resourceSectionType = ResourceSectionType.DIFFERENTIAL; }
+	public StructureDefinitionDifferentialFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
+		this.resourceSectionType = ResourceSectionType.DIFFERENTIAL;
+	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
@@ -25,7 +28,7 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData();
 		differentialTreeData.tidyData();
-		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData);
+		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData, wrappedResource.getImplicitFhirVersion());
 		
 		Table differentialTable = differentialTreeTable.asTable();
 		

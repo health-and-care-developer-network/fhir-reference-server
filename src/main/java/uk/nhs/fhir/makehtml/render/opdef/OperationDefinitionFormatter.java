@@ -24,7 +24,10 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
-	public OperationDefinitionFormatter() { this.resourceSectionType = ResourceSectionType.TREEVIEW;  }
+	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource) {
+		super(wrappedResource);
+		this.resourceSectionType = ResourceSectionType.TREEVIEW;  
+	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML(WrappedOperationDefinition operationDefinition) throws ParserConfigurationException {

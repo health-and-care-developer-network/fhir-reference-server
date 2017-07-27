@@ -5,11 +5,12 @@ import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 
-public class Dstu2FhirDocLinkFactory {
+public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
 		String dataTypeName;
@@ -20,7 +21,7 @@ public class Dstu2FhirDocLinkFactory {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
 			typeURL = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
 			
-			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL), StringUtil.capitaliseLowerCase(dataTypeName));
+			return new SimpleLinkData(FhirURL.buildOrThrow(typeURL, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(dataTypeName));
 		}
 	}
 
@@ -32,13 +33,13 @@ public class Dstu2FhirDocLinkFactory {
 	
 	public SimpleLinkData forDataTypeName(String dataTypeName) {
 		String url = urlForDataTypeName(dataTypeName);
-		return new SimpleLinkData(FhirURL.buildOrThrow(url), StringUtil.capitaliseLowerCase(dataTypeName));
+		return new SimpleLinkData(FhirURL.buildOrThrow(url, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(dataTypeName));
 	}
 	
 	public SimpleLinkData fromUri(String uri) {
 		String[] uriTokens = uri.split("/");
 		String linkTargetName = uriTokens[uriTokens.length - 1];
-		return new SimpleLinkData(FhirURL.buildOrThrow(uri), StringUtil.capitaliseLowerCase(linkTargetName));
+		return new SimpleLinkData(FhirURL.buildOrThrow(uri, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(linkTargetName));
 	}
 
 	private String urlForDataTypeName(String dataTypeName) {
