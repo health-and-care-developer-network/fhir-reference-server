@@ -360,8 +360,22 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<String> getLinkedNodeName() {
-		return Optional.ofNullable(definition.getContentReference());
+		return Optional.empty();
 	}
+
+	@Override
+	public Optional<String> getLinkedNodePath() {
+		String contentReference = definition.getContentReference();
+		if (contentReference == null) {
+			return Optional.empty();
+		} else if (contentReference.startsWith("#")) {
+			String trimmedContentReference = contentReference.substring(1);
+			return Optional.ofNullable(trimmedContentReference);
+		} else {
+			throw new IllegalStateException("Linked node path didn't start with #: " + contentReference + " (" + getPath() + ")");
+		}
+	}
+	
 
 	@Override
 	public List<FhirElementMapping> getMappings() {
@@ -388,7 +402,12 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
 		//return Optional.empty();
 		
-		// thought this was only required for DSTU2, but seems inconsistent in the STU3 profiles we have. TODO To query.
+		// believed this was only required for DSTU2, but seems inconsistent in the STU3 profiles we have. TODO To query.
 		return Optional.of(resolver);
+	}
+
+	@Override
+	public Optional<String> getId() {
+		return Optional.ofNullable(definition.getId());
 	}
 }

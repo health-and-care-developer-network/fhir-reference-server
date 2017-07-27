@@ -313,6 +313,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public Optional<String> getLinkedNodeName() {
 		return Optional.ofNullable(definition.getNameReference());
 	}
+
+	@Override
+	public Optional<String> getLinkedNodePath() {
+		return Optional.empty();
+	}
 	
 	/**
 	 * Consider the extension complex iff it has an element with path "Extension.extension.url"
@@ -384,6 +389,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	@Override
 	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
 		return Optional.of(resolver);
+	}
+
+	@Override
+	public Optional<String> getId() {
+		return Optional.ofNullable(definition.getElementSpecificId());
 	}
 	
 }

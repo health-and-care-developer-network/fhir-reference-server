@@ -64,6 +64,7 @@ public interface FhirTreeTableContent {
 	public Optional<String> getDefinition();
 	
 	public Optional<String> getLinkedNodeName();
+	public Optional<String> getLinkedNodeId();
 	
 	public Optional<ExtensionType> getExtensionType();
 
@@ -76,4 +77,6 @@ public interface FhirTreeTableContent {
 	boolean isPrimitive();
 
 	FhirDataType getDataType();
+
+	public Optional<String> getId();
 }

@@ -110,11 +110,16 @@ public class FhirTreeNodeBuilder {
 
 		node.setAliases(elementDefinition.getAliases());
 		node.setExtensionType(elementDefinition.getExtensionType());
-		
+
 		
 		Optional<String> nameReference = elementDefinition.getLinkedNodeName();
 		if (nameReference.isPresent() && !nameReference.get().isEmpty()) {
 			node.setLinkedNodeName(nameReference);
+		}
+		
+		Optional<String> nodePath = elementDefinition.getLinkedNodePath();
+		if (nodePath.isPresent() && !nodePath.get().isEmpty()) {
+			node.setLinkedNodeId(nodePath);
 		}
 		
 		node.setMappings(elementDefinition.getMappings());
@@ -127,6 +132,8 @@ public class FhirTreeNodeBuilder {
 		if (extensionUrlDiscriminatorResolver.isPresent()) {
 			node.setExtensionUrlDiscriminatorResolver(extensionUrlDiscriminatorResolver.get());
 		}
+		
+		node.setId(elementDefinition.getId());
 		
 		return node;
 	}

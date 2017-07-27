@@ -240,4 +240,14 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public FhirDataType getDataType() {
 		return backup.getDataType();
 	}
+
+	@Override
+	public Optional<String> getId() {
+		return backup.getId();
+	}
+
+	@Override
+	public Optional<String> getLinkedNodeId() {
+		return backup.getLinkedNodeId();
+	}
 }

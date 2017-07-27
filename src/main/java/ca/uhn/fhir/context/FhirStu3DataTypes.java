@@ -95,9 +95,10 @@ public class FhirStu3DataTypes {
 		} 
 		/*else if (typeName.equals("domainresource")) {
 			return FhirDataType.DOMAIN_RESOURCE;
-		} else if (typeName.equals("element")) {
-			return FhirDataType.ELEMENT;
 		}*/
+		else if (typeName.equals("element")) {
+			return FhirDataType.ELEMENT;
+		}
 		
 		if (nameToDefinition.containsKey(typeName)) {
 			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();

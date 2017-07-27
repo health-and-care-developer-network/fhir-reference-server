@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -170,8 +171,82 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			}
 		}
 	}
-
+	
 	public void resolveLinkedNodes() {
+		resolveNameLinkedNodes();
+		resolveIdLinkedNodes();
+	}
+
+	private void resolveIdLinkedNodes() {
+		Map<String, List<FhirTreeTableContent>> expectedIds = Maps.newHashMap();
+		Map<String, FhirTreeTableContent> nodesWithId = Maps.newHashMap();
+		
+		for (FhirTreeTableContent node : this) {
+			
+			Optional<String> id = node.getId();
+			boolean hasId = id.isPresent();
+			if (hasId) {
+				nodesWithId.put(id.get(), node);
+			}
+			
+			Optional<String> linkedNodeId = node.getLinkedNodeId();
+			boolean hasIdLinkedNode = linkedNodeId.isPresent();
+			if (hasIdLinkedNode) {
+				List<FhirTreeTableContent> nodesLinkingToThisId;
+				if (expectedIds.containsKey(linkedNodeId.get())) {
+					nodesLinkingToThisId = expectedIds.get(linkedNodeId.get());
+				} else {
+					nodesLinkingToThisId = Lists.newArrayList();
+					expectedIds.put(linkedNodeId.get(), nodesLinkingToThisId);
+				}
+				
+				nodesLinkingToThisId.add(node);
+			}
+			
+			if (hasId && hasIdLinkedNode) {
+				if (node.getId().get().equals(node.getLinkedNodeId().get())) {
+					RendererError.handle(RendererError.Key.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
+				}
+			}
+			
+			if (hasIdLinkedNode && node.getFixedValue().isPresent()) {
+				RendererError.handle(RendererError.Key.FIXEDVALUE_WITH_LINKED_NODE, 
+				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
+				  + " (" + node.getLinkedNodeId().get() + ")");
+			}
+		}
+		
+		setLinkedNodes(expectedIds, nodesWithId);
+	}
+
+	void setLinkedNodes(Map<String, List<FhirTreeTableContent>> expectedIds,
+			Map<String, FhirTreeTableContent> nodesWithId) {
+		for (Map.Entry<String, List<FhirTreeTableContent>> expectedIdEntry : expectedIds.entrySet()) {
+			String expectedId = expectedIdEntry.getKey();
+			List<FhirTreeTableContent> nodesWithLink = expectedIdEntry.getValue();
+			
+			if (nodesWithId.containsKey(expectedId)) {
+				for (FhirTreeTableContent nodeWithLink : nodesWithLink) {
+					if (nodeWithLink instanceof FhirTreeNode) {
+						((FhirTreeNode)nodeWithLink).setLinkedNode(nodesWithId.get(expectedId));
+					}
+					// If we are in a dummy node, we don't need to do anything since the backup node
+					// should contain this information
+				}
+			} else {
+				String nodesWithMissingLinkTarget = String.join(", ", 
+					nodesWithLink
+						.stream()
+						.map(node -> node.getPath())
+						.collect(Collectors.toList()));
+				
+				RendererError.handle(RendererError.Key.MISSING_REFERENCED_NODE, 
+					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedId + ")");
+			}
+		}
+	}
+
+	public void resolveNameLinkedNodes() {
 		Map<String, List<FhirTreeTableContent>> expectedNames = Maps.newHashMap();
 		Map<String, FhirTreeTableContent> namedNodes = Maps.newHashMap();
 		
@@ -207,29 +282,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			}
 		}
 		
-		for (Map.Entry<String, List<FhirTreeTableContent>> expectedNameEntry : expectedNames.entrySet()) {
-			String expectedName = expectedNameEntry.getKey();
-			List<FhirTreeTableContent> nodesWithLink = expectedNameEntry.getValue();
-			
-			if (namedNodes.containsKey(expectedName)) {
-				for (FhirTreeTableContent nodeWithLink : nodesWithLink) {
-					if (nodeWithLink instanceof FhirTreeNode) {
-						((FhirTreeNode)nodeWithLink).setLinkedNode(namedNodes.get(expectedName));
-					}
-					// If we are in a dummy node, we don't need to do anything since the backup node
-					// should contain this information
-				}
-			} else {
-				String nodesWithMissingLinkTarget = String.join(", ", 
-					expectedNames.get(expectedName)
-						.stream()
-						.map(node -> node.getPath())
-						.collect(Collectors.toList()));
-				
-				RendererError.handle(RendererError.Key.MISSING_REFERENCED_NODE, 
-					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedName + ")");
-			}
-		}
+		setLinkedNodes(expectedNames, namedNodes);
 	}
 
 	public void cacheSlicingDiscriminators() {

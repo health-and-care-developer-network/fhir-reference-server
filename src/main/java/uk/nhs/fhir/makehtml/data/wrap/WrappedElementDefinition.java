@@ -40,7 +40,10 @@ public abstract class WrappedElementDefinition {
 	public abstract List<String> getAliases();
 	public abstract Optional<ExtensionType> getExtensionType();
 	public abstract Optional<String> getLinkedNodeName();
+	public abstract Optional<String> getLinkedNodePath();
 	public abstract List<FhirElementMapping> getMappings();
+	public abstract Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver();
+	public abstract Optional<String> getId();
 	
 	// Introduced with STU3
 	
@@ -63,5 +66,4 @@ public abstract class WrappedElementDefinition {
 	public boolean isRootElement() {
 		return getPathParts().length == 1;
 	}
-	public abstract Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver();
 }
