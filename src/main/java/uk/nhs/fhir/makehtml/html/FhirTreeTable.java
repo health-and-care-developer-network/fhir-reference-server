@@ -188,7 +188,9 @@ public class FhirTreeTable {
 		
 		// Examples
 		for (String example : node.getExamples()) {
-			resourceInfos.add(new ResourceInfo("Example Value", example, ResourceInfoType.EXAMPLE_VALUE));
+			if (!node.isFixedValue()) {
+				resourceInfos.add(new ResourceInfo("Example Value", example, ResourceInfoType.EXAMPLE_VALUE));
+			}
 		}
 		
 		if (node.hasDefaultValue()
