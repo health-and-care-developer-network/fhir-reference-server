@@ -52,8 +52,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private FhirTreeNode backupNode = null;
 
 	private final List<FhirTreeTableContent> children = Lists.newArrayList();
-	
-	private Optional<ExtensionUrlDiscriminatorResolver> extensionUrlDiscriminatorResolver = Optional.empty();
 
 	public FhirTreeNode(
 			Optional<String> name,
@@ -649,13 +647,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	
 	public List<FhirElementMapping> getMappings() {
 		return mappings;
-	}
-	
-	public void setExtensionUrlDiscriminatorResolver(ExtensionUrlDiscriminatorResolver resolver) {
-		this.extensionUrlDiscriminatorResolver = Optional.of(resolver);
-	}
-	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
-		return extensionUrlDiscriminatorResolver;
 	}
 
 	public Optional<String> getId() {

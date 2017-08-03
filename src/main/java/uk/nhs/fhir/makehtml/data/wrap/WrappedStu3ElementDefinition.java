@@ -37,9 +37,7 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
-import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -400,16 +398,6 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	@Override
 	public Optional<String> getSliceName() {
 		return Optional.ofNullable(definition.getSliceName());
-	}
-
-	private static final ExtensionUrlDiscriminatorResolver resolver = new DSTU2ExtensionUrlDiscriminatorResolver();  
-	
-	@Override
-	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
-		//return Optional.empty();
-		
-		// believed this was only required for DSTU2, but seems inconsistent in the STU3 profiles we have. TODO To query.
-		return Optional.of(resolver);
 	}
 
 	@Override

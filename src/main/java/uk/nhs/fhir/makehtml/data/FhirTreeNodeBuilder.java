@@ -130,12 +130,6 @@ public class FhirTreeNodeBuilder {
 		
 		node.setSliceName(elementDefinition.getSliceName());
 		
-		// DSTU2 extension elements sliced on url actually refer to the XML element at extension/type/profile/@value
-		Optional<ExtensionUrlDiscriminatorResolver> extensionUrlDiscriminatorResolver = elementDefinition.getExtensionUrlDiscriminatorResolver();
-		if (extensionUrlDiscriminatorResolver.isPresent()) {
-			node.setExtensionUrlDiscriminatorResolver(extensionUrlDiscriminatorResolver.get());
-		}
-		
 		node.setId(elementDefinition.getId());
 		
 		return node;

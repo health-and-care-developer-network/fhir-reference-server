@@ -33,9 +33,7 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
-import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -51,7 +49,6 @@ import uk.nhs.fhir.util.HAPIUtils;
 public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
-	private static final ExtensionUrlDiscriminatorResolver resolver = new DSTU2ExtensionUrlDiscriminatorResolver();
 	private static final FhirDataTypes<Type> fhirDataTypes = new FhirDstu2DataTypes();
 
 	private final ElementDefinitionDt definition;
@@ -389,11 +386,6 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	@Override
 	public Optional<String> getSliceName() {
 		return Optional.ofNullable(definition.getName());
-	}
-
-	@Override
-	public Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver() {
-		return Optional.of(resolver);
 	}
 
 	@Override

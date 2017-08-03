@@ -11,7 +11,6 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
-import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
@@ -43,7 +42,6 @@ public abstract class WrappedElementDefinition {
 	public abstract Optional<String> getLinkedNodeName();
 	public abstract Optional<String> getLinkedNodePath();
 	public abstract List<FhirElementMapping> getMappings();
-	public abstract Optional<ExtensionUrlDiscriminatorResolver> getExtensionUrlDiscriminatorResolver();
 	public abstract Optional<String> getId();
 	public abstract FhirVersion getVersion();
 	
