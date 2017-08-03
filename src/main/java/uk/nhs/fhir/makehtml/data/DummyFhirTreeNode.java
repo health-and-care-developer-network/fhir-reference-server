@@ -98,16 +98,6 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public void setFhirIcon(FhirDstu2Icon icon) {
-		throw new IllegalStateException("Setting icon on a dummy node");
-	}
-	
-	@Override
-	public Optional<FhirDstu2Icon> getFhirIcon() {
-		return backup.getFhirIcon();
-	}
-
-	@Override
 	public String getDisplayName() {
 		if (backup != null) {
 			return backup.getDisplayName();
@@ -249,5 +239,10 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	@Override
 	public Optional<String> getLinkedNodeId() {
 		return backup.getLinkedNodeId();
+	}
+
+	@Override
+	public Optional<FhirTreeTableContent> getLinkedNode() {
+		return backup.getLinkedNode();
 	}
 }

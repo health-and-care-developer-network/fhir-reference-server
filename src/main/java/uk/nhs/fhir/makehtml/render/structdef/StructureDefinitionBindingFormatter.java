@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
+import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
@@ -182,7 +182,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
         		linkContents.add(
         			Elements.withAttributes("img",
                			Lists.newArrayList(
-           					new Attribute("src", FhirDstu2Icon.REFERENCE.getUrl()),
+           					new Attribute("src", FhirIcon.REFERENCE.getUrl()),
            					new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
         	}
         	

@@ -14,7 +14,7 @@ import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
+import uk.nhs.fhir.makehtml.data.FhirIconProvider;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
@@ -31,6 +31,8 @@ public class FhirTreeTable {
 	private final FhirTreeData data;
 	private final Style lineStyle = Style.DOTTED;
 	private final FhirVersion version;
+	
+	private final FhirIconProvider icons = new FhirIconProvider();
 	
 	public FhirTreeTable(FhirTreeData data, FhirVersion version) {
 		this.data = data;
@@ -62,10 +64,6 @@ public class FhirTreeTable {
 		
 		FhirTreeTableContent root = data.getRoot();
 		
-		// Dummy nodes don't store icon info. If it is a dummy node, it will inherit the correct icon anyway.
-		if (root instanceof FhirTreeData) {
-			root.setFhirIcon(FhirDstu2Icon.RESOURCE);
-		}
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
@@ -104,17 +102,6 @@ public class FhirTreeTable {
 					treeIcons.add(FhirTreeIcon.BLANK);
 				}
 			}
-			
-			if (childNode instanceof FhirTreeNode
-			  && childNode.hasChildren()) {
-				FhirTreeNode fhirTreeNode = (FhirTreeNode)childNode;
-				Optional<FhirDstu2Icon> currentIcon = fhirTreeNode.getFhirIcon();
-				// update default icon to folder icon
-				if (!currentIcon.isPresent() 
-				  || currentIcon.get().equals(FhirDstu2Icon.DATATYPE)) {
-					fhirTreeNode.setFhirIcon(FhirDstu2Icon.ELEMENT);
-				}
-			}
 
 			addTableRow(tableRows, childNode, childVlines, treeIcons);
 			addNodeRows(childNode, tableRows, childVlines);
@@ -134,7 +121,7 @@ public class FhirTreeTable {
 		
 		tableRows.add(
 			new TableRow(
-				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
+				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
 				new SimpleTextCell(nodeToAdd.getCardinality().toString(), nodeToAdd.useBackupCardinality(), removedByProfile), 
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile), 

@@ -20,7 +20,6 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 
 /**
@@ -29,6 +28,13 @@ import uk.nhs.fhir.makehtml.data.FhirURL;
 public class NewMain {
     private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+
+	// Set on startup. Path to folder containing extension files.
+	private static String suppliedResourcesFolderPath = null;
+	
+	public static String getSuppliedResourcesFolderPath() {
+		return suppliedResourcesFolderPath;
+	}
     
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
@@ -69,7 +75,7 @@ public class NewMain {
             if (!resourcesPath.endsWith(File.separator)) {
             	resourcesPath += File.separator;
             }
-            FhirDstu2Icon.setSuppliedResourcesFolderPath(resourcesPath);
+            suppliedResourcesFolderPath = resourcesPath;
             
             if (!inputDir.endsWith(File.separator)) {
             	inputDir += File.separator;

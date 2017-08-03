@@ -30,13 +30,13 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
 import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
@@ -267,7 +267,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveDstu2DatatypeValue(valueSet);
-				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(urlString, FhirVersion.DSTU2), FhirVersion.DSTU2));
+				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixDstu2(urlString), FhirVersion.DSTU2));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -300,6 +300,9 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<ExtensionType> getExtensionType() {
+		if (!definition.getSlicing().isEmpty()) {
+			return Optional.empty();
+		}
 		
 		for (Type type : definition.getType()) {
 			if (type.getCode() != null 
@@ -341,7 +344,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
 			// case insensitive search
 			File extensionFile = null;
-			for (File f : new File(FhirDstu2Icon.suppliedResourcesFolderPath).listFiles()) {
+			for (File f : new File(NewMain.getSuppliedResourcesFolderPath()).listFiles()) {
 				if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
 					extensionFile = f;
 					break;

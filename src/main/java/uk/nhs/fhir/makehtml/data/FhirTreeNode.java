@@ -19,7 +19,6 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class FhirTreeNode implements FhirTreeTableContent {
-	private Optional<FhirDstu2Icon> icon;
 	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
@@ -57,7 +56,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private Optional<ExtensionUrlDiscriminatorResolver> extensionUrlDiscriminatorResolver = Optional.empty();
 
 	public FhirTreeNode(
-			Optional<FhirDstu2Icon> icon,
 			Optional<String> name,
 			ResourceFlags flags,
 			Integer min,
@@ -68,7 +66,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			String path,
 			FhirDataType dataType,
 			FhirVersion version) {
-		this.icon = icon;
 		this.name = name;
 		this.resourceFlags = flags;
 		this.min = Optional.ofNullable(min);
@@ -90,22 +87,6 @@ public class FhirTreeNode implements FhirTreeTableContent {
 
 	public void setDefinition(Optional<String> definition) {
 		this.definition = definition;
-	}
-
-	@Override
-	public Optional<FhirDstu2Icon> getFhirIcon() {
-		// If using default and we have a backup, use the backup icon
-		if (icon.equals(FhirDstu2Icon.ELEMENT)
-		  && hasBackupNode()) {
-			return backupNode.getFhirIcon();
-		}
-
-		return icon;
-	}
-
-	@Override
-	public void setFhirIcon(FhirDstu2Icon icon) {
-		this.icon = Optional.of(icon);
 	}
 
 	public Optional<String> getName() {
@@ -561,11 +542,16 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			
 			for (String discriminatorPath : discriminatorPaths) {
 				if (getPathName().equals("extension") 
-				  && discriminatorPath.equals("url")
-				  && extensionUrlDiscriminatorResolver.isPresent()) {
-					// special case
-					
-					Set<FhirURL> extensionUrlDiscriminators = extensionUrlDiscriminatorResolver.get().getExtensionUrlDiscriminators(this);
+				  && discriminatorPath.equals("url")) {
+					// special case - check for an extension type link first. Otherwise we default to an actual child node 'url' as normal
+					Set<FhirURL> extensionUrlDiscriminators =
+						getTypeLinks()
+							.links()
+							.stream()
+							.filter(typeLink -> typeLink.getKey().getText().equals("Extension"))
+							.flatMap(typeLink -> typeLink.getValue().isEmpty() ? Lists.newArrayList(typeLink.getKey()).stream() : typeLink.getValue().stream())
+							.map(link -> link.getURL())
+							.collect(Collectors.toSet());
 					
 					if (extensionUrlDiscriminators.size() == 0) {
 						RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "

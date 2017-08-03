@@ -44,8 +44,6 @@ public class FhirTreeNodeBuilder {
 		Integer min = elementDefinition.getCardinalityMin();
 		String max = elementDefinition.getCardinalityMax();
 		
-		Optional<FhirDstu2Icon> icon = FhirDstu2Icon.forElementDefinition(elementDefinition);
-		
 		String shortDescription = elementDefinition.getShortDescription();
 		if (shortDescription == null) {
 			shortDescription = "";
@@ -77,7 +75,6 @@ public class FhirTreeNodeBuilder {
 		FhirVersion version = elementDefinition.getVersion();
 
 		FhirTreeNode node = new FhirTreeNode(
-			icon,
 			name,
 			flags,
 			min,

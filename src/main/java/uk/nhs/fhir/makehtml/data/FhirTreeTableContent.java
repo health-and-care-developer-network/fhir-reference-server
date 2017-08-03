@@ -24,8 +24,6 @@ public interface FhirTreeTableContent {
 	public boolean useBackupTypeLinks();
 	LinkDatas getTypeLinks();
 
-	Optional<FhirDstu2Icon> getFhirIcon();
-
 	String getDisplayName();
 
 	ResourceFlags getResourceFlags();
@@ -52,8 +50,6 @@ public interface FhirTreeTableContent {
 	void setBackupNode(FhirTreeNode backupNode);
 	boolean hasBackupNode();
 	Optional<FhirTreeNode> getBackupNode();
-
-	void setFhirIcon(FhirDstu2Icon icon);
 	
 	public List<ConstraintInfo> getConstraints();
 	
@@ -79,4 +75,6 @@ public interface FhirTreeTableContent {
 	FhirDataType getDataType();
 
 	public Optional<String> getId();
+
+	Optional<FhirTreeTableContent> getLinkedNode();
 }

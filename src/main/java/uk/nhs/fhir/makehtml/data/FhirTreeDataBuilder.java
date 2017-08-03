@@ -21,13 +21,13 @@ public class FhirTreeDataBuilder {
 	
 	public void addFhirTreeNode(FhirTreeNode node) {
 		String nodePath = node.getPath();
-		List<String> pathElements = Lists.newArrayList(nodePath.split("\\."));
-		String elementPathName = pathElements.remove(pathElements.size() - 1);
+		List<String> tailPathParts = Lists.newArrayList(nodePath.split("\\."));
+		String headPathPart = tailPathParts.remove(tailPathParts.size() - 1);
 		
-		stepOutTo(pathElements);
+		stepOutTo(tailPathParts);
 		
 		appendNode(node);
-		path.add(elementPathName);
+		path.add(headPathPart);
 	}
 	
 	private void appendNode(FhirTreeTableContent newNode) {

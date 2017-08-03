@@ -34,21 +34,21 @@ import ca.uhn.fhir.context.FhirDataTypes;
 import ca.uhn.fhir.context.FhirStu3DataTypes;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
 import uk.nhs.fhir.makehtml.data.DSTU2ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.ExtensionType;
 import uk.nhs.fhir.makehtml.data.ExtensionUrlDiscriminatorResolver;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirDstu2Icon;
 import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
 import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
-import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.Stu3FhirDocLinkFactory;
 
@@ -254,7 +254,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveStu3DatatypeValue(valueSet);
-				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(urlString, FhirVersion.STU3), FhirVersion.STU3));
+				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixStu3(urlString), FhirVersion.STU3));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -287,6 +287,10 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Optional<ExtensionType> getExtensionType() {
+		if (!definition.getSlicing().isEmpty()) {
+			return Optional.empty();
+		}
+		
 		for (TypeRefComponent type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
@@ -300,6 +304,9 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	private ExtensionType lookupExtensionType(TypeRefComponent type) {
 		
 		String profile = type.getProfile();
+		if (profile == null) {
+			return ExtensionType.SIMPLE;
+		}
 		
 		String targetProfile = type.getTargetProfile();
 		List<Enumeration<AggregationMode>> aggregation = type.getAggregation();
@@ -315,49 +322,45 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			throw new IllegalStateException("Don't know how to handle versioning for Extension");
 		}
 
-		if (Utilities.noString(profile)) {
-			return ExtensionType.SIMPLE;
-		} else {
-			String filePath;
-			try {
-				URI uri = new URI(profile);
-				filePath = uri.toURL().getFile() + ".xml";
-			} catch (URISyntaxException | MalformedURLException e) {
-				throw new IllegalStateException("URI/URL error for uri " + profile, e);
+		String filePath;
+		try {
+			URI uri = new URI(profile);
+			filePath = uri.toURL().getFile() + ".xml";
+		} catch (URISyntaxException | MalformedURLException e) {
+			throw new IllegalStateException("URI/URL error for uri " + profile, e);
+		}
+		
+		String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+		// case insensitive search
+		File extensionFile = null;
+		for (File f : new File(NewMain.getSuppliedResourcesFolderPath()).listFiles()) {
+			if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
+				extensionFile = f;
+				break;
 			}
-			
-			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			// case insensitive search
-			File extensionFile = null;
-			for (File f : new File(FhirDstu2Icon.suppliedResourcesFolderPath).listFiles()) {
-				if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
-					extensionFile = f;
-					break;
-				}
-			}
+		}
 
-			if (extensionFile == null) {
-				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-			} 
+		if (extensionFile == null) {
+			RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
+		} 
+		
+		try (FileInputStream fis = new FileInputStream(extensionFile);
+			Reader reader = new InputStreamReader(fis)) {
 			
-			try (FileInputStream fis = new FileInputStream(extensionFile);
-				Reader reader = new InputStreamReader(fis)) {
-				
-				IParser parser = HAPIUtils.xmlParser(FhirVersion.STU3);
-				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
-				
-				org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind kind = extension.getKind();
-				if (kind.equals(StructureDefinitionKind.COMPLEXTYPE)) {
-					return ExtensionType.COMPLEX;
-				} else if (kind.equals(StructureDefinitionKind.PRIMITIVETYPE)) {
-					return ExtensionType.SIMPLE;
-				} else {
-					throw new IllegalStateException("Not sure whether extension " + extensionFile.getAbsolutePath() 
-						+ " is simple or complex - kind is " + kind.getDisplay());
-				}
-			} catch (IOException ie) {
-				throw new IllegalStateException(ie);
+			IParser parser = HAPIUtils.xmlParser(FhirVersion.STU3);
+			StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
+			
+			org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind kind = extension.getKind();
+			if (kind.equals(StructureDefinitionKind.COMPLEXTYPE)) {
+				return ExtensionType.COMPLEX;
+			} else if (kind.equals(StructureDefinitionKind.PRIMITIVETYPE)) {
+				return ExtensionType.SIMPLE;
+			} else {
+				throw new IllegalStateException("Not sure whether extension " + extensionFile.getAbsolutePath() 
+					+ " is simple or complex - kind is " + kind.getDisplay());
 			}
+		} catch (IOException ie) {
+			throw new IllegalStateException(ie);
 		}
 	}
 

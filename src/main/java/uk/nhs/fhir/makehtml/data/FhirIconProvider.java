@@ -2,27 +2,27 @@ package uk.nhs.fhir.makehtml.data;
 
 public class FhirIconProvider {
 
-	public FhirDstu2Icon getIcon(FhirTreeNode node) {
+	public FhirIcon getIcon(FhirTreeTableContent node) {
 		
 		if (node.getLinkedNode().isPresent()) {
-			return FhirDstu2Icon.REUSE;
+			return FhirIcon.REUSE;
 		}
 		
 		if (node.getSlicingInfo().isPresent()) {
-			return FhirDstu2Icon.SLICE;
+			return FhirIcon.SLICE;
 		}
 		
 		if (node.getParent() == null) {
-			return FhirDstu2Icon.RESOURCE;
+			return FhirIcon.RESOURCE;
 		}
 		
 		if (node.getExtensionType().isPresent()) {
 			ExtensionType extensionType = node.getExtensionType().get();
 			switch (extensionType) {
 				case SIMPLE:
-					return FhirDstu2Icon.EXTENSION_SIMPLE;
+					return FhirIcon.EXTENSION_SIMPLE;
 				case COMPLEX:
-					return FhirDstu2Icon.EXTENSION_COMPLEX;
+					return FhirIcon.EXTENSION_COMPLEX;
 				default:
 					throw new IllegalStateException("which icon should be used for extension type " + extensionType.toString());
 			}
@@ -31,19 +31,19 @@ public class FhirIconProvider {
 		FhirDataType dataType = node.getDataType();
 		switch (dataType) {
 			case CHOICE:
-				return FhirDstu2Icon.CHOICE;
+				return FhirIcon.CHOICE;
 			case REFERENCE:
-				return FhirDstu2Icon.REFERENCE;
+				return FhirIcon.REFERENCE;
 			case PRIMITIVE:
-				return FhirDstu2Icon.PRIMITIVE;
+				return FhirIcon.PRIMITIVE;
 			case RESOURCE:
 			case COMPLEX_ELEMENT:
-				return FhirDstu2Icon.DATATYPE;
+				return FhirIcon.DATATYPE;
 			default:
 				if (node.hasChildren()) {
-					return FhirDstu2Icon.DATATYPE;
+					return FhirIcon.DATATYPE;
 				} else {
-					return FhirDstu2Icon.ELEMENT;
+					return FhirIcon.ELEMENT;
 				}
 		}
 	}

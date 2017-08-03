@@ -1,64 +1,30 @@
 package uk.nhs.fhir.makehtml.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.base.Strings;
-
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
-import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.api.ICompositeDatatype;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.UriDt;
-import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedDstu2ElementDefinition;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.html.RendererError;
-import uk.nhs.fhir.util.HAPIUtils;
 
-public enum FhirDstu2Icon {
-	CHOICE("icon_choice", "gif", FhirDstu2Icon.choiceBase64),
-	DATATYPE("icon_datatype", "gif", FhirDstu2Icon.datatypeBase64),
-	ELEMENT("icon_element", "gif", FhirDstu2Icon.elementBase64),
-	EXTENSION("icon_extension", "png", FhirDstu2Icon.extensionBase64),
-	EXTENSION_COMPLEX("icon_extension_complex", "png", FhirDstu2Icon.extensionComplexBase64),
-	EXTENSION_SIMPLE("icon_extension_simple", "png", FhirDstu2Icon.extensionSimpleBase64),
-	EXTERNAL("icon_external", "png", FhirDstu2Icon.externalBase64),
-	PRIMITIVE("icon_primitive", "png", FhirDstu2Icon.primitiveBase64),
-	PROFILE("icon_profile", "png", FhirDstu2Icon.profileBase64),
-	REFERENCE("icon_reference", "png", FhirDstu2Icon.referenceBase64),
-	RESOURCE("icon_resource", "png", FhirDstu2Icon.resourceBase64),
-	REUSE("icon_reuse", "png", FhirDstu2Icon.reuseBase64),
-	SLICE("icon_slice", "png", FhirDstu2Icon.sliceBase64),
-	TARGET("target", "png", FhirDstu2Icon.targetBase64),
+public enum FhirIcon {
+	CHOICE("icon_choice", "gif", FhirIcon.choiceBase64),
+	DATATYPE("icon_datatype", "gif", FhirIcon.datatypeBase64),
+	ELEMENT("icon_element", "gif", FhirIcon.elementBase64),
+	EXTENSION("icon_extension", "png", FhirIcon.extensionBase64),
+	EXTENSION_COMPLEX("icon_extension_complex", "png", FhirIcon.extensionComplexBase64),
+	EXTENSION_SIMPLE("icon_extension_simple", "png", FhirIcon.extensionSimpleBase64),
+	EXTERNAL("icon_external", "png", FhirIcon.externalBase64),
+	PRIMITIVE("icon_primitive", "png", FhirIcon.primitiveBase64),
+	PROFILE("icon_profile", "png", FhirIcon.profileBase64),
+	REFERENCE("icon_reference", "png", FhirIcon.referenceBase64),
+	RESOURCE("icon_resource", "png", FhirIcon.resourceBase64),
+	REUSE("icon_reuse", "png", FhirIcon.reuseBase64),
+	SLICE("icon_slice", "png", FhirIcon.sliceBase64),
+	TARGET("target", "png", FhirIcon.targetBase64),
 	// Note this one won't work until we host our icons ourselves, since the NHS Digital site doesn't have this icon
-	MODIFIER_EXTENSION_SIMPLE("icon_modifier_extension_simple", "png", FhirDstu2Icon.modifierExtensionSimpleBase64);
+	MODIFIER_EXTENSION_SIMPLE("icon_modifier_extension_simple", "png", FhirIcon.modifierExtensionSimpleBase64);
 	
 	private final String name;
 	private final String extension;
 	private final String base64;
 	
-	// Set on startup. Path to folder containing extension files.
-	public static String suppliedResourcesFolderPath = null;
-	public static void setSuppliedResourcesFolderPath(String suppliedResourcesFolderPath) {
-		FhirDstu2Icon.suppliedResourcesFolderPath = suppliedResourcesFolderPath;
-	}
-	
-	FhirDstu2Icon(String name, String extension, String base64) {
+	FhirIcon(String name, String extension, String base64) {
 		this.name = name;
 		this.extension = extension;
 		this.base64 = base64;
@@ -78,137 +44,6 @@ public enum FhirDstu2Icon {
 	
 	public String getAsDataUrl() {
 		return "url('data:image/" + extension + ";base64," + base64 + "')";
-	}
-
-	/*
-	 * This whole process should be happening based on tree nodes, not (FHIR-Version dependent) definition time
-	 * In that case, we have already done the legwork to work out whether the node is an extension (and whether it is simple/complex)
-	 * 
-	 * Now that we need to support STU3, even more reason to push this to later in the pipeline
-	 */
-	public static Optional<FhirDstu2Icon> forElementDefinition(WrappedElementDefinition wrappedDefinition) {
-		
-		ElementDefinitionDt definition;
-		if (wrappedDefinition instanceof WrappedDstu2ElementDefinition) {
-			definition = ((WrappedDstu2ElementDefinition)wrappedDefinition).getWrappedDefinition();
-		} else {
-			return Optional.empty();
-		}
-		
-		if (definition.getPath().endsWith("[x]")) {
-			return Optional.of(FhirDstu2Icon.CHOICE);
-		}
-		
-		for (Type type : definition.getType()) {
-			String typeName = type.getCode();
-			if (typeName != null) {
-				
-				if (typeName.equals("Extension")) {
-                    return Optional.of(lookupExtension(type));
-                } else {
-					Optional<Class<?>> maybeImplementingType = FhirDstu2DataTypes.getImplementingType(typeName);
-					
-					if (maybeImplementingType.isPresent()) {
-						Class<?> implementingType = maybeImplementingType.get();
-						
-						if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-							return Optional.of(FhirDstu2Icon.REFERENCE);
-						}
-						
-						if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-							return Optional.of(FhirDstu2Icon.DATATYPE);
-						}
-						
-						if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-							return Optional.of(FhirDstu2Icon.PRIMITIVE);
-						}
-					}
-				}
-			}
-		}
-		
-		if (!definition.getSlicing().isEmpty()) {
-			return Optional.of(FhirDstu2Icon.SLICE);
-		}
-		
-		if (!Strings.isNullOrEmpty(definition.getNameReference())) {
-			return Optional.of(FhirDstu2Icon.REUSE);
-		}
-		
-		String path = definition.getPath();
-		if (!Strings.isNullOrEmpty(path)) {
-			
-		} else {
-			System.out.println("Null or empty path");
-		}
-		
-		return Optional.of(FhirDstu2Icon.ELEMENT);
-	}
-
-	private static FhirDstu2Icon lookupExtension(Type type)  {
-
-		FhirContext ctx = HAPIUtils.fhirContext(FhirVersion.DSTU2);
-
-		List<UriDt> profiles = type.getProfile();
-		if (profiles.isEmpty()) {
-		    // Extension isn't profiled. So using base type and is simple
-			return FhirDstu2Icon.EXTENSION_SIMPLE;
-		}
-
-		boolean hasPrimitiveExtension = true;
-
-		for (UriDt uriDt : profiles) {
-
-			String fileName;
-			try {
-				URI uri = new URI(uriDt.getValue());
-				fileName = uri.toURL().getFile() + ".xml";
-			} catch (URISyntaxException | MalformedURLException e) {
-				throw new IllegalStateException("URI/URL error for uri " + uriDt.getValue(), e);
-			}
-			
-			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-			
-			String pathName = suppliedResourcesFolderPath + fileName;
-			File file = new File(pathName);
-			
-			if (!file.exists()) {
-				// case insensitive search
-				for (File f : new File(suppliedResourcesFolderPath).listFiles()) {
-					if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
-						file = f;
-						break;
-					}
-				}
-			}
-
-			if (!file.exists()) {
-				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-			}
-			
-			try (FileInputStream fis = new FileInputStream(file)){
-				Reader reader = new InputStreamReader(fis);
-				IParser parser = ctx.newXmlParser();
-				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
-				// KGM 8/May/2017 System.out.println(extension.getFhirVersion());
-
-				for (ElementDefinitionDt element : extension.getSnapshot().getElement()) {
-					if (element.getPath().contains("Extension.extension.url")) {
-
-						hasPrimitiveExtension = false;
-					}
-				}
-
-			} catch (IOException ie) {
-				throw new IllegalStateException(ie);
-			}
-		}
-
-		if (hasPrimitiveExtension) {
-			return FhirDstu2Icon.EXTENSION_SIMPLE;
-		} else {
-			return FhirDstu2Icon.EXTENSION_COMPLEX;
-		}
 	}
 
 	private static final String choiceBase64 = "R0lGODlhEAAQAMQfAGm6/idTd4yTmF+v8Xa37KvW+lyh3KHJ62aq41ee2bXZ98nm/2mt5W2Ck5XN/C1chEZieho8WXXA/2Gn4P39/W+y6V+l3qjP8Njt/lx2izxPYGyv51Oa1EJWZ////////yH5BAEAAB8ALAAAAAAQABAAAAWH4Cd+Xml6Y0pCQts0EKp6GbYshaM/skhjhCChUmFIeL4OsHIxXRAISQTl6SgIG8+FgfBMoh2qtbLZQr0TQJhk3TC4pYPBApiyFVDEwSOf18UFXxMWBoUJBn9sDgmDewcJCRyJJBoEkRyYmAABPZQEAAOhA5seFDMaDw8BAQ9TpiokJyWwtLUhADs=";

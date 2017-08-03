@@ -10,13 +10,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.html.RendererError;
 
@@ -50,8 +48,6 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	public void tidyData() {
 		removeExtensionsSlicingNodes(root);
 		stripChildlessDummyNodes(root);
-		addSlicingIcons(root);
-		addLinkIcons(root);
 		removeUnwantedConstraints(root);
 		stripComplexExtensionChildren(root);
 	}
@@ -102,35 +98,6 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			  && child.getChildren().isEmpty()) {
 				node.getChildren().remove(i);
 			}
-		}
-	}
-	
-	private static final Set<String> toleratedMissingTypeLinkPaths = Sets.newHashSet();
-	static {
-		toleratedMissingTypeLinkPaths.add("Patient.birthDate.value");
-	}
-
-	private void addLinkIcons(FhirTreeTableContent node) {
-		addIconIfRequired(content -> content.getLinkedNodeName().isPresent(), node, FhirDstu2Icon.REUSE);
-		
-		for (FhirTreeTableContent child : node.getChildren()) {
-			addLinkIcons(child);
-		}
-	}
-
-	private void addSlicingIcons(FhirTreeTableContent node) {
-		addIconIfRequired(content -> content.hasSlicingInfo(), node, FhirDstu2Icon.SLICE);
-		
-		for (FhirTreeTableContent child : node.getChildren()) {
-			addSlicingIcons(child);
-		}
-	}
-	
-	private void addIconIfRequired(Predicate<? super FhirTreeTableContent> predicate, FhirTreeTableContent node, FhirDstu2Icon icon) {
-		if ((node instanceof FhirTreeNode) 
-		  && predicate.test(node)) {
-			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
-			fhirTreeNode.setFhirIcon(icon);
 		}
 	}
 
