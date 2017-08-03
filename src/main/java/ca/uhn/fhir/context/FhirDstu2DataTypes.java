@@ -20,7 +20,7 @@ import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.util.HAPIUtils;
 
 /**

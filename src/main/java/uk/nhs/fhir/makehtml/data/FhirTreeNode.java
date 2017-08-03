@@ -182,13 +182,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		  && (linkedNodeName.isPresent() || linkedNodeId.isPresent())) {
 			String linkedContentKey = getLinkedNode().get().getNodeKey();
 			typeLinks.addSimpleLink(
-				new SimpleLinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey, version), "see " + linkedContentKey));
+				new LinkData(FhirURL.buildOrThrow("details.html#" + linkedContentKey, version), "see " + linkedContentKey));
 		}
 		
 		if (typeLinks.isEmpty()
 		  && fixableTypes.containsKey(getPathName())) {
 			RendererError.handle(RendererError.Key.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
-			typeLinks.addSimpleLink(new SimpleLinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
+			typeLinks.addSimpleLink(new LinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
 		} 
 
 		if (typeLinks.isEmpty()) {
@@ -198,7 +198,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		if (getPathName().endsWith("[x]")
 		  && hasAllTypes()) {
 			FhirURL openTypeUrl = FhirURL.buildOrThrow(FhirURLConstants.versionBase(version) + "/datatypes.html#open", version);
-			return new LinkDatas(new SimpleLinkData(openTypeUrl, "*"));
+			return new LinkDatas(new LinkData(openTypeUrl, "*"));
 		} else {
 			return typeLinks;
 		}
@@ -575,7 +575,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 						if (discriminatorNode.isPresent()) {
 							// if the element is a reference type, we need to look at the type it is a reference to. Otherwise it's just the type string.
 							LinkDatas discriminatorNodeTypeLinks = discriminatorNode.get().getTypeLinks();
-							for (Entry<SimpleLinkData, List<SimpleLinkData>> discriminatorNodeTypeLink : discriminatorNodeTypeLinks.links()) {
+							for (Entry<LinkData, List<LinkData>> discriminatorNodeTypeLink : discriminatorNodeTypeLinks.links()) {
 								if (discriminatorNodeTypeLink.getValue().isEmpty()) {
 									discriminators.add(discriminatorNodeTypeLink.getKey().getText());
 								} else {

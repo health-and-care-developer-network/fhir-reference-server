@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.data.LinkDatas;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
@@ -62,7 +62,7 @@ public class LinkCell extends TableCell {
 	 * <a href="link1">Link 1</a> (<a href="link2">Link 2</a> | <a href="link3">Link 3</a>)
 	 * @return
 	 */	
-	private List<Content> makeNestedLinkContents(SimpleLinkData primaryLink, List<SimpleLinkData> nestedLinks) {
+	private List<Content> makeNestedLinkContents(LinkData primaryLink, List<LinkData> nestedLinks) {
 		
 		Element outerLink = makeLinkElement(primaryLink);
 		
@@ -73,7 +73,7 @@ public class LinkCell extends TableCell {
 			children.add(new Text(" ("));
 			
 			boolean first = true;
-			for (SimpleLinkData nestedLink : nestedLinks) {
+			for (LinkData nestedLink : nestedLinks) {
 				if (!first) {
 					children.add(new Text(" | "));
 				}
@@ -93,12 +93,12 @@ public class LinkCell extends TableCell {
 		List<Content> cellContents = Lists.newArrayList();
 
 		boolean addedLink = false;
-		for (Map.Entry<SimpleLinkData, List<SimpleLinkData>> link : linkDatas.links()) {
+		for (Map.Entry<LinkData, List<LinkData>> link : linkDatas.links()) {
 			if (addedLink) {
 				cellContents.add(new Text(" | "));
 			}
 			
-			SimpleLinkData primaryLink = link.getKey();
+			LinkData primaryLink = link.getKey();
 			if (link.getValue().isEmpty()) {
 				cellContents.add(makeLinkElement(primaryLink));
 			} else {
@@ -127,7 +127,7 @@ public class LinkCell extends TableCell {
 			cellClasses);
 	}
 
-	Element makeLinkElement(SimpleLinkData linkData) {
+	Element makeLinkElement(LinkData linkData) {
 		Element link = 
 			Elements.addClasses(
 				Elements.withAttributesAndText("a",

@@ -22,7 +22,7 @@ import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 
@@ -217,10 +217,10 @@ public class FhirTreeTable {
 		// Extensions
 		if (node.getPathName().equals("extension")) {
 			LinkDatas typeLinks = node.getTypeLinks();
-			for (Entry<SimpleLinkData, List<SimpleLinkData>> link : typeLinks.links()) {
+			for (Entry<LinkData, List<LinkData>> link : typeLinks.links()) {
 				if (!link.getValue().isEmpty()
 				  && link.getKey().getText().equals("Extension")) {
-					for (SimpleLinkData nestedLink : link.getValue()) {
+					for (LinkData nestedLink : link.getValue()) {
 						resourceInfos.add(new ResourceInfo("URL", nestedLink.getURL(), ResourceInfoType.EXTENSION_URL));
 					}
 				}

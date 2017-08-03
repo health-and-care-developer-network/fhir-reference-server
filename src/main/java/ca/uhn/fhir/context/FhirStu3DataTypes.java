@@ -31,7 +31,6 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
 import uk.nhs.fhir.util.HAPIUtils;
 
 public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
@@ -142,6 +141,6 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 	}
 	
 	public static LinkData openTypeLink() {
-		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#open", FhirVersion.STU3), "*");
+		return new LinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#open", FhirVersion.STU3), "*");
 	}
 }

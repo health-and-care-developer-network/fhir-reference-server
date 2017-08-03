@@ -19,7 +19,7 @@ public class FhirTreeNodeBuilder {
 		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
 			typeLinks = new LinkDatas(
-				new SimpleLinkData(
+				new LinkData(
 					FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_FHIR + "/profiling.html", elementDefinition.getVersion()), 
 					"Profile"));
 		} else {

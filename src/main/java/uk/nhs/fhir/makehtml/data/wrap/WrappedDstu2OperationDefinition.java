@@ -22,10 +22,9 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.FhirOperationParameter;
 import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.util.Dstu2FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
@@ -73,7 +72,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 
 	@Override
 	public LinkData getKindTypeLink() {
-		return new SimpleLinkData(
+		return new LinkData(
 			FhirURL.buildOrThrow(definition.getKindElement().getValueAsEnum().getSystem(), getImplicitFhirVersion()), 
 			OperationKindEnum.VALUESET_NAME);
 	}

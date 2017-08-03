@@ -39,7 +39,7 @@ import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
@@ -75,7 +75,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 		if (!knownTypes.isEmpty()) {
 			for (Type type : knownTypes) {
 				String code = type.getCode();
-				SimpleLinkData codeLink = typeLinkFactory.forDataTypeName(code);
+				LinkData codeLink = typeLinkFactory.forDataTypeName(code);
 				
 				List<UriDt> profileUris = type.getProfile();
 				

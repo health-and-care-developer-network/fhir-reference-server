@@ -279,27 +279,6 @@ public class StructureDefinitionTreeDataProvider {
 			Set<FhirURL> elementUrlDiscriminators = element.getExtensionUrlDiscriminators();
 			Set<FhirURL> pathMatchUrlDiscriminators = pathMatch.getExtensionUrlDiscriminators();
 			return elementUrlDiscriminators.equals(pathMatchUrlDiscriminators);
-			
-			/*for (LinkData typeLinkToMatch : element.getTypeLinks()) {
-				if (typeLinkToMatch instanceof NestedLinkData
-				  && typeLinkToMatch.getPrimaryLinkData().getText().equals("Extension")
-				  && ((NestedLinkData) typeLinkToMatch).getNestedLinks().size() == 1) {
-					SimpleLinkData nestedLinkToMatch = ((NestedLinkData)typeLinkToMatch).getNestedLinks().get(0);
-					FhirURL urlToMatch = nestedLinkToMatch.getURL();
-					
-					for (LinkData typeLink : pathMatch.getTypeLinks()) {
-						if (typeLink instanceof NestedLinkData
-						  && typeLink.getPrimaryLinkData().getText().equals("Extension")) {
-							for (LinkData nestedLink : ((NestedLinkData)typeLink).getNestedLinks()) {
-								if (nestedLink.getURL().equals(urlToMatch)) {
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}*/
-			
 		}
 		
 		// most nodes

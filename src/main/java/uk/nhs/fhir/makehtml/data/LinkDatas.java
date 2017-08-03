@@ -12,10 +12,10 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class LinkDatas {
-	private final LinkedHashMap<SimpleLinkData, List<SimpleLinkData>> links = new LinkedHashMap<>();
+	private final LinkedHashMap<LinkData, List<LinkData>> links = new LinkedHashMap<>();
 	
-	public LinkDatas(SimpleLinkData... links) {
-		for (SimpleLinkData link : links) {
+	public LinkDatas(LinkData... links) {
+		for (LinkData link : links) {
 			addSimpleLink(link);
 		}
 	}
@@ -24,11 +24,11 @@ public class LinkDatas {
 		return links.isEmpty();
 	}
 	
-	public Set<Entry<SimpleLinkData, List<SimpleLinkData>>> links() {
+	public Set<Entry<LinkData, List<LinkData>>> links() {
 		return links.entrySet();
 	}
 	
-	public void addSimpleLink(SimpleLinkData link) {
+	public void addSimpleLink(LinkData link) {
 		if (links.containsKey(link)) {
 			throw new IllegalStateException("Trying to add link \"" + link.getText() + "\" twice");
 		} else {
@@ -36,7 +36,7 @@ public class LinkDatas {
 		}
 	}
 	
-	public void addNestedLink(SimpleLinkData outer, SimpleLinkData inner) {
+	public void addNestedLink(LinkData outer, LinkData inner) {
 		List<LinkData> matchingKeys = 
 			links
 				.keySet()
@@ -56,7 +56,7 @@ public class LinkDatas {
 		if (matchingKeys.isEmpty()) {
 			links.put(outer, Lists.newArrayList(inner));
 		} else {
-			List<SimpleLinkData> nestedLinks = links.get(matchingKeys.get(0));
+			List<LinkData> nestedLinks = links.get(matchingKeys.get(0));
 			
 			long nestedMatchingText = nestedLinks
 				.stream()
@@ -97,11 +97,11 @@ public class LinkDatas {
 			return false;
 		}
 		
-		for (Entry<SimpleLinkData, List<SimpleLinkData>> e : links.entrySet()) {
-			SimpleLinkData key = e.getKey();
-			List<SimpleLinkData> nested = e.getValue();
+		for (Entry<LinkData, List<LinkData>> e : links.entrySet()) {
+			LinkData key = e.getKey();
+			List<LinkData> nested = e.getValue();
 			
-			List<SimpleLinkData> otherNested = otherLinkDatas.links.get(key);
+			List<LinkData> otherNested = otherLinkDatas.links.get(key);
 			if (otherNested == null) {
 				return false;
 			} else if (nested.size() != otherNested.size()) {
@@ -117,9 +117,9 @@ public class LinkDatas {
 	public long hashcode() {
 		long hc = 0;
 
-		for (Entry<SimpleLinkData, List<SimpleLinkData>> e : links.entrySet()) {
-			SimpleLinkData key = e.getKey();
-			List<SimpleLinkData> nested = e.getValue();
+		for (Entry<LinkData, List<LinkData>> e : links.entrySet()) {
+			LinkData key = e.getKey();
+			List<LinkData> nested = e.getValue();
 			
 			hc += key.hashCode() * nested.hashCode();
 		}
@@ -127,10 +127,10 @@ public class LinkDatas {
 		return hc;
 	}
 
-	public void addNestedUri(SimpleLinkData outerLink, String nestedLinkUri, FhirVersion version) {
+	public void addNestedUri(LinkData outerLink, String nestedLinkUri, FhirVersion version) {
 		String[] uriTokens = nestedLinkUri.split("/");
 		String linkTargetName = uriTokens[uriTokens.length - 1];
-		SimpleLinkData inner = new SimpleLinkData(FhirURL.buildOrThrow(nestedLinkUri, version), StringUtil.capitaliseLowerCase(linkTargetName));
+		LinkData inner = new LinkData(FhirURL.buildOrThrow(nestedLinkUri, version), StringUtil.capitaliseLowerCase(linkTargetName));
 		addNestedLink(outerLink, inner);
 	}
 }

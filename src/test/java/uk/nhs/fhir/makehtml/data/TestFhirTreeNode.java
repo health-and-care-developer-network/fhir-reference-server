@@ -10,7 +10,6 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
 		return new FhirTreeNode(
-			Optional.of(FhirIcon.ELEMENT),
 			Optional.of(id), 
 			new ResourceFlags(), 
 			0, 

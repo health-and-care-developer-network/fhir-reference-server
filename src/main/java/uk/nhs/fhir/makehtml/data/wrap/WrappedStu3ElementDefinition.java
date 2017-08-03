@@ -43,7 +43,7 @@ import uk.nhs.fhir.makehtml.data.FhirElementMapping;
 import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.SlicingInfo;
 import uk.nhs.fhir.makehtml.html.RendererError;
 import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
@@ -86,14 +86,14 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 					if (code.equals("Extension")
 					  || code.equals("Quantity")
 					  || code.equals("Reference")) {
-						SimpleLinkData codeLink = typeLinkFactory.forDataTypeName(type.getCode());
+						LinkData codeLink = typeLinkFactory.forDataTypeName(type.getCode());
 						typeLinks.addNestedUri(codeLink, profile, FhirVersion.STU3);
 					} else {
 						throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
 					}
 				} else if (type.hasTargetProfile()) {
 					if (type.getCode().equals("Reference")) {
-						SimpleLinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
+						LinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
 						typeLinks.addNestedUri(referenceLink, type.getTargetProfile(), FhirVersion.STU3);
 					} else if (type.getCode().equals("string")){
 						RendererError.handle(RendererError.Key.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");

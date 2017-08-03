@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.data.FhirOperationParameter;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.html.TableTitle;
 
@@ -36,7 +36,7 @@ public class OperationDefinitionParameterTableDataProvider {
 		for (FhirOperationParameter parameter : parameters) {
 			String rowTitle = parameter.getName();
 			String cardinality = parameter.getMin() + ".." + parameter.getMax(); 
-			LinkData typeLink = parameter.getTypeLink();
+			LinkDatas typeLink = new LinkDatas(parameter.getTypeLink());
 			String documentation = parameter.getDocumentation();
 			List<ResourceInfo> flags = parameter.getResourceInfos();
 
