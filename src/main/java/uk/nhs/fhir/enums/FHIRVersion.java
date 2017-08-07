@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 
 public enum FHIRVersion {
 	DSTU2("", "<span class='dstu2'>DSTU2</span>"),
-	STU3("3.0.1/", "<span class='stu3'>STU3</span>");
+	STU3("STU3/", "<span class='stu3'>STU3</span>");
 	
 	private String urlPrefix = null;
 	private String label = null;
