@@ -35,16 +35,20 @@ public class ServletStreamArtefact {
     		if (resourceVersion != null) {
     			theId = theId.withVersion(resourceVersion);
     		}
-    		ResourceEntity entity = dataSource.getResourceEntityByID(fhirVersion, theId);
-    		for (SupportingArtefact artefact : entity.getArtefacts()) {
-    			if (artefact.getArtefactType().name().equals(artefactType)) {
-    				// We've found a matching artefact - stream it back
-    				response.setStatus(200);
-    				response.setContentType("text/html");
-    				File srcFile = artefact.getFilename();
-    			    FileUtils.copyFile(srcFile, response.getOutputStream());
-    			    return;
-    			}
+    		try {
+    			ResourceEntity entity = dataSource.getResourceEntityByID(fhirVersion, theId);
+    			for (SupportingArtefact artefact : entity.getArtefacts()) {
+        			if (artefact.getArtefactType().name().equals(artefactType)) {
+        				// We've found a matching artefact - stream it back
+        				response.setStatus(200);
+        				response.setContentType("text/html");
+        				File srcFile = artefact.getFilename();
+        			    FileUtils.copyFile(srcFile, response.getOutputStream());
+        			    return;
+        			}
+        		}
+    		} catch (NullPointerException ex) {
+    			LOG.severe("Unable to find matching artefact - resourceID=" + resourceID + ", version=" + resourceVersion);
     		}
     	}
     	LOG.severe("Unable to find matching artefact - resourceID=" + resourceID + ", version=" + resourceVersion);

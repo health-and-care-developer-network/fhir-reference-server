@@ -54,7 +54,7 @@ import uk.nhs.fhir.util.PropertyReader;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/3.0.1/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/3.0.1/*", "/STU3/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
@@ -72,6 +72,13 @@ public class STU3RestfulServlet extends RestfulServer {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.info("Requested URI: " + request.getRequestURI());
+        
+        // Redirect 
+        if (request.getRequestURI().contains("3.0.1")) {
+        	String newURL = request.getRequestURI().replaceAll("\\/3\\.0\\.1\\/", "\\/STU3\\/");
+        	response.sendRedirect(newURL);
+        	return;
+        }
 
         String requestedPath = request.getRequestURI().substring(6);
         LOG.fine("Request path: " + requestedPath);
