@@ -12,13 +12,11 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 	
 	public LinkData forDataType(BasePrimitive<?> fhirData) {
-		String dataTypeName;
-		String typeURL;
 		if (fhirData instanceof CodeDt) {
 			return forCodedType((CodeDt)fhirData);
 		} else {
-			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
-			typeURL = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
+			String dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
+			String typeURL = FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName;
 			
 			return new LinkData(FhirURL.buildOrThrow(typeURL, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(dataTypeName));
 		}

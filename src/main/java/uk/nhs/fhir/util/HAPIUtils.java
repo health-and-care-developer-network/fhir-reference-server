@@ -3,18 +3,10 @@ package uk.nhs.fhir.util;
 import java.util.Date;
 import java.util.List;
 
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.Type;
-import org.hl7.fhir.dstu3.model.UriType;
-
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.BasePrimitive;
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
@@ -47,33 +39,6 @@ public class HAPIUtils {
 
 	public static IParser dstu3XmlParser() {
 		return DSTU3_CONTEXT.newXmlParser();
-	}
-	
-	public static String resolveDstu2DatatypeValue(IDatatype datatype) {
-		if (datatype instanceof BasePrimitive) {
-			return ((BasePrimitive<?>) datatype).getValueAsString();
-		} else if (datatype instanceof ResourceReferenceDt) {
-			return ((ResourceReferenceDt) datatype).getReference().getValueAsString();
-		} else {
-			throw new IllegalStateException("Unhandled type for datatype: " + datatype.getClass().getName());
-		}
-	}
-	
-	public static String resolveStu3DatatypeValue(Type dataType) {
-		String value;
-		if (dataType instanceof Reference) {
-			value = ((Reference)dataType).getReference();
-		} else if (dataType instanceof UriType) {
-			value = ((UriType)dataType).getValue();
-		} else {
-			throw new IllegalStateException("Unhandled type for datatype: " + dataType.getClass().getName());
-		}
-		
-		if(Strings.isNullOrEmpty(value)) {
-			throw new IllegalStateException("Got empty or null value string for: " + dataType.getClass().getName());
-		}
-		
-		return value;
 	}
 	
 	public static String periodToString(PeriodDt period) {

@@ -14,6 +14,7 @@ import ca.uhn.fhir.model.api.BaseElement;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.FhirVersion;
@@ -114,5 +115,15 @@ public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 	
 	private static boolean implementsOrExtends(Class<?> implementor, Class<?> implementee) {
 		return implementee.isAssignableFrom(implementor);
+	}
+	
+	public static String resolveDstu2DatatypeValue(IDatatype datatype) {
+		if (datatype instanceof BasePrimitive) {
+			return ((BasePrimitive<?>) datatype).getValueAsString();
+		} else if (datatype instanceof ResourceReferenceDt) {
+			return ((ResourceReferenceDt) datatype).getReference().getValueAsString();
+		} else {
+			throw new IllegalStateException("Unhandled type for datatype: " + datatype.getClass().getName());
+		}
 	}
 }

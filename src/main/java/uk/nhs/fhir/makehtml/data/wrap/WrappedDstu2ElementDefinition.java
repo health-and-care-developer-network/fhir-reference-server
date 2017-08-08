@@ -263,7 +263,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			IDatatype valueSet = binding.getValueSet();
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
-				String urlString = HAPIUtils.resolveDstu2DatatypeValue(valueSet);
+				String urlString = FhirDstu2DataTypes.resolveDstu2DatatypeValue(valueSet);
 				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixDstu2(urlString), FhirVersion.DSTU2));
 			}
 			

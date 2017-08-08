@@ -251,7 +251,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			Type valueSet = binding.getValueSet();
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
-				String urlString = HAPIUtils.resolveStu3DatatypeValue(valueSet);
+				String urlString = FhirStu3DataTypes.resolveValue(valueSet);
 				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixStu3(urlString), FhirVersion.STU3));
 			}
 			

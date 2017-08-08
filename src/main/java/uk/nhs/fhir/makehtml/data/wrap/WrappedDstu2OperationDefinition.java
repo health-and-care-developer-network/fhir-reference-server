@@ -10,6 +10,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
@@ -22,11 +23,10 @@ import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.FhirOperationParameter;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
-import uk.nhs.fhir.makehtml.data.LinkData;
 import uk.nhs.fhir.util.Dstu2FhirDocLinkFactory;
-import uk.nhs.fhir.util.HAPIUtils;
 import uk.nhs.fhir.util.StringUtil;
 
 public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition {
@@ -49,7 +49,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	}
 	
 	private ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
-		String choice = HAPIUtils.resolveDstu2DatatypeValue(binding.getValueSet());
+		String choice = FhirDstu2DataTypes.resolveDstu2DatatypeValue(binding.getValueSet());
 		String strength = binding.getStrength();
 		
 		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, getImplicitFhirVersion())), strength);

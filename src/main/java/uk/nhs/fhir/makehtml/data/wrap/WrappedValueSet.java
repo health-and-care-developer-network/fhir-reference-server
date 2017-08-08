@@ -27,7 +27,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public abstract Optional<String> getRequirements();
 	public abstract Optional<Date> getDate();
 	public abstract boolean hasComposeIncludeFilter();
-	public abstract FhirCodeSystem getCodeSystem();
+	public abstract Optional<FhirCodeSystem> getCodeSystem();
 	public abstract FhirValueSetCompose getCompose();
 	
 	@Override

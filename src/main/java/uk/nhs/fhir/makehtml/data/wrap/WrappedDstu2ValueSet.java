@@ -103,7 +103,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 			definition
 				.getUndeclaredExtensions()
 				.stream()
-				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-sourceReference"))
+				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-oid"))
 				.map(extension -> extension.getValueAsPrimitive().getValueAsString())
 				.collect(Collectors.toList());
 		
@@ -122,7 +122,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 			definition
 				.getUndeclaredExtensions()
 				.stream()
-				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-oid"))
+				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-sourceReference"))
 				.map(extension -> extension.getValueAsPrimitive().getValueAsString())
 				.collect(Collectors.toList());
 		
@@ -171,7 +171,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	}
 
 	@Override
-	public FhirCodeSystem getCodeSystem() {
+	public Optional<FhirCodeSystem> getCodeSystem() {
 		CodeSystem sourceCodeSystem = definition.getCodeSystem();
 		
 		String sourceCodeSystemSystem = sourceCodeSystem.getSystem();
@@ -186,7 +186,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 			codeSystem.addConcept(new FhirCodeSystemConcept(code, description, definition));
 		}
 		
-		return codeSystem;
+		return Optional.of(codeSystem);
 	}
 
 	@Override

@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.Factory;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.dstu3.model.ValueSet.ConceptReferenceComponent;
+import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
+import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetFilterComponent;
+import org.hl7.fhir.dstu3.model.ValueSet.ValueSetComposeComponent;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -16,6 +22,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirCodeSystem;
 import uk.nhs.fhir.makehtml.data.FhirValueSetCompose;
+import uk.nhs.fhir.makehtml.data.FhirValueSetComposeInclude;
+import uk.nhs.fhir.makehtml.data.FhirValueSetComposeIncludeConcept;
+import uk.nhs.fhir.makehtml.data.FhirValueSetComposeIncludeFilter;
 
 public class WrappedStu3ValueSet extends WrappedValueSet {
 
@@ -82,68 +91,139 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 
 	@Override
 	public List<WrappedConceptMap> getConceptMaps() {
-		// TODO Auto-generated method stub
-		return null;
+		return definition
+			.getContained()
+			.stream()
+			.filter(resource -> resource instanceof ConceptMap)
+			.map(resource -> WrappedConceptMap.fromDefinition(resource))
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public Optional<String> getOid() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> references = 
+			definition
+				.getExtension()
+				.stream()
+				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-oid"))
+				.map(extension -> extension.getValueAsPrimitive().getValueAsString())
+				.collect(Collectors.toList());
+			
+		if (references.size() == 0) {
+			return Optional.empty();
+		} else if (references.size() == 1) {
+			return Optional.of(references.get(0));
+		} else {
+			throw new IllegalStateException("Found multiple references for value set: " + String.join(", ", references) + " (" + definition.getUrl() + ")");
+		}
 	}
 
 	@Override
 	public Optional<String> getReference() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> references = 
+			definition
+				.getExtension()
+				.stream()
+				.filter(extension -> extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-sourceReference"))
+				.map(extension -> extension.getValueAsPrimitive().getValueAsString())
+				.collect(Collectors.toList());
+			
+		if (references.size() == 0) {
+			return Optional.empty();
+		} else if (references.size() == 1) {
+			return Optional.of(references.get(0));
+		} else {
+			throw new IllegalStateException("Found multiple references for value set: " + String.join(", ", references) + " (" + definition.getUrl() + ")");
+		}
 	}
 
 	@Override
 	public Optional<String> getVersion() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.ofNullable(definition.getVersion());
 	}
 
 	@Override
 	public Optional<String> getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.ofNullable(definition.getDescription());
 	}
 
 	@Override
 	public Optional<String> getPublisher() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.ofNullable(definition.getPublisher());
 	}
 
 	@Override
 	public Optional<String> getRequirements() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.ofNullable(definition.getPurpose());
 	}
 
 	@Override
 	public Optional<Date> getDate() {
-		// TODO Auto-generated method stub
-		return null;
+		return Optional.ofNullable(definition.getDate());
 	}
 
 	@Override
 	public boolean hasComposeIncludeFilter() {
-		// TODO Auto-generated method stub
-		return false;
+		return 
+			definition
+				.getCompose()
+				.getInclude()
+				.stream()
+				.anyMatch(include -> !include.getFilter().isEmpty());
 	}
 
 	@Override
-	public FhirCodeSystem getCodeSystem() {
-		// TODO Auto-generated method stub
-		return null;
+	public Optional<FhirCodeSystem> getCodeSystem() {
+		return Optional.empty();
 	}
 
 	@Override
 	public FhirValueSetCompose getCompose() {
-		// TODO Auto-generated method stub
-		return null;
+		ValueSetComposeComponent sourceCompose = definition.getCompose();
+		
+		FhirValueSetCompose compose = new FhirValueSetCompose();
+		List<String> importUris = 
+			sourceCompose
+				.getInclude()
+				.stream()
+				.flatMap(
+					include -> 
+						include
+						.getValueSet()
+						.stream()
+						.map(uri -> uri.getValue()))
+				.collect(Collectors.toList());
+		importUris.forEach(importUri -> compose.addImportUri(importUri));
+		sourceCompose.getInclude().forEach(include -> compose.addInclude(convertInclude(include)));
+		sourceCompose.getExclude().forEach(exclude -> compose.addExclude(convertInclude(exclude)));
+		
+		return compose;
+	}
+
+	private FhirValueSetComposeInclude convertInclude(ConceptSetComponent sourceInclude) {
+		String system = sourceInclude.getSystem();
+		String version = sourceInclude.getVersion();
+		
+		FhirValueSetComposeInclude include = new FhirValueSetComposeInclude(system, version);
+		
+		for (ConceptSetFilterComponent sourceFilter : sourceInclude.getFilter()) {
+			String property = sourceFilter.getProperty();
+			String op = sourceFilter.getOp().getDisplay();
+			String value = sourceFilter.getValue();
+
+			FhirValueSetComposeIncludeFilter filter = new FhirValueSetComposeIncludeFilter(property, op, value);
+			include.addFilter(filter);
+		}
+
+		for (ConceptReferenceComponent sourceConcept : sourceInclude.getConcept()) {
+			String code = sourceConcept.getCode();
+			String description = sourceConcept.getDisplay();
+
+			FhirValueSetComposeIncludeConcept concept = new FhirValueSetComposeIncludeConcept(code, description);
+			include.addConcept(concept);
+		}
+		
+		return include;
 	}
 
 }

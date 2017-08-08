@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.UrlValidator;
+import uk.nhs.fhir.makehtml.data.FhirCodeSystem;
 import uk.nhs.fhir.makehtml.data.FhirCodeSystemConcept;
 import uk.nhs.fhir.makehtml.data.FhirConceptMapElement;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
@@ -122,22 +123,25 @@ public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueS
         }
 
         List<Element> tableContent = Lists.newArrayList(colgroup);
-        
-        String system = source.getCodeSystem().getSystem();
-        
+
         Boolean first = true;
-        for (FhirCodeSystemConcept concept: source.getCodeSystem().getConcepts()) {
-        	String description = concept.getDescription().orElse(BLANK);
-            String definition = concept.getDefinition().orElse(BLANK);
-            
-            if (first) {
-                tableContent.add(codeHeader(true));
-                tableContent.add(codeSystem(system, true, false, "Inline code system"));
-            }
-            
-            tableContent.add(
-                        codeContent(concept.getCode(), description, definition, getConceptMapping(concept.getCode())));
-            first = false;
+        Optional<FhirCodeSystem> codeSystem = source.getCodeSystem();
+        if (codeSystem.isPresent()) {
+			String system = codeSystem.get().getSystem();
+	        
+	        for (FhirCodeSystemConcept concept: codeSystem.get().getConcepts()) {
+	        	String description = concept.getDescription().orElse(BLANK);
+	            String definition = concept.getDefinition().orElse(BLANK);
+	            
+	            if (first) {
+	                tableContent.add(codeHeader(true));
+	                tableContent.add(codeSystem(system, true, false, "Inline code system"));
+	            }
+	            
+	            tableContent.add(
+	                        codeContent(concept.getCode(), description, definition, getConceptMapping(concept.getCode())));
+	            first = false;
+	        }
         }
 
 		for (String uri :source.getCompose().getImportUris()) {

@@ -1,9 +1,10 @@
 package uk.nhs.fhir.util;
 
+import org.hl7.fhir.dstu3.model.CodeType;
+import org.hl7.fhir.dstu3.model.PrimitiveType;
+
 import ca.uhn.fhir.context.FhirStu3DataTypes;
-import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import ca.uhn.fhir.model.primitive.CodeDt;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirURL;
@@ -11,11 +12,11 @@ import uk.nhs.fhir.makehtml.data.LinkData;
 
 public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 	
-	public LinkData forDataType(BasePrimitive<?> fhirData) {
+	public LinkData forDataType(PrimitiveType<?> fhirData) {
 		String dataTypeName;
 		String typeURL;
-		if (fhirData instanceof CodeDt) {
-			return forCodedType((CodeDt)fhirData);
+		if (fhirData instanceof CodeType) {
+			return forCodedType((CodeType)fhirData);
 		} else {
 			dataTypeName = fhirData.getClass().getAnnotation(DatatypeDef.class).name();
 			typeURL = FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName;
@@ -24,7 +25,7 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 		}
 	}
 
-	private LinkData forCodedType(CodeDt codedType) {
+	private LinkData forCodedType(CodeType codedType) {
 		String dataTypeName = codedType.getValue();
 		
 		return forDataTypeName(dataTypeName);

@@ -17,12 +17,15 @@ import org.hl7.fhir.dstu3.model.Meta;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.ParameterDefinition;
 import org.hl7.fhir.dstu3.model.PrimitiveType;
+import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.RelatedArtifact;
 import org.hl7.fhir.dstu3.model.TriggerDefinition;
 import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.dstu3.model.UriType;
 import org.hl7.fhir.dstu3.model.UsageContext;
 import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -145,5 +148,22 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 	
 	public static LinkData openTypeLink() {
 		return new LinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#open", FhirVersion.STU3), "*");
+	}
+	
+	public static String resolveValue(Type dataType) {
+		String value;
+		if (dataType instanceof Reference) {
+			value = ((Reference)dataType).getReference();
+		} else if (dataType instanceof UriType) {
+			value = ((UriType)dataType).getValue();
+		} else {
+			throw new IllegalStateException("Unhandled type for datatype: " + dataType.getClass().getName());
+		}
+		
+		if(Strings.isNullOrEmpty(value)) {
+			throw new IllegalStateException("Got empty or null value string for: " + dataType.getClass().getName());
+		}
+		
+		return value;
 	}
 }
