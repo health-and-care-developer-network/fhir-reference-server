@@ -16,9 +16,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.data.FhirContact;
-import uk.nhs.fhir.makehtml.data.FhirContacts;
-import uk.nhs.fhir.makehtml.data.FhirMapping;
+import uk.nhs.fhir.makehtml.data.structdef.FhirContact;
+import uk.nhs.fhir.makehtml.data.structdef.FhirContacts;
+import uk.nhs.fhir.makehtml.data.structdef.FhirMapping;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;

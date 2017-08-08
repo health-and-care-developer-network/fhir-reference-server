@@ -2,6 +2,7 @@ package uk.nhs.fhir.makehtml.data;
 
 import java.util.Optional;
 
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class BindingInfo {

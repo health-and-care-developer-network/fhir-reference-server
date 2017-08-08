@@ -9,8 +9,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.FhirElementMapping;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.makehtml.html.RendererError;
 
 public class NodeMappingValidator {

@@ -17,18 +17,17 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
+import uk.nhs.fhir.makehtml.html.FhirIcon;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
 import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.Table;
 import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.ValuesetLinkFix;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
@@ -37,7 +36,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
 	
 	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition) {
 		super(structureDefinition);
-		this.resourceSectionType = ResourceSectionType.BINDING;
 	}
 
     private static final String BLANK = "";

@@ -16,6 +16,12 @@ import org.jdom2.Element;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.data.wrap.dstu2.WrappedDstu2OperationDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.dstu2.WrappedDstu2StructureDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.dstu2.WrappedDstu2ValueSet;
+import uk.nhs.fhir.makehtml.data.wrap.stu3.WrappedStu3OperationDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.stu3.WrappedStu3StructureDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.stu3.WrappedStu3ValueSet;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.prep.ResourcePreparerv2;
@@ -23,7 +29,7 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FileUtils;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {
@@ -151,6 +157,6 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	}
 	
 	public IParser newXmlParser() {
-		return HAPIUtils.xmlParser(getImplicitFhirVersion());
+		return FhirContexts.xmlParser(getImplicitFhirVersion());
 	}
 }

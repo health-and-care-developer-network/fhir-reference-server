@@ -7,9 +7,9 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.data.FhirContacts;
-import uk.nhs.fhir.makehtml.data.FhirMapping;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.structdef.FhirContacts;
+import uk.nhs.fhir.makehtml.data.structdef.FhirMapping;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionBindingFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionDetailsFormatter;

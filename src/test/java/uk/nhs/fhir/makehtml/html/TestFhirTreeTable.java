@@ -10,12 +10,12 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.LinkDatas;
-import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
+import uk.nhs.fhir.makehtml.data.url.LinkData;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 
 public class TestFhirTreeTable {

@@ -20,7 +20,7 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
 
 /**
  * @author tim.coates@hscic.gov.uk

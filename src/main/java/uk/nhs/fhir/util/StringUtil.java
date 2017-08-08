@@ -1,8 +1,10 @@
 package uk.nhs.fhir.util;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class StringUtil {
 	public static boolean hasUpperCaseChars(String value) {
@@ -40,10 +42,21 @@ public class StringUtil {
 		}
 	}
 	
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+	/*
+	 *  Not necessary while it's a single-threaded application, but avoids difficult-to-debug errors later
+	 *  if that ever changes.
+	 */
+	private static final ThreadLocal<? extends DateFormat> dateFormat = 
+		ThreadLocal.withInitial(
+			new Supplier<SimpleDateFormat>(){
+				@Override public SimpleDateFormat get() { 
+					return new SimpleDateFormat("dd/MM/yy");
+				}
+			}
+		);
 	
 	public static String dateToString(Date date) {
-		return dateFormat.format(date);
+		return dateFormat.get().format(date);
 	}
 
 	public static void printIfPresent(String desc, Optional<String> s) {

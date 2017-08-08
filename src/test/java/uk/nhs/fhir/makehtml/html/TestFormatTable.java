@@ -12,9 +12,9 @@ import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
 import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkDatas;
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
+import uk.nhs.fhir.makehtml.data.url.LinkData;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 
 public class TestFormatTable {

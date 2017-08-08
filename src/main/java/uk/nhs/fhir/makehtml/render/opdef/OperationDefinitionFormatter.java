@@ -10,8 +10,7 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.FhirOperationParameter;
-import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.data.opdef.FhirOperationParameter;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.LinkCell;
@@ -26,7 +25,6 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 
 	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource) {
 		super(wrappedResource);
-		this.resourceSectionType = ResourceSectionType.TREEVIEW;  
 	}
 
 	@Override

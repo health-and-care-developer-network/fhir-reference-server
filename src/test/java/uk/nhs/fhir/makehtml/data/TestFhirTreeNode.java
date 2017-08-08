@@ -6,6 +6,10 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
 
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {

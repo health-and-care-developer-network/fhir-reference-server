@@ -14,12 +14,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.LinkDatas;
-import uk.nhs.fhir.makehtml.data.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;

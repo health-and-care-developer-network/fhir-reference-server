@@ -4,8 +4,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Element;
 
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.ResourceSectionType;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
@@ -17,7 +16,6 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 
 	public StructureDefinitionDifferentialFormatter(WrappedStructureDefinition wrappedResource) {
 		super(wrappedResource);
-		this.resourceSectionType = ResourceSectionType.DIFFERENTIAL;
 	}
 
 	@Override

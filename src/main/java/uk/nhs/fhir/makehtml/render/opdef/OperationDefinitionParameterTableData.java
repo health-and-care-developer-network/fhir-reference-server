@@ -2,8 +2,8 @@ package uk.nhs.fhir.makehtml.render.opdef;
 
 import java.util.List;
 
-import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
 
 public class OperationDefinitionParameterTableData {
 	

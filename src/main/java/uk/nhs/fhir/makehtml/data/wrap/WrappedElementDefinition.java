@@ -9,13 +9,15 @@ import org.hl7.fhir.dstu3.model.ElementDefinition;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.ExtensionType;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirElementMapping;
-import uk.nhs.fhir.makehtml.data.LinkDatas;
-import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.makehtml.data.structdef.ExtensionType;
+import uk.nhs.fhir.makehtml.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
+import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.url.LinkDatas;
+import uk.nhs.fhir.makehtml.data.wrap.dstu2.WrappedDstu2ElementDefinition;
+import uk.nhs.fhir.makehtml.data.wrap.stu3.WrappedStu3ElementDefinition;
 
 public abstract class WrappedElementDefinition {
 

@@ -19,7 +19,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.FhirContexts;
 
 /**
  * Uses the HAPI FHIR package-protected ModelScanner to gather information about the data types defined by HL7, according
@@ -33,7 +33,7 @@ public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
 		// implementing classes appropriately.
-		FhirContext fhirContext = HAPIUtils.fhirContext(FhirVersion.DSTU2);
+		FhirContext fhirContext = FhirContexts.forVersion(FhirVersion.DSTU2);
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {

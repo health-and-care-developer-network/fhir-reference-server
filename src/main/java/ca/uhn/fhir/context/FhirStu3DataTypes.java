@@ -33,9 +33,9 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
+import uk.nhs.fhir.makehtml.data.url.LinkData;
+import uk.nhs.fhir.util.FhirContexts;
 
 public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
@@ -43,7 +43,7 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
 		// implementing classes appropriately.
-		FhirContext fhirContext = HAPIUtils.fhirContext(FhirVersion.STU3);
+		FhirContext fhirContext = FhirContexts.forVersion(FhirVersion.STU3);
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {

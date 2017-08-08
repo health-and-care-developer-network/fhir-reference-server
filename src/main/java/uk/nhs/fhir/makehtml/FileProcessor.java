@@ -21,7 +21,7 @@ import uk.nhs.fhir.makehtml.data.FhirRelease;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.FhirContexts;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
@@ -64,14 +64,14 @@ public class FileProcessor {
 		// Couldn't confirm that any was correct. If we only successfully parsed a single version, use that.
 		if (successfullyParsedVersions.size() == 1) {
 			FhirVersion onlyParsableVersion = successfullyParsedVersions.get(0);
-			return parseFile(HAPIUtils.xmlParser(onlyParsableVersion), thisFile, onlyParsableVersion);
+			return parseFile(FhirContexts.xmlParser(onlyParsableVersion), thisFile, onlyParsableVersion);
 		}
 		
 		// Use directory structure as a final backup. This should hopefully be unnecessary once URLs consistently include Fhir Version.
 		for (String pathPart : thisFile.getAbsolutePath().split("/")) {
 			for (FhirVersion versionToTry : versionsToTry) {
 				if (pathPart.equals(versionToTry.toString())) {
-					IParser xmlParser = HAPIUtils.xmlParser(versionToTry);
+					IParser xmlParser = FhirContexts.xmlParser(versionToTry);
 					try (FileReader fr = new FileReader(thisFile)) {
 						return xmlParser.parseResource(fr);
 					} catch (IOException | DataFormatException e) {
@@ -86,7 +86,7 @@ public class FileProcessor {
 	}
 	
 	private IBaseResource tryParse(File thisFile, FhirVersion versionToTry, List<FhirVersion> successfullyParsedVersions) {
-		IParser xmlParser = HAPIUtils.xmlParser(versionToTry);
+		IParser xmlParser = FhirContexts.xmlParser(versionToTry);
 		IBaseResource resource = parseFile(xmlParser, thisFile, versionToTry);
 		
 		if (resource != null) {

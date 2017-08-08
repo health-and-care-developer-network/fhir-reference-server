@@ -3,7 +3,7 @@ package uk.nhs.fhir.makehtml;
 import org.junit.Test;
 
 import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
+import uk.nhs.fhir.makehtml.html.FhirIcon;
 
 public class TestFhirIcon {
 	@Test

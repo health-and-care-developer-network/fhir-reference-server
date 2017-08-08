@@ -9,9 +9,9 @@ import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;

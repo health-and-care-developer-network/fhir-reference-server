@@ -6,6 +6,8 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
+
 public class ResourceInfo {
 	private final String constraintName;
 	private final Optional<String> description;

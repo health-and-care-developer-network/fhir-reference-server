@@ -7,11 +7,11 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.RendererError;
 

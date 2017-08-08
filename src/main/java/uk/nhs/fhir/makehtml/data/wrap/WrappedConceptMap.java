@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirConceptMapElement;
+import uk.nhs.fhir.makehtml.data.valueset.FhirConceptMapElement;
+import uk.nhs.fhir.makehtml.data.wrap.dstu2.WrappedDstu2ConceptMap;
+import uk.nhs.fhir.makehtml.data.wrap.stu3.WrappedStu3ConceptMap;
 
 public abstract class WrappedConceptMap {
 	

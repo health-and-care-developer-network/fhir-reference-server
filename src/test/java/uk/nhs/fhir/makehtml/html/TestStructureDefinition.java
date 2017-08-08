@@ -25,7 +25,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.FhirContexts;
 
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
@@ -35,9 +35,8 @@ public class TestStructureDefinition {
 	@Ignore
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
-		IParser parser = HAPIUtils.fhirContext(FhirVersion.DSTU2).newXmlParser();
+		IParser parser = FhirContexts.forVersion(FhirVersion.DSTU2).newXmlParser();
 		try (
-				// TODO KGM 9/May/2017 moved to older strucutre definition example.
 			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition3.xml").getFile()));
 		) {
 			reader.mark(1);

@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml.render.opdef;
 
-import uk.nhs.fhir.makehtml.data.LinkData;
+import uk.nhs.fhir.makehtml.data.url.LinkData;
 
 public class OperationDefinitionMetaDataRowData {
 

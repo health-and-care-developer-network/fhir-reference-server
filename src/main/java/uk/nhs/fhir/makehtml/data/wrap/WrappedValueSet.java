@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
+import codesystem.FhirCodeSystem;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.data.FhirCodeSystem;
-import uk.nhs.fhir.makehtml.data.FhirValueSetCompose;
+import uk.nhs.fhir.makehtml.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
 

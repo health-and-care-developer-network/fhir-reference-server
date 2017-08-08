@@ -12,9 +12,9 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirConceptMapElement;
-import uk.nhs.fhir.makehtml.data.FhirConceptMapElementTarget;
-import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.url.FhirURL;
+import uk.nhs.fhir.makehtml.data.valueset.FhirConceptMapElement;
+import uk.nhs.fhir.makehtml.data.valueset.FhirConceptMapElementTarget;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
