@@ -15,12 +15,16 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystem;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.Compose;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeConcept;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeFilter;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.makehtml.FhirVersion;
 import uk.nhs.fhir.makehtml.data.FhirCodeSystem;
 import uk.nhs.fhir.makehtml.data.FhirCodeSystemConcept;
 import uk.nhs.fhir.makehtml.data.FhirValueSetCompose;
 import uk.nhs.fhir.makehtml.data.FhirValueSetComposeInclude;
+import uk.nhs.fhir.makehtml.data.FhirValueSetComposeIncludeConcept;
+import uk.nhs.fhir.makehtml.data.FhirValueSetComposeIncludeFilter;
 
 public class WrappedDstu2ValueSet extends WrappedValueSet {
 	private final ValueSet definition;
@@ -202,6 +206,23 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 		String version = sourceInclude.getVersion();
 		
 		FhirValueSetComposeInclude include = new FhirValueSetComposeInclude(system, version);
+		
+		for (ComposeIncludeFilter sourceFilter : sourceInclude.getFilter()) {
+			String property = sourceFilter.getProperty();
+			String op = sourceFilter.getOp();
+			String value = sourceFilter.getValue();
+
+			FhirValueSetComposeIncludeFilter filter = new FhirValueSetComposeIncludeFilter(property, op, value);
+			include.addFilter(filter);
+		}
+
+		for (ComposeIncludeConcept sourceConcept : sourceInclude.getConcept()) {
+			String code = sourceConcept.getCode();
+			String description = sourceConcept.getDisplay();
+
+			FhirValueSetComposeIncludeConcept concept = new FhirValueSetComposeIncludeConcept(code, description);
+			include.addConcept(concept);
+		}
 		
 		return include;
 	}
