@@ -38,6 +38,7 @@ public class FhirIconProvider {
 				return FhirIcon.PRIMITIVE;
 			case RESOURCE:
 			case COMPLEX_ELEMENT:
+			case XHTML_NODE:
 				return FhirIcon.DATATYPE;
 			default:
 				if (node.hasChildren()) {

@@ -159,8 +159,11 @@ public class StructureDefinitionTreeDataProvider {
 		}
 		
 		while (ancestor != null) {
+			
 			if (ancestor.hasSlicingSibling()
-			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingSibling())) {
+			  || ancestor.hasSlicingInfo()
+			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingSibling())
+			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingInfo())) {
 				if (!(ancestor instanceof FhirTreeNode)) {
 					throw new IllegalStateException("First sliced ancestor is a dummy node (" + ancestor.getPath() + " for " + node.getPath());
 				} else {

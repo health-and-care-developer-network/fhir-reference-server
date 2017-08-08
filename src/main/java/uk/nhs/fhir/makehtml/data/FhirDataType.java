@@ -20,6 +20,9 @@ public enum FhirDataType {
 	RESOURCE,
 	EXTENSION,
 	
+	// Sneaky extra inclusions at the bottom of the datatypes page
+	XHTML_NODE,
+	
 	// If we can't find an implementing class as defined by the lists that ship with HAPI (e.g. a user-defined type)
 	UNKNOWN,
 	

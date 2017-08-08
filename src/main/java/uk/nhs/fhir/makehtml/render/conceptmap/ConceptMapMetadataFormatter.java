@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.render.conceptmap;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,68 +10,41 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.util.StringUtil;
 
 public class ConceptMapMetadataFormatter {
 
-	private static final String BLANK = "";
+	private final WrappedConceptMap source;
 
-	private final ConceptMap source;
-
-	public ConceptMapMetadataFormatter(ConceptMap source){
-		this.source = source;
+	public ConceptMapMetadataFormatter(WrappedConceptMap conceptMap){
+		this.source = conceptMap;
 	}
 	
 	public Element getMetadataTable() {
 		
 		// These are all required and so should always be present
-		Optional<String>  url = Optional.ofNullable(source.getUrl());
-		Optional<String>  name = Optional.ofNullable(source.getName());
+		Optional<String>  name = source.getName();
 
 		String status = source.getStatus().toString();
 
-		Optional<String> OID= Optional.empty();
-		Optional<String> reference = Optional.empty();
+		Optional<String> version = source.getVersion();
 
-
-
-		Optional<String> version = Optional.ofNullable(source.getVersion());
-
-		String displayExperimental;
-		Boolean experimental = source.getExperimental();
-		if (experimental == null) {
-			displayExperimental = BLANK;
-		} else {
-			displayExperimental = experimental ? "Yes" : "No";
-		}
-		Optional<String> description = Optional.ofNullable(source.getDescription());
-		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
-		Optional<String> copyright = Optional.ofNullable(source.getCopyright());
-		//Optional<String> title = Optional.ofNullable(source.getTitle());
-
+		String sourceDesc = source.getSource();
+		String targetDesc = source.getTarget();
+		
 		String gridName = name.get();
 		if (version.isPresent()) {
 			gridName += " (v" + version.get() + ")";
 		}
 
-		Date date = source.getDate();
-		Optional<String> displayDate =
-				(date == null) ?
-						Optional.empty() :
-						Optional.of(StringUtil.dateToString(date));
-
-
 
 		Element colgroup = Elements.newElement("colgroup");
-		int columns = 4;
 
 		List<Element> tableContent = Lists.newArrayList(colgroup);
 
@@ -85,11 +57,11 @@ public class ConceptMapMetadataFormatter {
 
 		tableContent.add(
 				Elements.withChildren("tr",
-						labelledValueCell("Source", ((ResourceReferenceDt) source.getSource()).getReference().getValue(), 4, true)
+						labelledValueCell("Source", sourceDesc, 4, true)
 				));
 		tableContent.add(
 				Elements.withChildren("tr",
-						labelledValueCell("Target", ((ResourceReferenceDt) source.getTarget()).getReference().getValue(), 4, true)
+						labelledValueCell("Target", targetDesc, 4, true)
 						));
 
 
@@ -105,12 +77,6 @@ public class ConceptMapMetadataFormatter {
 		FhirPanel panel = new FhirPanel(panelTitle, table);
 		
 		return panel.makePanel();
-	}
-
-
-	private Element labelledValueCell(String label, Optional<String> value, int colspan) {
-		String displayValue = value.isPresent() ? value.get() : BLANK;
-		return labelledValueCell(label, displayValue, colspan);
 	}
 	
 	private Element labelledValueCell(String label, String value, int colspan) {
@@ -170,7 +136,7 @@ public class ConceptMapMetadataFormatter {
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK),
-						new Attribute("href", FhirURL.buildOrThrow(value).toLinkString())),
+						new Attribute("href", FhirURL.buildOrThrow(value, source.getImplicitFhirVersion()).toLinkString())),
 				value));
 		} else {
 			return Elements.withAttributeAndText("span", 

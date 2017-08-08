@@ -1,14 +1,14 @@
 package uk.nhs.fhir.makehtml.render.opdef;
 
-import uk.nhs.fhir.makehtml.data.LinkDatas;
+import uk.nhs.fhir.makehtml.data.LinkData;
 
 public class OperationDefinitionMetaDataRowData {
 
 	private final String rowTitle;
-	private final LinkDatas typeLink;
+	private final LinkData typeLink;
 	private final String content;
 
-	public OperationDefinitionMetaDataRowData(String rowTitle, LinkDatas typeLink, String content) {
+	public OperationDefinitionMetaDataRowData(String rowTitle, LinkData typeLink, String content) {
 		this.rowTitle = rowTitle;
 		this.typeLink = typeLink;
 		this.content = content;
@@ -18,7 +18,7 @@ public class OperationDefinitionMetaDataRowData {
 		return rowTitle;
 	}
 	
-	public LinkDatas getTypeLink() {
+	public LinkData getTypeLink() {
 		return typeLink;
 	}
 

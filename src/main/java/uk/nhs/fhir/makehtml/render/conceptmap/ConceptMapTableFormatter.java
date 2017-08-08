@@ -10,9 +10,12 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
+import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.makehtml.data.FhirConceptMapElement;
+import uk.nhs.fhir.makehtml.data.FhirConceptMapElementTarget;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -23,10 +26,10 @@ public class ConceptMapTableFormatter {
 
 	private static final String BLANK = "";
 
-	private final ConceptMap source;
+	private final WrappedConceptMap source;
 
-	public ConceptMapTableFormatter(ConceptMap source){
-		this.source = source;
+	public ConceptMapTableFormatter(WrappedConceptMap conceptMap){
+		this.source = conceptMap;
 	}
 
 	public Element getElementMapsDataTable() {
@@ -38,7 +41,7 @@ public class ConceptMapTableFormatter {
     	List<Element> tableContent = Lists.newArrayList(colgroup);
         Boolean first = true;
 
-		for (ConceptMap.Element element: source.getElement()) {
+		for (FhirConceptMapElement element: source.getElements()) {
 			if (first) {
 				tableContent.add(
 						Elements.withChildren("tr",
@@ -48,14 +51,15 @@ public class ConceptMapTableFormatter {
 								labelledValueCell("Comments", BLANK, 1, true, true)));
 				first = false;
 			}
-			for (ConceptMap.ElementTarget target : element.getTarget()) {
-				Optional<String> comments = Optional.ofNullable(target.getComments());
+			for (FhirConceptMapElementTarget target : element.getTargets()) {
+				Optional<String> comments = target.getComments();
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
 				
+				FhirVersion implicitFhirVersion = source.getImplicitFhirVersion();
 				tableContent.add(
 					Elements.withChildren("tr",
 						labelledValueCell(BLANK, element.getCode(), 1, true, true),
-						labelledHttpCell(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/valueset-concept-map-equivalence.html"), target.getEquivalence(),  1, true, false),
+						labelledHttpCell(FhirURL.buildOrThrow(FhirURLConstants.versionBase(implicitFhirVersion) + "/valueset-concept-map-equivalence.html", implicitFhirVersion), target.getEquivalence(),  1, true, false),
 						labelledValueCell(BLANK, target.getCode(), 1, true),
 						labelledValueCell(BLANK, displayComments, 1, true)));
 			}
@@ -64,8 +68,6 @@ public class ConceptMapTableFormatter {
                 Elements.withAttributeAndChildren("table",
                         new Attribute("class", FhirCSS.TABLE),
                         tableContent);
-
-		String panelTitle = "Elements: " ;
 
 		FhirPanel panel = new FhirPanel(null, table);
 
@@ -157,7 +159,7 @@ public class ConceptMapTableFormatter {
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", FhirURL.buildOrThrow(value).toLinkString())), 
+						new Attribute("href", FhirURL.buildOrThrow(value, source.getImplicitFhirVersion()).toLinkString())), 
 				value));
 			
 		} else {

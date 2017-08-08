@@ -31,7 +31,39 @@ public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 	}
 	
 	public LinkData forDataTypeName(String dataTypeName) {
-		String url = urlForDataTypeName(dataTypeName);
+		String url;
+		switch (FhirDstu2DataTypes.forType(dataTypeName)) {
+			case EXTENSION:
+				url = urlForExtension();
+				break;
+			case RESOURCE:
+				url = urlForComplexDataType(dataTypeName);
+				break;
+			case SIMPLE_ELEMENT:
+				url = urlForSimpleDataType(dataTypeName);
+				break;
+			case PRIMITIVE:
+				url = urlForSimpleDataType(dataTypeName);
+				break;
+			case COMPLEX_ELEMENT:
+				url = urlForComplexDataType(dataTypeName);
+				break;
+			case DOMAIN_RESOURCE:
+				url = urlForDomainResource();
+				break;
+			case ELEMENT:
+				url = urlForComplexDataType(dataTypeName);
+				break;
+			case UNKNOWN:
+				// The code doesn't represent an element or a resource. 
+				// Don't try to unpack - just treat it as a 'Code' type.
+				dataTypeName = "Code";
+				url = urlForSimpleDataType(dataTypeName);
+				break;
+			default:
+				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
+		}
+		
 		return new LinkData(FhirURL.buildOrThrow(url, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(dataTypeName));
 	}
 	
@@ -39,32 +71,6 @@ public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 		String[] uriTokens = uri.split("/");
 		String linkTargetName = uriTokens[uriTokens.length - 1];
 		return new LinkData(FhirURL.buildOrThrow(uri, FhirVersion.DSTU2), StringUtil.capitaliseLowerCase(linkTargetName));
-	}
-
-	private String urlForDataTypeName(String dataTypeName) {
-		switch (FhirDstu2DataTypes.forType(dataTypeName)) {
-			case EXTENSION:
-				return urlForExtension();
-			case RESOURCE:
-				return urlForComplexDataType(dataTypeName);
-			case SIMPLE_ELEMENT:
-				return urlForSimpleDataType(dataTypeName);
-			case PRIMITIVE:
-				return urlForSimpleDataType(dataTypeName);
-			case COMPLEX_ELEMENT:
-				return urlForComplexDataType(dataTypeName);
-			case UNKNOWN:
-				// The code doesn't represent an element or a resource. 
-				// Don't try to unpack - just treat it as a 'Code' type.
-				dataTypeName = "Code";
-				return urlForSimpleDataType(dataTypeName);
-			case DOMAIN_RESOURCE:
-				return urlForDomainResource();
-			case ELEMENT:
-				return urlForComplexDataType(dataTypeName);
-			default:
-				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
-		}
 	}
 
 	private String urlForDomainResource() {

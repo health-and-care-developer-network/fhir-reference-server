@@ -12,9 +12,6 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.api.ExtensionDt;
-import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.html.FhirCSS;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
@@ -40,29 +37,15 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedVal
 	}
 
 	public Element getMetadataTable(WrappedValueSet source) {
+		Optional<String>  url = source.getUrl();
+		String  name = source.getName();
 
-		Optional<String>  url = Optional.ofNullable(source.getUrl());
-		Optional<String>  name = Optional.ofNullable(source.getName());
+		String status = source.getStatus();
 
-		String status = source.getStatus().toString();
+		Optional<String> OID = source.getOid();
+		Optional<String> reference = source.getReference();
 
-		Optional<String> OID= Optional.empty();
-		Optional<String> reference = Optional.empty();
-
-		for (ExtensionDt extension : source.getUndeclaredExtensions())
-		{
-			if (extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-sourceReference")) {
-				UriDt uri = (UriDt) extension.getValue();
-				reference = Optional.ofNullable(uri.getValueAsString());
-			}
-			if (extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-oid")) {
-				UriDt uri = (UriDt) extension.getValue();
-				OID = Optional.ofNullable(uri.getValueAsString());
-			}
-
-		}
-
-		Optional<String> version = Optional.ofNullable(source.getVersion());
+		Optional<String> version = source.getVersion();
 
 		// Never used in NHS Digital value sets
 		/*String displayExperimental;
@@ -73,17 +56,17 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedVal
 			displayExperimental = experimental ? "Yes" : "No";
 		}*/
 		
-		Optional<String> description = Optional.ofNullable(source.getDescription());
-		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
-		Optional<String> copyright = Optional.ofNullable(source.getCopyright());
+		Optional<String> description = source.getDescription();
+		Optional<String> publisher = source.getPublisher();
+		Optional<String> copyright = source.getCopyright();
 
-		Optional<String> requirement = Optional.ofNullable(source.getRequirements());
+		Optional<String> requirement = source.getRequirements();
 
-		Date date = source.getDate();
+		Optional<Date> date = source.getDate();
 		Optional<String> displayDate =
-				(date == null) ?
-						Optional.empty() :
-						Optional.of(StringUtil.dateToString(date));
+			date.isPresent() ?
+				Optional.of(StringUtil.dateToString(date.get())) :
+				Optional.empty();
         if (!displayDate.isPresent())
         {
             Date lastUpdated = source.getSourceMeta().getLastUpdated();
@@ -107,7 +90,7 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedVal
 
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Name", name.get(), 2, true),
+				labelledValueCell("Name", name, 2, true),
 				labelledValueCell("URL", url.get(), 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
@@ -160,7 +143,7 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter<WrappedVal
 				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
-		String panelTitleName =  name.get();
+		String panelTitleName = name;
 		String panelTitle = "ValueSet: " + panelTitleName;
 		
 		FhirPanel panel = new FhirPanel(panelTitle, table);

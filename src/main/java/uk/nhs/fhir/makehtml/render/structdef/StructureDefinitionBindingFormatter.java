@@ -170,7 +170,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
         } else {
         	String uri = uriToDisplay.get();
         	
-        	uri = ValuesetLinkFix.fixLink(uri, wrappedResource.getImplicitFhirVersion());
+        	uri = ValuesetLinkFix.fixLink(uri, getResourceVersion());
         	
         	List<Content> linkContents = Lists.newArrayList();
     		linkContents.add(new Text(displayText));

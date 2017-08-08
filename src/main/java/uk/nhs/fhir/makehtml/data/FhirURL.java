@@ -33,11 +33,6 @@ public abstract class FhirURL {
 		}
 	}
 	
-	public static FhirURL buildOrThrow(String url) {
-		//TODO delete this method once finished refactoring
-		throw new IllegalStateException("Delete this method");
-	}
-	
 	public boolean equals(Object other) {
 		if (other == null) {
 			return false;

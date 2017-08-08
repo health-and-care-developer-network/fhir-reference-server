@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.LinkDatas;
 import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
 import uk.nhs.fhir.makehtml.html.TableTitle;
 import uk.nhs.fhir.util.StringUtil;
@@ -30,7 +29,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 
 	public List<OperationDefinitionMetaDataRowData> getRows() {
 		return Lists.newArrayList(
-			new OperationDefinitionMetaDataRowData("Name", new LinkDatas(source.getNameTypeLink()), StringUtil.capitaliseLowerCase(source.getName())),
+			new OperationDefinitionMetaDataRowData("Name", source.getNameTypeLink(), StringUtil.capitaliseLowerCase(source.getName())),
 			new OperationDefinitionMetaDataRowData("Kind", source.getKindTypeLink(), StringUtil.capitaliseLowerCase(source.getKind())),
 			new OperationDefinitionMetaDataRowData("Description", source.getDescriptionTypeLink(), StringUtil.capitaliseLowerCase(source.getDescription())),
 			new OperationDefinitionMetaDataRowData("Code", source.getCodeTypeLink(), source.getCode()),

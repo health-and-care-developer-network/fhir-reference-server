@@ -89,7 +89,7 @@ public abstract class MetadataTableFormatter<T extends WrappedResource<T>> exten
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", FhirURL.buildOrThrow(value, wrappedResource.getImplicitFhirVersion()).toLinkString())), 
+						new Attribute("href", FhirURL.buildOrThrow(value, getResourceVersion()).toLinkString())), 
 					value));
 		} else {
 			return Elements.withAttributeAndText("span", 

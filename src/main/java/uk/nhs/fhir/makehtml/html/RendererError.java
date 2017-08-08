@@ -38,7 +38,8 @@ public class RendererError {
 		IGNORABLE_MAPPING_ID,
 		MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE,
 		TYPELINK_STRING_WITH_PROFILE,
-		RESOURCE_WITHOUT_SNAPSHOT;
+		RESOURCE_WITHOUT_SNAPSHOT,
+		RESOURCE_URL_WITHOUT_FHIR_VERSION;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -65,9 +66,11 @@ public class RendererError {
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY, ErrorResponse.IGNORE);
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
-		
-		// Unsorted
 
+		
+		responses.put(Key.RESOURCE_URL_WITHOUT_FHIR_VERSION, ErrorResponse.LOG_WARNING);
+		
+		
 		// Currently not hit
 		responses.put(Key.HL7_URL_WITHOUT_DSTU2, ErrorResponse.THROW);
 		responses.put(Key.EMPTY_TYPE_LINKS, ErrorResponse.THROW);

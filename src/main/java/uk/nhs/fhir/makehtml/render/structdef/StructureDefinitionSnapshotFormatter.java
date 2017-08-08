@@ -37,7 +37,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 		snapshotTreeData.stripRemovedElements();
 		snapshotTreeData.tidyData();
 		
-		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData, wrappedResource.getImplicitFhirVersion());
+		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData, getResourceVersion());
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();

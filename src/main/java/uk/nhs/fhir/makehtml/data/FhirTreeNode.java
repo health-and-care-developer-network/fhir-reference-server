@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -153,8 +154,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 				Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
 				String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
 				return new FhirCardinality(resolvedMin, resolvedMax);
-			} catch (NullPointerException e) {
-				if (backupNode == null) {
+			} catch (NullPointerException | NoSuchElementException e) {
+				if (backupNode == null
+				  || !backupNode.getMin().isPresent()
+				  || !backupNode.getMax().isPresent()) {
 					RendererError.handle(RendererError.Key.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
 					return new FhirCardinality(0, "*");
 				} else {

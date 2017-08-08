@@ -21,6 +21,7 @@ import org.hl7.fhir.dstu3.model.RelatedArtifact;
 import org.hl7.fhir.dstu3.model.TriggerDefinition;
 import org.hl7.fhir.dstu3.model.Type;
 import org.hl7.fhir.dstu3.model.UsageContext;
+import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -104,6 +105,8 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 				return FhirDataType.META;
 			} else if (implementsOrExtends(implementingClass, Narrative.class)) {
 				return FhirDataType.NARRATIVE;
+			} else if (implementsOrExtends(implementingClass, XhtmlNode.class)) {
+				return FhirDataType.XHTML_NODE;
 			} else if (implementsOrExtends(implementingClass, Extension.class)) {
 				return FhirDataType.EXTENSION;
 			} else if (implementsOrExtends(implementingClass, BaseResource.class)) {

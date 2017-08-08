@@ -47,7 +47,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 
 	public String getOutputDirectory(String inputPath) {
 		String inputFileName = inputPath.substring(inputPath.lastIndexOf(File.separatorChar) + 1, inputPath.lastIndexOf(".xml"));
-		return typedOutputDirectory + inputFileName + File.separator;
+		return typedOutputDirectory + resource.getOutputFolderName() + File.separator + inputFileName + File.separator;
 	}
 	
 	public String getOutputPath(String inputPath) {

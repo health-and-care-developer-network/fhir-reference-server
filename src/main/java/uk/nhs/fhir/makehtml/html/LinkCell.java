@@ -23,25 +23,25 @@ public class LinkCell extends TableCell {
 	private final Set<String> cellClasses;
 	private final Set<String> linkClasses;
 
-	public LinkCell(LinkDatas linkData) {
-		this(linkData, Sets.newHashSet(), Sets.newHashSet());
+	public LinkCell(LinkDatas linkDatas) {
+		this(linkDatas, Sets.newHashSet(), Sets.newHashSet());
 	}
 	
-	public LinkCell(LinkDatas typeLinks, boolean faded) {
-		this(typeLinks, faded, false);
+	public LinkCell(LinkDatas linkDatas, boolean faded) {
+		this(linkDatas, faded, false);
 	}
 	
-	public LinkCell(LinkDatas linkData, Set<String> cellClasses, Set<String> linkClasses) {
-		this(linkData, cellClasses, linkClasses, false, false);
+	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses) {
+		this(linkDatas, cellClasses, linkClasses, false, false);
 	}
 
-	public LinkCell(LinkDatas typeLinks, boolean faded, boolean strikethrough) {
-		this(typeLinks, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough);
+	public LinkCell(LinkDatas linkDatas, boolean faded, boolean strikethrough) {
+		this(linkDatas, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough);
 	}
 	
-	public LinkCell(LinkDatas linkData, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
+	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
 		super(faded, strikethrough);
-		this.linkDatas = linkData;
+		this.linkDatas = linkDatas;
 		this.cellClasses = cellClasses;
 		this.linkClasses = linkClasses;
 	}

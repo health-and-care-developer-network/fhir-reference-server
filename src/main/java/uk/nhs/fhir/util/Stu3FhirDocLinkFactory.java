@@ -24,7 +24,7 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 		}
 	}
 
-	private LinkData	 forCodedType(CodeDt codedType) {
+	private LinkData forCodedType(CodeDt codedType) {
 		String dataTypeName = codedType.getValue();
 		
 		return forDataTypeName(dataTypeName);
@@ -60,6 +60,8 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 				return FhirURLConstants.HTTP_HL7_STU3 + "/resource.html#Meta";
 			case NARRATIVE:
 				return FhirURLConstants.HTTP_HL7_STU3 + "/narrative.html#Narrative";
+			case XHTML_NODE:
+				return FhirURLConstants.HTTP_HL7_STU3 + "/narrative.html#xhtml";
 			case REFERENCE:
 				return FhirURLConstants.HTTP_HL7_STU3 + "/references.html";
 			case METADATA:
