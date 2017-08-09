@@ -20,7 +20,8 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.UrlValidator;
 
 /**
  * @author tim.coates@hscic.gov.uk
@@ -45,6 +46,12 @@ public class NewMain {
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static final boolean TEST_LINK_URLS = false;
 
+	private final FilenameFilter xmlFileFilter = new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+            return name.toLowerCase().endsWith(fileExtension);
+        }
+    };
+	
     private final File inputDirectory;
     private final String outPath;
     private final String newBaseURL;
@@ -96,17 +103,11 @@ public class NewMain {
      * @param directoryPath
      */
     private void process() {
-    	
-        File[] allProfiles = inputDirectory.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(fileExtension);
-            }
-        });
 
         FileProcessor fileProcessor = new FileProcessor();
         try {
-	        for (File thisFile : allProfiles) {
-	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
+	        for (File xmlFile : inputDirectory.listFiles(xmlFileFilter)) {
+	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, xmlFile);
 	        }
 	        
 	        if (TEST_LINK_URLS) {

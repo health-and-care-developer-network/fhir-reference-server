@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.ResourceInfo;
-import uk.nhs.fhir.makehtml.data.opdef.FhirOperationParameter;
-import uk.nhs.fhir.makehtml.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.html.TableTitle;
+import uk.nhs.fhir.data.ResourceInfo;
+import uk.nhs.fhir.data.opdef.FhirOperationParameter;
+import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.makehtml.html.table.TableTitle;
 
 // KGM 8/May/2017 Altered meta table column to % widths
 

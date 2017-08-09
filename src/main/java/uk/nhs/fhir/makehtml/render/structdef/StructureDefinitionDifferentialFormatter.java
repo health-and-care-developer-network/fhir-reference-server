@@ -4,11 +4,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Element;
 
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.FhirTreeTable;
-import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 

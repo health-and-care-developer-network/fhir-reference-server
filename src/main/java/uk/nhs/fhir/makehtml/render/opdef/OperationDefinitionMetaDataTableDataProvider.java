@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
-import uk.nhs.fhir.makehtml.html.TableTitle;
+import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
+import uk.nhs.fhir.makehtml.html.table.TableTitle;
 import uk.nhs.fhir.util.StringUtil;
 
 // KGM 8/May/2017 Altered meta table column widths

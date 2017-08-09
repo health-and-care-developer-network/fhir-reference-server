@@ -7,13 +7,13 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.RendererError;
 
 public class StructureDefinitionTreeDataProvider {
 	

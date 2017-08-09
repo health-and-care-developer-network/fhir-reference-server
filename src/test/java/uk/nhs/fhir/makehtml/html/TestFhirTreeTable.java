@@ -8,15 +8,17 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.data.url.LinkData;
-import uk.nhs.fhir.makehtml.data.url.LinkDatas;
+import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {
 	@Test
@@ -30,7 +32,7 @@ public class TestFhirTreeTable {
 			"root info",
 			Lists.newArrayList(),
 			"path.to.resource",
-			FhirDataType.ELEMENT,
+			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
 		FhirTreeData data = new FhirTreeData(node);
 		

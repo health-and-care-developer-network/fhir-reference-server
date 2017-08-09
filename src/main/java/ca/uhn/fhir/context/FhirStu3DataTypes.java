@@ -30,14 +30,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirDataType;
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.data.url.LinkData;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirVersion;
 
-public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
+public class FhirStu3DataTypes {
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
 	static {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
@@ -60,7 +60,7 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 		for (TypeRefComponent type : types) {
 			String code = type.getCode();
 			if (code != null 
-			  && !forType(code).equals(FhirDataType.UNKNOWN)) {
+			  && !forType(code).equals(FhirElementDataType.UNKNOWN)) {
 				knownTypes.add(type);
 			}
 		}
@@ -68,8 +68,8 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 		return knownTypes;
 	}
 	
-	public static Set<FhirDataType> getTypes(List<TypeRefComponent> list) {
-		Set<FhirDataType> dataTypes = Sets.newHashSet();
+	public static Set<FhirElementDataType> getTypes(List<TypeRefComponent> list) {
+		Set<FhirElementDataType> dataTypes = Sets.newHashSet();
 		
 		for (TypeRefComponent type : list) {
 			String code = type.getCode();
@@ -81,51 +81,51 @@ public class FhirStu3DataTypes implements FhirDataTypes<TypeRefComponent> {
 		return dataTypes;
 	}
 	
-	public static FhirDataType forType(String typeName) {
+	public static FhirElementDataType forType(String typeName) {
 		typeName = typeName.toLowerCase();
 		
 		// mysteriously missing any object representation - from DSTU2
 		if (typeName.equals("backboneelement")) {
-			return FhirDataType.COMPLEX_ELEMENT;
+			return FhirElementDataType.COMPLEX_ELEMENT;
 		} else if (typeName.equals("resource")) {
-			return FhirDataType.RESOURCE;
+			return FhirElementDataType.RESOURCE;
 		} 
 		/*else if (typeName.equals("domainresource")) {
 			return FhirDataType.DOMAIN_RESOURCE;
 		}*/
 		else if (typeName.equals("element")) {
-			return FhirDataType.ELEMENT;
+			return FhirElementDataType.ELEMENT;
 		}
 		
 		if (nameToDefinition.containsKey(typeName)) {
 			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();
 			
 			if (isMetaDataClass(implementingClass)) {
-				return FhirDataType.METADATA;
+				return FhirElementDataType.METADATA;
 			} else if (implementsOrExtends(implementingClass, BaseReference.class)) {
-				return FhirDataType.REFERENCE;
+				return FhirElementDataType.REFERENCE;
 			} else if (implementsOrExtends(implementingClass, Meta.class)) {
-				return FhirDataType.META;
+				return FhirElementDataType.META;
 			} else if (implementsOrExtends(implementingClass, Narrative.class)) {
-				return FhirDataType.NARRATIVE;
+				return FhirElementDataType.NARRATIVE;
 			} else if (implementsOrExtends(implementingClass, XhtmlNode.class)) {
-				return FhirDataType.XHTML_NODE;
+				return FhirElementDataType.XHTML_NODE;
 			} else if (implementsOrExtends(implementingClass, Extension.class)) {
-				return FhirDataType.EXTENSION;
+				return FhirElementDataType.EXTENSION;
 			} else if (implementsOrExtends(implementingClass, BaseResource.class)) {
-				return FhirDataType.RESOURCE;
+				return FhirElementDataType.RESOURCE;
 			} else if (implementsOrExtends(implementingClass, PrimitiveType.class)) {
-				return FhirDataType.PRIMITIVE;
+				return FhirElementDataType.PRIMITIVE;
 			} else if (implementsOrExtends(implementingClass, Type.class)) {
-				return FhirDataType.SIMPLE_ELEMENT;
+				return FhirElementDataType.SIMPLE_ELEMENT;
 			} else if (implementsOrExtends(implementingClass, Element.class)) {
-				return FhirDataType.COMPLEX_ELEMENT;
+				return FhirElementDataType.COMPLEX_ELEMENT;
 			} else {
 				throw new IllegalStateException("Type '" + typeName + "' (class " + implementingClass.getCanonicalName() + ") from properties file wasn't a resource or element");
 			}
 		} else {
 			// not present in HL7 types - probably user defined type
-			return FhirDataType.UNKNOWN;
+			return FhirElementDataType.UNKNOWN;
 		}
 	}
 	

@@ -3,8 +3,8 @@ package uk.nhs.fhir.makehtml.render.structdef;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 
 /**
  * Takes a FHIR tree data and its differential data. Removes any children of slice nodes if they are not modified 

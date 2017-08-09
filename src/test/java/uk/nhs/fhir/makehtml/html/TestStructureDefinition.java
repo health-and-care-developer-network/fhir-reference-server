@@ -17,15 +17,15 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
-import uk.nhs.fhir.makehtml.FhirVersion;
+import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;

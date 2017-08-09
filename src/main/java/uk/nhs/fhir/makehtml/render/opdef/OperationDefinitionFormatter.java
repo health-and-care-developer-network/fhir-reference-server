@@ -10,14 +10,14 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.data.opdef.FhirOperationParameter;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedOperationDefinition;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.Table;
-import uk.nhs.fhir.makehtml.html.TableRow;
-import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.data.opdef.FhirOperationParameter;
+import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 

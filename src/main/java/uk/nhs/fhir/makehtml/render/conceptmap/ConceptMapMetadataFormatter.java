@@ -10,13 +10,13 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedConceptMap;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public class ConceptMapMetadataFormatter {
 

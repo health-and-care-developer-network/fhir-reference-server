@@ -2,7 +2,6 @@ package uk.nhs.fhir.util;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import uk.nhs.fhir.makehtml.FhirVersion;
 
 public class FhirContexts {
 	private static final FhirContext DSTU2_CONTEXT = FhirContext.forDstu2();

@@ -2,8 +2,8 @@ package uk.nhs.fhir.makehtml.render.structdef;
 
 import java.util.stream.StreamSupport;
 
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 
 public class RedundantValueNodeRemover {
 

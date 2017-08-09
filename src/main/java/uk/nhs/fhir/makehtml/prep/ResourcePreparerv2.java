@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml.prep;
 
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 
 public class ResourcePreparerv2 {
 	private final WrappedResource<?> resource;

@@ -17,16 +17,16 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
-import uk.nhs.fhir.makehtml.data.FhirRelease;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirRelease;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
     
-	public void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
+	public <T extends WrappedResource<T>>void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
 		if (thisFile.isFile()) {
 			
 		    String inFilePath = thisFile.getPath();
@@ -34,7 +34,8 @@ public class FileProcessor {
 
 		    IBaseResource resource = parseFile(thisFile);
 		    
-			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(resource);
+			@SuppressWarnings("unchecked")
+			T wrappedResource = (T) WrappedResource.fromBaseResource(resource);
 			
 			if (wrappedResource instanceof WrappedStructureDefinition
 			  && ((WrappedStructureDefinition)wrappedResource).missingSnapshot()) {
@@ -43,6 +44,12 @@ public class FileProcessor {
 			}
 
 		    wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL);
+			
+		    for (FormattedOutputSpec<T> formatter : wrappedResource.getFormatSpecs(outPath)) {
+				System.out.println("Generating " + formatter.getOutputPath(inFilePath));
+		    	formatter.formatAndSave(inFilePath);
+		    }
+		    
 		    wrappedResource.saveFormattedOutputs(thisFile, outPath, newBaseURL);
 		}
 	}

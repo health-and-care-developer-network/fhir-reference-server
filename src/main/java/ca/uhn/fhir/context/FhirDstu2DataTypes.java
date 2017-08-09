@@ -17,16 +17,16 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.FhirDataType;
+import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  * Uses the HAPI FHIR package-protected ModelScanner to gather information about the data types defined by HL7, according
  * to the class mapping configured in hapi-fhir-structures-dstu2-2.0!ca/uhn/fhir/model/dstu2/fhirversion.properties.
  * @author jon
  */
-public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
+public class FhirDstu2DataTypes {
 	
 	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
 	static {
@@ -55,7 +55,7 @@ public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 		for (Type type : types) {
 			String code = type.getCode();
 			if (code != null 
-			  && !forType(code).equals(FhirDataType.UNKNOWN)) {
+			  && !forType(code).equals(FhirElementDataType.UNKNOWN)) {
 				knownTypes.add(type);
 			}
 		}
@@ -63,8 +63,8 @@ public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 		return knownTypes;
 	}
 	
-	public static Set<FhirDataType> getTypes(List<Type> types) {
-		Set<FhirDataType> dataTypes = Sets.newHashSet();
+	public static Set<FhirElementDataType> getTypes(List<Type> types) {
+		Set<FhirElementDataType> dataTypes = Sets.newHashSet();
 		
 		for (Type type : types) {
 			String code = type.getCode();
@@ -76,40 +76,40 @@ public class FhirDstu2DataTypes implements FhirDataTypes<Type> {
 		return dataTypes;
 	}
 	
-	public static FhirDataType forType(String typeName) {
+	public static FhirElementDataType forType(String typeName) {
 		typeName = typeName.toLowerCase();
 		
 		// mysteriously missing any object representation
 		if (typeName.equals("backboneelement")) {
-			return FhirDataType.COMPLEX_ELEMENT;
+			return FhirElementDataType.COMPLEX_ELEMENT;
 		} else if (typeName.equals("resource")) {
-			return FhirDataType.RESOURCE;
+			return FhirElementDataType.RESOURCE;
 		} else if (typeName.equals("domainresource")) {
-			return FhirDataType.DOMAIN_RESOURCE;
+			return FhirElementDataType.DOMAIN_RESOURCE;
 		} else if (typeName.equals("element")) {
-			return FhirDataType.ELEMENT;
+			return FhirElementDataType.ELEMENT;
 		}
 		
 		if (nameToDefinition.containsKey(typeName)) {
 			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();
 			
 			if (implementsOrExtends(implementingClass, ExtensionDt.class)) {
-				return FhirDataType.EXTENSION;
+				return FhirElementDataType.EXTENSION;
 			} else if (implementsOrExtends(implementingClass, BaseResource.class)) {
-				return FhirDataType.RESOURCE;
+				return FhirElementDataType.RESOURCE;
 			} else if (implementsOrExtends(implementingClass, BasePrimitive.class)) {
-				return FhirDataType.PRIMITIVE;
+				return FhirElementDataType.PRIMITIVE;
 			} else if (implementsOrExtends(implementingClass, IDatatype.class)) {
-				return FhirDataType.SIMPLE_ELEMENT;
+				return FhirElementDataType.SIMPLE_ELEMENT;
 			} else if (implementsOrExtends(implementingClass, BaseElement.class)) {
 				// should always match
-				return FhirDataType.COMPLEX_ELEMENT;
+				return FhirElementDataType.COMPLEX_ELEMENT;
 			} else {
 				throw new IllegalStateException("Type from properties file wasn't a resource or element");
 			}
 		} else {
 			// not present in HL7 types - probably user defined type
-			return FhirDataType.UNKNOWN;
+			return FhirElementDataType.UNKNOWN;
 		}
 	}
 	

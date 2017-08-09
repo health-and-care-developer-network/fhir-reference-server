@@ -6,14 +6,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Element;
 
-import uk.nhs.fhir.makehtml.data.wrap.WrappedConceptMap;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
-import uk.nhs.fhir.makehtml.html.Table;
-import uk.nhs.fhir.makehtml.html.TablePNGGenerator;
-import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.data.wrap.WrappedConceptMap;
+import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
+import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.TablePNGGenerator;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapMetadataFormatter;

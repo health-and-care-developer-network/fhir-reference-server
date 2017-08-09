@@ -12,20 +12,20 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.structdef.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.structdef.FhirElementMapping;
-import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
-import uk.nhs.fhir.makehtml.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.LinkCell;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.BindingInfo;
+import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {

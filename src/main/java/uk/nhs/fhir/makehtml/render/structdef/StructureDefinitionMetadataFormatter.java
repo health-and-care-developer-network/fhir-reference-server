@@ -15,16 +15,16 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.data.structdef.FhirContact;
-import uk.nhs.fhir.makehtml.data.structdef.FhirContacts;
-import uk.nhs.fhir.makehtml.data.structdef.FhirMapping;
-import uk.nhs.fhir.makehtml.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
-import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.FhirContact;
+import uk.nhs.fhir.data.structdef.FhirContacts;
+import uk.nhs.fhir.data.structdef.FhirMapping;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.MetadataTableFormatter;
+import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 

@@ -5,8 +5,8 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.makehtml.render.structdef.UnchangedSliceInfoRemover;
 
 public class TestUnchangedSliceInfoRemover {

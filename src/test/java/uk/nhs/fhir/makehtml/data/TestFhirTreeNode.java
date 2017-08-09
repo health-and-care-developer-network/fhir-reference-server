@@ -5,11 +5,12 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.FhirVersion;
-import uk.nhs.fhir.makehtml.data.structdef.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.structdef.SlicingInfo;
-import uk.nhs.fhir.makehtml.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.url.LinkDatas;
+import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeNode {
 	public static FhirTreeNode testNode(String id, String path) {
@@ -22,7 +23,7 @@ public class TestFhirTreeNode {
 			"", 
 			Lists.newArrayList(), 
 			path,
-			FhirDataType.ELEMENT,
+			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
 	}
 	
