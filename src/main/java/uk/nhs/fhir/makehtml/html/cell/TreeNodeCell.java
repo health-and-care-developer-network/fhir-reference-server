@@ -75,6 +75,8 @@ public class TreeNodeCell extends TableCell {
 			elementNameAttributes.add(new Attribute("title", mouseOverText.get()));
 		}
 		
+		elementNameAttributes.add(new Attribute("class", String.join(" ", elementNameClasses)));
+		
 		Element nameElement = 
 			Elements.withAttributesAndText(
 				(removed ? "span" : "a"), 

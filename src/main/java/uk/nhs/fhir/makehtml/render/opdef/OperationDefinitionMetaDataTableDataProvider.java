@@ -21,8 +21,8 @@ public class OperationDefinitionMetaDataTableDataProvider {
 	public List<TableTitle> getColumns() {
 		// KGM 8/May/2017 Altered meta table column to % widths
 		return Lists.newArrayList(
-			new TableTitle("Name", "The logical name of the element", "25%"),
-			new TableTitle("Type", "Reference to the type of the element", "25%"),
+			new TableTitle("Name", "The logical name of the element", "20%"),
+			new TableTitle("Type", "Reference to the type of the element", "30%"),
 			new TableTitle("Value", "Additional information about the element", "50%")
 		);
 	}

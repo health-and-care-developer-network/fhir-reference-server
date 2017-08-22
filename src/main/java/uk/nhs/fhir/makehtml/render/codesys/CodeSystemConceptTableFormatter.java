@@ -52,6 +52,7 @@ public class CodeSystemConceptTableFormatter extends TableFormatter<WrappedCodeS
 		Element wrapperDiv = 
 			Elements.withChildren("div", 
 				Elements.withText("div", "System: " + codeSystemConcepts.getSystem()),
+				Elements.newElement("br"),
 				new Table(tableData.getColumns(), tableRows, Sets.newHashSet()).makeTable());
 		return new FhirPanel("Codes defined by " + wrappedResource.getUserFriendlyName(), wrapperDiv).makePanel();
 	}

@@ -18,14 +18,14 @@ public class CodeSystemConceptRowFormatter {
 	public TableRow formatRow(CodeSystemConceptTableRowData data) {
 		TableRow row = new TableRow();
 		
-		row.addCell(new SimpleTextCell(data.getCode()));
+		row.addCell(new SimpleTextCell(data.getCode(), true));
 		
 		if (tableData.includeDescriptionColumn(rows)) {
-			row.addCell(new SimpleTextCell(data.getDescription().orElse(TableFormatter.BLANK)));
+			row.addCell(new SimpleTextCell(data.getDescription().orElse(TableFormatter.BLANK), true));
 		}
 		
 		if (tableData.includeDefinitionColumn(rows)) {
-			row.addCell(new SimpleTextCell(data.getDefinition().orElse(TableFormatter.BLANK)));
+			row.addCell(new SimpleTextCell(data.getDefinition().orElse(TableFormatter.BLANK), true));
 		}
 		
 		return row;

@@ -16,7 +16,7 @@ public class FhirCSS {
 	public static final String LIST = "fhir-list";
 	
 	public static final String TREE_ICON = "fhir-tree-icon";
-	public static final CharSequence TREE_ICONS = "fhir-tree-icons";
+	public static final String TREE_ICONS = "fhir-tree-icons";
 	public static final String TREE_RESOURCE_ICON = "fhir-tree-resource-icon";
 	
 	public static final String DATA_CELL = "fhir-data-cell";

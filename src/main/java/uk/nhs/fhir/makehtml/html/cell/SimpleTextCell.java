@@ -10,7 +10,11 @@ public class SimpleTextCell extends TableCell {
 	private final String text;
 
 	public SimpleTextCell(String text) {
-		this(text, false, false, false);
+		this(text, false);
+	}
+	
+	public SimpleTextCell(String text, boolean bordered) {
+		this(text, bordered, false, false);
 	}
 	
 	public SimpleTextCell(String text, boolean bordered, boolean faded, boolean strikethrough) {

@@ -21,6 +21,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
@@ -30,6 +31,7 @@ import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.StringUtil;
 
 public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 
@@ -41,9 +43,23 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		this.definition = source;
 	}
 	
-	@Override
-	public String getName() {
+	public String getNameUnsafe() {
 		return definition.getName();
+	}
+	
+	@Override
+ 	public String getName() {
+		String unsafeName = definition.getName();
+		if (!Strings.isNullOrEmpty(unsafeName)) {
+			return unsafeName;
+		} else if (!Strings.isNullOrEmpty(getUrl())) {
+			// https://fhir.nhs.uk/spine-response-codes-1 -> Spine-Response-Codes-1
+			String[] urlParts = getUrl().split("/"); 
+			String unformatted = urlParts[urlParts.length-1];
+			return StringUtil.capitaliseLowerCase(unformatted);
+		} else {
+			return "(anonymous)";
+		}
 	}
 	
 	public Optional<String> getTitle() {
