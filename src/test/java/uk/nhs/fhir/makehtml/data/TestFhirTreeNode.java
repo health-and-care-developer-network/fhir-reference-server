@@ -16,7 +16,8 @@ public class TestFhirTreeNode {
 			Lists.newArrayList(), 
 			"", 
 			Lists.newArrayList(), 
-			path);
+			path,
+			FhirDataType.ELEMENT);
 	}
 	
 	public static FhirTreeNode testSlicingNode(String id, String path, Set<String> discriminators) {

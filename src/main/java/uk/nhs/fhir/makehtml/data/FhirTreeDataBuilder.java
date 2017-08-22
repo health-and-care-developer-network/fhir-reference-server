@@ -18,6 +18,7 @@ public class FhirTreeDataBuilder {
 	private List<String> path = Lists.newArrayList();
 	private FhirTreeTableContent rootNode = null;
 	private FhirTreeTableContent currentNode = null;
+	private boolean allowDummyNodes = false;
 	
 	public FhirTreeDataBuilder() {
 		this(new FhirTreeNodeBuilder());
@@ -26,12 +27,16 @@ public class FhirTreeDataBuilder {
 		this.nodeBuilder = nodeBuilder;
 	}
 	
-	public void addElementDefinition(ElementDefinitionDt elementDefinition, boolean allowDummyNodes) {
+	public void permitDummyNodes() {
+		this.allowDummyNodes = true;
+	}
+	
+	private void addElementDefinition(ElementDefinitionDt elementDefinition) {
 		String newElementPath = elementDefinition.getPath();
 		List<String> pathElements = Lists.newArrayList(newElementPath.split("\\."));
 		String elementPathName = pathElements.remove(pathElements.size() - 1);
 		
-		stepOutTo(pathElements, allowDummyNodes);
+		stepOutTo(pathElements);
 		
 		FhirTreeNode newNode = nodeBuilder.fromElementDefinition(elementDefinition);
 		
@@ -48,7 +53,7 @@ public class FhirTreeDataBuilder {
 			currentNode = newNode;
 		}
 	}
-	private void stepOutTo(List<String> targetPath, boolean allowDummyNodes) {
+	private void stepOutTo(List<String> targetPath) {
 		//System.out.println("stepping out to " + String.join(".", targetPath));
 		if (pathIsSubpath(path, targetPath)) {
 			int stepOutCount = path.size() - targetPath.size();
@@ -98,7 +103,15 @@ public class FhirTreeDataBuilder {
 		return true;
 	}
 	
-	public FhirTreeData getTree() {
+	private FhirTreeData getTree() {
 		return new FhirTreeData(rootNode); 
+	}
+	
+	public FhirTreeData build(List<ElementDefinitionDt> elements) {
+		for (ElementDefinitionDt element : elements) {
+			addElementDefinition(element);
+		}
+		
+		return getTree();
 	}
 }

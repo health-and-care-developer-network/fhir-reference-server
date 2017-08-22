@@ -212,7 +212,37 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
+	public Optional<String> getLinkedNodeName() {
+		return backup.getLinkedNodeName();
+	}
+	
+	@Override
 	public Optional<ExtensionType> getExtensionType() {
 		return backup.getExtensionType();
+	}
+
+	@Override
+	public boolean hasSlicingSibling() {
+		return backup.hasSlicingSibling();
+	}
+
+	@Override
+	public FhirTreeTableContent getSlicingSibling() {
+		return backup.getSlicingSibling();
+	}
+
+	@Override
+	public String getKeySegment() {
+		return backup.getKeySegment();
+	}
+
+	@Override
+	public boolean isPrimitive() {
+		return backup.isPrimitive();
+	}
+
+	@Override
+	public FhirDataType getDataType() {
+		return backup.getDataType();
 	}
 }

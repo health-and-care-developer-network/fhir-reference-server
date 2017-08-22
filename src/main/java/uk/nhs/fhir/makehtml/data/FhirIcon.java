@@ -77,40 +77,38 @@ public enum FhirIcon {
 		return "url('data:image/" + extension + ";base64," + base64 + "')";
 	}
 
+	/*
+	 * This whole process should be happening based on tree nodes, not (FHIR-Version dependent) definition time
+	 * In that case, we have already done the legwork to work out whether the node is an extension (and whether it is simple/complex)
+	 */
 	public static FhirIcon forElementDefinition(ElementDefinitionDt definition) {
-		List<Type> types = definition.getType();
 		
 		if (definition.getPath().endsWith("[x]")) {
 			return FhirIcon.CHOICE;
 		}
 		
-		if (!types.isEmpty()) {
-			for (Type type : types) {
-				String typeName = type.getCode();
-				if (typeName != null) {
+		for (Type type : definition.getType()) {
+			String typeName = type.getCode();
+			if (typeName != null) {
+				
+				if (typeName.equals("Extension")) {
+                    return lookupExtension(type);
+                } else {
+					Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
 					
-					if (typeName.equals("Extension")) {
-						/*
-						KGM 25/Apr/2017
-						*/
-                        return lookupExtension(type, definition);
-                    } else {
-						Optional<Class<?>> maybeImplementingType = FhirDataTypes.getImplementingType(typeName);
+					if (maybeImplementingType.isPresent()) {
+						Class<?> implementingType = maybeImplementingType.get();
 						
-						if (maybeImplementingType.isPresent()) {
-							Class<?> implementingType = maybeImplementingType.get();
-							
-							if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.REFERENCE;
-							}
-							
-							if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.DATATYPE;
-							}
-							
-							if (BasePrimitive.class.isAssignableFrom(implementingType)) {
-								return FhirIcon.PRIMITIVE;
-							}
+						if (ResourceReferenceDt.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.REFERENCE;
+						}
+						
+						if (ICompositeDatatype.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.DATATYPE;
+						}
+						
+						if (BasePrimitive.class.isAssignableFrom(implementingType)) {
+							return FhirIcon.PRIMITIVE;
 						}
 					}
 				}
@@ -119,6 +117,10 @@ public enum FhirIcon {
 		
 		if (!definition.getSlicing().isEmpty()) {
 			return FhirIcon.SLICE;
+		}
+		
+		if (!Strings.isNullOrEmpty(definition.getNameReference())) {
+			return FhirIcon.REUSE;
 		}
 		
 		String path = definition.getPath();
@@ -131,7 +133,7 @@ public enum FhirIcon {
 		return FhirIcon.ELEMENT;
 	}
 
-	private static FhirIcon lookupExtension(Type type, ElementDefinitionDt definition)  {
+	private static FhirIcon lookupExtension(Type type)  {
 
 		FhirContext ctx = HAPIUtils.sharedFhirContext();
 
@@ -169,15 +171,7 @@ public enum FhirIcon {
 			}
 
 			if (!file.exists()) {
-				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml") && !file.exists()) {
-					// fix up for known incorrectly named file
-					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
-					fileName = newFileName;
-					file = new File(suppliedResourcesFolderPath + fileName);
-				} else {
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-				}
+				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 			}
 			
 			try (FileInputStream fis = new FileInputStream(file)){

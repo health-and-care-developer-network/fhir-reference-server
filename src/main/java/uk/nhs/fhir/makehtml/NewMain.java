@@ -20,8 +20,8 @@ import java.io.FilenameFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirURL;
+import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
 import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
 import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
@@ -42,7 +42,7 @@ public class NewMain {
 	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
 	
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
-	public static final boolean TEST_LINK_URLS = true;
+	public static final boolean TEST_LINK_URLS = false;
 
     private final File inputDirectory;
     private final String outPath;
@@ -116,13 +116,13 @@ public class NewMain {
 	        for (File thisFile : allProfiles) {
 	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
 	        }
+	        
+	        if (TEST_LINK_URLS) {
+	        	new UrlValidator().testUrls(FhirURL.getLinkUrls());
+	            UrlValidator.logSuccessAndFailures();
+	        }
         } catch (Exception e) {
         	e.printStackTrace();
-        }
-        
-        if (TEST_LINK_URLS) {
-        	new UrlTester().testUrls(FhirURL.getLinkUrls());
-            UrlTester.logSuccessAndFailures();
         }
     }
 }

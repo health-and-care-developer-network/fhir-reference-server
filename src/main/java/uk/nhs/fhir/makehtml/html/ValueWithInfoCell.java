@@ -9,6 +9,7 @@ import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.makehtml.data.FhirURL;
 import uk.nhs.fhir.makehtml.data.ResourceInfo;
 import uk.nhs.fhir.makehtml.data.ResourceInfoType;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -89,7 +90,7 @@ public class ValueWithInfoCell extends TableCell {
 		}
 		
 		String description = hasText ? resourceInfo.getDescription().get() : "";
-		String link = hasLink ? resourceInfo.getDescriptionLink().get().toLinkString() : "";
+		FhirURL fhirURL = hasLink ? resourceInfo.getDescriptionLink().get() : null;
 		
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {
@@ -103,14 +104,14 @@ public class ValueWithInfoCell extends TableCell {
 		if (hasLink) {
 			if (resourceInfo.getTextualLink()) {
 				// This URL would result in a broken link - it is only intended to be used as an identifier
-				constraintInfoText.add(new Text(link));
+				constraintInfoText.add(new Text(fhirURL.toFullString()));
 			} else {
 				constraintInfoText.add(
 					Elements.withAttributesAndText("a", 
 						Lists.newArrayList(
-							new Attribute("href", link),
+							new Attribute("href", fhirURL.toLinkString()),
 							new Attribute("class", FhirCSS.LINK)),
-						link));
+						fhirURL.toFullString()));
 			}
 		}
 			

@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.render.opdef;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,11 +72,7 @@ public class OperationDefinitionParameterTableDataProvider {
 		
 		ResourceReferenceDt profile = parameter.getProfile();
 		if (!profile.isEmpty()) {
-			try {
-				resourceFlags.add(new ResourceInfo("Profile", new FhirURL(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
-			}
+			resourceFlags.add(new ResourceInfo("Profile", FhirURL.buildOrThrow(profile.getReferenceElement().getValue()),  ResourceInfoType.PROFILE));
 		}
 		
 		//TODO tuple parameters
@@ -93,10 +88,6 @@ public class OperationDefinitionParameterTableDataProvider {
 		String choice = HAPIUtils.resolveDatatypeValue(binding.getValueSet());
 		String strength = binding.getStrength();
 		
-		try {
-			return new BindingResourceInfo(Optional.empty(), Optional.of(new FhirURL(choice)), strength);
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(e);
-		}
+		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice)), strength);
 	}
 }
