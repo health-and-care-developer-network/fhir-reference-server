@@ -8,5 +8,7 @@ public enum FhirDataType {
 	EXTENSION,
 	UNKNOWN,
 	DOMAIN_RESOURCE,
-	ELEMENT;
+	ELEMENT, 
+	CHOICE,
+	DELEGATED_TYPE;
 }

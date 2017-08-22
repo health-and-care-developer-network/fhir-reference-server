@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class UrlTester {
+public class UrlValidator {
 
 	private static Map<String, Integer> success = Maps.newConcurrentMap();
 	private static Map<String, Integer> silentFailure = Maps.newConcurrentMap();

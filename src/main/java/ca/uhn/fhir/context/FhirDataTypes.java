@@ -1,13 +1,14 @@
 package ca.uhn.fhir.context;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.api.BaseElement;
 import ca.uhn.fhir.model.api.BasePrimitive;
@@ -56,12 +57,26 @@ public class FhirDataTypes {
 		
 		for (Type type : types) {
 			String code = type.getCode();
-			if (code != null && !forType(code).equals(FhirDataType.UNKNOWN)) {
+			if (code != null 
+			  && !forType(code).equals(FhirDataType.UNKNOWN)) {
 				knownTypes.add(type);
 			}
 		}
 		
 		return knownTypes;
+	}
+	
+	public static Set<FhirDataType> getTypes(List<Type> types) {
+		Set<FhirDataType> dataTypes = Sets.newHashSet();
+		
+		for (Type type : types) {
+			String code = type.getCode();
+			if (code != null) {
+				dataTypes.add(forType(code));
+			}
+		}
+		
+		return dataTypes;
 	}
 	
 	public static FhirDataType forType(String typeName) {
@@ -106,10 +121,6 @@ public class FhirDataTypes {
 	}
 	
 	public static LinkData openTypeLink() {
-		try {
-			return new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(e);
-		}
+		return new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#open"), "*");
 	}
 }

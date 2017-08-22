@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.render.conceptmap;
 
-import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -166,17 +165,13 @@ public class ConceptMapMetadataFormatter {
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
 		
 		if (url) {
-			try {
 			return Elements.withAttributeAndChild("span",
 				new Attribute("class", fhirMetadataClass),
 				Elements.withAttributesAndText("a",
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK),
-						new Attribute("href", new FhirURL(value).toLinkString())),
+						new Attribute("href", FhirURL.buildOrThrow(value).toLinkString())),
 				value));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
-			}
 		} else {
 			return Elements.withAttributeAndText("span", 
 				new Attribute("class", fhirMetadataClass), 

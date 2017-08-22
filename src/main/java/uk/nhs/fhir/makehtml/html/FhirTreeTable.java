@@ -1,9 +1,6 @@
 package uk.nhs.fhir.makehtml.html;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,11 +8,10 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.UrlTester;
+import uk.nhs.fhir.makehtml.UrlValidator;
 import uk.nhs.fhir.makehtml.data.BindingInfo;
 import uk.nhs.fhir.makehtml.data.BindingResourceInfo;
 import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.DummyFhirTreeNode;
 import uk.nhs.fhir.makehtml.data.FhirIcon;
 import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.FhirTreeNode;
@@ -59,7 +55,7 @@ public class FhirTreeTable {
 	private List<TableRow> getRows() {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
-		tidyData();
+		data.tidyData();
 		
 		FhirTreeTableContent root = data.getRoot();
 		
@@ -74,76 +70,6 @@ public class FhirTreeTable {
 		addNodeRows(root, tableRows, rootVlines);
 		
 		return tableRows;
-	}
-	
-	private void tidyData() {
-		FhirTreeTableContent treeRoot = data.getRoot();
-		
-		removeExtensionsSlicingNodes(treeRoot);
-		stripChildlessDummyNodes(treeRoot);
-		addSlicingIcons(treeRoot);
-		removeUnwantedConstraints(treeRoot);
-	}
-
-	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
-	
-	private void removeUnwantedConstraints(FhirTreeTableContent node) {
-		for (FhirTreeTableContent child : node.getChildren()) {
-			List<ConstraintInfo> constraints = child.getConstraints();
-			for (int constraintIndex=constraints.size()-1; constraintIndex>=0; constraintIndex--) {
-				ConstraintInfo constraint = constraints.get(constraintIndex);
-				if (constraintKeysToRemove.contains(constraint.getKey())) {
-					constraints.remove(constraintIndex);
-				}
-			}
-			
-			removeUnwantedConstraints(child);
-		}
-	}
-
-	private void stripChildlessDummyNodes(FhirTreeTableContent node) {
-		for (int i=node.getChildren().size()-1; i>=0; i--) {
-			FhirTreeTableContent child = node.getChildren().get(i);
-			
-			stripChildlessDummyNodes(child);
-			
-			if (child instanceof DummyFhirTreeNode
-			  && child.getChildren().isEmpty()) {
-				node.getChildren().remove(i);
-			}
-		}
-	}
-
-	private void addSlicingIcons(FhirTreeTableContent node) {
-		if (node.hasSlicingInfo()) {
-			if (node instanceof FhirTreeNode) {
-				FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
-				fhirTreeNode.setFhirIcon(FhirIcon.SLICE);
-			} else {
-				throw new IllegalStateException("Dummy node with slicing info");
-			}
-		}
-		
-		for (FhirTreeTableContent child : node.getChildren()) {
-			// call recursively over whole tree
-			addSlicingIcons(child);
-		}
-	}
-
-	private void removeExtensionsSlicingNodes(FhirTreeTableContent node) {
-		List<? extends FhirTreeTableContent> children = node.getChildren();
-		
-		// if there is an extensions slicing node (immediately under root), remove it.
-		for (int i=children.size()-1; i>=0; i--) {
-			FhirTreeTableContent child = children.get(i);
-			if (child.getPathName().equals("extension")
-			  && child.hasSlicingInfo()) {
-				children.remove(i);
-			} else {
-				// call recursively over whole tree
-				removeExtensionsSlicingNodes(child);
-			}
-		}
 	}
 
 	private void addNodeRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
@@ -176,8 +102,8 @@ public class FhirTreeTable {
 				}
 			}
 			
-			if (childNode.hasChildren()
-			  && childNode instanceof FhirTreeNode) {
+			if (childNode instanceof FhirTreeNode
+			  && childNode.hasChildren()) {
 				FhirTreeNode fhirTreeNode = (FhirTreeNode)childNode;
 				FhirIcon currentIcon = fhirTreeNode.getFhirIcon();
 				// update default icon to folder icon
@@ -204,7 +130,7 @@ public class FhirTreeTable {
 		
 		tableRows.add(
 			new TableRow(
-				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey()),
+				new TreeNodeCell(treeIcons, nodeToAdd.getFhirIcon(), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
 				new SimpleTextCell(nodeToAdd.getCardinality().toString(), nodeToAdd.useBackupCardinality(), removedByProfile), 
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile), 
@@ -249,7 +175,7 @@ public class FhirTreeTable {
 			
 			if (maybeLogicalUrl
 			  && looksLikeUrl(description)
-			  && !new UrlTester().testSingleUrl(description)) {
+			  && !new UrlValidator().testSingleUrl(description)) {
 				resourceInfos.add(new ResourceInfo("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
 			} else {
 				resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
@@ -316,8 +242,8 @@ public class FhirTreeTable {
 	private ResourceInfo makeResourceInfoWithMaybeUrl(String title, String value, ResourceInfoType type) {
 		if (looksLikeUrl(value)) {
 			try {
-				return new ResourceInfo(title, new FhirURL(value), type);
-			} catch (MalformedURLException e) {
+				return new ResourceInfo(title, FhirURL.buildOrThrow(value), type);
+			} catch (IllegalStateException e) {
 				// revert to non-link version
 			}
 		} 

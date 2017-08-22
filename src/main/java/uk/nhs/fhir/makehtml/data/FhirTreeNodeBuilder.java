@@ -23,6 +23,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Mapping;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
@@ -34,6 +35,7 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.makehtml.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.Dstu2Fix;
 import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.makehtml.valid.NodeMappingValidator;
 import uk.nhs.fhir.util.FhirDocLinkFactory;
 import uk.nhs.fhir.util.HAPIUtils;
 
@@ -46,16 +48,22 @@ public class FhirTreeNodeBuilder {
 
 		List<LinkData> typeLinks = Lists.newArrayList();
 		if (elementDefinition.getPath().split("\\.").length == 1) {
-			try {
-				typeLinks.add(new SimpleLinkData(new FhirURL(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
-			} catch (MalformedURLException e) {
-				throw new IllegalStateException(e);
-			}
+			typeLinks.add(new SimpleLinkData(FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_DSTU2 + "/profiling.html"), "Profile"));
 		} else {
-			List<Type> snapshotElementTypes = elementDefinition.getType();
-			if (!snapshotElementTypes.isEmpty()) {
-				typeLinks.addAll(getTypeLinks(snapshotElementTypes));
-			}
+			typeLinks.addAll(getTypeLinks(elementDefinition.getType()));
+		}
+		
+		Set<FhirDataType> dataTypes = FhirDataTypes.getTypes(elementDefinition.getType());
+		FhirDataType dataType;
+		if (dataTypes.isEmpty()) {
+			dataType = FhirDataType.DELEGATED_TYPE; 
+		} else if (dataTypes.size() == 1) {
+			dataType = dataTypes.iterator().next();
+		} else if (dataTypes.size() > 1
+		  && elementDefinition.getPath().endsWith("[x]")) {
+			dataType = FhirDataType.CHOICE;
+		} else {
+			throw new IllegalStateException("Found " + dataTypes.size() + " data types for node " + elementDefinition.getPath());
 		}
 
 		ResourceFlags flags = ResourceFlags.forDefinition(elementDefinition);
@@ -103,7 +111,6 @@ public class FhirTreeNodeBuilder {
 		
 		String path = elementDefinition.getPath();
 
-		// KGM Added Element 9/May/2017
 		FhirTreeNode node = new FhirTreeNode(
 			icon,
 			name,
@@ -113,7 +120,8 @@ public class FhirTreeNodeBuilder {
 			typeLinks, 
 			shortDescription,
 			constraints,
-			path);
+			path,
+			dataType);
 
 		String definition = elementDefinition.getDefinition();
 		if (!Strings.isNullOrEmpty(definition)) {
@@ -122,7 +130,11 @@ public class FhirTreeNodeBuilder {
 		
 		Slicing slicing = elementDefinition.getSlicing();
 		if (!slicing.isEmpty()) {
-			node.setSlicingInfo(new SlicingInfo(slicing));
+
+			if (slicing.getDiscriminator().isEmpty()) {
+				RendererError.handle(RendererError.Key.SLICING_WITHOUT_DISCRIMINATOR, "Element " + node.getPath() + " has slicing without any discriminator");
+			}
+			node.setSlicingInfo(new SlicingInfo(slicing));	
 		}
 		
 		IDatatype fixed = elementDefinition.getFixed();
@@ -173,11 +185,7 @@ public class FhirTreeNodeBuilder {
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
 				String urlString = HAPIUtils.resolveDatatypeValue(valueSet);
-				try {
-					url = Optional.of(new FhirURL(Dstu2Fix.fixValuesetLink(urlString)));
-				} catch (MalformedURLException e) {
-					throw new IllegalStateException(e);
-				}
+				url = Optional.of(FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(urlString)));
 			}
 			
 			Optional<String> description = Optional.ofNullable(binding.getDescription());
@@ -202,17 +210,27 @@ public class FhirTreeNodeBuilder {
 			node.setAliases(aliases);
 		}
 		
-		ExtensionType extensionType = null;
 		for (Type type : elementDefinition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
-				extensionType = lookupExtensionType(type);
+				node.setExtensionType(lookupExtensionType(type));
 				break;
 			}
 		}
-		if (extensionType != null) {
-			node.setExtensionType(extensionType);
+		
+		String nameReference = elementDefinition.getNameReference();
+		if (!Strings.isNullOrEmpty(nameReference)) {
+			node.setLinkedNodeName(nameReference);
 		}
+			
+		for (Mapping mapping : elementDefinition.getMapping()) {
+			String identity = mapping.getIdentity();
+			Optional<String> language = Optional.ofNullable(mapping.getLanguage());
+			String map = mapping.getMap();
+			
+			node.addMapping(new FhirElementMapping(identity, map, language));
+		}
+		NodeMappingValidator.validate(node);
 		
 		return node;
 	}
@@ -245,15 +263,7 @@ public class FhirTreeNodeBuilder {
 			}
 
 			if (extensionFile == null) {
-				if (fileName.equalsIgnoreCase("extension-careconnect-gpc-nhscommunication-1.xml")) {
-					// fix up for known incorrectly named file
-					String newFileName = "Extension-CareConnect-NhsCommunication-1.xml";
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_MISNAMED, "Fixing path for extension: " + fileName + " -> " + newFileName);
-					fileName = newFileName;
-					extensionFile = new File(FhirIcon.suppliedResourcesFolderPath + fileName);
-				} else {
-					RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-				}
+				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
 			}
 			
 			try (FileInputStream fis = new FileInputStream(extensionFile);

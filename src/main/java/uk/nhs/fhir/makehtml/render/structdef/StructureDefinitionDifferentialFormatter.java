@@ -6,6 +6,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Element;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import uk.nhs.fhir.makehtml.data.FhirTreeData;
 import uk.nhs.fhir.makehtml.data.ResourceSectionType;
 import uk.nhs.fhir.makehtml.html.FhirPanel;
 import uk.nhs.fhir.makehtml.html.FhirTreeTable;
@@ -24,17 +25,20 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
 		
-		FhirTreeTable differentialTreeData = new FhirTreeTable(dataProvider.getDifferentialTreeData());
-		Table differentialTable = differentialTreeData.asTable();
+		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData();
+		differentialTreeData.tidyData();
+		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData);
+		
+		Table differentialTable = differentialTreeTable.asTable();
+		
 		Element differentialHtmlTable = differentialTable.makeTable();
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);
 		
 		addStyles(section);
-		differentialTreeData.getStyles().forEach(section::addStyle);
+		differentialTreeTable.getStyles().forEach(section::addStyle);
 		section.addBodyElement(new FhirPanel(differentialHtmlTable).makePanel());
 		
 		return section;
 	}
-
 }
