@@ -32,7 +32,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract Optional<String> getVersion();
 	public abstract Optional<String> getDisplay();
 	public abstract Optional<String> getPublisher();
-	public abstract Date getDate();
+	public abstract Optional<Date> getDate();
 	public abstract Optional<String> getCopyright();
 	public abstract Optional<String> getFhirVersion();
 	public abstract Optional<String> getContextType();

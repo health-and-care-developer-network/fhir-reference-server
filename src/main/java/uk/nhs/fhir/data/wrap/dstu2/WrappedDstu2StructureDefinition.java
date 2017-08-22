@@ -101,8 +101,8 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
-	public Date getDate() {
-		return definition.getDate();
+	public Optional<Date> getDate() {
+		return Optional.ofNullable(definition.getDate());
 	}
 
 	@Override

@@ -192,6 +192,20 @@ public class FileProcessor {
 			}
 			
 			return null;
+		} else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
+			
+			org.hl7.fhir.dstu3.model.CodeSystem stu3CodeSystem = (org.hl7.fhir.dstu3.model.CodeSystem)resource;
+			
+			String url = stu3CodeSystem.getUrl();
+			if (!Strings.isNullOrEmpty(url)) {
+				FhirVersion version = fromResourceUrl(url);
+				
+				if (version != null) {
+					return version;
+				}
+			}
+			
+			return null;
 		} else {
 			throw new IllegalStateException("Need to support class " + resource.getClass().getCanonicalName());
 		}

@@ -22,11 +22,12 @@ public class TreeNodeCell extends TableCell {
 	private final FhirIcon fhirIcon;
 	private final String name;
 	private final String backgroundClass;
-	private final boolean strikethrough;
 	private final String nodeKey;
 	private final Optional<String> mouseOverText;
 	
 	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey, Optional<String> mouseOverText) {
+		super(false, strikethrough);
+		
 		Preconditions.checkNotNull(name);
 		Preconditions.checkNotNull(fhirIcon);
 		Preconditions.checkNotNull(treeIcons);
@@ -37,7 +38,6 @@ public class TreeNodeCell extends TableCell {
 		this.fhirIcon = fhirIcon;
 		this.treeIcons = treeIcons;
 		this.backgroundClass = backgroundClass;
-		this.strikethrough = strikethrough;
 		this.nodeKey = nodeKey;
 		this.mouseOverText = mouseOverText;
 	}
@@ -68,7 +68,7 @@ public class TreeNodeCell extends TableCell {
 		}
 		
 		contents.add(
-			strikethrough
+			getStrikethrough()
 				? Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TEXT_STRIKETHROUGH), name)
 				: Elements.withAttributesAndChild(
 					"a",

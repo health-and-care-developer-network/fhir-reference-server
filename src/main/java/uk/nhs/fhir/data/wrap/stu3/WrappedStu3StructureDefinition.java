@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.hl7.fhir.dstu3.model.ContactDetail;
-import org.hl7.fhir.dstu3.model.ContactPoint;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.Factory;
 import org.hl7.fhir.dstu3.model.Narrative;
@@ -23,7 +21,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.structdef.FhirContact;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
@@ -104,8 +101,8 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	}
 
 	@Override
-	public Date getDate() {
-		return definition.getDate();
+	public Optional<Date> getDate() {
+		return Optional.ofNullable(definition.getDate());
 	}
 
 	@Override
@@ -135,21 +132,7 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public List<FhirContacts> getContacts() {
-		List<FhirContacts> contacts = Lists.newArrayList();
-		
-		for (ContactDetail contact : definition.getContact()) {
-			FhirContacts fhirContact = new FhirContacts(contact.getName());
-			
-			for (ContactPoint telecom : contact.getTelecom()){
-				String value = telecom.getValue();
-				int rank = telecom.getRank();
-				fhirContact.addTelecom(new FhirContact(value, rank));
-			}
-			
-			contacts.add(fhirContact);
-		}
-		
-		return contacts;
+		return new Stu3FhirContactConverter().convertList(definition.getContact());
 	}
 
 	@Override

@@ -27,11 +27,11 @@ import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
-import uk.nhs.fhir.makehtml.html.table.MetadataTableFormatter;
+import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
-public class ValueSetTableFormatter extends MetadataTableFormatter<WrappedValueSet> {
+public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
 	public ValueSetTableFormatter(WrappedValueSet wrappedResource) {
 		super(wrappedResource);

@@ -18,15 +18,30 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
-public abstract class MetadataTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
+public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
-	public MetadataTableFormatter(T wrappedResource) {
+	public TableFormatter(T wrappedResource) {
 		super(wrappedResource);
 	}
 
 	protected static final String VERSION_DATE = "Version date";
 	
 	protected static final String BLANK = "";
+
+	protected Element getColGroup(int columns) {
+		Element colgroup = Elements.newElement("colgroup");
+		Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
+		
+		int percentPerColumn = 100/columns;
+		
+		for (int i=0; i<columns; i++) {
+			colgroup.addContent(
+				Elements.withAttributes("col", 
+					Lists.newArrayList(
+						new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
+		}
+		return colgroup;
+	}
 	
 	protected Element labelledValueCell(String label, Optional<String> value, int colspan) {
 		String displayValue = value.isPresent() ? value.get() : BLANK;

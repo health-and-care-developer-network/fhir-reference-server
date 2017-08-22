@@ -17,6 +17,7 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2OperationDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ValueSet;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
@@ -27,9 +28,9 @@ import uk.nhs.fhir.makehtml.prep.ResourcePreparerv2;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.FileUtils;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.FileUtils;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {
@@ -109,6 +110,10 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			return new WrappedDstu2OperationDefinition((ca.uhn.fhir.model.dstu2.resource.OperationDefinition)resource);
 		} else if (resource instanceof org.hl7.fhir.dstu3.model.OperationDefinition) {
 			return new WrappedStu3OperationDefinition((org.hl7.fhir.dstu3.model.OperationDefinition)resource);
+		}
+		
+		else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
+			return new WrappedStu3CodeSystem((org.hl7.fhir.dstu3.model.CodeSystem)resource);
 		}
 		
 		else {
