@@ -239,32 +239,37 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		// source.getExperimentalElement().getValue()
 		// source.getPurpose()
 		
-		checkIsNull(source.getUseContext());
-		checkIsNull(source.getJurisdiction());
-		checkIsNull(source.getCompositionalElement().getValue());
-		checkIsNull(source.getVersionNeededElement().getValue());
-		checkIsNull(source.getCountElement().getValue());
-		checkIsNull(source.getProperty());
-		
+		checkNoInfoPresent(source.getUseContext());
+		checkNoInfoPresent(source.getJurisdiction());
+		checkNoInfoPresent(source.getCompositionalElement().getValue());
+		checkNoInfoPresent(source.getVersionNeededElement().getValue());
+		checkNoInfoPresent(source.getCountElement().getValue());
 
 		Identifier identifier = source.getIdentifier();
 		if (identifier != null) {
-			checkIsNull(identifier.getUse());
-			checkIsEmpty(identifier.getType());
-			checkIsEmpty(identifier.getPeriod());
-			checkIsEmpty(identifier.getAssigner());
+			checkNoInfoPresent(identifier.getUse());
+			checkNoInfoPresent(identifier.getType());
+			checkNoInfoPresent(identifier.getPeriod());
+			checkNoInfoPresent(identifier.getAssigner());
+		}
+		
+		checkNoInfoPresent(source.getProperty());
+		
+		for (ConceptDefinitionComponent concept : source.getConcept()) {
+			checkNoInfoPresent(concept.getDesignation());
+			checkNoInfoPresent(concept.getProperty());
+			// nested concepts
+			checkNoInfoPresent(concept.getConcept());
 		}
 	}
 
-	private static void checkIsEmpty(Base o) {
-		if (!o.isEmpty()) {
-			throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-		}	
-	}
-
-	private static void checkIsNull(Object o) {
+	private static void checkNoInfoPresent(Object o) {
 		if (o instanceof Collection<?>) {
 			if (!((Collection<?>) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		} else if (o instanceof Base) {
+			if (!((Base) o).isEmpty()) {
 				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
 			}
 		} else {
