@@ -29,7 +29,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		ensureOutputDirectoryExists(inputPath);
 		String outputPath = getOutputPath(inputPath);
 		
-		HTMLDocSection sectionHTML = formatter.makeSectionHTML(resource);
+		HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 		
 		if (sectionHTML == null) {
 			System.out.println("No section returned by formatter - skipping " + outputPath);

@@ -40,7 +40,7 @@ public class FhirContactRenderer {
 		}
 		
 		if (!publishingOrgContacts.isEmpty()) {
-			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_LABEL), "Contacts"));
+			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_LABEL), "Contacts"));
 			publishingOrgContacts.add(1, Elements.newElement("br"));
 		}
 		
@@ -65,7 +65,7 @@ public class FhirContactRenderer {
 			
 			publishingOrgContacts.add(
 				Elements.withAttributeAndText("span", 
-					new Attribute("class", FhirCSS.METADATA_VALUE), 
+					new Attribute("class", FhirCSS.DATA_VALUE), 
 					"\t" + individualTelecom.getContactData()));
 		}
 	}
@@ -78,7 +78,7 @@ public class FhirContactRenderer {
 		
 		publishingOrgContacts.add(
 			Elements.withAttributeAndText("span", 
-				new Attribute("class", FhirCSS.METADATA_VALUE), 
+				new Attribute("class", FhirCSS.DATA_VALUE), 
 				individualTelecoms.get(0).getContactData()));
 	}
 

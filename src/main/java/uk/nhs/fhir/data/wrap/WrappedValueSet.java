@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
@@ -27,7 +27,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public abstract Optional<String> getRequirements();
 	public abstract Optional<Date> getDate();
 	public abstract boolean hasComposeIncludeFilter();
-	public abstract Optional<FhirCodeSystem> getCodeSystem();
+	public abstract Optional<FhirCodeSystemConcepts> getCodeSystem();
 	public abstract FhirValueSetCompose getCompose();
 	
 	@Override

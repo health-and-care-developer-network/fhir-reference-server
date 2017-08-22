@@ -52,7 +52,7 @@ public class TestStructureDefinition {
 			
 			for (FormattedOutputSpec<WrappedStructureDefinition> formatSpec : wrappedStructureDefinition.getFormatSpecs("this/path/isnt/used")) {
 				ResourceFormatter<WrappedStructureDefinition> formatter = formatSpec.getFormatter();
-				HTMLDocSection sectionHTML = formatter.makeSectionHTML(wrappedStructureDefinition);
+				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {
 					doc.addSection(sectionHTML);
 				}

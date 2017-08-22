@@ -19,14 +19,14 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 
 		HTMLDocSection section = new HTMLDocSection();
 		
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 
-		boolean isExtension = structureDefinition.isExtension();
+		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
 			FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
 			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);

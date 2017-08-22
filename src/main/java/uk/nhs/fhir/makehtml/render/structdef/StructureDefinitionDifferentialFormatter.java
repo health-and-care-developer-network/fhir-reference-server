@@ -19,10 +19,10 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 		
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData();
 		differentialTreeData.tidyData();

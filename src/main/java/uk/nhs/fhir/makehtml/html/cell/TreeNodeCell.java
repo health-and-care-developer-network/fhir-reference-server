@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -24,9 +23,10 @@ public class TreeNodeCell extends TableCell {
 	private final String backgroundClass;
 	private final String nodeKey;
 	private final Optional<String> mouseOverText;
+	private final boolean removed;
 	
-	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean strikethrough, String nodeKey, Optional<String> mouseOverText) {
-		super(false, strikethrough);
+	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean removed, String nodeKey, Optional<String> mouseOverText) {
+		super(false, false, removed);
 		
 		Preconditions.checkNotNull(name);
 		Preconditions.checkNotNull(fhirIcon);
@@ -40,6 +40,7 @@ public class TreeNodeCell extends TableCell {
 		this.backgroundClass = backgroundClass;
 		this.nodeKey = nodeKey;
 		this.mouseOverText = mouseOverText;
+		this.removed = removed;
 	}
 	
 	@Override
@@ -60,20 +61,27 @@ public class TreeNodeCell extends TableCell {
 				new Attribute("src", fhirIcon.getUrl()),
 				new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
 		
-		List<Attribute> elementNameAttributes = Lists.newArrayList(
-			new Attribute("class", String.join(" ", Lists.newArrayList(FhirCSS.LINK, "tabLink"))),
-			new Attribute("href", "details.html#" + nodeKey));
+		List<Attribute> elementNameAttributes = Lists.newArrayList();
+		List<String> elementNameClasses = Lists.newArrayList(cellClasses);
+		
+		if (!removed) {
+			elementNameClasses.add(FhirCSS.LINK);
+			elementNameClasses.add("tabLink");
+			
+			elementNameAttributes.add(new Attribute("href", "details.html#" + nodeKey));
+		}
+		
 		if (mouseOverText.isPresent()) {
 			elementNameAttributes.add(new Attribute("title", mouseOverText.get()));
 		}
 		
-		contents.add(
-			getStrikethrough()
-				? Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TEXT_STRIKETHROUGH), name)
-				: Elements.withAttributesAndChild(
-					"a",
-					elementNameAttributes, 
-					new Text(name)));
+		Element nameElement = 
+			Elements.withAttributesAndText(
+				(removed ? "span" : "a"), 
+				elementNameAttributes, 
+				name);
+		
+		contents.add(nameElement);
 		
 		return Elements.withAttributeAndChildren("td", 
 			new Attribute("class", String.join(" ", backgroundClass, FhirCSS.TREE_ICONS)), 

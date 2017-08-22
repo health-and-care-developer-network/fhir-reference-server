@@ -38,10 +38,10 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getDetailsPanel(structureDefinition);
+		Element metadataPanel = getDetailsPanel(wrappedResource);
 		section.addBodyElement(metadataPanel);
 
 		getStyles().forEach(section::addStyle);

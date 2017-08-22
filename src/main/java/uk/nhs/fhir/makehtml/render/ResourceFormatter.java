@@ -13,7 +13,7 @@ public abstract class ResourceFormatter<T extends WrappedResource<T>> {
 		this.wrappedResource = wrappedResource;
 	}
 	
-	public abstract HTMLDocSection makeSectionHTML(T source) throws ParserConfigurationException;
+	public abstract HTMLDocSection makeSectionHTML() throws ParserConfigurationException;
 	
 	protected FhirVersion getResourceVersion() {
 		return wrappedResource.getImplicitFhirVersion();

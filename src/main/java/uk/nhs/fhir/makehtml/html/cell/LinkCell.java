@@ -21,7 +21,6 @@ import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public class LinkCell extends TableCell {
 	private final LinkDatas linkDatas;
-	private final Set<String> cellClasses;
 	private final Set<String> linkClasses;
 
 	public LinkCell(LinkDatas linkDatas) {
@@ -41,9 +40,9 @@ public class LinkCell extends TableCell {
 	}
 	
 	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
-		super(faded, strikethrough);
+		super(false, faded, strikethrough);
 		this.linkDatas = linkDatas;
-		this.cellClasses = cellClasses;
+		this.cellClasses.addAll(cellClasses);
 		this.linkClasses = linkClasses;
 	}
 
@@ -116,13 +115,6 @@ public class LinkCell extends TableCell {
 	}
 	
 	Element makeDataCell(List<Content> children) {
-		if (getFaded()) {
-			cellClasses.add(FhirCSS.TEXT_FADED);
-		}
-		if (getStrikethrough()) {
-			cellClasses.add(FhirCSS.TEXT_STRIKETHROUGH);
-		}
-		
 		return Elements.addClasses(
 			Elements.withChildren("td", children),
 			cellClasses);

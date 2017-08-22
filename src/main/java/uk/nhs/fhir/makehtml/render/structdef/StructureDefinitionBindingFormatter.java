@@ -46,7 +46,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     Boolean foundBinding = false;
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		
 		HTMLDocSection section = new HTMLDocSection();
 
@@ -81,7 +81,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 
         for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);
@@ -153,11 +153,11 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     		uriToDisplay = Optional.of(value);
     	}
     	
-    	String cssClass = FhirCSS.METADATA_VALUE;
+    	String cssClass = FhirCSS.DATA_VALUE;
     	String displayText = value;
     	if (!Strings.isNullOrEmpty(label)) {
     		displayText = label;
-    		cssClass = FhirCSS.METADATA_LABEL;
+    		cssClass = FhirCSS.DATA_LABEL;
     	}
         
         List<Element> cellSpans = Lists.newArrayList();
@@ -211,7 +211,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     private Element cell(List<? extends Content> content, int colspan) {
         return Elements.withAttributesAndChildren("td",
                 Lists.newArrayList(
-                        new Attribute("class", FhirCSS.METADATA_CELL),
+                        new Attribute("class", FhirCSS.DATA_CELL),
                         new Attribute("colspan", Integer.toString(colspan))),
                 content);
     }

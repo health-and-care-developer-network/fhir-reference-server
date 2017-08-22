@@ -19,12 +19,12 @@ public class FhirCSS {
 	public static final CharSequence TREE_ICONS = "fhir-tree-icons";
 	public static final String TREE_RESOURCE_ICON = "fhir-tree-resource-icon";
 	
-	public static final String METADATA_CELL = "fhir-metadata-cell";
-	public static final String METADATA_LABEL = "fhir-metadata-label";
-	public static final String METADATA_LABEL_EMPTY = "fhir-metadata-label-empty";
-	public static final String METADATA_VALUE = "fhir-metadata-value";
-	public static final String METADATA_VALUE_SMALLTEXT = "fhir-metadata-value-smalltext";
-	public static final String METADATA_BLOCK_TITLE = "fhir-metadata-block-title";
+	public static final String DATA_CELL = "fhir-data-cell";
+	public static final String DATA_LABEL = "fhir-data-label";
+	public static final String DATA_LABEL_EMPTY = "fhir-data-label-empty";
+	public static final String DATA_VALUE = "fhir-data-value";
+	public static final String DATA_VALUE_SMALLTEXT = "fhir-data-value-smalltext";
+	public static final String DATA_BLOCK_TITLE = "fhir-data-block-title";
 	
 	public static final String TEXT_STRIKETHROUGH = "fhir-text-strikethrough";
 	public static final String TEXT_FADED = "fhir-text-faded";

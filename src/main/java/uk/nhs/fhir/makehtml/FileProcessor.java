@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.base.Strings;
@@ -26,7 +28,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
     
-	public <T extends WrappedResource<T>>void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
+	public <T extends WrappedResource<T>> void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
 		if (thisFile.isFile()) {
 			
 		    String inFilePath = thisFile.getPath();
@@ -43,14 +45,17 @@ public class FileProcessor {
 				return;
 			}
 
-		    wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL);
-			
-		    for (FormattedOutputSpec<T> formatter : wrappedResource.getFormatSpecs(outPath)) {
-				System.out.println("Generating " + formatter.getOutputPath(inFilePath));
-		    	formatter.formatAndSave(inFilePath);
-		    }
-		    
-		    wrappedResource.saveFormattedOutputs(thisFile, outPath, newBaseURL);
+		    renderAndSave(outPath, newBaseURL, thisFile, inFilePath, wrappedResource);
+		}
+	}
+
+	<T extends WrappedResource<T>> void renderAndSave(String outPath, String newBaseURL, File thisFile,
+			String inFilePath, T wrappedResource) throws Exception, ParserConfigurationException, IOException {
+		wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL);
+		
+		for (FormattedOutputSpec<T> formatter : wrappedResource.getFormatSpecs(outPath)) {
+			System.out.println("Generating " + formatter.getOutputPath(inFilePath));
+			formatter.formatAndSave(inFilePath);
 		}
 	}
 
@@ -146,8 +151,12 @@ public class FileProcessor {
 				}
 			}
 			
-			return FhirRelease.forString(stu3StructureDefinition.getFhirVersion()).getVersion();
+			String fhirVersion = stu3StructureDefinition.getFhirVersion();
+			if (!Strings.isNullOrEmpty(fhirVersion)) {
+				return FhirRelease.forString(fhirVersion).getVersion(); 
+			}
 			
+			return null;
 		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
 			
 			ca.uhn.fhir.model.dstu2.resource.ValueSet dstu2ValueSet = (ca.uhn.fhir.model.dstu2.resource.ValueSet)resource;

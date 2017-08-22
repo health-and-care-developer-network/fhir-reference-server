@@ -1,12 +1,9 @@
 package uk.nhs.fhir.data.wrap;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -132,22 +129,10 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL);
 	}
 	
-	public void saveFormattedOutputs(File inFile, String outPath, String newBaseURL) throws ParserConfigurationException, IOException {
-		List<FormattedOutputSpec<T>> formatters = getFormatSpecs(outPath);
-		
-		String inFilePath = inFile.getPath();
-		
-	    for (FormattedOutputSpec<T> formatter : formatters) {
-			System.out.println("Generating " + formatter.getOutputPath(inFilePath));
-	    	formatter.formatAndSave(inFilePath);
-	    }
-	}
-	
 	public void augmentAndWriteResource(WrappedResource<?> parsedResource, String outFilePath, String newBaseURL) throws Exception {
 		ResourceFormatter<T> defaultViewFormatter = getDefaultViewFormatter();
 		
-		@SuppressWarnings("unchecked")
-		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML((T)this);
+		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML();
 		SectionedHTMLDoc defaultView = new SectionedHTMLDoc();
 		defaultView.addSection(defaultViewSection);
 		

@@ -28,14 +28,14 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedOperationDefinition operationDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		Element renderedOperationDefinition =
 			Elements.withAttributeAndChildren("div",
 				new Attribute("id", "fhir-ref-operation-definition-structure"),
 				Lists.newArrayList(
-					buildMetaDataPanel(operationDefinition),
-					buildParameterPanel("Input Parameters", operationDefinition.getInputParameters()),
-					buildParameterPanel("Output Parameters", operationDefinition.getOutputParameters())));
+					buildMetaDataPanel(wrappedResource),
+					buildParameterPanel("Input Parameters", wrappedResource.getInputParameters()),
+					buildParameterPanel("Output Parameters", wrappedResource.getOutputParameters())));
 		
 		HTMLDocSection section = new HTMLDocSection();
 		addStyles(section);

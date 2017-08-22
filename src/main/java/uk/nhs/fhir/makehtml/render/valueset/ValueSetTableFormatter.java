@@ -12,13 +12,13 @@ import org.jdom2.Text;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.url.UrlValidator;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
-import uk.nhs.fhir.data.valueset.FhirConceptMapElement;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeConcept;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
@@ -47,10 +47,10 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
     private WrappedConceptMap conceptMap = null;
 	
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getConceptDataTable(valueSet);
+		Element metadataPanel = getConceptDataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
 		
 		return section;
@@ -125,7 +125,7 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
         List<Element> tableContent = Lists.newArrayList(colgroup);
 
         Boolean first = true;
-        Optional<FhirCodeSystem> codeSystem = source.getCodeSystem();
+        Optional<FhirCodeSystemConcepts> codeSystem = source.getCodeSystem();
         if (codeSystem.isPresent()) {
 			String system = codeSystem.get().getSystem();
 	        
@@ -367,9 +367,9 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
-		String cssClass = FhirCSS.METADATA_LABEL;
+		String cssClass = FhirCSS.DATA_LABEL;
 		if (valueIsEmpty && !alwaysBold) {
-			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
+			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -389,8 +389,8 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"))
 		  && new UrlValidator().testSingleUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
-		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
+		String fhirMetadataClass = FhirCSS.DATA_VALUE;
+		if (!largeText) fhirMetadataClass += " " + FhirCSS.DATA_VALUE_SMALLTEXT;
 		
 		if (url) {
 		    if (reference) {

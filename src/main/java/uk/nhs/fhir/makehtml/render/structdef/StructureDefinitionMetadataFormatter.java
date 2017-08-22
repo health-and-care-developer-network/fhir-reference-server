@@ -33,10 +33,10 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedStructureDefinition structureDefinition) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(structureDefinition);
+		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
 		
 		getStyles().forEach(section::addStyle);
@@ -104,7 +104,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		List<Content> externalSpecMappings = Lists.newArrayList();
 		boolean multipleMappings = mappings.size() >= 2;
 		if (multipleMappings) {
-			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_BLOCK_TITLE), "External Specifications"));
+			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_BLOCK_TITLE), "External Specifications"));
 		}
 		for (FhirMapping mapping : mappings) {
 			String displayName = mapping.getName().orElse(mapping.getIdentity());
@@ -116,12 +116,12 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 			displayName += ": ";
 			
 			externalSpecMappings.add(
-				Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_LABEL), displayName));
+				Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_LABEL), displayName));
 			if (mapping.getUri().isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), mapping.getUri().get()));
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_VALUE), mapping.getUri().get()));
 			}
 			if (mapping.getComments().isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), "(" + mapping.getComments().get() + ")"));
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_VALUE), "(" + mapping.getComments().get() + ")"));
 			}
 		}
 		

@@ -18,7 +18,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeConcept;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeFilter;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
@@ -173,12 +173,12 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	}
 
 	@Override
-	public Optional<FhirCodeSystem> getCodeSystem() {
+	public Optional<FhirCodeSystemConcepts> getCodeSystem() {
 		CodeSystem sourceCodeSystem = definition.getCodeSystem();
 		
 		String sourceCodeSystemSystem = sourceCodeSystem.getSystem();
 		
-		FhirCodeSystem codeSystem = new FhirCodeSystem(sourceCodeSystemSystem);
+		FhirCodeSystemConcepts codeSystem = new FhirCodeSystemConcepts(sourceCodeSystemSystem);
 		
 		for (CodeSystemConcept concept : sourceCodeSystem.getConcept()) {
 			String description = concept.getDisplay();

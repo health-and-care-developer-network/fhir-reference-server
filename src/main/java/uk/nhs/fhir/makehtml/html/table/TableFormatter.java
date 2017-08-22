@@ -26,7 +26,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 
 	protected static final String VERSION_DATE = "Version date";
 	
-	protected static final String BLANK = "";
+	public static final String BLANK = "";
 
 	protected Element getColGroup(int columns) {
 		Element colgroup = Elements.newElement("colgroup");
@@ -69,15 +69,15 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	protected Element cell(List<? extends Content> content, int colspan) {
 		return Elements.withAttributesAndChildren("td", 
 			Lists.newArrayList(
-				new Attribute("class", FhirCSS.METADATA_CELL),
+				new Attribute("class", FhirCSS.DATA_CELL),
 				new Attribute("colspan", Integer.toString(colspan))),
 			content);
 	}
 	
 	protected Element labelSpan(String label, boolean valueIsEmpty) {
-		String cssClass = FhirCSS.METADATA_LABEL;
+		String cssClass = FhirCSS.DATA_LABEL;
 		if (valueIsEmpty) {
-			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
+			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -96,8 +96,8 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	protected Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
 		boolean largeText = alwaysLargeText || value.length() < 25;
-		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
-		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
+		String fhirMetadataClass = FhirCSS.DATA_VALUE;
+		if (!largeText) fhirMetadataClass += " " + FhirCSS.DATA_VALUE_SMALLTEXT;
 		
 		if (url) {
 			return Elements.withAttributeAndChild("span", 
@@ -119,36 +119,36 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList("." + FhirCSS.METADATA_CELL),
+				Lists.newArrayList("." + FhirCSS.DATA_CELL),
 				Lists.newArrayList(
 					new CSSRule("border", "1px solid #f0f0f0"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_LABEL, "." + FhirCSS.TELECOM_NAME),
+					Lists.newArrayList("." + FhirCSS.DATA_LABEL, "." + FhirCSS.TELECOM_NAME),
 					Lists.newArrayList(
 						new CSSRule("color", "#808080"),
 						new CSSRule("font-weight", "bold"),
 						new CSSRule("font-size", "13"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_LABEL_EMPTY),
+					Lists.newArrayList("." + FhirCSS.DATA_LABEL_EMPTY),
 					Lists.newArrayList(
 						new CSSRule("color", "#D0D0D0"),
 						new CSSRule("font-weight", "normal"))));
 		styles.add(
 			new CSSStyleBlock(
-				Lists.newArrayList("." + FhirCSS.METADATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
+				Lists.newArrayList("." + FhirCSS.DATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
 				Lists.newArrayList(
 					new CSSRule("color", "#000000"),
 					new CSSRule("font-size", "13"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_VALUE_SMALLTEXT),
+					Lists.newArrayList("." + FhirCSS.DATA_VALUE_SMALLTEXT),
 					Lists.newArrayList(
 						new CSSRule("font-size", "10"))));
 		styles.add(
 				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_BLOCK_TITLE),
+					Lists.newArrayList("." + FhirCSS.DATA_BLOCK_TITLE),
 					Lists.newArrayList(
 							new CSSRule("color", "#808080"),
 							new CSSRule("font-weight", "bold"),

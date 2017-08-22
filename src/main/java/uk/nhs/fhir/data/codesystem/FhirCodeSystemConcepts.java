@@ -3,12 +3,12 @@ package uk.nhs.fhir.data.codesystem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FhirCodeSystem {
+public class FhirCodeSystemConcepts {
 
 	private final String system;
 	private final List<FhirCodeSystemConcept> concepts = new ArrayList<>();
 
-	public FhirCodeSystem(String system) {
+	public FhirCodeSystemConcepts(String system) {
 		this.system = system;
 	}
 	

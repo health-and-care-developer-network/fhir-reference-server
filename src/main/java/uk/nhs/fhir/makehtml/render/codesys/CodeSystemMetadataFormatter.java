@@ -31,10 +31,10 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedCodeSystem codeSystem) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(codeSystem);
+		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
 		
 		getStyles().forEach(section::addStyle);

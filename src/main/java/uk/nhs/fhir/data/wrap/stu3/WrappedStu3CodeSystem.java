@@ -23,7 +23,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemFilter;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
@@ -86,8 +86,8 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	}
 	
 	@Override
-	public FhirCodeSystem getCodeSystem() {
-		FhirCodeSystem codeSystem = new FhirCodeSystem(definition.getUrl());
+	public FhirCodeSystemConcepts getCodeSystemConcepts() {
+		FhirCodeSystemConcepts codeSystemConcepts = new FhirCodeSystemConcepts(definition.getUrl());
 		
 		for (ConceptDefinitionComponent concept : definition.getConcept()) {
 			FhirCodeSystemConcept newConcept = 
@@ -96,10 +96,10 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 					concept.getDisplay(),
 					concept.getDefinition());
 			
-			codeSystem.addConcept(newConcept);
+			codeSystemConcepts.addConcept(newConcept);
 		}
 		
-		return codeSystem;
+		return codeSystemConcepts;
 	}
 
 	@Override
@@ -229,7 +229,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		// source.getPublisher();
 		// source.getCopyright();
 		// source.getValueSet();
-		// source.getFilter();
+		// source.getFilter(); // (including all nested fields)
 		// source.getConcept();
 		// source.getIdentifier()
 		// source.getCaseSensitiveElement().getValue();
@@ -261,6 +261,10 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 			// nested concepts
 			checkNoInfoPresent(concept.getConcept());
 		}
+		
+		// actually the filter panel rendering is implemented, but worth being aware once it is being used so we can test with live data rather than test data
+		checkNoInfoPresent(source.getFilter());
+		
 	}
 
 	private static void checkNoInfoPresent(Object o) {

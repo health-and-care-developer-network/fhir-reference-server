@@ -19,7 +19,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeConcept;
@@ -175,7 +175,7 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 	}
 
 	@Override
-	public Optional<FhirCodeSystem> getCodeSystem() {
+	public Optional<FhirCodeSystemConcepts> getCodeSystem() {
 		return Optional.empty();
 	}
 

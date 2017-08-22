@@ -6,12 +6,13 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.codesystem.FhirCodeSystem;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemFilter;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.makehtml.render.codesys.CodeSystemConceptTableFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemFiltersTableFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemMetadataFormatter;
 
@@ -40,7 +41,7 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 	public abstract Optional<String> getHierarchyMeaning();
 	public abstract List<FhirContacts> getContacts();
 	
-	public abstract FhirCodeSystem getCodeSystem();
+	public abstract FhirCodeSystemConcepts getCodeSystemConcepts();
 	public abstract List<FhirCodeSystemFilter> getFilters();
 
 	@Override
@@ -59,7 +60,16 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 
 		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemMetadataFormatter(this), outputDirectory, "metadata.html"));
 		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemFiltersTableFormatter(this), outputDirectory, "filters.html"));
+		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemConceptTableFormatter(this), outputDirectory, "concepts.html"));
 		
 		return formatSpecs;
+	}
+	
+	public String getUserFriendlyName() {
+		if (getTitle().isPresent()) {
+			return getTitle().get();
+		} else {
+			return getName();
+		}
 	}
 }

@@ -27,10 +27,10 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 	}
 	
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(valueSet);
+		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
 		
 		return section;
@@ -98,34 +98,31 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 					labelledValueCell("Status", status, 1),
 					labelledValueCell("Last updated", displayDate, 2)));
 
-		tableContent.add(
+		if (description.isPresent()) {
+			tableContent.add(
 				Elements.withChildren("tr",
-						labelledValueCell("Description", description.get(), 4, true)
-				));
+					labelledValueCell("Description", description.get(), 4, true)));
+		}
         // KGM 5/May/2017
         if (requirement.isPresent()) {
             tableContent.add(
-                    Elements.withChildren("tr",
-                            labelledValueCell("Requirements", requirement.get(), 4, true)
-                    ));
+                Elements.withChildren("tr",
+                    labelledValueCell("Requirements", requirement.get(), 4, true)));
         }
         if (publisher.isPresent()) {
             tableContent.add(
-                    Elements.withChildren("tr",
-                            labelledValueCell("Publisher", publisher.get(), 4)
-                    ));
+                Elements.withChildren("tr",
+                    labelledValueCell("Publisher", publisher.get(), 4)));
         }
         if (copyright.isPresent()) {
             tableContent.add(
                     Elements.withChildren("tr",
-                            labelledValueCell("Copyright", copyright.get(), 4, true)
-                    ));
+                            labelledValueCell("Copyright", copyright.get(), 4, true)));
         }
 		if (reference.isPresent()) {
 			tableContent.add(
 					Elements.withChildren("tr",
-							labelledValueCell("Reference", reference.get(), 4, true)
-					));
+							labelledValueCell("Reference", reference.get(), 4, true)));
 		}
 
 		// Should this be in the identifier section? Makes sense when linked to Hl7v2 tables

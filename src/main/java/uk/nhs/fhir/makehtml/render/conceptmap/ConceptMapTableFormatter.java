@@ -3,33 +3,40 @@ package uk.nhs.fhir.makehtml.render.conceptmap;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
 import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.valueset.FhirConceptMapElement;
-import uk.nhs.fhir.data.valueset.FhirConceptMapElementTarget;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
-import uk.nhs.fhir.makehtml.html.style.CSSRule;
-import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.TableFormatter;
+import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class ConceptMapTableFormatter {
-
-	private static final String BLANK = "";
-
-	private final WrappedConceptMap source;
+public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> {
 
 	public ConceptMapTableFormatter(WrappedConceptMap conceptMap){
-		this.source = conceptMap;
+		super(conceptMap);
+	}
+
+	@Override
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
+		HTMLDocSection section = new HTMLDocSection();
+		
+		section.addBodyElement(getElementMapsDataTable());
+		section.addStyles(getStyles());
+		
+		return section;
 	}
 
 	public Element getElementMapsDataTable() {
@@ -41,7 +48,7 @@ public class ConceptMapTableFormatter {
     	List<Element> tableContent = Lists.newArrayList(colgroup);
         Boolean first = true;
 
-		for (FhirConceptMapElement element: source.getElements()) {
+		for (FhirConceptMapElement element: wrappedResource.getElements()) {
 			if (first) {
 				tableContent.add(
 						Elements.withChildren("tr",
@@ -55,13 +62,13 @@ public class ConceptMapTableFormatter {
 				Optional<String> comments = target.getComments();
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
 				
-				FhirVersion implicitFhirVersion = source.getImplicitFhirVersion();
+				FhirVersion implicitFhirVersion = wrappedResource.getImplicitFhirVersion();
 				tableContent.add(
 					Elements.withChildren("tr",
 						labelledValueCell(BLANK, element.getCode(), 1, true, true),
 						labelledHttpCell(FhirURL.buildOrThrow(FhirURLConstants.versionBase(implicitFhirVersion) + "/valueset-concept-map-equivalence.html", implicitFhirVersion), target.getEquivalence(),  1, true, false),
-						labelledValueCell(BLANK, target.getCode(), 1, true),
-						labelledValueCell(BLANK, displayComments, 1, true)));
+						labelledValueCell(BLANK, target.getCode(), 1, true, false),
+						labelledValueCell(BLANK, displayComments, 1, true, false)));
 			}
 		}
         Element table =
@@ -73,12 +80,6 @@ public class ConceptMapTableFormatter {
 
 		return panel.makePanel();
 	}
-
-
-    private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig)
-    {
-        return labelledValueCell(label, value, colspan, alwaysBig, false);
-    }
 
 	private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig, boolean alwaysBold) {
 		Preconditions.checkNotNull(value, "value data");
@@ -100,18 +101,10 @@ public class ConceptMapTableFormatter {
         return cell(cellSpans, colspan);
     }
 	
-	private Element cell(List<? extends Content> content, int colspan) {
-		return Elements.withAttributesAndChildren("td", 
-			Lists.newArrayList(
-				new Attribute("class", FhirCSS.METADATA_CELL),
-				new Attribute("colspan", Integer.toString(colspan))),
-			content);
-	}
-	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
-		String cssClass = FhirCSS.METADATA_LABEL;
+		String cssClass = FhirCSS.DATA_LABEL;
 		if (valueIsEmpty && !alwaysBold) {
-			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
+			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -130,86 +123,17 @@ public class ConceptMapTableFormatter {
     private Element valueSpanRef(String value, FhirURL http, boolean alwaysLargeText) {
 
         boolean largeText = alwaysLargeText || value.length() < 20;
-        String fhirMetadataClass = FhirCSS.METADATA_VALUE;
+        String fhirMetadataClass = FhirCSS.DATA_VALUE;
         if (!largeText) {
-        	fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
+        	fhirMetadataClass += " " + FhirCSS.DATA_VALUE_SMALLTEXT;
         }
 
-
         return Elements.withAttributeAndChild("span",
-                    new Attribute("class", fhirMetadataClass),
-                    Elements.withAttributesAndText("a",
-                            Lists.newArrayList(
-                                    new Attribute("class", FhirCSS.LINK),
-                                    new Attribute("href", http.toLinkString())),
-                            value));
-
-
+            new Attribute("class", fhirMetadataClass),
+            Elements.withAttributesAndText("a",
+                Lists.newArrayList(
+                    new Attribute("class", FhirCSS.LINK),
+                    new Attribute("href", http.toLinkString())),
+                value));
     }
-
-	private Element valueSpan(String value, boolean alwaysLargeText) {
-		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
-		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
-		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
-		
-		if (url) {
-			return Elements.withAttributeAndChild("span", 
-				new Attribute("class", fhirMetadataClass), 
-				Elements.withAttributesAndText("a", 
-					Lists.newArrayList(
-						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", FhirURL.buildOrThrow(value, source.getImplicitFhirVersion()).toLinkString())), 
-				value));
-			
-		} else {
-			return Elements.withAttributeAndText("span", 
-				new Attribute("class", fhirMetadataClass), 
-				value);
-		}
-	}
-	
-	public static List<CSSStyleBlock> getStyles() {
-		List<CSSStyleBlock> styles = Lists.newArrayList();
-
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList("." + FhirCSS.METADATA_CELL),
-				Lists.newArrayList(
-					new CSSRule("border", "1px solid #f0f0f0"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_LABEL, "." + FhirCSS.TELECOM_NAME),
-					Lists.newArrayList(
-						new CSSRule("color", "#808080"),
-						new CSSRule("font-weight", "bold"),
-						new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_LABEL_EMPTY),
-					Lists.newArrayList(
-						new CSSRule("color", "#D0D0D0"),
-						new CSSRule("font-weight", "normal"))));
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList("." + FhirCSS.METADATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
-				Lists.newArrayList(
-					new CSSRule("color", "#000000"),
-					new CSSRule("font-size", "13"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_VALUE_SMALLTEXT),
-					Lists.newArrayList(
-						new CSSRule("font-size", "10"))));
-		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.METADATA_BLOCK_TITLE),
-					Lists.newArrayList(
-							new CSSRule("color", "#808080"),
-							new CSSRule("font-weight", "bold"),
-							new CSSRule("text-decoration", "underline"),
-							new CSSRule("font-size", "13"))));
-		
-		return styles;
-	}
 }

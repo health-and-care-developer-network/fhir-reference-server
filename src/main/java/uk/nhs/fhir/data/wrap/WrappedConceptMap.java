@@ -4,15 +4,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import uk.nhs.fhir.data.valueset.FhirConceptMapElement;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
+import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.FhirVersion;
 
-public abstract class WrappedConceptMap {
+public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMap> {
 	
 	public abstract Optional<String> getUrl();
-	public abstract Optional<String> getName();
+	public abstract String getName();
 	public abstract String getStatus();
 	public abstract Optional<String> getVersion();
 	public abstract Boolean getExperimental();
@@ -26,6 +28,21 @@ public abstract class WrappedConceptMap {
 	
 	public abstract List<FhirConceptMapElement> getElements();
 
+	@Override
+	public String getOutputFolderName() {
+		return "ConceptMap";
+	}
+	
+	@Override
+	public List<FormattedOutputSpec<WrappedConceptMap>> getFormatSpecs(String outputDirectory) {
+		throw new IllegalStateException("No format specs");
+	}
+	
+	@Override
+	public ResourceFormatter<WrappedConceptMap> getDefaultViewFormatter() {
+		throw new IllegalStateException("No format specs");
+	}
+	
 	public static WrappedConceptMap fromDefinition(Object definition) {
 		if (definition instanceof ca.uhn.fhir.model.dstu2.resource.ConceptMap) {
 			return new WrappedDstu2ConceptMap((ca.uhn.fhir.model.dstu2.resource.ConceptMap)definition);

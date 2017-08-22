@@ -28,42 +28,43 @@ public class ValueSetFormatter extends ResourceFormatter<WrappedValueSet> {
 	TablePNGGenerator backgrounds = new TablePNGGenerator();
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedValueSet valueSet) throws ParserConfigurationException {
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 
-		Element metadataPanel = new ValueSetMetadataFormatter(valueSet).getMetadataTable(valueSet);
-		HTMLDocSection section = new HTMLDocSection();
-		addStyles(section);
-		section.addBodyElement(metadataPanel);
+		Element metadataPanel = new ValueSetMetadataFormatter(wrappedResource).getMetadataTable(wrappedResource);
+		HTMLDocSection valueSetSection = new HTMLDocSection();
+		addStyles(valueSetSection);
+		valueSetSection.addBodyElement(metadataPanel);
 
 		// Inline CodeSystem - must have system if present
 		// External CodeSystem - should have Import or Include if present
 
-		ValueSetTableFormatter tableformatter = new ValueSetTableFormatter(valueSet);
-		Element tableDataPanel = tableformatter.getConceptDataTable(valueSet);
+		ValueSetTableFormatter tableformatter = new ValueSetTableFormatter(wrappedResource);
+		Element tableDataPanel = tableformatter.getConceptDataTable(wrappedResource);
 
-		section.addBodyElement(tableDataPanel);
+		valueSetSection.addBodyElement(tableDataPanel);
 
 		// Expansion
 
 		// Included ConceptMaps - this is coded so ConceptMap can be a separate resource
-		List<WrappedConceptMap> conceptMaps = valueSet.getConceptMaps();
+		List<WrappedConceptMap> conceptMaps = wrappedResource.getConceptMaps();
 		
 		for (WrappedConceptMap conceptMap : conceptMaps) {
 			ConceptMapMetadataFormatter conceptMapMetadata = new ConceptMapMetadataFormatter(conceptMap);
 
 			ConceptMapTableFormatter conceptMapTableData = new ConceptMapTableFormatter(conceptMap);
+			conceptMapTableData.makeSectionHTML();
 
 			Element conceptMapMetadataPanel = conceptMapMetadata.getMetadataTable();
 
-			addStyles(section);
-			section.addBodyElement(conceptMapMetadataPanel);
+			addStyles(valueSetSection);
+			valueSetSection.addBodyElement(conceptMapMetadataPanel);
 
             Element containedTableDataPanel = conceptMapTableData.getElementMapsDataTable();
 
-            section.addBodyElement(containedTableDataPanel);
+            valueSetSection.addBodyElement(containedTableDataPanel);
 		}
 
-		return section;
+		return valueSetSection;
 	}
 
 	public void addStyles(HTMLDocSection section) {

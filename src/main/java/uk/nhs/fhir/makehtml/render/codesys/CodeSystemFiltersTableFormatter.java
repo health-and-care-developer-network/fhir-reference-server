@@ -22,12 +22,12 @@ public class CodeSystemFiltersTableFormatter extends TableFormatter<WrappedCodeS
 	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(WrappedCodeSystem source) {
+	public HTMLDocSection makeSectionHTML() {
 		
 		HTMLDocSection section = new HTMLDocSection();
 		addStyles(section);
 		
-		List<FhirCodeSystemFilter> filters = source.getFilters();
+		List<FhirCodeSystemFilter> filters = wrappedResource.getFilters();
 		
 		if (filters.isEmpty()) {
 			return null;
