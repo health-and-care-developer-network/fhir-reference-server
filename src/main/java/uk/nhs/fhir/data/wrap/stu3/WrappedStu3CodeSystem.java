@@ -165,7 +165,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		if (identifier == null) {
 			return Optional.empty();
 		} else {
-			return Optional.of(new FhirIdentifier(identifier.getType().getText(), identifier.getSystem()));
+			return Optional.of(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
 		}
 	}
 
@@ -175,8 +175,13 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	}
 	
 	@Override
-	public Optional<String> getPurpose() {
+	public Optional<String> getDescription() {
 		return Optional.ofNullable(definition.getDescription());
+	}
+
+	@Override
+	public Optional<String> getPurpose() {
+		return Optional.ofNullable(definition.getPurpose());
 	}
 	
 	@Override
@@ -232,10 +237,10 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		// source.getContact()
 		// source.getHierarchyMeaning()
 		// source.getExperimentalElement().getValue()
+		// source.getPurpose()
 		
 		checkIsNull(source.getUseContext());
 		checkIsNull(source.getJurisdiction());
-		checkIsNull(source.getPurpose());
 		checkIsNull(source.getCompositionalElement().getValue());
 		checkIsNull(source.getVersionNeededElement().getValue());
 		checkIsNull(source.getCountElement().getValue());
@@ -245,7 +250,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		Identifier identifier = source.getIdentifier();
 		if (identifier != null) {
 			checkIsNull(identifier.getUse());
-			checkIsNull(identifier.getValue());
+			checkIsEmpty(identifier.getType());
 			checkIsEmpty(identifier.getPeriod());
 			checkIsEmpty(identifier.getAssigner());
 		}

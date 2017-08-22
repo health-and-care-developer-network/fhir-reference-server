@@ -55,6 +55,7 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		Optional<Boolean> experimental = codeSystem.getExperimental();
 		String experimentalDesc = experimental.isPresent() ? experimental.get() ? "yes" : "no" : BLANK;
 		
+		String description = codeSystem.getDescription().orElse(BLANK);
 		String purpose = codeSystem.getPurpose().orElse(BLANK);
 		Optional<Boolean> caseSensitive = codeSystem.getCaseSensitive();
 		String caseSensitiveDesc = caseSensitive.isPresent() ? caseSensitive.get() ? "yes" : "no" : BLANK;
@@ -79,7 +80,7 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		Optional<FhirIdentifier> identifier = codeSystem.getIdentifier();
 		if (identifier.isPresent()) {
 			identifierSystem = identifier.get().getSystem().orElse(BLANK);
-			identifierType = identifier.get().getType().orElse(BLANK);
+			identifierType = identifier.get().getValue().orElse(BLANK);
 		}
 		
 		String hierarchyMeaning = codeSystem.getHierarchyMeaning().orElse(BLANK);
@@ -103,20 +104,23 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 				labelledValueCell("Associated ValueSet", valueSet, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Purpose", purpose, 2, true),
-				labelledValueCell("Experimental", experimentalDesc, 1, true),
-				labelledValueCell("Case Sensitive", caseSensitiveDesc, 1, true)));
+				labelledValueCell("Description", description, 2, true),
+				labelledValueCell("Purpose", purpose, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
 				labelledValueCell("Last updated", lastUpdated, 1, true),
 				labelledValueCell("Published by", publisher, 1, true),
 				labelledValueCell("Identifier system", identifierSystem, 1, true),
-				labelledValueCell("Identifier type", identifierType, 1, true)));
+				labelledValueCell("Identifier", identifierType, 1, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-					labelledValueCell("Compositional", compositionalDesc, 1, true),
-					labelledValueCell("Content", content, 1, true),
-					labelledValueCell("Hierarchy Meaning", hierarchyMeaning, 2, true)));
+				labelledValueCell("Compositional", compositionalDesc, 1, true),
+				labelledValueCell("Content", content, 1, true),
+				labelledValueCell("Experimental", experimentalDesc, 1, true),
+				labelledValueCell("Case Sensitive", caseSensitiveDesc, 1, true)));
+		tableContent.add(
+			Elements.withChildren("tr",
+				labelledValueCell("Hierarchy Meaning", hierarchyMeaning, 4, true)));
 		
 		if (!publishingOrgContacts.isEmpty()) {
 			List<Content> renderedPublishingOrgContacts = new FhirContactRenderer().getPublishingOrgContactsContents(publishingOrgContacts);

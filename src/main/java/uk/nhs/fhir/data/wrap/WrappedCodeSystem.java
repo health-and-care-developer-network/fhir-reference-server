@@ -31,6 +31,7 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 	public abstract Optional<FhirIdentifier> getIdentifier();
 	
 	public abstract Optional<Boolean> getExperimental();
+	public abstract Optional<String> getDescription();
 	public abstract Optional<String> getPurpose();
 	public abstract Optional<Boolean> getCaseSensitive();
 	public abstract Optional<Boolean> getCompositional();
@@ -61,6 +62,4 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 		
 		return formatSpecs;
 	}
-
-
 }
