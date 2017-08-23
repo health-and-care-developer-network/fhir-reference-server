@@ -19,6 +19,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.TablePNGGenerator;
 
@@ -67,8 +68,8 @@ public abstract class TreeTableFormatter<T extends WrappedResource<T>> extends R
 			backgroundStyles.add(
 				new CSSStyleBlock(Lists.newArrayList("." + key),
 					Lists.newArrayList(
-						new CSSRule("background-image", "url(data:image/png;base64," + backgroundBase64 + ")"),
-						new CSSRule("background-repeat", "repeat-y"))));
+						new CSSRule(CSSTag.BACKGROUND_IMAGE, "url(data:image/png;base64," + backgroundBase64 + ")"),
+						new CSSRule(CSSTag.BACKGROUND_REPEAT, "repeat-y"))));
 		}
 		
 		return backgroundStyles;

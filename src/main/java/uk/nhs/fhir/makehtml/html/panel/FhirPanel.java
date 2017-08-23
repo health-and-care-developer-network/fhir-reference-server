@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public class FhirPanel {
@@ -64,22 +65,22 @@ public class FhirPanel {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL), //html
 				Lists.newArrayList(
-					new CSSRule("font-family", "Helvetica Neue, Helvetica, Arial, sans-serif"),
-					new CSSRule("font-size", "14px"),
-					new CSSRule("line-height", "1.4"),
-					new CSSRule("width", "95%"),
-					new CSSRule("max-width", "100%"),
-					new CSSRule("word-wrap", "break-word"))));
+					new CSSRule(CSSTag.FONT_FAMILY, "Helvetica Neue, Helvetica, Arial, sans-serif"),
+					new CSSRule(CSSTag.FONT_SIZE, "14px"),
+					new CSSRule(CSSTag.LINE_HEIGHT, "1.4"),
+					new CSSRule(CSSTag.WIDTH, "95%"),
+					new CSSRule(CSSTag.MAX_WIDTH, "100%"),
+					new CSSRule(CSSTag.WORD_WRAP, "break-word"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL), 
 				Lists.newArrayList(
-					new CSSRule("padding", "15px"),
-					new CSSRule("margin-bottom", "20"),
-					new CSSRule("background-color", "#ffffff"),
-					new CSSRule("border", "1px solid #dddddd"),
-					new CSSRule("border-radius", "4px"),
-					new CSSRule("box-shadow", "0 1px 1px rgba(0, 0, 0, 0.05)"))));
+					new CSSRule(CSSTag.PADDING, "15px"),
+					new CSSRule(CSSTag.MARGIN_BOTTOM, "20"),
+					new CSSRule(CSSTag.BACKGROUND_COLOR, "#ffffff"),
+					new CSSRule(CSSTag.BORDER, "1px solid #dddddd"),
+					new CSSRule(CSSTag.BORDER_RADIUS, "4px"),
+					new CSSRule(CSSTag.BOX_SHADOW, "0 1px 1px rgba(0, 0, 0, 0.05)"))));
 
 		return styles;
 	}

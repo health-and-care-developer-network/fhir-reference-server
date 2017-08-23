@@ -15,6 +15,7 @@ import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
@@ -121,39 +122,39 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DATA_CELL),
 				Lists.newArrayList(
-					new CSSRule("border", "1px solid #f0f0f0"))));
+					new CSSRule(CSSTag.BORDER, "1px solid #f0f0f0"))));
 		styles.add(
 				new CSSStyleBlock(
 					Lists.newArrayList("." + FhirCSS.DATA_LABEL, "." + FhirCSS.TELECOM_NAME),
 					Lists.newArrayList(
-						new CSSRule("color", "#808080"),
-						new CSSRule("font-weight", "bold"),
-						new CSSRule("font-size", "13"))));
+						new CSSRule(CSSTag.COLOR, "#808080"),
+						new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+						new CSSRule(CSSTag.FONT_SIZE, "13"))));
 		styles.add(
 				new CSSStyleBlock(
 					Lists.newArrayList("." + FhirCSS.DATA_LABEL_EMPTY),
 					Lists.newArrayList(
-						new CSSRule("color", "#D0D0D0"),
-						new CSSRule("font-weight", "normal"))));
+						new CSSRule(CSSTag.COLOR, "#D0D0D0"),
+						new CSSRule(CSSTag.FONT_WEIGHT, "normal"))));
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
 				Lists.newArrayList(
-					new CSSRule("color", "#000000"),
-					new CSSRule("font-size", "13"))));
+					new CSSRule(CSSTag.COLOR, "#000000"),
+					new CSSRule(CSSTag.FONT_SIZE, "13"))));
 		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.DATA_VALUE_SMALLTEXT),
-					Lists.newArrayList(
-						new CSSRule("font-size", "10"))));
+			new CSSStyleBlock(
+				Lists.newArrayList("." + FhirCSS.DATA_VALUE_SMALLTEXT),
+				Lists.newArrayList(
+					new CSSRule(CSSTag.FONT_SIZE, "10"))));
 		styles.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("." + FhirCSS.DATA_BLOCK_TITLE),
-					Lists.newArrayList(
-							new CSSRule("color", "#808080"),
-							new CSSRule("font-weight", "bold"),
-							new CSSRule("text-decoration", "underline"),
-							new CSSRule("font-size", "13"))));
+			new CSSStyleBlock(
+				Lists.newArrayList("." + FhirCSS.DATA_BLOCK_TITLE),
+				Lists.newArrayList(
+					new CSSRule(CSSTag.COLOR, "#808080"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+					new CSSRule(CSSTag.TEXT_DECORATION, "underline"),
+					new CSSRule(CSSTag.FONT_SIZE, "13"))));
 		
 		return styles;
 	}

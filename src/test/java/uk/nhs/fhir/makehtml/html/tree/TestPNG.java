@@ -15,6 +15,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.tree.TablePNGGenerator;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 
@@ -67,11 +68,11 @@ public class TestPNG {
 	 */
 	private void addDemoBackgroundSection(SectionedHTMLDoc doc, String desc, String base64Input) throws ParserConfigurationException, IOException {
 		doc.addStyle(new CSSStyleBlock(Lists.newArrayList(".demo_" + desc), Lists.newArrayList(
-			new CSSRule("background-image", "url(data:image/png;base64," + base64Input + ")"),
-			new CSSRule("background-repeat", "repeat-y"),
-			new CSSRule("height", "80"),
-			new CSSRule("width", "200"),
-			new CSSRule("clear", "both")
+			new CSSRule(CSSTag.BACKGROUND_IMAGE, "url(data:image/png;base64," + base64Input + ")"),
+			new CSSRule(CSSTag.BACKGROUND_REPEAT, "repeat-y"),
+			new CSSRule(CSSTag.HEIGHT, "80"),
+			new CSSRule(CSSTag.WIDTH, "200"),
+			new CSSRule(CSSTag.CLEAR, "both")
 			)));
 		doc.addBodyElement(
 			Elements.withAttributeAndText("div",

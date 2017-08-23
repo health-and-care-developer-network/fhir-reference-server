@@ -17,6 +17,7 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public class LinkCell extends TableCell {
@@ -138,18 +139,18 @@ public class LinkCell extends TableCell {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LINK), 
 				Lists.newArrayList(
-					new CSSRule("text-decoration", "none"),
-					new CSSRule("color", "#005EB8"))));
+					new CSSRule(CSSTag.TEXT_DECORATION, "none"),
+					new CSSRule(CSSTag.COLOR, "#005EB8"))));
 
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_FADED),
 				Lists.newArrayList(
-					new CSSRule("opacity", "0.4"))));
+					new CSSRule(CSSTag.OPACITY, "0.4"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_STRIKETHROUGH),
 				Lists.newArrayList(
-					new CSSRule("text-decoration", "line-through"))));
+					new CSSRule(CSSTag.TEXT_DECORATION, "line-through"))));
 		
 		return styles;
 	}

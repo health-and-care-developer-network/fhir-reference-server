@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public class Table {
@@ -94,72 +95,72 @@ public class Table {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("tr", "." + FhirCSS.TABLE_TITLE), 
 				Lists.newArrayList(
-					new CSSRule("font-size", "11px"),
-					new CSSRule("font-family", "verdana"),
-					new CSSRule("vertical-align", "top"),
-					new CSSRule("border", "0"))));
+					new CSSRule(CSSTag.FONT_SIZE, "11px"),
+					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
+					new CSSRule(CSSTag.BORDER, "0"))));
 		
 		styles.add(new CSSStyleBlock(Lists.newArrayList("td", "." + FhirCSS.TABLE_TITLE), 
 			Lists.newArrayList(
-				new CSSRule("padding", "0px 4px"))));
+				new CSSRule(CSSTag.PADDING, "0px 4px"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL_HEADING_BOX), 
 				Lists.newArrayList(
-					new CSSRule("margin", "-15px -15px 15px"),
-					new CSSRule("padding", "10px 15px"),
-					new CSSRule("background-color", "#f7f7f7"),
-					new CSSRule("border-bottom", "1px solid #dddddd"),
-					new CSSRule("border-top-left-radius", "3px"),
-					new CSSRule("border-top-right-radius", "3px"))));
+					new CSSRule(CSSTag.MARGIN, "-15px -15px 15px"),
+					new CSSRule(CSSTag.PADDING, "10px 15px"),
+					new CSSRule(CSSTag.BACKGROUND_COLOR, "#f7f7f7"),
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid #dddddd"),
+					new CSSRule(CSSTag.BORDER_TOP_LEFT_RADIUS, "3px"),
+					new CSSRule(CSSTag.BORDER_TOP_RIGHT_RADIUS, "3px"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL_HEADING_TEXT), 
 				Lists.newArrayList(
-					new CSSRule("margin-top", "0"),
-					new CSSRule("margin-bottom", "0"),
-					new CSSRule("font-size", "17.5px"),
-					new CSSRule("font-weight", "500"))));
+					new CSSRule(CSSTag.MARGIN_TOP, "0"),
+					new CSSRule(CSSTag.MARGIN_BOTTOM, "0"),
+					new CSSRule(CSSTag.FONT_SIZE, "17.5px"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "500"))));
 		
 		
 		styles.add(new CSSStyleBlock(Lists.newArrayList("tr"),
 			Lists.newArrayList(
-				new CSSRule("padding", "3px"),
-				new CSSRule("line-height", "1.66em"))));
+				new CSSRule(CSSTag.PADDING, "3px"),
+				new CSSRule(CSSTag.LINE_HEIGHT, "1.66em"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TABLE_HEADER_ROW), 
 				Lists.newArrayList(
-					new CSSRule("border", "1px #F0F0F0 solid"))));
+					new CSSRule(CSSTag.BORDER, "1px #F0F0F0 solid"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("tr", FhirCSS.TABLE_TITLE, "td"), 
 				Lists.newArrayList(
-					new CSSRule("text-align", "left"),
-					new CSSRule("vertical-align", "top"))));
+					new CSSRule(CSSTag.TEXT_ALIGN, "left"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("table"), 
 				Lists.newArrayList(
-					new CSSRule("width", "100%"),
-					new CSSRule("font-family", "sans-serif"),
-					new CSSRule("border-collapse", "collapse"))));
+					new CSSRule(CSSTag.WIDTH, "100%"),
+					new CSSRule(CSSTag.FONT_FAMILY, "sans-serif"),
+					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"))));
 
 		styles.add(new CSSStyleBlock(
 			Lists.newArrayList("." + FhirCSS.PANEL + " *"),
 			Lists.newArrayList(
-				new CSSRule("-webkit-box-sizing", "border-box"),
-				new CSSRule("-moz-box-sizing", "border-box"),
-				new CSSRule("box-sizing", "border-box"))));
+				new CSSRule(CSSTag._WEBKIT_BOX_SIZING, "border-box"),
+				new CSSRule(CSSTag._MOZ_BOX_SIZING, "border-box"),
+				new CSSRule(CSSTag.BOX_SIZING, "border-box"))));
 		
 		// Styling hack to add space between thead and tbody
 		styles.add(new CSSStyleBlock(
 			Lists.newArrayList("." + FhirCSS.TABLE + " tbody:before"),
 			Lists.newArrayList(
-				new CSSRule("content", "'-'"),
-				new CSSRule("display", "block"),
-				new CSSRule("line-height", "1em"),
-				new CSSRule("color", "transparent"))));
+				new CSSRule(CSSTag.CONTENT, "'-'"),
+				new CSSRule(CSSTag.DISPLAY, "block"),
+				new CSSRule(CSSTag.LINE_HEIGHT, "1em"),
+				new CSSRule(CSSTag.COLOR, "transparent"))));
 		
 		return styles;
 	}

@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml.html.style;
 
-public class FhirCSS {
+public interface FhirCSS {
 	
 	public static final String TABLE = "fhir-table";
 	public static final String TABLE_HEADER_ROW = "fhir-table-header-row";

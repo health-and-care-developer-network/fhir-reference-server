@@ -15,6 +15,7 @@ import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -148,42 +149,42 @@ public class ValueWithInfoCell extends TableCell {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK, "." + FhirCSS.INFO_TAG_BLOCK),
 				Lists.newArrayList(
-					new CSSRule("display", "inline"),
-					new CSSRule("color", "#ffffff"),
-					new CSSRule("font-weight", "bold"),
-					new CSSRule("font-size", "10px"),
-					new CSSRule("padding", ".2em .6em .3em"),
-					new CSSRule("text-align", "center"),
-					new CSSRule("vertical-align", "baseline"),
-					new CSSRule("white-space", "nowrap"),
-					new CSSRule("line-height", "2em"),
-					new CSSRule("border-radius", ".25em"))));
+					new CSSRule(CSSTag.DISPLAY, "inline"),
+					new CSSRule(CSSTag.COLOR, "#ffffff"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+					new CSSRule(CSSTag.FONT_SIZE, "10px"),
+					new CSSRule(CSSTag.PADDING, ".2em .6em .3em"),
+					new CSSRule(CSSTag.TEXT_ALIGN, "center"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "baseline"),
+					new CSSRule(CSSTag.WHITE_SPACE, "nowrap"),
+					new CSSRule(CSSTag.LINE_HEIGHT, "2em"),
+					new CSSRule(CSSTag.BORDER_RADIUS, ".25em"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK),
-				Lists.newArrayList(new CSSRule("background-color", "#cccccc"))));
+				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, "#cccccc"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.INFO_TAG_BLOCK),
-				Lists.newArrayList(new CSSRule("background-color", "#ffbb55"))));
+				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, "#ffbb55"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.INFO_NAME_BOLD),
-				Lists.newArrayList(new CSSRule("font-weight", "bold"))));
+				Lists.newArrayList(new CSSRule(CSSTag.FONT_WEIGHT, "bold"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TEXT_ITALIC),
-				Lists.newArrayList(new CSSRule("font-style", "italic"))));
+				Lists.newArrayList(new CSSRule(CSSTag.FONT_STYLE, "italic"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.RESOURCE_INFO_CELL),
 				Lists.newArrayList(
-					new CSSRule("padding", "5px 4px"),
-					new CSSRule("border-bottom", "1px solid #F0F0F0"))));
+					new CSSRule(CSSTag.PADDING, "5px 4px"),
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid #F0F0F0"))));
 		
 		return styles;
 	}

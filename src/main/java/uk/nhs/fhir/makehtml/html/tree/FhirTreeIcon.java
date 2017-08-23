@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.FhirURLConstants;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 /**
@@ -44,42 +45,15 @@ public enum FhirTreeIcon {
 	
 	public static List<CSSStyleBlock> getCssRules() {
 		List<CSSStyleBlock> rules = Lists.newArrayList();
-		/*for (FhirTreeIcon icon : FhirTreeIcon.values()) {
-			String filename = icon.getFileName();
-			String fileExtension = filename.substring(filename.lastIndexOf('.') + 1);
-			
-			//Chrome
-			rules.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("img." + icon.getCssClass()), 
-					Lists.newArrayList(
-						new CSSRule("background", "url('data:image/" + fileExtension + ";base64," + icon.getBase64() + "')"),
-						new CSSRule("background-repeat", "no-repeat"),
-						//new CSSRule("background-color", "white"),
-						new CSSRule("border", "0"),
-						new CSSRule("width", "16"),
-						new CSSRule("height", "22"))));
-			
-			//Firefox/IE
-			/*rules.add(
-				new CSSStyleBlock(
-					Lists.newArrayList("img." + icon.getCssClass() + "::after"), 
-					Lists.newArrayList(
-						new CSSRule("content", "url(data:image/" + fileExtension + ";base64," + icon.getBase64() + ")"),
-						new CSSRule("background-color", "white"),
-						new CSSRule("border", "0"),
-						new CSSRule("width", "16"),
-						new CSSRule("height", "22"))));
-		}*/
 		
 		rules.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("img." + FhirCSS.TREE_ICON), 
 				Lists.newArrayList(
-					new CSSRule("background-color", "white"),
-					new CSSRule("border", "0"),
-					new CSSRule("width", "16"),
-					new CSSRule("height", "22"))));
+					new CSSRule(CSSTag.BACKGROUND_COLOR, "white"),
+					new CSSRule(CSSTag.BORDER, "0"),
+					new CSSRule(CSSTag.WIDTH, "16"),
+					new CSSRule(CSSTag.HEIGHT, "22"))));
 		
 		return rules;
 	}

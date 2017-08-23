@@ -29,6 +29,7 @@ import uk.nhs.fhir.makehtml.html.cell.TreeNodeCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
@@ -272,7 +273,7 @@ public class FhirTreeTable {
 	public List<CSSStyleBlock> getStyles() {
 		List<CSSStyleBlock> tableStyles = Lists.newArrayList();
 
-		tableStyles.addAll(getIconStyles());
+		tableStyles.add(getIconStyle());
 		tableStyles.addAll(FhirTreeIcon.getCssRules());
 		tableStyles.addAll(getLayoutStyles());
 		
@@ -285,60 +286,43 @@ public class FhirTreeTable {
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TREE_ICONS),
 				Lists.newArrayList(
-					new CSSRule("padding", "0 4px"),
-					new CSSRule("border-collapse", "collapse"))));
+					new CSSRule(CSSTag.PADDING, "0 4px"),
+					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"))));
 
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TREE_ICONS + " img"),
 				Lists.newArrayList(
-					new CSSRule("vertical-align", "top"),
-					new CSSRule("float", "left"),
-					new CSSRule("border-collapse", "collapse"))));
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
+					new CSSRule(CSSTag.FLOAT, "left"),
+					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"))));
 
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TABLE, "." + FhirCSS.TABLE + " tbody tr"),
 				Lists.newArrayList(
-					new CSSRule("border-collapse", "collapse"),
-					new CSSRule("vertical-align", "top"),
-					new CSSRule("border-style", "none"))));
+					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
+					new CSSRule(CSSTag.BORDER_STYLE, "none"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TREE_ICONS, "." + FhirCSS.TREE_ICONS + " img", "." + FhirCSS.TABLE),
 				Lists.newArrayList(
-					new CSSRule("-webkit-border-horizontal-spacing", "0"),
-					new CSSRule("-webkit-border-vertical-spacing", "0"))));
+					new CSSRule(CSSTag._WEBKIT_BORDER_HORIZONTAL_SPACING, "0"),
+					new CSSRule(CSSTag._WEBKIT_BORDER_VERTICAL_SPACING, "0"))));
 		
 		return styles;
 	}
 
-	private List<CSSStyleBlock> getIconStyles() {
-		List<CSSStyleBlock> iconStyles = Lists.newArrayList();
-		
-		/*for (FhirIcon icon : getIcons()) {
-			iconStyles.add(
-				new CSSStyleBlock(Lists.newArrayList("." + icon.getCSSClass()),
-					Lists.newArrayList(
-						new CSSRule("padding-right", "4px"),
-						new CSSRule("background-color", "white"),
-						new CSSRule("border", "0"),
-						new CSSRule("content", icon.getAsDataUrl()),
-						new CSSRule("width", "20"),
-						new CSSRule("height", "16"))));
-		}*/
-		
-		iconStyles.add(
-			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TREE_RESOURCE_ICON),
+	private CSSStyleBlock getIconStyle() {
+		return new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TREE_RESOURCE_ICON),
 				Lists.newArrayList(
-					new CSSRule("padding-right", "4px"),
-					new CSSRule("background-color", "white"),
-					new CSSRule("border", "0"),
-					new CSSRule("width", "20"),
-					new CSSRule("height", "16"))));
-		
-		return iconStyles;
+					new CSSRule(CSSTag.PADDING_RIGHT, "4px"),
+					new CSSRule(CSSTag.BACKGROUND_COLOR, "white"),
+					new CSSRule(CSSTag.BORDER, "0"),
+					new CSSRule(CSSTag.WIDTH, "20"),
+					new CSSRule(CSSTag.HEIGHT, "16")));
 	}
 
 	public void stripRemovedElements() {

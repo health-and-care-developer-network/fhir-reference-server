@@ -26,6 +26,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
@@ -143,42 +144,42 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_ROW),
 				Lists.newArrayList(
-					new CSSRule("font-size", "12px"),
-					new CSSRule("font-family", "verdana"),
-					new CSSRule("padding", "3px"),
-					new CSSRule("vertical-align", "top"),
+					new CSSRule(CSSTag.FONT_SIZE, "12px"),
+					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.PADDING, "3px"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					
-					new CSSRule("line-height", "1.4em"),
-					new CSSRule("font-weight", "normal"),
-					new CSSRule("text-align", "left"),
-					new CSSRule("border-bottom", "1px silver solid"),
-					new CSSRule("background", "#EFEFEF"))));
+					new CSSRule(CSSTag.LINE_HEIGHT, "1.4em"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "normal"),
+					new CSSRule(CSSTag.TEXT_ALIGN, "left"),
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px silver solid"),
+					new CSSRule(CSSTag.BACKGROUND, "#EFEFEF"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DETAILS_DATA_ROW, "." + FhirCSS.DETAILS_DATA_CELL),
 				Lists.newArrayList(
-					new CSSRule("padding", "3px"),
-					new CSSRule("font-family", "verdana"),
-					new CSSRule("font-size", "11px"),
-					new CSSRule("line-height", "1.2em"),
-					new CSSRule("font-weight", "normal"),
-					new CSSRule("vertical-align", "top"),
-					new CSSRule("text-align", "left"))));
+					new CSSRule(CSSTag.PADDING, "3px"),
+					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.FONT_SIZE, "11px"),
+					new CSSRule(CSSTag.LINE_HEIGHT, "1.2em"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "normal"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
+					new CSSRule(CSSTag.TEXT_ALIGN, "left"))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_CELL),
 				Lists.newArrayList(
-					new CSSRule("font-size", "12px"),
-					new CSSRule("font-family", "verdana"),
-					new CSSRule("padding", "3px"),
-					new CSSRule("vertical-align", "top"),
+					new CSSRule(CSSTag.FONT_SIZE, "12px"),
+					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.PADDING, "3px"),
+					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					
-					new CSSRule("line-height", "1.2em"),
-					new CSSRule("font-weight", "bold"),
-					new CSSRule("border-bottom", "1px silver solid"),
-					new CSSRule("background", "#EFEFEF"))));
+					new CSSRule(CSSTag.LINE_HEIGHT, "1.2em"),
+					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px silver solid"),
+					new CSSRule(CSSTag.BACKGROUND, "#EFEFEF"))));
 		
 		return styles;
 	}

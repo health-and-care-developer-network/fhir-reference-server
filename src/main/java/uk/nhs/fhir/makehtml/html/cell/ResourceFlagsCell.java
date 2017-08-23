@@ -55,7 +55,7 @@ public class ResourceFlagsCell extends TableCell {
 		/*styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.RESOURCE_FLAG + " span"),
 				Lists.newArrayList(
-					new CSSRule("background-color", "#ffffbb"))));*/
+					new CSSRule(CSSTag.BACKGROUND_COLOR, "#ffffbb"))));*/
 		
 		return styles;
 	}

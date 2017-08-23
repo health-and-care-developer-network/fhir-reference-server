@@ -24,6 +24,7 @@ import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
@@ -436,7 +437,7 @@ public class StructureDefinitionDetails {
 		iconStyles.add(
 				new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LIST),
 					Lists.newArrayList(
-						new CSSRule("margin", "0px"))));
+						new CSSRule(CSSTag.MARGIN, "0px"))));
 			
 		return iconStyles;
 	}
