@@ -17,6 +17,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueWithInfoCell extends TableCell {
@@ -150,7 +151,7 @@ public class ValueWithInfoCell extends TableCell {
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK, "." + FhirCSS.INFO_TAG_BLOCK),
 				Lists.newArrayList(
 					new CSSRule(CSSTag.DISPLAY, "inline"),
-					new CSSRule(CSSTag.COLOR, "#ffffff"),
+					new CSSRule(CSSTag.COLOR, FhirColour.RESOURCE_INFO_TITLE_BACKGROUND_TEXT),
 					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
 					new CSSRule(CSSTag.FONT_SIZE, "10px"),
 					new CSSRule(CSSTag.PADDING, ".2em .6em .3em"),
@@ -162,12 +163,12 @@ public class ValueWithInfoCell extends TableCell {
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK),
-				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, "#cccccc"))));
+				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.RESOURCE_INFO_TITLE_BACKGROUND))));
 		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.INFO_TAG_BLOCK),
-				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, "#ffbb55"))));
+				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.RESOURCE_INFO_ADDITIONAL_BACKGROUND))));
 		
 		styles.add(
 			new CSSStyleBlock(
@@ -184,7 +185,7 @@ public class ValueWithInfoCell extends TableCell {
 				Lists.newArrayList("." + FhirCSS.RESOURCE_INFO_CELL),
 				Lists.newArrayList(
 					new CSSRule(CSSTag.PADDING, "5px 4px"),
-					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid #F0F0F0"))));
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid " + FhirColour.TREE_INFO_DIVIDER))));
 		
 		return styles;
 	}

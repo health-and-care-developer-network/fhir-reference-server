@@ -12,6 +12,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 
 public class FhirPanel {
 	
@@ -77,8 +78,8 @@ public class FhirPanel {
 				Lists.newArrayList(
 					new CSSRule(CSSTag.PADDING, "15px"),
 					new CSSRule(CSSTag.MARGIN_BOTTOM, "20"),
-					new CSSRule(CSSTag.BACKGROUND_COLOR, "#ffffff"),
-					new CSSRule(CSSTag.BORDER, "1px solid #dddddd"),
+					new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.PANEL_BACKGROUND),
+					new CSSRule(CSSTag.BORDER, "1px solid " + FhirColour.PANEL_BORDER),
 					new CSSRule(CSSTag.BORDER_RADIUS, "4px"),
 					new CSSRule(CSSTag.BOX_SHADOW, "0 1px 1px rgba(0, 0, 0, 0.05)"))));
 

@@ -28,6 +28,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
@@ -152,8 +153,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 					new CSSRule(CSSTag.LINE_HEIGHT, "1.4em"),
 					new CSSRule(CSSTag.FONT_WEIGHT, "normal"),
 					new CSSRule(CSSTag.TEXT_ALIGN, "left"),
-					new CSSRule(CSSTag.BORDER_BOTTOM, "1px silver solid"),
-					new CSSRule(CSSTag.BACKGROUND, "#EFEFEF"))));
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid " + FhirColour.DETAILS_PAGE_DIVIDER),
+					new CSSRule(CSSTag.BACKGROUND, FhirColour.DETAILS_HEADER_BACKGROUND))));
 		
 		styles.add(
 			new CSSStyleBlock(
@@ -178,8 +179,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 					
 					new CSSRule(CSSTag.LINE_HEIGHT, "1.2em"),
 					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
-					new CSSRule(CSSTag.BORDER_BOTTOM, "1px silver solid"),
-					new CSSRule(CSSTag.BACKGROUND, "#EFEFEF"))));
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid " + FhirColour.DETAILS_PAGE_DIVIDER),
+					new CSSRule(CSSTag.BACKGROUND, FhirColour.DETAILS_HEADER_BACKGROUND))));
 		
 		return styles;
 	}

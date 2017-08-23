@@ -14,6 +14,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 
 public class Table {
 	private final List<TableTitle> cols = Lists.newArrayList();
@@ -109,8 +110,8 @@ public class Table {
 				Lists.newArrayList(
 					new CSSRule(CSSTag.MARGIN, "-15px -15px 15px"),
 					new CSSRule(CSSTag.PADDING, "10px 15px"),
-					new CSSRule(CSSTag.BACKGROUND_COLOR, "#f7f7f7"),
-					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid #dddddd"),
+					new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.PANEL_HEADING_BACKGROUND),
+					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid " + FhirColour.PANEL_HEADING_BOTTOM),
 					new CSSRule(CSSTag.BORDER_TOP_LEFT_RADIUS, "3px"),
 					new CSSRule(CSSTag.BORDER_TOP_RIGHT_RADIUS, "3px"))));
 		
@@ -131,7 +132,7 @@ public class Table {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TABLE_HEADER_ROW), 
 				Lists.newArrayList(
-					new CSSRule(CSSTag.BORDER, "1px #F0F0F0 solid"))));
+					new CSSRule(CSSTag.BORDER, "1px solid " + FhirColour.TABLE_HEADER_BORDER))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("tr", FhirCSS.TABLE_TITLE, "td"), 

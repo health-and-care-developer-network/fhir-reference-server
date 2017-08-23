@@ -17,6 +17,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
@@ -122,25 +123,25 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DATA_CELL),
 				Lists.newArrayList(
-					new CSSRule(CSSTag.BORDER, "1px solid #f0f0f0"))));
+					new CSSRule(CSSTag.BORDER, "1px solid " + FhirColour.DATA_CELL_BORDER))));
 		styles.add(
 				new CSSStyleBlock(
 					Lists.newArrayList("." + FhirCSS.DATA_LABEL, "." + FhirCSS.TELECOM_NAME),
 					Lists.newArrayList(
-						new CSSRule(CSSTag.COLOR, "#808080"),
+						new CSSRule(CSSTag.COLOR, FhirColour.DATA_LABEL),
 						new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
 						new CSSRule(CSSTag.FONT_SIZE, "13"))));
 		styles.add(
 				new CSSStyleBlock(
 					Lists.newArrayList("." + FhirCSS.DATA_LABEL_EMPTY),
 					Lists.newArrayList(
-						new CSSRule(CSSTag.COLOR, "#D0D0D0"),
+						new CSSRule(CSSTag.COLOR, FhirColour.DATA_LABEL_WITHOUT_VALUE),
 						new CSSRule(CSSTag.FONT_WEIGHT, "normal"))));
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DATA_VALUE, "." + FhirCSS.TELECOM_VALUE),
 				Lists.newArrayList(
-					new CSSRule(CSSTag.COLOR, "#000000"),
+					new CSSRule(CSSTag.COLOR, FhirColour.DATA_VALUE),
 					new CSSRule(CSSTag.FONT_SIZE, "13"))));
 		styles.add(
 			new CSSStyleBlock(
@@ -151,7 +152,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.DATA_BLOCK_TITLE),
 				Lists.newArrayList(
-					new CSSRule(CSSTag.COLOR, "#808080"),
+					new CSSRule(CSSTag.COLOR, FhirColour.MULTILINE_DATA_TITLE),
 					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
 					new CSSRule(CSSTag.TEXT_DECORATION, "underline"),
 					new CSSRule(CSSTag.FONT_SIZE, "13"))));

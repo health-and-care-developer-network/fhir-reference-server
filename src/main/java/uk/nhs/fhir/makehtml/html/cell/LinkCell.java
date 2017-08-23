@@ -19,6 +19,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.style.FhirColour;
 
 public class LinkCell extends TableCell {
 	private final LinkDatas linkDatas;
@@ -140,7 +141,7 @@ public class LinkCell extends TableCell {
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LINK), 
 				Lists.newArrayList(
 					new CSSRule(CSSTag.TEXT_DECORATION, "none"),
-					new CSSRule(CSSTag.COLOR, "#005EB8"))));
+					new CSSRule(CSSTag.COLOR, FhirColour.LINK))));
 
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TEXT_FADED),

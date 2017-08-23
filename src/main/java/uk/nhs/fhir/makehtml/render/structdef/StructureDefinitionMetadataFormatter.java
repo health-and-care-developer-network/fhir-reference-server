@@ -100,6 +100,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		
 		List<String> useContexts = structureDefinition.getUseContexts();
 		
+		// JE - information only relevant to the base resource - not relevant to the profile
 		List<FhirMapping> mappings = structureDefinition.getMappings();
 		List<Content> externalSpecMappings = Lists.newArrayList();
 		boolean multipleMappings = mappings.size() >= 2;
