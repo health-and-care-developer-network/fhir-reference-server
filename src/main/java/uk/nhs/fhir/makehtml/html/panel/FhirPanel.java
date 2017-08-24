@@ -13,6 +13,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
+import uk.nhs.fhir.makehtml.html.style.FhirFont;
 
 public class FhirPanel {
 	
@@ -66,7 +67,7 @@ public class FhirPanel {
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL), //html
 				Lists.newArrayList(
-					new CSSRule(CSSTag.FONT_FAMILY, "Helvetica Neue, Helvetica, Arial, sans-serif"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.PANEL),
 					new CSSRule(CSSTag.FONT_SIZE, "14px"),
 					new CSSRule(CSSTag.LINE_HEIGHT, "1.4"),
 					new CSSRule(CSSTag.WIDTH, "95%"),

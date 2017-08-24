@@ -12,7 +12,7 @@ public abstract class TableCell {
 	
 	public abstract Element makeCell();
 	
-	protected final Set<String> cellClasses = Sets.newHashSet();
+	protected final Set<String> cellClasses = Sets.newHashSet(FhirCSS.TREE_CELL);
 	
 	public TableCell() {
 		this(false, false, false);

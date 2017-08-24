@@ -7,10 +7,10 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Text;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.ResourceInfo;
-import uk.nhs.fhir.data.ResourceInfoType;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
@@ -34,53 +34,41 @@ public class ValueWithInfoCell extends TableCell {
 	public Element makeCell() {
 		List<Content> valueDataNodes = Lists.newArrayList();
 		if (!value.isEmpty()) {
-			valueDataNodes.add(new Text(StringUtil.capitaliseLowerCase(value)));
-		}
-		for (ResourceInfo resourceInfo : resourceInfos) {
-			if (!valueDataNodes.isEmpty()) {
-				valueDataNodes.add(new Element("br"));
-			}
-			valueDataNodes.addAll(nodesForResourceFlag(resourceInfo));
+			valueDataNodes.add(
+				Elements.withAttributeAndText("div", 
+					new Attribute("class", FhirCSS.INFO_NAME_BOLD), 
+					StringUtil.capitaliseLowerCase(value)));
 		}
 		
-		return Elements.withAttributeAndChildren("td", new Attribute("class", FhirCSS.RESOURCE_INFO_CELL), valueDataNodes);
+		
+		
+		for (ResourceInfo resourceInfo : resourceInfos) {
+			List<Content> resourceInfoContent = Lists.newArrayList();
+			resourceInfoContent.add(new Text(getDisplayName(resourceInfo)));
+			resourceInfoContent.addAll(getResourceInfoContents(resourceInfo));
+			
+			valueDataNodes.add(
+				Elements.withAttributeAndChildren("div", 
+					new Attribute("class", String.join(" ", FhirCSS.INDENT_WRAPPED_TEXT, FhirCSS.INFO_PLAIN)), 
+					resourceInfoContent));
+		}
+		
+		return Elements.withAttributeAndChildren("td", 
+			new Attribute("class", FhirCSS.RESOURCE_INFO_CELL), 
+			valueDataNodes);
 	}
 	
-	private List<Content> nodesForResourceFlag(ResourceInfo resourceInfo) {
-		List<Content> constraintInfoNodes = Lists.newArrayList();
-		
-		ResourceInfoType type = resourceInfo.getType();
-		boolean useTidyStyle = useTidyStyle(type);
-		String nameClass = useTidyStyle ?
-			FhirCSS.INFO_NAME_BOLD :
-			FhirCSS.INFO_NAME_BLOCK;
-		
-		// The tidy style doesn't have a box around the title, so needs a colon to separate it from the content
+	private String getDisplayName(ResourceInfo resourceInfo) {
 		String name = resourceInfo.getName();
-		if (useTidyStyle) {
-			name += ": ";
-		}
-		constraintInfoNodes.add(
-			Elements.withAttributeAndText("span", 
-				new Attribute("class", nameClass),
-				name));
 		
-		List<Content> resourceInfoText = getResourceInfoContents(resourceInfo);
-		
-		if (useTidyStyle) {
-			constraintInfoNodes.add(
-				Elements.withAttributeAndChildren("span",
-					new Attribute("class", FhirCSS.TEXT_ITALIC),
-					resourceInfoText));
-		} else {
-			constraintInfoNodes.addAll(resourceInfoText);
+		String qualifier = resourceInfo.getQualifier();
+		if (!Strings.isNullOrEmpty(qualifier)) {
+			name += " " + qualifier.toLowerCase();
 		}
 		
-		for (String tag: resourceInfo.getExtraTags()) {
-			constraintInfoNodes.add(getFormattedTag(tag));
-		}
+		name += ": ";
 		
-		return constraintInfoNodes;
+		return name;
 	}
 
 	List<Content> getResourceInfoContents(ResourceInfo resourceInfo) {
@@ -125,60 +113,27 @@ public class ValueWithInfoCell extends TableCell {
 		return constraintInfoText;
 	}
 	
-	private boolean useTidyStyle(ResourceInfoType type) {
-		switch (type) {
-		case SLICING:
-		case EXTENSION_URL:
-		case CONSTRAINT:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	private Content getFormattedTag(String tag) {
-		return 
-			Elements.withAttributeAndText("span", 
-				new Attribute("class", FhirCSS.INFO_TAG_BLOCK),
-				tag);
-	}
-	
 	public static List<CSSStyleBlock> getStyles() {
 		
 		List<CSSStyleBlock> styles = Lists.newArrayList();
-		
-		styles.add(
-			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK, "." + FhirCSS.INFO_TAG_BLOCK),
-				Lists.newArrayList(
-					new CSSRule(CSSTag.DISPLAY, "inline"),
-					new CSSRule(CSSTag.COLOR, FhirColour.RESOURCE_INFO_TITLE_BACKGROUND_TEXT),
-					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
-					new CSSRule(CSSTag.FONT_SIZE, "10px"),
-					new CSSRule(CSSTag.PADDING, ".2em .6em .3em"),
-					new CSSRule(CSSTag.TEXT_ALIGN, "center"),
-					new CSSRule(CSSTag.VERTICAL_ALIGN, "baseline"),
-					new CSSRule(CSSTag.WHITE_SPACE, "nowrap"),
-					new CSSRule(CSSTag.LINE_HEIGHT, "2em"),
-					new CSSRule(CSSTag.BORDER_RADIUS, ".25em"))));
-		
-		styles.add(
-			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.INFO_NAME_BLOCK),
-				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.RESOURCE_INFO_TITLE_BACKGROUND))));
-		
-		styles.add(
-			new CSSStyleBlock(
-				Lists.newArrayList("." + FhirCSS.INFO_TAG_BLOCK),
-				Lists.newArrayList(new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.RESOURCE_INFO_ADDITIONAL_BACKGROUND))));
-		
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.INFO_NAME_BOLD),
-				Lists.newArrayList(new CSSRule(CSSTag.FONT_WEIGHT, "bold"))));
-		
+				Lists.newArrayList(
+					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+					new CSSRule(CSSTag.COLOR, FhirColour.DATA_TITLE))));
+
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TEXT_ITALIC),
-				Lists.newArrayList(new CSSRule(CSSTag.FONT_STYLE, "italic"))));
+				Lists.newArrayList(
+					new CSSRule(CSSTag.FONT_STYLE, "italic"),
+					new CSSRule(CSSTag.COLOR, FhirColour.DATA_VALUE))));
+		
+		styles.add(
+				new CSSStyleBlock(
+					Lists.newArrayList("." + FhirCSS.INFO_PLAIN),
+					Lists.newArrayList(new CSSRule(CSSTag.COLOR, FhirColour.DATA_VALUE))));
 		
 		styles.add(
 			new CSSStyleBlock(
@@ -186,6 +141,14 @@ public class ValueWithInfoCell extends TableCell {
 				Lists.newArrayList(
 					new CSSRule(CSSTag.PADDING, "5px 4px"),
 					new CSSRule(CSSTag.BORDER_BOTTOM, "1px solid " + FhirColour.TREE_INFO_DIVIDER))));
+		
+		// styles hack to cause wrapped text to be indented
+		styles.add(
+			new CSSStyleBlock(
+				Lists.newArrayList("." + FhirCSS.INDENT_WRAPPED_TEXT),
+				Lists.newArrayList(
+					new CSSRule(CSSTag.MARGIN_LEFT, "3em"),
+					new CSSRule(CSSTag.TEXT_INDENT, "-3em"))));
 		
 		return styles;
 	}

@@ -59,11 +59,11 @@ public class FhirTreeTable {
 	
 	private List<TableTitle> getColumns() {
 		return Lists.newArrayList(
-			new TableTitle("Name", "The logical name of the element", "30%"),
+			new TableTitle("Name", "The logical name of the element", "25%"),
 			new TableTitle("Flags", "Features of the element", "5%", "60px"),
 			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "5%", "40px"),
-			new TableTitle("Type", "Reference to the type of the element", "20%", "80px"),
-			new TableTitle("Description/Constraints", "Additional information about the element", "40%")
+			new TableTitle("Type", "Reference to the type of the element", "15%", "80px"),
+			new TableTitle("Description/Constraints", "Additional information about the element", "50%")
 		);
 	}
 	
@@ -142,7 +142,9 @@ public class FhirTreeTable {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
 		
 		for (ConstraintInfo constraint : node.getConstraints()) {
-			resourceInfos.add(new ResourceInfo(constraint.getKey(), constraint.getDescription(), ResourceInfoType.CONSTRAINT));
+			ResourceInfo constraintResourceInfo = new ResourceInfo("Constraint", constraint.getDescription(), ResourceInfoType.CONSTRAINT);
+			constraintResourceInfo.setQualifier("(" + constraint.getKey() + ")");
+			resourceInfos.add(constraintResourceInfo);
 		}
 		
 		// slicing
@@ -304,13 +306,19 @@ public class FhirTreeTable {
 					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"),
 					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					new CSSRule(CSSTag.BORDER_STYLE, "none"))));
-		
+
 		styles.add(
 			new CSSStyleBlock(
 				Lists.newArrayList("." + FhirCSS.TREE_ICONS, "." + FhirCSS.TREE_ICONS + " img", "." + FhirCSS.TABLE),
 				Lists.newArrayList(
 					new CSSRule(CSSTag._WEBKIT_BORDER_HORIZONTAL_SPACING, "0"),
 					new CSSRule(CSSTag._WEBKIT_BORDER_VERTICAL_SPACING, "0"))));
+		
+		styles.add(
+				new CSSStyleBlock(
+					Lists.newArrayList("." + FhirCSS.TREE_CELL),
+					Lists.newArrayList(
+						new CSSRule(CSSTag.PADDING, "5px 4px"))));
 		
 		return styles;
 	}

@@ -1,10 +1,8 @@
 package uk.nhs.fhir.data;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.url.FhirURL;
 
@@ -12,7 +10,7 @@ public class ResourceInfo {
 	private final String constraintName;
 	private final Optional<String> description;
 	private final Optional<FhirURL> descriptionLink;
-	private final List<String> extraTags= Lists.newArrayList();
+	private String qualifier = "";
 	private final boolean textualLink;
 	
 	private final ResourceInfoType type;
@@ -47,8 +45,8 @@ public class ResourceInfo {
 		this.textualLink = textualLink;
 	}
 	
-	public void addExtraTag(String tag) {
-		extraTags.add(tag);
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
 	}
 	
 	public String getName() {
@@ -63,8 +61,8 @@ public class ResourceInfo {
 		return descriptionLink;
 	}
 	
-	public List<String> getExtraTags() {
-		return extraTags;
+	public String getQualifier() {
+		return qualifier ;
 	}
 	
 	public ResourceInfoType getType() {

@@ -7,6 +7,7 @@ public interface CSSTag {
 	public static final String BACKGROUND_COLOR = "background-color";
 	
 	public static final String MARGIN = "margin";
+	public static final String MARGIN_LEFT = "margin-left";
 	public static final String MARGIN_TOP = "margin-top";
 	public static final String MARGIN_BOTTOM = "margin-bottom";
 	
@@ -44,6 +45,7 @@ public interface CSSTag {
 	public static final String COLOR = "color";
 	public static final String OPACITY = "opacity";
 	
+	public static final String TEXT_INDENT = "text-indent";
 	public static final String WHITE_SPACE = "white-space";
 	public static final String WORD_WRAP = "word-wrap";
 	public static final String TEXT_ALIGN = "text-align";

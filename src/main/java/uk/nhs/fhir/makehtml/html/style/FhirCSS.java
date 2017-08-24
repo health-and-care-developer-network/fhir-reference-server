@@ -14,10 +14,13 @@ public interface FhirCSS {
 	public static final String LINK = "fhir-link";
 	public static final String RESOURCE_FLAG = "fhir-resource-flag";
 	public static final String LIST = "fhir-list";
-	
+
+	public static final String TREE_CELL = "fhir-tree-cell";
 	public static final String TREE_ICON = "fhir-tree-icon";
 	public static final String TREE_ICONS = "fhir-tree-icons";
 	public static final String TREE_RESOURCE_ICON = "fhir-tree-resource-icon";
+	
+	public static final String INDENT_WRAPPED_TEXT = "fhir-indent-wrapped-text";
 	
 	public static final String DATA_CELL = "fhir-data-cell";
 	public static final String DATA_LABEL = "fhir-data-label";
@@ -32,8 +35,7 @@ public interface FhirCSS {
 	
 	public static final String RESOURCE_INFO_CELL = "fhir-resource-info-cell";
 	public static final String INFO_NAME_BOLD = "fhir-info-name-bold";
-	public static final String INFO_NAME_BLOCK = "fhir-info-name-block";
-	public static final String INFO_TAG_BLOCK = "fhir-info-tag-block";
+	public static final String INFO_PLAIN = "fhir-info-plain";
 	
 	public static final String DETAILS_HEADER_ROW = "fhir-details-header-row";
 	public static final String DETAILS_HEADER_CELL = "fhir-details-header-cell";

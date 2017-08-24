@@ -29,6 +29,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
+import uk.nhs.fhir.makehtml.html.style.FhirFont;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
@@ -146,7 +147,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_ROW),
 				Lists.newArrayList(
 					new CSSRule(CSSTag.FONT_SIZE, "12px"),
-					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.DETAILS_HEADER),
 					new CSSRule(CSSTag.PADDING, "3px"),
 					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					
@@ -161,7 +162,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 				Lists.newArrayList("." + FhirCSS.DETAILS_DATA_ROW, "." + FhirCSS.DETAILS_DATA_CELL),
 				Lists.newArrayList(
 					new CSSRule(CSSTag.PADDING, "3px"),
-					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.DETAILS_DATA),
 					new CSSRule(CSSTag.FONT_SIZE, "11px"),
 					new CSSRule(CSSTag.LINE_HEIGHT, "1.2em"),
 					new CSSRule(CSSTag.FONT_WEIGHT, "normal"),
@@ -173,7 +174,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 				Lists.newArrayList("." + FhirCSS.DETAILS_HEADER_CELL),
 				Lists.newArrayList(
 					new CSSRule(CSSTag.FONT_SIZE, "12px"),
-					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.DETAILS_HEADER),
 					new CSSRule(CSSTag.PADDING, "3px"),
 					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					

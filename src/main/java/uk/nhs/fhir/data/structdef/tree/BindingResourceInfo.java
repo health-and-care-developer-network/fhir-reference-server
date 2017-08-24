@@ -15,6 +15,6 @@ public class BindingResourceInfo extends ResourceInfo {
 
 	public BindingResourceInfo(Optional<String> description, Optional<FhirURL> url, String strength) {
 		super("Binding", description, url, ResourceInfoType.BINDING, url.isPresent() && FhirURL.isLogicalUrl(url.get().toFullString()));
-		addExtraTag("Strength: " + strength);
+		setQualifier("(" + strength + ")");
 	}
 }

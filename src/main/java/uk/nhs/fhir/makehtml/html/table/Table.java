@@ -15,6 +15,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
+import uk.nhs.fhir.makehtml.html.style.FhirFont;
 
 public class Table {
 	private final List<TableTitle> cols = Lists.newArrayList();
@@ -97,13 +98,19 @@ public class Table {
 			new CSSStyleBlock(Lists.newArrayList("tr", "." + FhirCSS.TABLE_TITLE), 
 				Lists.newArrayList(
 					new CSSRule(CSSTag.FONT_SIZE, "11px"),
-					new CSSRule(CSSTag.FONT_FAMILY, "verdana"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.TABLE_HEADER),
 					new CSSRule(CSSTag.VERTICAL_ALIGN, "top"),
 					new CSSRule(CSSTag.BORDER, "0"))));
 		
-		styles.add(new CSSStyleBlock(Lists.newArrayList("td", "." + FhirCSS.TABLE_TITLE), 
-			Lists.newArrayList(
-				new CSSRule(CSSTag.PADDING, "0px 4px"))));
+		styles.add(
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.TABLE_TITLE), 
+				Lists.newArrayList(
+					new CSSRule(CSSTag.PADDING, "0px 4px"))));
+
+		styles.add(
+			new CSSStyleBlock(Lists.newArrayList("td"), 
+				Lists.newArrayList(
+					new CSSRule(CSSTag.PADDING, "5px 4px"))));
 		
 		styles.add(
 			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL_HEADING_BOX), 
@@ -144,7 +151,7 @@ public class Table {
 			new CSSStyleBlock(Lists.newArrayList("table"), 
 				Lists.newArrayList(
 					new CSSRule(CSSTag.WIDTH, "100%"),
-					new CSSRule(CSSTag.FONT_FAMILY, "sans-serif"),
+					new CSSRule(CSSTag.FONT_FAMILY, FhirFont.TABLE_BODY),
 					new CSSRule(CSSTag.BORDER_COLLAPSE, "collapse"))));
 
 		styles.add(new CSSStyleBlock(
