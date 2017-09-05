@@ -17,6 +17,7 @@ import uk.nhs.fhir.data.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
@@ -28,8 +29,8 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionMetadataFormatter extends TableFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource) {
-		super(wrappedResource);
+	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 	public Element getMetadataTable(WrappedStructureDefinition structureDefinition) {
 		
 		String name = structureDefinition.getName();
-		String url = structureDefinition.getUrl();
+		String url = structureDefinition.getUrl().get();
 		String kind = structureDefinition.getKind();
 		
 		String status = structureDefinition.getStatus();

@@ -18,10 +18,11 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.prep.ResourcePreparerv2;
+import uk.nhs.fhir.makehtml.prep.ResourcePreparer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
@@ -36,6 +37,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	public abstract IBaseMetaType getSourceMeta();
 	public abstract FhirVersion getImplicitFhirVersion();
 	public abstract String getOutputFolderName();
+	public abstract Optional<String> getUrl();
 	public abstract void setUrl(String url);
 	
 	// Name as used in the resource's URL
@@ -50,8 +52,8 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	 * Returns the formatter which will be used to generate the <Text/> section in the profile when supplied as a raw profile
 	 * rather than as a web page for a browser.
 	 */
-	public abstract ResourceFormatter<T> getDefaultViewFormatter();
-	public abstract List<FormattedOutputSpec<T>> getFormatSpecs(String outputDirectory);
+	public abstract ResourceFormatter<T> getDefaultViewFormatter(FhirFileRegistry otherResources);
+	public abstract List<FormattedOutputSpec<T>> getFormatSpecs(String outputDirectory, FhirFileRegistry otherResources);
 
 	public boolean isDstu2() {
 		return getImplicitFhirVersion().equals(FhirVersion.DSTU2);
@@ -117,7 +119,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}
 	}
-	public void saveAugmentedResource(File inFile, WrappedResource<?> parsedResource, String outPath, String newBaseURL) throws Exception {
+	public void saveAugmentedResource(File inFile, WrappedResource<?> parsedResource, String outPath, String newBaseURL, FhirFileRegistry registry) throws Exception {
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 	    String outputDirectoryName = getOutputFolderName();
 	    String outDirPath = outPath + outputDirectoryName; 
@@ -126,11 +128,11 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		String outFilePath = outDirPath + File.separatorChar + inFile.getName();
 		System.out.println("Generating " + outFilePath);
 	    
-	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL);
+	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL, registry);
 	}
 	
-	public void augmentAndWriteResource(WrappedResource<?> parsedResource, String outFilePath, String newBaseURL) throws Exception {
-		ResourceFormatter<T> defaultViewFormatter = getDefaultViewFormatter();
+	public void augmentAndWriteResource(WrappedResource<?> parsedResource, String outFilePath, String newBaseURL, FhirFileRegistry registry) throws Exception {
+		ResourceFormatter<T> defaultViewFormatter = getDefaultViewFormatter(registry);
 		
 		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML();
 		SectionedHTMLDoc defaultView = new SectionedHTMLDoc();
@@ -142,7 +144,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		    
 	    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
 	    
-        String augmentedResource = new ResourcePreparerv2(parsedResource).prepareAndSerialise(renderedTextSection, newBaseURL);
+        String augmentedResource = new ResourcePreparer(parsedResource).prepareAndSerialise(renderedTextSection, newBaseURL);
         FileUtils.writeFile(outFilePath, augmentedResource.getBytes("UTF-8"));
 	}
 	

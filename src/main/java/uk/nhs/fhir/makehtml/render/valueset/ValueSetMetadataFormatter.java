@@ -7,23 +7,32 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.data.codesystem.FhirIdentifier;
+import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
+import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 
-	public ValueSetMetadataFormatter(WrappedValueSet valueSet) {
-		super(valueSet);
+	public ValueSetMetadataFormatter(WrappedValueSet valueSet, FhirFileRegistry otherResources) {
+		super(valueSet, otherResources);
 	}
 	
 	@Override
@@ -32,11 +41,15 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 		
 		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
+
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
+		LinkCell.getStyles().forEach(section::addStyle);
 		
 		return section;
 	}
 
-	public Element getMetadataTable(WrappedValueSet source) {
+	private Element getMetadataTable(WrappedValueSet source) {
 		Optional<String>  url = source.getUrl();
 		String  name = source.getName();
 
@@ -58,6 +71,7 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 		
 		Optional<String> description = source.getDescription();
 		Optional<String> publisher = source.getPublisher();
+		List<FhirContacts> publishingOrgContacts = source.getContacts();
 		Optional<String> copyright = source.getCopyright();
 
 		Optional<String> requirement = source.getRequirements();
@@ -73,6 +87,20 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
             if (lastUpdated != null)
             displayDate = Optional.of(StringUtil.dateToString(lastUpdated));
         }
+        
+        Optional<Boolean> isExperimental = source.getExperimental();
+        String experimental = isExperimental.isPresent() ? isExperimental.get().toString() : BLANK;
+        
+        String identifierSystem = BLANK;
+		String identifierType = BLANK;
+		List<FhirIdentifier> identifiers = source.getIdentifiers();
+		if (identifiers.size() > 1) {
+			throw new IllegalStateException("Display multiple ValueSet identifiers");
+		}
+		for (FhirIdentifier identifier : identifiers) {
+			identifierSystem = identifier.getSystem().orElse(BLANK);
+			identifierType = identifier.getValue().orElse(BLANK);
+		}
 
         Element colgroup = Elements.newElement("colgroup");
         int columns = 4;
@@ -94,10 +122,21 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 				labelledValueCell("URL", url.get(), 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-					labelledValueCell("Version", version, 1),
-					labelledValueCell("Status", status, 1),
-					labelledValueCell("Last updated", displayDate, 2)));
+				labelledValueCell("Version", version, 1),
+				labelledValueCell("Status", status, 1),
+				labelledValueCell("Last updated", displayDate, 1),
+				labelledValueCell("Experimental", experimental, 1)));
 
+		if (!Strings.isNullOrEmpty(identifierSystem)
+		  || !Strings.isNullOrEmpty(identifierType)) {
+			tableContent.add(
+				Elements.withChildren("tr",
+					labelledValueCell("Identifier system", identifierSystem, 1, true),
+					labelledValueCell("Identifier", identifierType, 1, true),
+					TableCell.empty().makeCell(),
+					TableCell.empty().makeCell()));
+		}
+		
 		if (description.isPresent()) {
 			tableContent.add(
 				Elements.withChildren("tr",
@@ -114,6 +153,12 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
                 Elements.withChildren("tr",
                     labelledValueCell("Publisher", publisher.get(), 4)));
         }
+		if (!publishingOrgContacts.isEmpty()) {
+			List<Content> renderedPublishingOrgContacts = new FhirContactRenderer().getPublishingOrgContactsContents(publishingOrgContacts);
+			tableContent.add(
+				Elements.withChild("tr", 
+					cell(renderedPublishingOrgContacts, 4)));
+		}
         if (copyright.isPresent()) {
             tableContent.add(
                     Elements.withChildren("tr",
@@ -132,8 +177,6 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 							labelledValueCell("OID", OID.get(), 4, true)
 					));
 		}
-
-		
 
 		Element table = 
 			Elements.withAttributeAndChildren("table",

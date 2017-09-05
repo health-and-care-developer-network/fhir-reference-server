@@ -16,7 +16,7 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +27,6 @@ import uk.nhs.fhir.data.url.UrlValidator;
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain {
-    private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
 
 	// Set on startup. Path to folder containing extension files.
@@ -45,12 +44,6 @@ public class NewMain {
 	
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static final boolean TEST_LINK_URLS = false;
-
-	private final FilenameFilter xmlFileFilter = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith(fileExtension);
-        }
-    };
 	
     private final File inputDirectory;
     private final String outPath;
@@ -103,10 +96,14 @@ public class NewMain {
      * @param directoryPath
      */
     private void process() {
+    	List<File> potentialFhirFiles = new XmlFileFinder(inputDirectory).findFiles();
+    	
+    	FhirFileRegistry fhirFileRegistry = cacheParsedFhirFiles(potentialFhirFiles);
 
-        FileProcessor fileProcessor = new FileProcessor();
+        FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
-	        for (File xmlFile : inputDirectory.listFiles(xmlFileFilter)) {
+        	
+	        for (File xmlFile : potentialFhirFiles) {
 	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, xmlFile);
 	        }
 	        
@@ -118,4 +115,14 @@ public class NewMain {
         	e.printStackTrace();
         }
     }
+
+	private FhirFileRegistry cacheParsedFhirFiles(List<File> potentialFhirFiles) {
+		FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
+		
+		for (File xmlFile : potentialFhirFiles) {
+			fhirFileRegistry.register(xmlFile);
+		}
+		
+		return fhirFileRegistry;
+	}
 }

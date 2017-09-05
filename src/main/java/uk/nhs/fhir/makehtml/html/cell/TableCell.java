@@ -9,7 +9,13 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 
 public abstract class TableCell {
-	
+
+	public static final String ZERO_WIDTH_CHARACTER = "&#8203;";
+	private static final TableCell EMPTY_CELL = new SimpleTextCell(ZERO_WIDTH_CHARACTER, true);
+	public static TableCell empty() {
+		return EMPTY_CELL;
+	}
+			
 	public abstract Element makeCell();
 	
 	protected final Set<String> cellClasses = Sets.newHashSet(FhirCSS.TREE_CELL);

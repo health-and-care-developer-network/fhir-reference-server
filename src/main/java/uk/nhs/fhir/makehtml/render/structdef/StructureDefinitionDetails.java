@@ -215,7 +215,7 @@ public class StructureDefinitionDetails {
 	}
 	
 	private Element linkCell(LinkDatas linkDatas) {
-		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet(), false, false).makeCell();
+		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet()).makeCell();
 	}
 
 	private void addListDataIfPresent(List<Element> tableContent, String label, List<String> listData) {

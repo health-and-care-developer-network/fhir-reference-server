@@ -2,10 +2,10 @@ package uk.nhs.fhir.makehtml.prep;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
 
-public class ResourcePreparerv2 {
+public class ResourcePreparer {
 	private final WrappedResource<?> resource;
 	
-	public ResourcePreparerv2(WrappedResource<?> resource) {
+	public ResourcePreparer(WrappedResource<?> resource) {
 		this.resource = resource;
 	}
 	

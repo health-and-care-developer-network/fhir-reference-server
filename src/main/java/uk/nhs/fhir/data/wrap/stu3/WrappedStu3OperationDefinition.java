@@ -167,6 +167,11 @@ private final OperationDefinition definition;
 	}
 
 	@Override
+	public Optional<String> getUrl() {
+		return Optional.ofNullable(definition.getUrl());
+	}
+
+	@Override
 	public void setUrl(String url) {
 		definition.setUrl(url);
 	}

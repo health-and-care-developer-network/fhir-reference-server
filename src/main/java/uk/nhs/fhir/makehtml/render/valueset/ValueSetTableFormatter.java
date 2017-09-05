@@ -1,131 +1,53 @@
 package uk.nhs.fhir.makehtml.render.valueset;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Text;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
-import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
-import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
-import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
-import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.url.FullFhirURL;
-import uk.nhs.fhir.data.url.UrlValidator;
-import uk.nhs.fhir.data.url.ValuesetLinkFix;
-import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
-import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeConcept;
-import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
-import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.html.jdom2.Elements;
-import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
-import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
-import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
 public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
-
-	public ValueSetTableFormatter(WrappedValueSet wrappedResource) {
-		super(wrappedResource);
-		
-		List<WrappedConceptMap> conceptMaps = wrappedResource.getConceptMaps();
-		if (!conceptMaps.isEmpty()) {
-			conceptMap = conceptMaps.get(0);
-		}
+	
+	public ValueSetTableFormatter(WrappedValueSet wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
-	private static final String BLANK = "";
+	//private static final String BLANK = "";
 
-    private WrappedConceptMap conceptMap = null;
+    //private WrappedConceptMap conceptMap = null;
 	
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
-		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getConceptDataTable(wrappedResource);
+		boolean filterPresent = wrappedResource.hasComposeIncludeFilter();
+		if (filterPresent) {
+			return new FilteredValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		} else {
+			return new ConceptsValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		}
+		
+		/*HTMLDocSection section = new HTMLDocSection();
+		
+		Element metadataPanel = getConceptDataTable();
 		section.addBodyElement(metadataPanel);
 		
-		return section;
-	}
-
-	public Element getConceptDataTable(WrappedValueSet source) {
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
+		LinkCell.getStyles().forEach(section::addStyle);
+		ValueWithInfoCell.getStyles().forEach(section::addStyle);
+		TableFormatter.getStyles().forEach(section::addStyle);
 		
-		int columns = source.getConceptMaps().size() > 0 ? 5 : 4;
-        boolean filterPresent = source.hasComposeIncludeFilter();
-
-        Element colgroup = Elements.newElement("colgroup");
-
-        Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
-
-        int percentPerColumn = 100/columns;
-
-        // Display when ConceptMap present
-        if (columns == 5) {
-            percentPerColumn = 10;
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-
-        }
-        else if (!filterPresent && columns == 4)
-        {
-            // Basic list of codes
-
-            percentPerColumn = 10;
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(4 * percentPerColumn) + "%"))));
-        } else {
-            for (int i = 0; i < columns; i++) {
-                colgroup.addContent(
-                        Elements.withAttributes("col",
-                                Lists.newArrayList(
-                                        new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
-            }
-        }
-
-        List<Element> tableContent = Lists.newArrayList(colgroup);
+		return section;*/
+	}
+	
+	/*private Element getConceptDataTable() {
+		
+		
+		FhirValueSetCompose compose = wrappedResource.getCompose();
 
         Boolean first = true;
-        Optional<FhirCodeSystemConcepts> codeSystem = source.getCodeSystem();
+        Optional<FhirCodeSystemConcepts> codeSystem = wrappedResource.getCodeSystem();
         if (codeSystem.isPresent()) {
 			String system = codeSystem.get().getSystem();
 	        
@@ -144,7 +66,8 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 	        }
         }
 
-		for (String uri :source.getCompose().getImportUris()) {
+
+		for (String uri :compose.getImportUris()) {
             if (first)
             {
                 tableContent.add(
@@ -161,13 +84,13 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
                             labelledValueCell(BLANK, uri, 1, true),
                             labelledValueCell(BLANK, "", 1, true, true, false),
                             labelledValueCell(BLANK, "", 1, true, true, false)));
-        }
+        }*/
         /*
 
         Include from an External CodeSystem
 
          */
-		for (FhirValueSetComposeInclude include: source.getCompose().getIncludes()) {
+		/*for (FhirValueSetComposeInclude include: compose.getIncludes()) {
 
 
             Boolean filterFirst = true;
@@ -192,7 +115,7 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
             }
             
             Boolean composeFirst = true;
-			for (FhirValueSetComposeIncludeConcept concept : include.getConcepts()) {
+			for (FhirCodeSystemConcept concept : include.getConcepts()) {
 
 				boolean hasSystem = (include.getSystem() != null);
 				
@@ -215,13 +138,13 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
             }
 
-		}
+		}*/
 		/*
 
         Exclude from External CodeSystem
 
          */
-        for (FhirValueSetComposeInclude exclude: source.getCompose().getExcludes()) {
+        /*for (FhirValueSetComposeInclude exclude: compose.getExcludes()) {
 
 
             if (exclude.getSystem() != null) {
@@ -233,7 +156,7 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
                                 labelledValueCell("Version", displayVersion, 2, true)));
             }
 
-            for (FhirValueSetComposeIncludeConcept concept : exclude.getConcepts()) {
+            for (FhirCodeSystemConcept concept : exclude.getConcepts()) {
                 String description = concept.getDescription().orElse(BLANK);
 
                 if (first) {
@@ -259,8 +182,8 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
 		return panel.makePanel();
 	}
-	
-    private String getConceptMapping(String code) {
+
+	private String getConceptMapping(String code) {
         String mapping = BLANK;
         if (conceptMap != null) {
             for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
@@ -435,5 +358,5 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
                 new Attribute("class", fhirMetadataClass),
                 value);
 		}
-	}
+	}*/
 }

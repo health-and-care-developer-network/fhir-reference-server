@@ -29,20 +29,20 @@ public class LinkCell extends TableCell {
 		this(linkDatas, Sets.newHashSet(), Sets.newHashSet());
 	}
 	
-	public LinkCell(LinkDatas linkDatas, boolean faded) {
-		this(linkDatas, faded, false);
+	public LinkCell(LinkDatas linkDatas, boolean bordered) {
+		this(linkDatas, false, false, bordered);
 	}
 	
 	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses) {
-		this(linkDatas, cellClasses, linkClasses, false, false);
+		this(linkDatas, cellClasses, linkClasses, false, false, false);
 	}
 
-	public LinkCell(LinkDatas linkDatas, boolean faded, boolean strikethrough) {
-		this(linkDatas, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough);
+	public LinkCell(LinkDatas linkDatas, boolean faded, boolean strikethrough, boolean bordered) {
+		this(linkDatas, Sets.newHashSet(), Sets.newHashSet(), faded, strikethrough, bordered);
 	}
 	
-	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough) {
-		super(false, faded, strikethrough);
+	public LinkCell(LinkDatas linkDatas, Set<String> cellClasses, Set<String> linkClasses, boolean faded, boolean strikethrough, boolean bordered) {
+		super(bordered, faded, strikethrough);
 		this.linkDatas = linkDatas;
 		this.cellClasses.addAll(cellClasses);
 		this.linkClasses = linkClasses;

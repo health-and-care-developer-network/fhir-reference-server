@@ -5,10 +5,10 @@ import java.util.List;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemFilter;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
@@ -17,8 +17,8 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
 public class CodeSystemFiltersTableFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemFiltersTableFormatter(WrappedCodeSystem wrappedResource) {
-		super(wrappedResource);
+	public CodeSystemFiltersTableFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class CodeSystemFiltersTableFormatter extends TableFormatter<WrappedCodeS
 		List<TableRow> tableRows = Lists.newArrayList();
 		rows.forEach(data -> tableRows.add(rowFormatter.formatRow(data)));
 		
-		Element filtersTable = new Table(tableData.getColumns(), tableRows, Sets.newHashSet()).makeTable();
+		Element filtersTable = new Table(tableData.getColumns(), tableRows).makeTable();
 		return new FhirPanel("Available Filters", filtersTable).makePanel();
 	}
 

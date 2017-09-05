@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import com.google.common.collect.Lists;
+
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
@@ -18,11 +21,12 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeConcept;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeFilter;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
+import uk.nhs.fhir.data.codesystem.FhirIdentifier;
+import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
-import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeConcept;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
@@ -58,6 +62,18 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	@Override
 	public String getName() {
 		return definition.getName();
+	}
+
+	@Override
+	public List<FhirIdentifier> getIdentifiers() {
+		List<FhirIdentifier> identifiers = Lists.newArrayList();
+		
+		IdentifierDt identifier = definition.getIdentifier();
+		if (identifier != null) {
+			identifiers.add(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
+		}
+
+		return identifiers;
 	}
 
 	@Override
@@ -163,6 +179,11 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	}
 
 	@Override
+	public Optional<Boolean> getExperimental() {
+		return Optional.ofNullable(definition.getExperimentalElement().getValue());
+	}
+
+	@Override
 	public boolean hasComposeIncludeFilter() {
 		return 
 			definition
@@ -177,6 +198,8 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 		CodeSystem sourceCodeSystem = definition.getCodeSystem();
 		
 		String sourceCodeSystemSystem = sourceCodeSystem.getSystem();
+		
+		
 		
 		FhirCodeSystemConcepts codeSystem = new FhirCodeSystemConcepts(sourceCodeSystemSystem);
 		
@@ -203,6 +226,11 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 		return compose;
 	}
 
+	@Override
+	public List<FhirContacts> getContacts() {
+		return new Dstu2FhirContactConverter().convertList(definition.getContact());
+	}
+
 	private FhirValueSetComposeInclude convertInclude(ComposeInclude sourceInclude) {
 		String system = sourceInclude.getSystem();
 		String version = sourceInclude.getVersion();
@@ -222,7 +250,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 			String code = sourceConcept.getCode();
 			String description = sourceConcept.getDisplay();
 
-			FhirValueSetComposeIncludeConcept concept = new FhirValueSetComposeIncludeConcept(code, description);
+			FhirCodeSystemConcept concept = new FhirCodeSystemConcept(code, description, null);
 			include.addConcept(concept);
 		}
 		

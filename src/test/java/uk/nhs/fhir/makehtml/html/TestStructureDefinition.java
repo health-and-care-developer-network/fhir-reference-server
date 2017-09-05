@@ -50,7 +50,7 @@ public class TestStructureDefinition {
 			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition) WrappedResource.fromBaseResource(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
 			
-			for (FormattedOutputSpec<WrappedStructureDefinition> formatSpec : wrappedStructureDefinition.getFormatSpecs("this/path/isnt/used")) {
+			for (FormattedOutputSpec<WrappedStructureDefinition> formatSpec : wrappedStructureDefinition.getFormatSpecs("this/path/isnt/used", null)) {
 				ResourceFormatter<WrappedStructureDefinition> formatter = formatSpec.getFormatter();
 				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {

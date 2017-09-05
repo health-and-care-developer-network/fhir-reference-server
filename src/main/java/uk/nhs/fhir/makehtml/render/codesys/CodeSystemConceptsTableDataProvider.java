@@ -18,52 +18,40 @@ public class CodeSystemConceptsTableDataProvider {
 	}
 
 	public List<TableTitle> getColumns() {
+		
+		int codePercent = 100;
+		int descriptionPercent = 0;
+		int definitionPercent = 0;
 
 		List<CodeSystemConceptTableRowData> rows = getRows();
-		boolean includeDescriptionColumn = includeDescriptionColumn(rows);
-		boolean includeDefinitionColumn = includeDefinitionColumn(rows);
 		
-		int columnsCount = 1;
-		if (includeDescriptionColumn) {
-			columnsCount++;
+		if (includeDescriptionColumn(rows)) {
+			if (codePercent > 25) {
+				descriptionPercent = codePercent - 25;
+				codePercent = 25;
+			}
 		}
-		if (includeDefinitionColumn) {
-			columnsCount++;
+		
+		if (includeDefinitionColumn(rows)) {
+			if (codePercent > 25) {
+				definitionPercent = codePercent - 25;
+				codePercent = 25;
+			} else if (descriptionPercent > 25) {
+				definitionPercent = descriptionPercent - 25;
+				descriptionPercent = 25;
+			}
 		}
 		
 		List<TableTitle> columns = Lists.newArrayList();
 		
-		String codeWidth;
-		String definitionWidth;
-		String descriptionWidth;
-		switch(columnsCount) {
-		case 1:
-			codeWidth = "100%";
-			definitionWidth = "0%";
-			descriptionWidth = "0%";
-			break;
-		case 2:
-			codeWidth = "20%";
-			definitionWidth = "80%";
-			descriptionWidth = "80%";
-			break;
-		case 3:
-			codeWidth = "20%";
-			definitionWidth = "40%";
-			descriptionWidth = "40%";
-			break;
-		default:
-			throw new IllegalStateException("Didn't expect " + columnsCount + " columns");
-		}
-		
-		columns.add(new TableTitle("Code", "Code that identifies the concept.", codeWidth));
+		columns.add(new TableTitle("Code", "Code that identifies the concept.", Integer.toString(codePercent) + "%"));
 
-		if (includeDefinitionColumn) {
-			columns.add(new TableTitle("Description", "User-friendly name", descriptionWidth));
+		if (descriptionPercent > 0) {
+			columns.add(new TableTitle("Description", "User-friendly name", Integer.toString(descriptionPercent) + "%"));
 		}
 		
-		if (includeDefinitionColumn) {
-			columns.add(new TableTitle("Definition", "Formal definition.", definitionWidth));
+		if (definitionPercent > 0) {
+			columns.add(new TableTitle("Definition", "Formal definition.", Integer.toString(definitionPercent) + "%"));
 		}
 		
 		return columns;

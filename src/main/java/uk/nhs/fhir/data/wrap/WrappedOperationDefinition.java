@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.opdef.FhirOperationParameter;
 import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.opdef.OperationDefinitionFormatter;
@@ -13,14 +14,14 @@ import uk.nhs.fhir.makehtml.render.opdef.OperationDefinitionFormatter;
 public abstract class WrappedOperationDefinition extends WrappedResource<WrappedOperationDefinition> {
 
 	@Override
-	public ResourceFormatter<WrappedOperationDefinition> getDefaultViewFormatter() {
-		return new OperationDefinitionFormatter(this);
+	public ResourceFormatter<WrappedOperationDefinition> getDefaultViewFormatter(FhirFileRegistry otherResources) {
+		return new OperationDefinitionFormatter(this, otherResources);
 	}
 
 	@Override
-	public List<FormattedOutputSpec<WrappedOperationDefinition>> getFormatSpecs(String outputDirectory) {
+	public List<FormattedOutputSpec<WrappedOperationDefinition>> getFormatSpecs(String outputDirectory, FhirFileRegistry otherResources) {
 		List<FormattedOutputSpec<WrappedOperationDefinition>> specs = Lists.newArrayList();
-		specs.add(new FormattedOutputSpec<WrappedOperationDefinition>(this, new OperationDefinitionFormatter(this), outputDirectory, "render.html"));
+		specs.add(new FormattedOutputSpec<WrappedOperationDefinition>(this, new OperationDefinitionFormatter(this, otherResources), outputDirectory, "render.html"));
 		return specs;
 	}
 	

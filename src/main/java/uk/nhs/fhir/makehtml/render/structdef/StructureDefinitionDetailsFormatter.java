@@ -21,6 +21,7 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
@@ -36,15 +37,15 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource) {
-		super(wrappedResource);
+	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getDetailsPanel(wrappedResource);
+		Element metadataPanel = getDetailsPanel();
 		section.addBodyElement(metadataPanel);
 
 		getStyles().forEach(section::addStyle);
@@ -56,8 +57,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		return section;
 	}
 
-	private Element getDetailsPanel(WrappedStructureDefinition structureDefinition) {
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+	private Element getDetailsPanel() {
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
@@ -90,7 +91,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, fhirTreeNode.getMappings(), structureDefinition.getImplicitFhirVersion());
+				linkedNodeKey, fhirTreeNode.getMappings(), wrappedResource.getImplicitFhirVersion());
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

@@ -25,7 +25,7 @@ public class OperationDefinitionParameterTableDataProvider {
 		return Lists.newArrayList(
 			new TableTitle("Name", "The logical name of the element", "20%"),
 			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "10%"),
-			new TableTitle("Type", "Reference to the type of the element", "20%x"),
+			new TableTitle("Type", "Reference to the type of the element", "20%"),
 			new TableTitle("Value", "Additional information about the element", "50%")
 		);
 	}

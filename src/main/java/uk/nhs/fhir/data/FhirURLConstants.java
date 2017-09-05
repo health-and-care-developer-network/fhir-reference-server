@@ -32,7 +32,7 @@ public class FhirURLConstants {
 	public static final String HL7_FORMATS = HTTP_HL7_FHIR + "/formats.html";
 	
 	public static final String FHIR_HL7_ORG_UK = "fhir.hl7.org.uk";
-	public static final String HTTP_FHIR_HL7_ORG_UK = "https://" + FHIR_HL7_ORG_UK;
+	public static final String HTTPS_FHIR_HL7_ORG_UK = "https://" + FHIR_HL7_ORG_UK;
 
 	public static final String FHIR_NHS_UK = "https://fhir.nhs.uk";
 	public static final String NHS_ID = FHIR_NHS_UK + "/Id";

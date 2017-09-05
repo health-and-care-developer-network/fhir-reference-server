@@ -11,6 +11,7 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
@@ -19,8 +20,8 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
 public class ConceptMapMetadataFormatter extends TableFormatter<WrappedConceptMap>{
 
-	public ConceptMapMetadataFormatter(WrappedConceptMap conceptMap){
-		super(conceptMap);
+	public ConceptMapMetadataFormatter(WrappedConceptMap conceptMap, FhirFileRegistry otherResources){
+		super(conceptMap, otherResources);
 	}
 
 	@Override

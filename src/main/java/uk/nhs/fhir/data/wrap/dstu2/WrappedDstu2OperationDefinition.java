@@ -187,4 +187,9 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
         textElement.setDiv(textSection);
         definition.setText(textElement);
 	}
+
+	@Override
+	public Optional<String> getUrl() {
+		return Optional.ofNullable(definition.getUrl());
+	}
 }

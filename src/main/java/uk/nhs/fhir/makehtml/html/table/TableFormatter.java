@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
@@ -22,8 +23,8 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
-	public TableFormatter(T wrappedResource) {
-		super(wrappedResource);
+	public TableFormatter(T wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	protected static final String VERSION_DATE = "Version date";

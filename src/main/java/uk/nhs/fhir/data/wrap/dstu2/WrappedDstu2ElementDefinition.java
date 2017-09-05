@@ -41,6 +41,7 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.RendererError;
 import uk.nhs.fhir.util.FhirContexts;
@@ -54,7 +55,8 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	private final ElementDefinitionDt definition;
 
-	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition) {
+	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition, FhirFileRegistry otherResources) {
+		super(otherResources);
 		this.definition = definition;
 	}
 

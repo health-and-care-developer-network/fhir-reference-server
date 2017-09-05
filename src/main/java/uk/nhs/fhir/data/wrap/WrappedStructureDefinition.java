@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionBindingFormatter;
@@ -22,7 +24,6 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract void checkUnimplementedFeatures();
 
 	public abstract String getName();
-	public abstract String getUrl();
 	public abstract String getKind();
 	public abstract String getStatus();
 	public abstract Boolean getAbstract();
@@ -42,38 +43,40 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract List<FhirMapping> getMappings();
 	public abstract List<String> getUseLocationContexts();
 
-	public abstract FhirTreeData getSnapshotTree();
-	public abstract FhirTreeData getDifferentialTree();
+	public abstract FhirTreeData getSnapshotTree(FhirFileRegistry otherResources);
+	public abstract FhirTreeData getDifferentialTree(FhirFileRegistry otherResources);
+	
+	public abstract ExtensionType getExtensionType();
 
 	public abstract boolean missingSnapshot();
 	
 	protected abstract void setCopyright(String updatedCopyRight);
 	
 	@Override
-	public ResourceFormatter<WrappedStructureDefinition> getDefaultViewFormatter() {
-		return new StructureDefinitionSnapshotFormatter(this);
+	public ResourceFormatter<WrappedStructureDefinition> getDefaultViewFormatter(FhirFileRegistry otherResources) {
+		return new StructureDefinitionSnapshotFormatter(this, otherResources);
 	}
 
 	public boolean isExtension() {
 		if (getConstrainedType().isPresent()) {
-			return getConstrainedType().equals("Extension");
+			return getConstrainedType().get().equals("Extension");
 		} else {
 			throw new IllegalStateException("Not sure whether this is an extension - no constrained type present");
 		}
 	}
 	
 	@Override
-	public List<FormattedOutputSpec<WrappedStructureDefinition>> getFormatSpecs(String outputDirectory) {
+	public List<FormattedOutputSpec<WrappedStructureDefinition>> getFormatSpecs(String outputDirectory, FhirFileRegistry otherResources) {
 		List<FormattedOutputSpec<WrappedStructureDefinition>> specs = Lists.newArrayList();
 
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionMetadataFormatter(this), outputDirectory, "metadata.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionSnapshotFormatter(this), outputDirectory, "snapshot.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionBindingFormatter(this), outputDirectory, "bindings.html"));
-		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDetailsFormatter(this), outputDirectory, "details.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionMetadataFormatter(this, otherResources), outputDirectory, "metadata.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionSnapshotFormatter(this, otherResources), outputDirectory, "snapshot.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionBindingFormatter(this, otherResources), outputDirectory, "bindings.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDetailsFormatter(this, otherResources), outputDirectory, "details.html"));
 		
 		if (!getConstrainedType().equals("Extension")) {
 			specs.add(
-				new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDifferentialFormatter(this), outputDirectory, "differential.html"));
+				new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDifferentialFormatter(this, otherResources), outputDirectory, "differential.html"));
 		}
 		
 		return specs;

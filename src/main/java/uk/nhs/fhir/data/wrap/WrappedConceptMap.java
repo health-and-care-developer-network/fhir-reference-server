@@ -7,13 +7,13 @@ import java.util.Optional;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMap> {
 	
-	public abstract Optional<String> getUrl();
 	public abstract String getName();
 	public abstract String getStatus();
 	public abstract Optional<String> getVersion();
@@ -34,12 +34,12 @@ public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMa
 	}
 	
 	@Override
-	public List<FormattedOutputSpec<WrappedConceptMap>> getFormatSpecs(String outputDirectory) {
+	public List<FormattedOutputSpec<WrappedConceptMap>> getFormatSpecs(String outputDirectory, FhirFileRegistry otherResources) {
 		throw new IllegalStateException("No format specs");
 	}
 	
 	@Override
-	public ResourceFormatter<WrappedConceptMap> getDefaultViewFormatter() {
+	public ResourceFormatter<WrappedConceptMap> getDefaultViewFormatter(FhirFileRegistry otherResources) {
 		throw new IllegalStateException("No format specs");
 	}
 	

@@ -8,10 +8,10 @@ import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.opdef.FhirOperationParameter;
 import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -23,8 +23,8 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
-	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource) {
-		super(wrappedResource);
+	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -49,9 +49,9 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 		List<OperationDefinitionMetaDataRowData> rows = tableData.getRows();
 		OperationDefinitionMetaDataRowFormatter rowFormatter = new OperationDefinitionMetaDataRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();
-		rows.forEach((OperationDefinitionMetaDataRowData data) -> tableRows.add(rowFormatter.formatRow(data)));
+		rows.forEach(data -> tableRows.add(rowFormatter.formatRow(data)));
 		
-		Element metaDataTable = new Table(tableData.getColumns(), tableRows, Sets.newHashSet()).makeTable();
+		Element metaDataTable = new Table(tableData.getColumns(), tableRows).makeTable();
 		return new FhirPanel("Meta", metaDataTable).makePanel();
 	}
 
@@ -60,9 +60,9 @@ public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOpera
 		List<OperationDefinitionParameterTableData> rows = tableData.getRows();
 		OperationDefinitionParameterRowFormatter rowFormatter = new OperationDefinitionParameterRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();
-		rows.forEach((OperationDefinitionParameterTableData data) -> tableRows.add(rowFormatter.formatRow(data)));
+		rows.forEach(data -> tableRows.add(rowFormatter.formatRow(data)));
 		
-		Element parametersTable = new Table(tableData.getColumns(), tableRows, Sets.newHashSet()).makeTable();
+		Element parametersTable = new Table(tableData.getColumns(), tableRows).makeTable();
 		return new FhirPanel(panelTitle, parametersTable).makePanel();
 	}
 

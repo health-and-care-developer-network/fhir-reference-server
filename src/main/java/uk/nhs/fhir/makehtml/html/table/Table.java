@@ -1,13 +1,11 @@
 package uk.nhs.fhir.makehtml.html.table;
 
 import java.util.List;
-import java.util.Set;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
@@ -20,16 +18,14 @@ import uk.nhs.fhir.makehtml.html.style.FhirFont;
 public class Table {
 	private final List<TableTitle> cols = Lists.newArrayList();
 	private final List<TableRow> rows = Lists.newArrayList();
-	private final Set<String> tableClasses = Sets.newHashSet();
 	
-	public Table(List<TableTitle> cols, Set<String> tableClasses) {
-		this(cols, Lists.newArrayList(), tableClasses);
+	public Table(List<TableTitle> cols) {
+		this(cols, Lists.newArrayList());
 	}
 	
-	public Table(List<TableTitle> cols, List<TableRow> rows, Set<String> tableClasses) {
+	public Table(List<TableTitle> cols, List<TableRow> rows) {
 		this.cols.addAll(cols);
 		this.rows.addAll(rows);
-		this.tableClasses.addAll(tableClasses);
 	}
 	
 	public void addRow(TableRow row) {

@@ -21,6 +21,7 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
@@ -34,8 +35,8 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 	
-	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition) {
-		super(structureDefinition);
+	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition, FhirFileRegistry otherResources) {
+		super(structureDefinition, otherResources);
 	}
 
     private static final String BLANK = "";
@@ -81,7 +82,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 
         for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);
@@ -141,7 +142,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     
     private Element labelledValueCell(String label, FhirURL url, int colspan) {
     	
-    	return labelledValueCell(label, url.toFullString(), colspan, FhirURL.isLogicalUrl(url.toFullString()) ? null : url.toLinkString());
+    	return labelledValueCell(label, url.toFullString(), colspan, url.isLogicalUrl() ? null : url.toLinkString());
     }
 
     private Element labelledValueCell(String label, String value, int colspan, String uriOverride) {

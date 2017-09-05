@@ -21,6 +21,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
+import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirContact;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
@@ -30,6 +31,7 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeNodeBuilder;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -56,8 +58,8 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
-	public String getUrl() {
-		return definition.getUrl();
+	public Optional<String> getUrl() {
+		return Optional.ofNullable(definition.getUrl());
 	}
 
 	@Override
@@ -223,11 +225,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
 	
 	@Override
-	public FhirTreeData getSnapshotTree() {
+	public FhirTreeData getSnapshotTree(FhirFileRegistry otherResources) {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		
 		for (ElementDefinitionDt element : definition.getSnapshot().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, otherResources));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 		
@@ -235,12 +237,12 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
-	public FhirTreeData getDifferentialTree() {
+	public FhirTreeData getDifferentialTree(FhirFileRegistry otherResources) {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		fhirTreeDataBuilder.permitDummyNodes();
 		
 		for (ElementDefinitionDt element : definition.getDifferential().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, otherResources));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 
@@ -268,5 +270,18 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	@Override
 	public boolean missingSnapshot() {
 		return definition.getSnapshot().isEmpty();
+	}
+
+	@Override
+	public ExtensionType getExtensionType() {
+		if (!isExtension()) {
+			return null;
+		}
+		
+		switch(definition.getKind()) {
+			default:
+				throw new IllegalStateException("Not sure whether extension " + getUrl() 
+				+ " is simple or complex - kind is " + definition.getKind());
+		}
 	}
 }

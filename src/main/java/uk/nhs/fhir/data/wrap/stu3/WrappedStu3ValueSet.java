@@ -1,13 +1,16 @@
 package uk.nhs.fhir.data.wrap.stu3;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.Factory;
+import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
@@ -19,10 +22,14 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import com.google.common.collect.Lists;
+
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
+import uk.nhs.fhir.data.codesystem.FhirIdentifier;
+import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
-import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeConcept;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
@@ -33,6 +40,8 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 	private final ValueSet definition;
 
 	public WrappedStu3ValueSet(ValueSet definition) {
+		checkForUnexpectedFeatures(definition);
+		
 		this.definition = definition;
 	}
 	
@@ -99,6 +108,11 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 			.filter(resource -> resource instanceof ConceptMap)
 			.map(resource -> WrappedConceptMap.fromDefinition(resource))
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public Optional<Boolean> getExperimental() {
+		return Optional.ofNullable(definition.getExtensibleElement().getValue());
 	}
 
 	@Override
@@ -202,6 +216,11 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 		return compose;
 	}
 
+	@Override
+	public List<FhirContacts> getContacts() {
+		return new Stu3FhirContactConverter().convertList(definition.getContact());
+	}
+
 	private FhirValueSetComposeInclude convertInclude(ConceptSetComponent sourceInclude) {
 		String system = sourceInclude.getSystem();
 		String version = sourceInclude.getVersion();
@@ -221,11 +240,102 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 			String code = sourceConcept.getCode();
 			String description = sourceConcept.getDisplay();
 
-			FhirValueSetComposeIncludeConcept concept = new FhirValueSetComposeIncludeConcept(code, description);
+			FhirCodeSystemConcept concept = new FhirCodeSystemConcept(code, description, null);
 			include.addConcept(concept);
 		}
 		
 		return include;
 	}
+	
+	public static void checkForUnexpectedFeatures(ValueSet definition) {
+		// accessible features
+		// definition.getUrl();
+		// definition.getVersion();
+		// definition.getName();
+		// definition.getStatus();
+		// definition.getDate();
+		// definition.getDescription();
+		// definition.getPurpose();
+		// definition.getCopyright();
+		// definition.getIdentifier()
+		// definition.getPublisher()
+		// definition.getContact();
+		// definition.getExtensibleElement().getValue();
+		
+		checkNoInfoPresent(definition.getTitle());
+		checkNoInfoPresent(definition.getExperimentalElement().getValue());
+		checkNoInfoPresent(definition.getUseContext());
+		checkNoInfoPresent(definition.getJurisdiction());
+		checkNoInfoPresent(definition.getImmutableElement().getValue());
+		
+		for (Identifier identifier : definition.getIdentifier()) {
+			checkNoInfoPresent(identifier.getUse());
+			checkNoInfoPresent(identifier.getType());
+			checkNoInfoPresent(identifier.getPeriod());
+			checkNoInfoPresent(identifier.getAssigner());
+		}
+		
+		ValueSetComposeComponent compose = definition.getCompose();
+		if (compose != null) {
+			checkNoInfoPresent(compose.getLockedDate());
+			checkNoInfoPresent(compose.getInactiveElement().getValue());
+			
+			for (ConceptSetComponent include : compose.getInclude()) {
+				// include.getSystem();
+				checkNoInfoPresent(include.getVersion());
+				
+				for (ConceptReferenceComponent concept : include.getConcept()) {
+					// concept.getCode();
+					// concept.getDisplay();
+					checkNoInfoPresent(concept.getDesignation());
+				}
+				
+				// for (ConceptSetFilterComponent filter : include.getFilter()) {
+					// filter.getProperty();
+					// filter.getOp();
+					// filter.getValue();
+				// }
+				
+				checkNoInfoPresent(include.getValueSet());
+			}
+			
+			checkNoInfoPresent(compose.getExclude());
+		}
+		
+		checkNoInfoPresent(definition.getExpansion());
+		
+		for (Identifier identifier : definition.getIdentifier()) {
+			checkNoInfoPresent(identifier.getUse());
+			checkNoInfoPresent(identifier.getType());
+			checkNoInfoPresent(identifier.getPeriod());
+			checkNoInfoPresent(identifier.getAssigner());
+		}
+	}
 
+	private static void checkNoInfoPresent(Object o) {
+		if (o instanceof Collection<?>) {
+			if (!((Collection<?>) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		} else if (o instanceof Base) {
+			if (!((Base) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		} else {
+			if (o != null) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		}
+	}
+
+	@Override
+	public List<FhirIdentifier> getIdentifiers() {
+		List<FhirIdentifier> identifiers = Lists.newArrayList();
+		
+		for (Identifier identifier : definition.getIdentifier()) {
+			identifiers.add(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
+		}
+
+		return identifiers;
+	}
 }

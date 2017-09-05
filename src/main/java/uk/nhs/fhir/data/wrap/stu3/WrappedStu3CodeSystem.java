@@ -52,9 +52,10 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		String unsafeName = definition.getName();
 		if (!Strings.isNullOrEmpty(unsafeName)) {
 			return unsafeName;
-		} else if (!Strings.isNullOrEmpty(getUrl())) {
+		} else if (getUrl().isPresent()
+			  && !Strings.isNullOrEmpty(getUrl().get())) {
 			// https://fhir.nhs.uk/spine-response-codes-1 -> Spine-Response-Codes-1
-			String[] urlParts = getUrl().split("/"); 
+			String[] urlParts = getUrl().get().split("/"); 
 			String unformatted = urlParts[urlParts.length-1];
 			return StringUtil.capitaliseLowerCase(unformatted);
 		} else {
@@ -67,8 +68,8 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	}
 
 	@Override
-	public String getUrl() {
-		return definition.getUrl();
+	public Optional<String> getUrl() {
+		return Optional.ofNullable(definition.getUrl());
 	}
 
 	@Override
@@ -234,7 +235,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		return Optional.ofNullable(definition.getContent().getDisplay());
 	}
 	
-	public static void checkForUnexpectedFeatures(CodeSystem source) {
+	public static void checkForUnexpectedFeatures(CodeSystem definition) {
 		// accessible features
 		// source.getUrl();
 		// source.getVersion();
@@ -255,13 +256,13 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		// source.getExperimentalElement().getValue()
 		// source.getPurpose()
 		
-		checkNoInfoPresent(source.getUseContext());
-		checkNoInfoPresent(source.getJurisdiction());
-		checkNoInfoPresent(source.getCompositionalElement().getValue());
-		checkNoInfoPresent(source.getVersionNeededElement().getValue());
-		checkNoInfoPresent(source.getCountElement().getValue());
+		checkNoInfoPresent(definition.getUseContext());
+		checkNoInfoPresent(definition.getJurisdiction());
+		checkNoInfoPresent(definition.getCompositionalElement().getValue());
+		checkNoInfoPresent(definition.getVersionNeededElement().getValue());
+		checkNoInfoPresent(definition.getCountElement().getValue());
 
-		Identifier identifier = source.getIdentifier();
+		Identifier identifier = definition.getIdentifier();
 		if (identifier != null) {
 			checkNoInfoPresent(identifier.getUse());
 			checkNoInfoPresent(identifier.getType());
@@ -269,17 +270,19 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 			checkNoInfoPresent(identifier.getAssigner());
 		}
 		
-		checkNoInfoPresent(source.getProperty());
+		checkNoInfoPresent(definition.getProperty());
 		
-		for (ConceptDefinitionComponent concept : source.getConcept()) {
+		for (ConceptDefinitionComponent concept : definition.getConcept()) {
 			checkNoInfoPresent(concept.getDesignation());
 			checkNoInfoPresent(concept.getProperty());
+			
 			// nested concepts
 			checkNoInfoPresent(concept.getConcept());
 		}
 		
-		// actually the filter panel rendering is implemented, but worth being aware once it is being used so we can test with live data rather than test data
-		checkNoInfoPresent(source.getFilter());
+		// Filter panel rendering is implemented, but worth being aware once it is being used so we 
+		// can eyeball with real data rather than test data.
+		checkNoInfoPresent(definition.getFilter());
 		
 	}
 

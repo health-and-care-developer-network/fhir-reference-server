@@ -37,7 +37,8 @@ public class RendererError {
 		MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE,
 		TYPELINK_STRING_WITH_PROFILE,
 		RESOURCE_WITHOUT_SNAPSHOT,
-		RESOURCE_URL_WITHOUT_FHIR_VERSION;
+		RESOURCE_URL_WITHOUT_FHIR_VERSION,
+		EMPTY_VALUE_SET;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -59,6 +60,7 @@ public class RendererError {
 		responses.put(Key.IGNORABLE_MAPPING_ID, ErrorResponse.IGNORE);
 		
 		// Perhaps valid?
+		responses.put(Key.EMPTY_VALUE_SET, ErrorResponse.LOG_WARNING);
 		responses.put(Key.MISSING_TYPE_LINK, ErrorResponse.LOG_WARNING);
 		responses.put(Key.TYPELINK_STRING_WITH_PROFILE, ErrorResponse.LOG_WARNING);
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY, ErrorResponse.IGNORE);

@@ -13,21 +13,25 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
 
 public class StructureDefinitionTreeDataProvider {
 	
 	private final WrappedStructureDefinition source;
+	private final FhirFileRegistry registry;
+	
 	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
 			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
 			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
-	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source) {
+	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source, FhirFileRegistry registry) {
 		this.source = source;
+		this.registry = registry;
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-		FhirTreeData snapshotTree = source.getSnapshotTree();
+		FhirTreeData snapshotTree = source.getSnapshotTree(registry);
 		
 		snapshotTree.resolveLinkedNodes();
 		snapshotTree.cacheSlicingDiscriminators();
@@ -40,7 +44,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeData differentialTree = source.getDifferentialTree();
+		FhirTreeData differentialTree = source.getDifferentialTree(registry);
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		

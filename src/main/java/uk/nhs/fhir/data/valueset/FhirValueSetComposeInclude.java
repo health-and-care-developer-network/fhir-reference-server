@@ -5,13 +5,15 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
+import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
+
 public class FhirValueSetComposeInclude {
 
 	private final String system;
 	private final Optional<String> version;
 	
 	private final List<FhirValueSetComposeIncludeFilter> filters = Lists.newArrayList();
-	private final List<FhirValueSetComposeIncludeConcept> concepts = Lists.newArrayList();
+	private final List<FhirCodeSystemConcept> concepts = Lists.newArrayList();
 	
 	public FhirValueSetComposeInclude(String system, String version) {
 		this.system = system;
@@ -34,11 +36,11 @@ public class FhirValueSetComposeInclude {
 		return filters;
 	}
 
-	public void addConcept(FhirValueSetComposeIncludeConcept concept) {
+	public void addConcept(FhirCodeSystemConcept concept) {
 		concepts.add(concept);
 	}
 
-	public List<FhirValueSetComposeIncludeConcept> getConcepts() {
+	public List<FhirCodeSystemConcept> getConcepts() {
 		return concepts ;
 	}
 

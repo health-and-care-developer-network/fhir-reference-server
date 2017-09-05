@@ -54,8 +54,8 @@ public interface FhirColour {
 	public static final String PANEL_BORDER = THE_SAME_GREY;
 	public static final String PANEL_BACKGROUND = WHITE;
 	
-	public static final String TABLE_HEADER_BORDER = THE_SAME_GREY;
-	public static final String DATA_CELL_BORDER = THE_SAME_GREY;
+	public static final String TABLE_HEADER_BORDER = LIGHT_GREY;
+	public static final String DATA_CELL_BORDER = LIGHT_GREY;
 	
 	public static final String TREE_INFO_DIVIDER = LIGHT_GREY;
 	

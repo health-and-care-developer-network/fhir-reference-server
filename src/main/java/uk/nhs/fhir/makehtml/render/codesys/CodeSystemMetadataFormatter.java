@@ -15,6 +15,8 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
@@ -26,8 +28,8 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemMetadataFormatter(WrappedCodeSystem wrappedResource) {
-		super(wrappedResource);
+	public CodeSystemMetadataFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -36,16 +38,18 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		
 		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
-		
 		getStyles().forEach(section::addStyle);
-		Table.getStyles().forEach(section::addStyle);
-		FhirPanel.getStyles().forEach(section::addStyle);
+
+		section.addStyles(TableFormatter.getStyles());
+		section.addStyles(Table.getStyles());
+		section.addStyles(FhirPanel.getStyles());
+		section.addStyles(LinkCell.getStyles());
 		
 		return section;
 	}
 
 	private Element getMetadataTable(WrappedCodeSystem codeSystem) {
-		String url = codeSystem.getUrl();
+		String url = codeSystem.getUrl().get();
 		String name = codeSystem.getName();
 		Optional<String> title = codeSystem.getTitle();
 		
@@ -147,5 +151,5 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		
 		return panel.makePanel();
 	}
-
+	
 }

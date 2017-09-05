@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.ResourceInfo;
 import uk.nhs.fhir.data.ResourceInfoType;
@@ -54,7 +53,7 @@ public class FhirTreeTable {
 	}
 
 	public Table asTable() {
-		return new Table(getColumns(), getRows(), Sets.newHashSet());
+		return new Table(getColumns(), getRows());
 	}
 	
 	private List<TableTitle> getColumns() {
@@ -134,7 +133,7 @@ public class FhirTreeTable {
 				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
 				new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile), 
-				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile), 
+				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false), 
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
 	

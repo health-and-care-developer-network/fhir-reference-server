@@ -1,37 +1,22 @@
 package uk.nhs.fhir.data.wrap.stu3;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
-import org.hl7.fhir.dstu3.model.ElementDefinition.AggregationMode;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionBindingComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionConstraintComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionSlicingComponent;
-import org.hl7.fhir.dstu3.model.ElementDefinition.ReferenceVersionRules;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
-import org.hl7.fhir.dstu3.model.Enumeration;
 import org.hl7.fhir.dstu3.model.PrimitiveType;
-import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind;
 import org.hl7.fhir.dstu3.model.Type;
-import org.hl7.fhir.utilities.Utilities;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.context.FhirStu3DataTypes;
-import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
@@ -44,9 +29,9 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
@@ -56,7 +41,8 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
 	private final ElementDefinition definition;
 
-	public WrappedStu3ElementDefinition(ElementDefinition definition) {
+	public WrappedStu3ElementDefinition(ElementDefinition definition, FhirFileRegistry otherResources) {
+		super(otherResources);
 		this.definition = definition;
 	}
 
@@ -299,66 +285,13 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	private ExtensionType lookupExtensionType(TypeRefComponent type) {
-		
 		String profile = type.getProfile();
 		if (profile == null) {
 			return ExtensionType.SIMPLE;
 		}
 		
-		String targetProfile = type.getTargetProfile();
-		List<Enumeration<AggregationMode>> aggregation = type.getAggregation();
-		ReferenceVersionRules versioning = type.getVersioning();
-
-		if (!Utilities.noString(targetProfile)) {
-			throw new IllegalStateException("Don't know how to handle target profile for Extension");
-		}
-		if (!aggregation.isEmpty()) {
-			throw new IllegalStateException("Don't know how to handle aggregation for Extension");
-		}
-		if (versioning != null) {
-			throw new IllegalStateException("Don't know how to handle versioning for Extension");
-		}
-
-		String filePath;
-		try {
-			URI uri = new URI(profile);
-			filePath = uri.toURL().getFile() + ".xml";
-		} catch (URISyntaxException | MalformedURLException e) {
-			throw new IllegalStateException("URI/URL error for uri " + profile, e);
-		}
-		
-		String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-		// case insensitive search
-		File extensionFile = null;
-		for (File f : new File(NewMain.getSuppliedResourcesFolderPath()).listFiles()) {
-			if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
-				extensionFile = f;
-				break;
-			}
-		}
-
-		if (extensionFile == null) {
-			RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-		} 
-		
-		try (FileInputStream fis = new FileInputStream(extensionFile);
-			Reader reader = new InputStreamReader(fis)) {
-			
-			IParser parser = FhirContexts.xmlParser(FhirVersion.STU3);
-			StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
-			
-			org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind kind = extension.getKind();
-			if (kind.equals(StructureDefinitionKind.COMPLEXTYPE)) {
-				return ExtensionType.COMPLEX;
-			} else if (kind.equals(StructureDefinitionKind.PRIMITIVETYPE)) {
-				return ExtensionType.SIMPLE;
-			} else {
-				throw new IllegalStateException("Not sure whether extension " + extensionFile.getAbsolutePath() 
-					+ " is simple or complex - kind is " + kind.getDisplay());
-			}
-		} catch (IOException ie) {
-			throw new IllegalStateException(ie);
-		}
+		WrappedStructureDefinition extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(profile);
+		return extensionDefinition.getExtensionType();
 	}
 
 	@Override

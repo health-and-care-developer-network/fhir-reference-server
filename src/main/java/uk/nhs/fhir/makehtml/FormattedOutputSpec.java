@@ -25,7 +25,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		this.filename = filename;
 	}
 
-	public void formatAndSave(String inputPath) throws ParserConfigurationException, IOException {
+	public void formatAndSave(String inputPath, FhirFileRegistry otherResources) throws ParserConfigurationException, IOException {
 		ensureOutputDirectoryExists(inputPath);
 		String outputPath = getOutputPath(inputPath);
 		

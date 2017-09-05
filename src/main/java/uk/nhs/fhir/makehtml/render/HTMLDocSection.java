@@ -14,6 +14,14 @@ public class HTMLDocSection {
 	protected List<Content> headElements = Lists.newArrayList();
 	protected List<Content> bodyElements = Lists.newArrayList();
 
+	public void addSection(HTMLDocSection sectionToAdd) {
+		if (sectionToAdd != null) {
+			styles.addStylesSection(sectionToAdd.getStyles());
+			sectionToAdd.getHeadElements().forEach(headElement -> addHeadElement(headElement));
+			sectionToAdd.getBodyElements().forEach(bodyElement -> addBodyElement(bodyElement));
+		}
+	}
+
 	public void addHeadElement(Content headElement) {
 		headElements.add(headElement);
 	}

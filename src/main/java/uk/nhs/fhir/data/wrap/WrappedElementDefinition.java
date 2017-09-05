@@ -17,6 +17,7 @@ import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class WrappedElementDefinition {
@@ -51,11 +52,17 @@ public abstract class WrappedElementDefinition {
 	
 	public abstract Optional<String> getSliceName();
 	
-	public static WrappedElementDefinition fromDefinition(Object definition) {
+	protected final FhirFileRegistry otherResources;
+	
+	public WrappedElementDefinition(FhirFileRegistry otherResources) {
+		this.otherResources = otherResources;
+	}
+	
+	public static WrappedElementDefinition fromDefinition(Object definition, FhirFileRegistry otherResources) {
 		if (definition instanceof ElementDefinitionDt) {
-			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition);
+			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition, otherResources);
 		} else if (definition instanceof ElementDefinition) {
-			return new WrappedStu3ElementDefinition((ElementDefinition)definition);
+			return new WrappedStu3ElementDefinition((ElementDefinition)definition, otherResources);
 		} else {
 			throw new IllegalStateException("Can't wrap element definition class " + definition.getClass().getCanonicalName());
 		}

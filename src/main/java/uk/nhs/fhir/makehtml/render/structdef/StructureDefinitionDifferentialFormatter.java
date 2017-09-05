@@ -6,6 +6,7 @@ import org.jdom2.Element;
 
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
@@ -14,15 +15,15 @@ import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 
 public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionDifferentialFormatter(WrappedStructureDefinition wrappedResource) {
-		super(wrappedResource);
+	public StructureDefinitionDifferentialFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 		
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData();
 		differentialTreeData.tidyData();

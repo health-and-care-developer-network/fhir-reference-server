@@ -74,7 +74,7 @@ public class TestFormatTable {
 		List<TableTitle> columns = Lists.newArrayList(
 			new TableTitle("ColumnName", "hoverInfo", "50px"), 
 			new TableTitle("ColumnName2", "hoverInfo2", "60px"));
-		Table table = new Table(columns, Sets.newHashSet("class1"));
+		Table table = new Table(columns);
 		table.addRow(new TableRow(new SimpleTextCell("first cell"), new SimpleTextCell("second cell")));
 		Element tableElement = table.makeTable();
 		String tableHTML = HTMLUtil.docToString(new Document(tableElement), false, false);
@@ -107,7 +107,7 @@ public class TestFormatTable {
 		List<TableTitle> columns = Lists.newArrayList(
 			new TableTitle("Use", "info1", "50px"),
 			new TableTitle("Link", "info3", "70px"));
-		Table table = new Table(columns, Sets.newHashSet("class1"));
+		Table table = new Table(columns);
 		table.addRow(new TableRow(new SimpleTextCell("Search engine"), 
 				new LinkCell(new LinkDatas(new LinkData(FhirURL.buildOrThrow("https://www.google.com", FhirVersion.DSTU2), "Google")))));
 		table.addRow(new TableRow(new SimpleTextCell("News"), 

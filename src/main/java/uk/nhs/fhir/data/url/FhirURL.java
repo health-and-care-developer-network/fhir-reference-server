@@ -59,4 +59,8 @@ public abstract class FhirURL {
 		return url.startsWith(FhirURLConstants.NHS_ID)
 		  || url.equals(FhirURLConstants.SNOMED_ID);
 	}
+	
+	public boolean isLogicalUrl() {
+		return isLogicalUrl(toFullString());
+	}
 }

@@ -10,16 +10,17 @@ import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemFilter;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemConceptTableFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemFiltersTableFormatter;
+import uk.nhs.fhir.makehtml.render.codesys.CodeSystemFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemMetadataFormatter;
 
 public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSystem> {
 	public abstract String getName();
 	public abstract Optional<String> getTitle();
-	public abstract String getUrl();
 	public abstract String getStatus();
 
 	public abstract Optional<String> getVersion();
@@ -50,17 +51,18 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 	}
 
 	@Override
-	public ResourceFormatter<WrappedCodeSystem> getDefaultViewFormatter() {
-		return new CodeSystemMetadataFormatter(this);
+	public ResourceFormatter<WrappedCodeSystem> getDefaultViewFormatter(FhirFileRegistry otherResources) {
+		return new CodeSystemFormatter(this, otherResources);
 	}
 
 	@Override
-	public List<FormattedOutputSpec<WrappedCodeSystem>> getFormatSpecs(String outputDirectory) {
+	public List<FormattedOutputSpec<WrappedCodeSystem>> getFormatSpecs(String outputDirectory, FhirFileRegistry otherResources) {
 		List<FormattedOutputSpec<WrappedCodeSystem>> formatSpecs = Lists.newArrayList();
 
-		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemMetadataFormatter(this), outputDirectory, "metadata.html"));
-		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemFiltersTableFormatter(this), outputDirectory, "filters.html"));
-		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemConceptTableFormatter(this), outputDirectory, "concepts.html"));
+		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemMetadataFormatter(this, otherResources), outputDirectory, "metadata.html"));
+		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemFiltersTableFormatter(this, otherResources), outputDirectory, "filters.html"));
+		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemConceptTableFormatter(this, otherResources), outputDirectory, "concepts.html"));
+		formatSpecs.add(new FormattedOutputSpec<>(this, new CodeSystemFormatter(this, otherResources), outputDirectory, "codesystem-full.html"));
 		
 		return formatSpecs;
 	}

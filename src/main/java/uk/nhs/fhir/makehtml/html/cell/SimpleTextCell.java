@@ -6,7 +6,7 @@ import org.jdom2.Element;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 
 public class SimpleTextCell extends TableCell {
-
+	
 	private final String text;
 
 	public SimpleTextCell(String text) {

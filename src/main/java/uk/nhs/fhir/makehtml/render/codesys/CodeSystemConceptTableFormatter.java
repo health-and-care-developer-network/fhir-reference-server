@@ -5,10 +5,10 @@ import java.util.List;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
@@ -18,8 +18,8 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
 public class CodeSystemConceptTableFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemConceptTableFormatter(WrappedCodeSystem wrappedResource) {
-		super(wrappedResource);
+	public CodeSystemConceptTableFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class CodeSystemConceptTableFormatter extends TableFormatter<WrappedCodeS
 			Elements.withChildren("div", 
 				Elements.withText("div", "System: " + codeSystemConcepts.getSystem()),
 				Elements.newElement("br"),
-				new Table(tableData.getColumns(), tableRows, Sets.newHashSet()).makeTable());
+				new Table(tableData.getColumns(), tableRows).makeTable());
 		return new FhirPanel("Codes defined by " + wrappedResource.getUserFriendlyName(), wrapperDiv).makePanel();
 	}
 

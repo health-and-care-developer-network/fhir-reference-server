@@ -6,6 +6,7 @@ import org.jdom2.Element;
 
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
@@ -14,8 +15,8 @@ import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 
 public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 	
-	public StructureDefinitionSnapshotFormatter(WrappedStructureDefinition wrappedResource) {
-		super(wrappedResource);
+	public StructureDefinitionSnapshotFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
 	@Override
@@ -23,7 +24,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 
 		HTMLDocSection section = new HTMLDocSection();
 		
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 
 		boolean isExtension = wrappedResource.isExtension();

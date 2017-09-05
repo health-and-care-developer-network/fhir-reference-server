@@ -6,12 +6,12 @@ import uk.nhs.fhir.makehtml.html.table.TableRow;
 public class CodeSystemFilterRowFormatter {
 	public TableRow formatRow(CodeSystemFilterTableRowData data) {
 		TableRow row = new TableRow(
-			new SimpleTextCell(data.getCode()),
-			new SimpleTextCell(data.getOperators()),
-			new SimpleTextCell(data.getValue()));
+			new SimpleTextCell(data.getCode(), true),
+			new SimpleTextCell(data.getOperators(), true),
+			new SimpleTextCell(data.getValue(), true));
 		
 		if (data.hasDocumentation()) {
-			row.addCell(new SimpleTextCell(data.getDocumentation().get()));
+			row.addCell(new SimpleTextCell(data.getDocumentation().get(), true));
 		}
 		
 		return row;
