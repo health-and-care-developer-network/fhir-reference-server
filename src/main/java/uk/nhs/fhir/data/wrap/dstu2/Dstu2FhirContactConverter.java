@@ -26,7 +26,7 @@ public class Dstu2FhirContactConverter {
 		
 		for (ContactPointDt telecom : contact.getTelecom()){
 			String value = telecom.getValue();
-			int rank = telecom.getRank();
+			Integer rank = telecom.getRank();
 			fhirContact.addTelecom(new FhirContact(value, rank));
 		}
 		

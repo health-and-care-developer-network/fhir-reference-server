@@ -20,6 +20,7 @@ import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.FhirVersion;
@@ -36,6 +37,8 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 		
 		section.addBodyElement(getElementMapsDataTable());
 		section.addStyles(getStyles());
+		section.addStyles(FhirPanel.getStyles());
+		section.addStyles(Table.getStyles());
 		
 		return section;
 	}

@@ -131,7 +131,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HTTP_HL7_FHIR + "/terminologies.html#" + anchorStrength),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.versionBase(wrappedResource.getImplicitFhirVersion()) + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);

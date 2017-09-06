@@ -2,8 +2,10 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -14,7 +16,7 @@ import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 
-public class FhirFileRegistry {
+public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResource<?>>> {
 
 	private final FhirFileParser parser = new FhirFileParser();
 	
@@ -24,17 +26,28 @@ public class FhirFileRegistry {
 	public void register(File xmlFile) {
 		try {
 			IBaseResource parsedFile = parser.parseFile(xmlFile);
-			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
-			resourcesByFile.put(xmlFile, wrappedResource);
 			
-			if (wrappedResource.getUrl().isPresent()) {
-				resourcesByUrl.put(wrappedResource.getUrl().get(), wrappedResource);
+			if (FhirFileParser.isSupported(parsedFile)) {
+				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
+				
+				resourcesByFile.put(xmlFile, wrappedResource);
+				
+				if (wrappedResource.getUrl().isPresent()) {
+					
+					String extractedUrl = wrappedResource.getUrl().get();
+					
+					if (!resourcesByUrl.containsKey(extractedUrl)) {
+						resourcesByUrl.put(extractedUrl, wrappedResource); 
+					} else {
+						throw new IllegalStateException("Found multiple resources with URL " + extractedUrl);
+					}
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("Skipping file: " + e.getMessage());
 		}
 	}
-	
+
 	public WrappedResource<?> getResource(File f) {
 		return resourcesByFile.get(f);
 	}
@@ -78,5 +91,10 @@ public class FhirFileRegistry {
 			System.out.println(String.join("\n", resourcesByUrl.keySet()));
 			throw new IllegalStateException("Expected a single structure definition to match url " + url + " but found " + matchingDefinitions.size());
 		}
+	}
+
+	@Override
+	public Iterator<Entry<File, WrappedResource<?>>> iterator() {
+		return resourcesByFile.entrySet().iterator();
 	}
 }

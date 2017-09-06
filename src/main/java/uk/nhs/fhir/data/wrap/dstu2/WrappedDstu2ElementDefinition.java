@@ -1,13 +1,6 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
@@ -26,9 +20,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Constraint;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Slicing;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
-import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
@@ -42,9 +34,7 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
-import uk.nhs.fhir.makehtml.NewMain;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -309,14 +299,27 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			return Optional.empty();
 		}
 		
+		Set<ExtensionType> extensionTypes = Sets.newHashSet();
+		
 		for (Type type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
-				return Optional.of(lookupExtensionType(type));
+				for (UriDt profile : type.getProfile()) {
+					ExtensionType extensionType = lookupExtensionType(profile.getValueAsString());
+					if (extensionType != null) {
+						extensionTypes.add(extensionType);
+					}
+				}
 			}
 		}
 		
-		return Optional.empty();
+		if (extensionTypes.isEmpty()) {
+			return Optional.empty();
+		} else if (extensionTypes.size() == 1) {
+			return Optional.of(extensionTypes.iterator().next());
+		} else {
+			throw new IllegalStateException("Unsure of extension type - multiple found: " + Arrays.toString(extensionTypes.toArray()));
+		}
 	}
 
 	@Override
@@ -329,54 +332,6 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 		return Optional.empty();
 	}
 	
-	/**
-	 * Consider the extension complex iff it has an element with path "Extension.extension.url"
-	 */
-	private static ExtensionType lookupExtensionType(Type type)  {
-
-		List<UriDt> profiles = type.getProfile();
-
-		for (UriDt uriDt : profiles) {
-
-			String filePath;
-			try {
-				URI uri = new URI(uriDt.getValue());
-				filePath = uri.toURL().getFile() + ".xml";
-			} catch (URISyntaxException | MalformedURLException e) {
-				throw new IllegalStateException("URI/URL error for uri " + uriDt.getValue(), e);
-			}
-			
-			String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-			// case insensitive search
-			File extensionFile = null;
-			for (File f : new File(NewMain.getSuppliedResourcesFolderPath()).listFiles()) {
-				if (f.getName().toLowerCase().equals(fileName.toLowerCase())) {
-					extensionFile = f;
-					break;
-				}
-			}
-
-			if (extensionFile == null) {
-				RendererError.handle(RendererError.Key.EXTENSION_FILE_NOT_FOUND, "Extension source expected at: " + fileName);
-			}
-			
-			try (FileInputStream fis = new FileInputStream(extensionFile);
-				Reader reader = new InputStreamReader(fis)) {
-				
-				IParser parser = FhirContexts.xmlParser(FhirVersion.DSTU2);
-				StructureDefinition extension = parser.parseResource(StructureDefinition.class, reader);
-
-				if (extension.getSnapshot().getElement().stream().anyMatch(element -> element.getPath().contains("Extension.extension.url"))) {
-					return ExtensionType.COMPLEX;
-				}
-			} catch (IOException ie) {
-				throw new IllegalStateException(ie);
-			}
-		}
-
-		return ExtensionType.SIMPLE;
-	}
-
 	@Override
 	public List<FhirElementMapping> getMappings() {
 		return 

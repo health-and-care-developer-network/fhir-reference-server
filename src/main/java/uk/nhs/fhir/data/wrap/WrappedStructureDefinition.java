@@ -16,6 +16,7 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionBindingFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionDetailsFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionDifferentialFormatter;
+import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
 
@@ -54,7 +55,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	
 	@Override
 	public ResourceFormatter<WrappedStructureDefinition> getDefaultViewFormatter(FhirFileRegistry otherResources) {
-		return new StructureDefinitionSnapshotFormatter(this, otherResources);
+		return new StructureDefinitionFormatter(this, otherResources);
 	}
 
 	public boolean isExtension() {
@@ -73,6 +74,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionSnapshotFormatter(this, otherResources), outputDirectory, "snapshot.html"));
 		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionBindingFormatter(this, otherResources), outputDirectory, "bindings.html"));
 		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionDetailsFormatter(this, otherResources), outputDirectory, "details.html"));
+		specs.add(new FormattedOutputSpec<WrappedStructureDefinition>(this, new StructureDefinitionFormatter(this, otherResources), outputDirectory, "full.html"));
 		
 		if (!getConstrainedType().equals("Extension")) {
 			specs.add(

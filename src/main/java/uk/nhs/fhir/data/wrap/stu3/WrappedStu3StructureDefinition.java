@@ -259,14 +259,15 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 			return null;
 		}
 		
-		switch(definition.getKind()) {
-			case COMPLEXTYPE:
-				return ExtensionType.COMPLEX;
-			case PRIMITIVETYPE:
-				return ExtensionType.SIMPLE;
-			default:
-				throw new IllegalStateException("Not sure whether extension " + getUrl() 
-				+ " is simple or complex - kind is " + definition.getKind().toString() + " (" + getKind() + ")");
+		if (definition
+				.getSnapshot()
+				.getElement()
+				.stream()
+				.anyMatch(element -> element.getPath().equals("Extension.extension.url"))) {
+			return ExtensionType.COMPLEX;
+		} else {
+			return ExtensionType.SIMPLE;
 		}
+		
 	}
 }

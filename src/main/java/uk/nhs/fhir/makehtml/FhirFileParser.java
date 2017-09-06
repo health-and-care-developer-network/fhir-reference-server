@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
@@ -22,6 +24,22 @@ import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirFileParser {
 
+	@SuppressWarnings("unchecked")
+	private final static Set<Class<? extends IBaseResource>> supportedClasses =
+		Sets.newHashSet(
+			ca.uhn.fhir.model.dstu2.resource.StructureDefinition.class,
+			org.hl7.fhir.dstu3.model.StructureDefinition.class,
+			ca.uhn.fhir.model.dstu2.resource.ValueSet.class,
+			org.hl7.fhir.dstu3.model.ValueSet.class,
+			ca.uhn.fhir.model.dstu2.resource.OperationDefinition.class,
+			org.hl7.fhir.dstu3.model.CodeSystem.class,
+			ca.uhn.fhir.model.dstu2.resource.ConceptMap.class,
+			org.hl7.fhir.dstu3.model.ConceptMap.class);
+	
+	public static boolean isSupported(IBaseResource resource) {
+		return supportedClasses.contains(resource.getClass());
+	}
+	
 	public IBaseResource parseFile(File thisFile) throws IOException {
 		
 		List<FhirVersion> successfullyParsedVersions = Lists.newArrayList();
@@ -50,7 +68,7 @@ public class FhirFileParser {
 					try (FileReader fr = new FileReader(thisFile)) {
 						return xmlParser.parseResource(fr);
 					} catch (IOException | DataFormatException e) {
-						throw new IllegalStateException(e);
+						throw new IOException("Error parsing file " + thisFile.getAbsolutePath(), e);
 					}
 				}
 			}
@@ -81,6 +99,11 @@ public class FhirFileParser {
 	}
 
 	private FhirVersion getResourceVersion(IBaseResource resource) {
+		
+		if (!isSupported(resource)) {
+			System.out.println("Skipping input xml file with class " + resource.getClass().getCanonicalName() + " (not supported)");
+			return null;
+		}
 		
 		if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
 			StructureDefinition dstu2StructureDefinition = (ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource;
@@ -120,6 +143,7 @@ public class FhirFileParser {
 			}
 			
 			return null;
+			
 		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
 			
 			ca.uhn.fhir.model.dstu2.resource.ValueSet dstu2ValueSet = (ca.uhn.fhir.model.dstu2.resource.ValueSet)resource;
@@ -164,6 +188,7 @@ public class FhirFileParser {
 			}
 			
 			return null;
+			
 		} else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
 			
 			org.hl7.fhir.dstu3.model.CodeSystem stu3CodeSystem = (org.hl7.fhir.dstu3.model.CodeSystem)resource;
@@ -178,8 +203,37 @@ public class FhirFileParser {
 			}
 			
 			return null;
+			
+		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ConceptMap) {
+			ca.uhn.fhir.model.dstu2.resource.ConceptMap dstu2CodeSystem = (ca.uhn.fhir.model.dstu2.resource.ConceptMap)resource;
+			
+			String url = dstu2CodeSystem.getUrl();
+			if (!Strings.isNullOrEmpty(url)) {
+				FhirVersion version = fromResourceUrl(url);
+				
+				if (version != null) {
+					return version;
+				}
+			}
+			
+			return null;
+			
+		} else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
+			org.hl7.fhir.dstu3.model.ConceptMap stu3CodeSystem = (org.hl7.fhir.dstu3.model.ConceptMap)resource;
+			
+			String url = stu3CodeSystem.getUrl();
+			if (!Strings.isNullOrEmpty(url)) {
+				FhirVersion version = fromResourceUrl(url);
+				
+				if (version != null) {
+					return version;
+				}
+			}
+
+			return null;
+			
 		} else {
-			throw new IllegalStateException("Need to support class " + resource.getClass().getCanonicalName());
+			throw new IllegalStateException("Class " + resource.getClass().getCanonicalName() + " is marked as supported, but wasn't handled");
 		}
 	}
 	

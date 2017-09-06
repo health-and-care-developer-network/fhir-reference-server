@@ -11,10 +11,12 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2OperationDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ValueSet;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
@@ -115,10 +117,17 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			return new WrappedStu3CodeSystem((org.hl7.fhir.dstu3.model.CodeSystem)resource);
 		}
 		
+		else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ConceptMap) {
+			return new WrappedDstu2ConceptMap((ca.uhn.fhir.model.dstu2.resource.ConceptMap)resource);
+		} else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
+			return new WrappedStu3ConceptMap((org.hl7.fhir.dstu3.model.ConceptMap)resource);
+		}
+		
 		else {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}
 	}
+	
 	public void saveAugmentedResource(File inFile, WrappedResource<?> parsedResource, String outPath, String newBaseURL, FhirFileRegistry registry) throws Exception {
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 	    String outputDirectoryName = getOutputFolderName();

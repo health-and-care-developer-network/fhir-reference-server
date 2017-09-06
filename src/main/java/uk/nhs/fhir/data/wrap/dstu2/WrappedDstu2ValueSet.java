@@ -196,11 +196,12 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	@Override
 	public Optional<FhirCodeSystemConcepts> getCodeSystem() {
 		CodeSystem sourceCodeSystem = definition.getCodeSystem();
+		if (sourceCodeSystem.isEmpty()) {
+			return Optional.empty();
+		}
 		
-		String sourceCodeSystemSystem = sourceCodeSystem.getSystem();
-		
-		
-		
+ 		String sourceCodeSystemSystem = sourceCodeSystem.getSystem();
+ 		
 		FhirCodeSystemConcepts codeSystem = new FhirCodeSystemConcepts(sourceCodeSystemSystem);
 		
 		for (CodeSystemConcept concept : sourceCodeSystem.getConcept()) {

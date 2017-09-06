@@ -49,7 +49,6 @@ public abstract class WrappedElementDefinition {
 	public abstract FhirVersion getVersion();
 	
 	// Introduced with STU3
-	
 	public abstract Optional<String> getSliceName();
 	
 	protected final FhirFileRegistry otherResources;
@@ -74,5 +73,14 @@ public abstract class WrappedElementDefinition {
 	
 	public boolean isRootElement() {
 		return getPathParts().length == 1;
+	}
+
+	protected ExtensionType lookupExtensionType(String typeProfile) {
+		if (typeProfile == null) {
+			return ExtensionType.SIMPLE;
+		} else {
+			WrappedStructureDefinition extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(typeProfile);
+			return extensionDefinition.getExtensionType();
+		}
 	}
 }

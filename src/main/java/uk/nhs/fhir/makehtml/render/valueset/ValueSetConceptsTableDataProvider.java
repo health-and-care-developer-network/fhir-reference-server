@@ -40,10 +40,10 @@ public class ValueSetConceptsTableDataProvider {
 		
 		for (FhirValueSetComposeInclude include : valueSet.getCompose().getIncludes()) {
 			if (include.getConcepts().isEmpty()) {
-				if (include.getSystem().startsWith(FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK)) {
-					// try to find the concept map from the registry
-					WrappedCodeSystem standaloneCodeSystem = registry.getCodeSystem(include.getSystem());
-					addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
+				// try to find the concept map from the registry
+				WrappedCodeSystem standaloneCodeSystem = registry.getCodeSystem(include.getSystem());
+				if (standaloneCodeSystem != null) {
+						addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
 					RendererError.handle(Key.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
 					// ensure that we still display the code system

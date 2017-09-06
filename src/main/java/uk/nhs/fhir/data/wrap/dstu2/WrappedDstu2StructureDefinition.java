@@ -274,14 +274,34 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 
 	@Override
 	public ExtensionType getExtensionType() {
-		if (!isExtension()) {
+		boolean isExtensionFromPath = 
+			definition
+				.getSnapshot()
+				.getElement()
+				.stream()
+				.anyMatch(element -> element.getPath().equals("Extension"));
+		
+		boolean isExtensionFromConstrainedType = isExtension();
+		
+		if (isExtensionFromPath != isExtensionFromConstrainedType) {
+			throw new IllegalStateException("Unsure whether this is an extension");
+		}
+		
+		if (!isExtensionFromPath) {
 			return null;
 		}
 		
-		switch(definition.getKind()) {
-			default:
-				throw new IllegalStateException("Not sure whether extension " + getUrl() 
-				+ " is simple or complex - kind is " + definition.getKind());
+		boolean complexFromPath = 
+			definition
+				.getSnapshot()
+				.getElement()
+				.stream()
+				.anyMatch(element -> element.getPath().equals("Extension.extension.url"));
+		
+		if (complexFromPath) {
+			return ExtensionType.COMPLEX;
+		} else {
+			return ExtensionType.SIMPLE;
 		}
 	}
 }

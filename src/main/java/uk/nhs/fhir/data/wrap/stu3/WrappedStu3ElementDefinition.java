@@ -15,6 +15,7 @@ import org.hl7.fhir.dstu3.model.Type;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.context.FhirStu3DataTypes;
 import uk.nhs.fhir.data.structdef.BindingInfo;
@@ -29,7 +30,6 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
 import uk.nhs.fhir.util.FhirVersion;
@@ -277,21 +277,11 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 		for (TypeRefComponent type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
-				return Optional.of(lookupExtensionType(type));
+				return Optional.of(lookupExtensionType(type.getProfile()));
 			}
 		}
 		
 		return Optional.empty();
-	}
-
-	private ExtensionType lookupExtensionType(TypeRefComponent type) {
-		String profile = type.getProfile();
-		if (profile == null) {
-			return ExtensionType.SIMPLE;
-		}
-		
-		WrappedStructureDefinition extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(profile);
-		return extensionDefinition.getExtensionType();
 	}
 
 	@Override

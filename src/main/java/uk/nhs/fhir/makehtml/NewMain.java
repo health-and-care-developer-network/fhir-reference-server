@@ -17,11 +17,13 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.UrlValidator;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 
 /**
  * @author tim.coates@hscic.gov.uk
@@ -103,8 +105,8 @@ public class NewMain {
         FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
         	
-	        for (File xmlFile : potentialFhirFiles) {
-	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, xmlFile);
+        	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
+	        	fileProcessor.processFile(outPath, newBaseURL, e.getKey(), e.getValue());
 	        }
 	        
 	        if (TEST_LINK_URLS) {
