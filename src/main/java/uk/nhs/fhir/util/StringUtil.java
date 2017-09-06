@@ -55,6 +55,10 @@ public class StringUtil {
 			}
 		);
 	
+	public static String dateRange(Date dateStart, Date dateEnd) {
+		return dateToString(dateStart) + " - " + dateToString(dateEnd);
+	}
+	
 	public static String dateToString(Date date) {
 		return dateFormat.get().format(date);
 	}

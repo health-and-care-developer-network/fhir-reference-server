@@ -8,14 +8,16 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionBindingComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionConstraintComponent;
+import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionExampleComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionSlicingComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
+import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.PrimitiveType;
 import org.hl7.fhir.dstu3.model.Type;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.context.FhirStu3DataTypes;
 import uk.nhs.fhir.data.structdef.BindingInfo;
@@ -33,6 +35,7 @@ import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.StringUtil;
 
 public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
@@ -210,7 +213,26 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public List<String> getExamples() {
-		return definition.getExample().stream().map(example -> example.getValue().toString()).collect(Collectors.toList());
+		List<String> examples = Lists.newArrayList();
+		for (ElementDefinitionExampleComponent example : definition.getExample()) {
+			Type value = example.getValue();
+			if (value instanceof PrimitiveType) {
+				examples.add(((PrimitiveType<?>)value).asStringValue());
+			} else if (value instanceof Period) {
+				Period examplePeriod = ((Period)value);
+				
+				String dateText = StringUtil.dateRange(examplePeriod.getStart(), examplePeriod.getEnd());
+				
+				examples.add(dateText);
+			} else if (value instanceof Identifier){
+				Identifier exampleIdentifier = (Identifier)value;
+				examples.add(exampleIdentifier.getValue());
+			} else {
+				throw new IllegalStateException("Handle example value of type " + value.getClass().getName());
+			}
+		}
+		
+		return examples;
 	}
 
 	@Override

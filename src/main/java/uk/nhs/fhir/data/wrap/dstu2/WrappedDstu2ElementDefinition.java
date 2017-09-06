@@ -1,7 +1,6 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -223,9 +222,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			} else if (example instanceof PeriodDt) {
 				PeriodDt examplePeriod = (PeriodDt)example;
 				
-				Date start = examplePeriod.getStart();
-				Date end = examplePeriod.getEnd();
-				String dateText = StringUtil.dateToString(start) + " - " + StringUtil.dateToString(end);
+				String dateText = StringUtil.dateRange(examplePeriod.getStart(), examplePeriod.getEnd());
 				
 				examples.add(dateText);
 			} else {

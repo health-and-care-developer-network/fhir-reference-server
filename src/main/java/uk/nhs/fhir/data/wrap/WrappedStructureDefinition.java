@@ -38,6 +38,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	public abstract Optional<String> getCopyright();
 	public abstract Optional<String> getFhirVersion();
 	public abstract Optional<String> getContextType();
+	public abstract Optional<String> getDescription();
 
 	public abstract List<FhirContacts> getContacts();
 	public abstract List<String> getUseContexts();

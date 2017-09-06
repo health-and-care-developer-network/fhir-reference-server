@@ -178,7 +178,9 @@ public class FhirTreeTable {
 			if (maybeLogicalUrl
 			  && looksLikeUrl(description)
 			  && !new UrlValidator().testSingleUrl(description)) {
-				resourceInfos.add(new ResourceInfo("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
+				// textual link
+				resourceInfos.add(new ResourceInfo("Fixed Value",  Optional.empty(), Optional.of(FhirURL.buildOrThrow(description, version)), 
+						ResourceInfoType.FIXED_VALUE, true));
 			} else {
 				resourceInfos.add(makeResourceInfoWithMaybeUrl("Fixed Value", description, ResourceInfoType.FIXED_VALUE));
 			}

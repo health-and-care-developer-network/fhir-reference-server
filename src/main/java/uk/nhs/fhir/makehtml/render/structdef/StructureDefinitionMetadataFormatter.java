@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirContacts;
-import uk.nhs.fhir.data.structdef.FhirMapping;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -72,6 +71,8 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		Optional<String> version = structureDefinition.getVersion();
 		Optional<String> display = structureDefinition.getDisplay();
 		
+		Optional<String> description = structureDefinition.getDescription();
+		
 		// never used in NHS Digital profiles
 		/*
 		String displayExperimental;
@@ -102,7 +103,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		List<String> useContexts = structureDefinition.getUseContexts();
 		
 		// JE - information only relevant to the base resource - not relevant to the profile
-		List<FhirMapping> mappings = structureDefinition.getMappings();
+		/*List<FhirMapping> mappings = structureDefinition.getMappings();
 		List<Content> externalSpecMappings = Lists.newArrayList();
 		boolean multipleMappings = mappings.size() >= 2;
 		if (multipleMappings) {
@@ -125,7 +126,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 			if (mapping.getComments().isPresent()) {
 				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_VALUE), "(" + mapping.getComments().get() + ")"));
 			}
-		}
+		}*/
 		
 		List<String> useLocationContexts = structureDefinition.getUseLocationContexts();
 		
@@ -143,6 +144,13 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 				labelledValueCell("Constrained type", constrainedType, 1),
 				labelledValueCell("Constrained URL", displayBaseUrl, 1),
 				labelledValueCell("Status", status, 1)));
+		
+		if (description.isPresent()) {
+			tableContent.add(
+				Elements.withChildren("tr",
+					labelledValueCell("Description", description.get(), 4, true)));
+		}
+		
 		tableContent.add(
 			Elements.withChildren("tr",
 				labelledValueCell("Published by", publisher, 1),
@@ -163,11 +171,12 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 					cell(renderedPublishingOrgContacts, 4)));
 		}
 		
-		if (!externalSpecMappings.isEmpty()) {
+		// JE - don't want to show this
+		/*if (!externalSpecMappings.isEmpty()) {
 			tableContent.add(
 				Elements.withChild("tr", 
 					cell(externalSpecMappings, 4)));
-		}
+		}*/
 		
 		if (!useContexts.isEmpty()) {
 			throw new NotImplementedException("UseContext");

@@ -108,6 +108,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
+	public Optional<String> getDescription() {
+		return Optional.ofNullable(definition.getDescription());
+	}
+
+	@Override
 	public Optional<String> getCopyright() {
 		return Optional.ofNullable(definition.getCopyright());
 	}

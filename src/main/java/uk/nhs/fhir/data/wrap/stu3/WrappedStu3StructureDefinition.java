@@ -113,6 +113,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	}
 
 	@Override
+	public Optional<String> getDescription() {
+		return Optional.ofNullable(definition.getDescription());
+	}
+
+	@Override
 	public Optional<String> getFhirVersion() {
 		Optional<String> fhirVersionDesc = Optional.empty();
 		
