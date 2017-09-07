@@ -6,60 +6,59 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.api.ExtensionDt;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
+import uk.nhs.fhir.data.codesystem.FhirIdentifier;
+import uk.nhs.fhir.data.structdef.FhirContacts;
+import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.table.TableFormatter;
+import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 
-public class ValueSetMetadataFormatter extends MetadataTableFormatter {
+public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 
+	public ValueSetMetadataFormatter(WrappedValueSet valueSet, FhirFileRegistry otherResources) {
+		super(valueSet, otherResources);
+	}
+	
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		ValueSet valueSet = (ValueSet)source;
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(valueSet);
+		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
+
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
+		LinkCell.getStyles().forEach(section::addStyle);
 		
 		return section;
 	}
 
-	public Element getMetadataTable(ValueSet source) {
+	private Element getMetadataTable(WrappedValueSet source) {
+		Optional<String>  url = source.getUrl();
+		String  name = source.getName();
 
-		Optional<String>  url = Optional.ofNullable(source.getUrl());
-		Optional<String>  name = Optional.ofNullable(source.getName());
+		String status = source.getStatus();
 
-		String status = source.getStatus().toString();
+		Optional<String> OID = source.getOid();
+		Optional<String> reference = source.getReference();
 
-		Optional<String> OID= Optional.empty();
-		Optional<String> reference = Optional.empty();
-
-		for (ExtensionDt extension : source.getUndeclaredExtensions())
-		{
-			if (extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-sourceReference")) {
-				UriDt uri = (UriDt) extension.getValue();
-				reference = Optional.ofNullable(uri.getValueAsString());
-			}
-			if (extension.getUrl().contains("http://hl7.org/fhir/StructureDefinition/valueset-oid")) {
-				UriDt uri = (UriDt) extension.getValue();
-				OID = Optional.ofNullable(uri.getValueAsString());
-			}
-
-		}
-
-		Optional<String> version = Optional.ofNullable(source.getVersion());
+		Optional<String> version = source.getVersion();
 
 		// Never used in NHS Digital value sets
 		/*String displayExperimental;
@@ -70,23 +69,38 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 			displayExperimental = experimental ? "Yes" : "No";
 		}*/
 		
-		Optional<String> description = Optional.ofNullable(source.getDescription());
-		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
-		Optional<String> copyright = Optional.ofNullable(source.getCopyright());
+		Optional<String> description = source.getDescription();
+		Optional<String> publisher = source.getPublisher();
+		List<FhirContacts> publishingOrgContacts = source.getContacts();
+		Optional<String> copyright = source.getCopyright();
 
-		Optional<String> requirement = Optional.ofNullable(source.getRequirements());
+		Optional<String> requirement = source.getRequirements();
 
-		Date date = source.getDate();
+		Optional<Date> date = source.getDate();
 		Optional<String> displayDate =
-				(date == null) ?
-						Optional.empty() :
-						Optional.of(StringUtil.dateToString(date));
+			date.isPresent() ?
+				Optional.of(StringUtil.dateToString(date.get())) :
+				Optional.empty();
         if (!displayDate.isPresent())
         {
-            Date lastUpdated = source.getMeta().getLastUpdated();
+            Date lastUpdated = source.getSourceMeta().getLastUpdated();
             if (lastUpdated != null)
             displayDate = Optional.of(StringUtil.dateToString(lastUpdated));
         }
+        
+        Optional<Boolean> isExperimental = source.getExperimental();
+        String experimental = isExperimental.isPresent() ? isExperimental.get().toString() : BLANK;
+        
+        String identifierSystem = BLANK;
+		String identifierType = BLANK;
+		List<FhirIdentifier> identifiers = source.getIdentifiers();
+		if (identifiers.size() > 1) {
+			throw new IllegalStateException("Display multiple ValueSet identifiers");
+		}
+		for (FhirIdentifier identifier : identifiers) {
+			identifierSystem = identifier.getSystem().orElse(BLANK);
+			identifierType = identifier.getValue().orElse(BLANK);
+		}
 
         Element colgroup = Elements.newElement("colgroup");
         int columns = 4;
@@ -104,42 +118,56 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Name", name.get(), 2, true),
+				labelledValueCell("Name", name, 2, true),
 				labelledValueCell("URL", url.get(), 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-					labelledValueCell("Version", version, 1),
-					labelledValueCell("Status", status, 1),
-					labelledValueCell("Last updated", displayDate, 2)));
+				labelledValueCell("Version", version, 1),
+				labelledValueCell("Status", status, 1),
+				labelledValueCell("Last updated", displayDate, 1),
+				labelledValueCell("Experimental", experimental, 1)));
 
-		tableContent.add(
+		if (!Strings.isNullOrEmpty(identifierSystem)
+		  || !Strings.isNullOrEmpty(identifierType)) {
+			tableContent.add(
 				Elements.withChildren("tr",
-						labelledValueCell("Description", description.get(), 4, true)
-				));
+					labelledValueCell("Identifier system", identifierSystem, 1, true),
+					labelledValueCell("Identifier", identifierType, 1, true),
+					TableCell.empty().makeCell(),
+					TableCell.empty().makeCell()));
+		}
+		
+		if (description.isPresent()) {
+			tableContent.add(
+				Elements.withChildren("tr",
+					labelledValueCell("Description", description.get(), 4, true)));
+		}
         // KGM 5/May/2017
         if (requirement.isPresent()) {
             tableContent.add(
-                    Elements.withChildren("tr",
-                            labelledValueCell("Requirements", requirement.get(), 4, true)
-                    ));
+                Elements.withChildren("tr",
+                    labelledValueCell("Requirements", requirement.get(), 4, true)));
         }
         if (publisher.isPresent()) {
             tableContent.add(
-                    Elements.withChildren("tr",
-                            labelledValueCell("Publisher", publisher.get(), 4)
-                    ));
+                Elements.withChildren("tr",
+                    labelledValueCell("Publisher", publisher.get(), 4)));
         }
+		if (!publishingOrgContacts.isEmpty()) {
+			List<Content> renderedPublishingOrgContacts = new FhirContactRenderer().getPublishingOrgContactsContents(publishingOrgContacts);
+			tableContent.add(
+				Elements.withChild("tr", 
+					cell(renderedPublishingOrgContacts, 4)));
+		}
         if (copyright.isPresent()) {
             tableContent.add(
                     Elements.withChildren("tr",
-                            labelledValueCell("Copyright", copyright.get(), 4, true)
-                    ));
+                            labelledValueCell("Copyright", copyright.get(), 4, true)));
         }
 		if (reference.isPresent()) {
 			tableContent.add(
 					Elements.withChildren("tr",
-							labelledValueCell("Reference", reference.get(), 4, true)
-					));
+							labelledValueCell("Reference", reference.get(), 4, true)));
 		}
 
 		// Should this be in the identifier section? Makes sense when linked to Hl7v2 tables
@@ -150,14 +178,12 @@ public class ValueSetMetadataFormatter extends MetadataTableFormatter {
 					));
 		}
 
-		
-
 		Element table = 
 			Elements.withAttributeAndChildren("table",
 				new Attribute("class", FhirCSS.TABLE),
 				tableContent);
 		
-		String panelTitleName =  name.get();
+		String panelTitleName = name;
 		String panelTitle = "ValueSet: " + panelTitleName;
 		
 		FhirPanel panel = new FhirPanel(panelTitle, table);

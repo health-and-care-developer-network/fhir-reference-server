@@ -1,154 +1,73 @@
 package uk.nhs.fhir.makehtml.render.valueset;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.jdom2.Attribute;
-import org.jdom2.Element;
-import org.jdom2.Text;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.primitive.UriDt;
-import uk.nhs.fhir.makehtml.UrlValidator;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.FullFhirURL;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
-import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 
-public class ValueSetTableFormatter extends MetadataTableFormatter {
-
-	private static final String BLANK = "";
-
-    private ConceptMap conceptMap = null;
+public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 	
-	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		ValueSet valueSet = (ValueSet)source;
-		HTMLDocSection section = new HTMLDocSection();
-		
-		Element metadataPanel = getConceptDataTable(valueSet);
-		section.addBodyElement(metadataPanel);
-		
-		return section;
+	public ValueSetTableFormatter(WrappedValueSet wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
 	}
 
-	public Element getConceptDataTable(ValueSet source) {
+	//private static final String BLANK = "";
 
+    //private WrappedConceptMap conceptMap = null;
+	
+	@Override
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
+		
+		boolean filterPresent = wrappedResource.hasComposeIncludeFilter();
+		if (filterPresent) {
+			return new FilteredValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		} else {
+			return new ConceptsValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		}
+		
+		/*HTMLDocSection section = new HTMLDocSection();
+		
+		Element metadataPanel = getConceptDataTable();
+		section.addBodyElement(metadataPanel);
+		
+		Table.getStyles().forEach(section::addStyle);
+		FhirPanel.getStyles().forEach(section::addStyle);
+		LinkCell.getStyles().forEach(section::addStyle);
+		ValueWithInfoCell.getStyles().forEach(section::addStyle);
+		TableFormatter.getStyles().forEach(section::addStyle);
+		
+		return section;*/
+	}
+	
+	/*private Element getConceptDataTable() {
+		
+		
+		FhirValueSetCompose compose = wrappedResource.getCompose();
 
-		int columns = 4;
-        Boolean filterPresent = false;
-        conceptMap = getConceptMap(source);
-
-        if (conceptMap != null) {
-            columns = 5;
-        }
-        for (ValueSet.ComposeInclude include: source.getCompose().getInclude()) {
-            if (include.getFilter().size() > 0) filterPresent = true;
-        }
-
-        Element colgroup = Elements.newElement("colgroup");
-
-        Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
-
-        int percentPerColumn = 100/columns;
-
-        // Display when ConceptMap present
-        if (columns == 5) {
-            percentPerColumn = 10;
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-
-        }
-        else if (!filterPresent && columns == 4)
-        {
-            // Basic list of codes
-
-            percentPerColumn = 10;
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(3 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(1 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(2 * percentPerColumn) + "%"))));
-            colgroup.addContent(
-                    Elements.withAttributes("col",
-                            Lists.newArrayList(
-                                    new Attribute("width", Integer.toString(4 * percentPerColumn) + "%"))));
-        } else {
-            for (int i = 0; i < columns; i++) {
-                colgroup.addContent(
-                        Elements.withAttributes("col",
-                                Lists.newArrayList(
-                                        new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
-            }
-        }
-
-
-
-
-        List<Element> tableContent = Lists.newArrayList(colgroup);
-         /*
-
-        Include from an Internal CodeSystem
-
-         */
         Boolean first = true;
-        for (ValueSet.CodeSystemConcept concept: source.getCodeSystem().getConcept()) {
-            Optional<String> display = Optional.ofNullable(concept.getDisplay());
-            String displayDisplay = (display!=null && display.isPresent()) ? display.get() : BLANK;
-
-            Optional<String> system = Optional.ofNullable(source.getCodeSystem().getSystem());
-            String displaySystem = (system!=null && system.isPresent()) ? system.get() : BLANK;
-
-            Optional<String> definition = Optional.ofNullable(concept.getDefinition());
-            String displayDefinition = (definition!=null && definition.isPresent()) ? definition.get() : BLANK;
-            if (first) {
-                tableContent.add(codeHeader(true));
-                tableContent.add(codeSystem(displaySystem,true, false, "Inline code system"));
-            }
-            tableContent.add(
-                        codeContent(concept.getCode(), displayDisplay, displayDefinition, getConceptMapping(concept.getCode())));
-            first = false;
+        Optional<FhirCodeSystemConcepts> codeSystem = wrappedResource.getCodeSystem();
+        if (codeSystem.isPresent()) {
+			String system = codeSystem.get().getSystem();
+	        
+	        for (FhirCodeSystemConcept concept: codeSystem.get().getConcepts()) {
+	        	String description = concept.getDescription().orElse(BLANK);
+	            String definition = concept.getDefinition().orElse(BLANK);
+	            
+	            if (first) {
+	                tableContent.add(codeHeader(true));
+	                tableContent.add(codeSystem(system, true, false, "Inline code system"));
+	            }
+	            
+	            tableContent.add(
+	                        codeContent(concept.getCode(), description, definition, getConceptMapping(concept.getCode())));
+	            first = false;
+	        }
         }
 
-		for (UriDt uri :source.getCompose().getImport()) {
+
+		for (String uri :compose.getImportUris()) {
             if (first)
             {
                 tableContent.add(
@@ -162,25 +81,22 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
             tableContent.add(
                     Elements.withChildren("tr",
                             labelledValueCell("Import",BLANK , 1, true, true, false,false,"Import the contents of another ValueSet"),
-                            labelledValueCell(BLANK, uri.getValue(), 1, true),
+                            labelledValueCell(BLANK, uri, 1, true),
                             labelledValueCell(BLANK, "", 1, true, true, false),
                             labelledValueCell(BLANK, "", 1, true, true, false)));
-        }
+        }*/
         /*
 
         Include from an External CodeSystem
 
          */
-		for (ValueSet.ComposeInclude include: source.getCompose().getInclude()) {
+		/*for (FhirValueSetComposeInclude include: compose.getIncludes()) {
 
 
             Boolean filterFirst = true;
-            for (ValueSet.ComposeIncludeFilter filter: include.getFilter()) {
+            for (FhirValueSetComposeIncludeFilter filter: include.getFilters()) {
                 // Display System first. Filter or Included must follow
                 if (filterFirst && include.getSystem() != null) {
-                    // May not have an included CodeSystem
-                    Optional<String> version = Optional.ofNullable(include.getVersion());
-                    String displayVersion = (version != null && version.isPresent() ) ? version.get() : BLANK;
                     tableContent.add(codeHeader(false));
                     tableContent.add(
                             codeSystem( include.getSystem() ,false, true, "External Code System"));
@@ -197,39 +113,42 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                 // Added a filter so force column header
 
             }
+            
             Boolean composeFirst = true;
-			for (ValueSet.ComposeIncludeConcept concept : include.getConcept()) {
+			for (FhirCodeSystemConcept concept : include.getConcepts()) {
 
-                if (first && include.getSystem() != null) {
-                    // May not have an included CodeSystem
-                    Optional<String> version = Optional.ofNullable(include.getVersion());
-                    String displayVersion = (version != null && version.isPresent()) ? version.get() : BLANK;
+				boolean hasSystem = (include.getSystem() != null);
+				
+                if (first 
+                  && hasSystem) {
                     tableContent.add(codeHeader(true));
                     first = false;
                 }
-                if (composeFirst && include.getSystem() != null) {
-                    tableContent.add(codeSystem( include.getSystem(), false, true,"External Code System"));
+                
+                if (composeFirst 
+                  && hasSystem) {
+                    tableContent.add(codeSystem(include.getSystem(), false, true,"External Code System"));
                     composeFirst = false;
                 }
 
-                Optional<String> display = Optional.ofNullable(concept.getDisplay());
-                String displayDisplay = (display != null && display.isPresent()) ? display.get() : BLANK;
+                String description = concept.getDescription().orElse(BLANK);
+                
                 // Add the code details
-                tableContent.add(codeContent(concept.getCode(), displayDisplay, BLANK, getConceptMapping(concept.getCode())));
+                tableContent.add(codeContent(concept.getCode(), description, BLANK, getConceptMapping(concept.getCode())));
 
             }
 
-		}
+		}*/
 		/*
 
         Exclude from External CodeSystem
 
          */
-        for (ValueSet.ComposeInclude exclude: source.getCompose().getExclude()) {
+        /*for (FhirValueSetComposeInclude exclude: compose.getExcludes()) {
 
 
             if (exclude.getSystem() != null) {
-                Optional<String> version = Optional.ofNullable(exclude.getVersion());
+                Optional<String> version = exclude.getVersion();
                 String displayVersion = (version != null && version.isPresent() ) ? version.get() : BLANK;
                 tableContent.add(
                         Elements.withChildren("tr",
@@ -237,15 +156,13 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                                 labelledValueCell("Version", displayVersion, 2, true)));
             }
 
-
-            for (ValueSet.ComposeIncludeConcept concept : exclude.getConcept()) {
-                Optional<String> display = Optional.ofNullable(concept.getDisplay());
-                String displayDisplay = (display != null && display.isPresent()) ? display.get() : BLANK;
+            for (FhirCodeSystemConcept concept : exclude.getConcepts()) {
+                String description = concept.getDescription().orElse(BLANK);
 
                 if (first) {
                     tableContent.add(codeHeader(true));
                 }
-                codeContent(concept.getCode(), BLANK, displayDisplay, getConceptMapping(concept.getCode()));
+                codeContent(concept.getCode(), BLANK, description, getConceptMapping(concept.getCode()));
 
                 first  = false;
             }
@@ -265,33 +182,18 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 
 		return panel.makePanel();
 	}
-    private String getConceptMapping(String code)
-    {
+
+	private String getConceptMapping(String code) {
         String mapping = BLANK;
         if (conceptMap != null) {
-            for (ConceptMap.Element mapElement : conceptMap.getElement()) {
-                if (code.equals(mapElement.getCode()) && mapElement.getTarget().size() > 0) {
-                    mapping = "~" + mapElement.getTarget().get(0).getCode();
+            for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
+                if (code.equals(mapElement.getCode()) 
+                  && mapElement.getTargets().size() > 0) {
+                    mapping = "~" + mapElement.getTargets().get(0).getCode();
                 }
             }
         }
         return mapping;
-    }
-    
-	private ConceptMap getConceptMap(ValueSet source)
-    {
-        // Included ConceptMaps - this is coded so ConceptMap can be a separate resource
-        ConceptMap conceptMap = null;
-
-        for (IResource resource : source.getContained().getContainedResources())
-        {
-            if (resource instanceof ConceptMap)
-            {
-                conceptMap = (ConceptMap) resource;
-            }
-        }
-            
-        return conceptMap;
     }
 	
     private Element codeSystem(String displaySystem, Boolean internal, Boolean reference, String hint)
@@ -313,6 +215,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                     labelledValueCell(BLANK, BLANK, 1, true));
         }
     }
+    
     private Element codeContent(String code, String display, String definition, String mapping)
     {
         if (conceptMap == null) {
@@ -331,6 +234,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                     labelledValueCell(BLANK, mapping, 1, true));
         }
     }
+    
     private Element codeHeader(Boolean full)
     {
 	    if (full) {
@@ -386,9 +290,9 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 	}
 	
 	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
-		String cssClass = FhirCSS.METADATA_LABEL;
+		String cssClass = FhirCSS.DATA_LABEL;
 		if (valueIsEmpty && !alwaysBold) {
-			cssClass += " " + FhirCSS.METADATA_LABEL_EMPTY;
+			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		
 		if (label.length() > 0) {
@@ -408,8 +312,8 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
 		boolean url = (value.startsWith("http://") || value.startsWith("https://"))
 		  && new UrlValidator().testSingleUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 20;
-		String fhirMetadataClass = FhirCSS.METADATA_VALUE;
-		if (!largeText) fhirMetadataClass += " " + FhirCSS.METADATA_VALUE_SMALLTEXT;
+		String fhirMetadataClass = FhirCSS.DATA_VALUE;
+		if (!largeText) fhirMetadataClass += " " + FhirCSS.DATA_VALUE_SMALLTEXT;
 		
 		if (url) {
 		    if (reference) {
@@ -418,7 +322,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                     Elements.withAttributesAndChildren("a",
                         Lists.newArrayList(
                             new Attribute("class", FhirCSS.LINK),
-                            new Attribute("href", FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("href", FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(value, getResourceVersion()), getResourceVersion()).toLinkString()),
                             new Attribute("title", hint)),
                         Lists.newArrayList(
                             new Text(value),
@@ -433,7 +337,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                         Elements.withAttributesAndText("a",
                             Lists.newArrayList(
                                 new Attribute("class", FhirCSS.LINK),
-                                new Attribute("href", FhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                                new Attribute("href", FhirURL.buildOrThrow(ValuesetLinkFix.fixLink(value, getResourceVersion()), getResourceVersion()).toLinkString()),
                                 new Attribute("title", hint)),
                             value)
                 //        ,new Text(" (internal)") // Removed internal, using icon for external instead
@@ -444,7 +348,7 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                     Elements.withAttributesAndText("a",
                         Lists.newArrayList(
                             new Attribute("class", FhirCSS.LINK),
-                            new Attribute("href", FullFhirURL.buildOrThrow(Dstu2Fix.fixValuesetLink(value)).toLinkString()),
+                            new Attribute("href", FullFhirURL.buildOrThrow(ValuesetLinkFix.fixLink(value, getResourceVersion()), getResourceVersion()).toLinkString()),
                             new Attribute("title", hint)),
                         value));
             }
@@ -454,5 +358,5 @@ public class ValueSetTableFormatter extends MetadataTableFormatter {
                 new Attribute("class", fhirMetadataClass),
                 value);
 		}
-	}
+	}*/
 }

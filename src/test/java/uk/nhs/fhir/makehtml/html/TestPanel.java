@@ -10,6 +10,7 @@ import org.junit.Test;
 import junit.framework.Assert;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 
 public class TestPanel {
 

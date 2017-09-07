@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -16,27 +15,29 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.ResourceSectionType;
-import uk.nhs.fhir.makehtml.html.Dstu2Fix;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.ResourceFlagsCell;
-import uk.nhs.fhir.makehtml.html.Table;
-import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.BindingInfo;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.ValuesetLinkFix;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
+import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
-public class StructureDefinitionBindingFormatter extends ResourceFormatter {
-
-	public StructureDefinitionBindingFormatter() { this.resourceSectionType = ResourceSectionType.BINDING; }
+public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
+	
+	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition, FhirFileRegistry otherResources) {
+		super(structureDefinition, otherResources);
+	}
 
     private static final String BLANK = "";
 
@@ -46,8 +47,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     Boolean foundBinding = false;
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		StructureDefinition structureDefinition = (StructureDefinition)source;
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		
 		HTMLDocSection section = new HTMLDocSection();
 
@@ -82,7 +82,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 
         for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);
@@ -131,7 +131,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.HTTP_HL7_DSTU2 + "/terminologies.html#" + anchorStrength),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.versionBase(wrappedResource.getImplicitFhirVersion()) + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);
@@ -142,7 +142,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     
     private Element labelledValueCell(String label, FhirURL url, int colspan) {
     	
-    	return labelledValueCell(label, url.toFullString(), colspan, FhirURL.isLogicalUrl(url.toFullString()) ? null : url.toLinkString());
+    	return labelledValueCell(label, url.toFullString(), colspan, url.isLogicalUrl() ? null : url.toLinkString());
     }
 
     private Element labelledValueCell(String label, String value, int colspan, String uriOverride) {
@@ -154,11 +154,11 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     		uriToDisplay = Optional.of(value);
     	}
     	
-    	String cssClass = FhirCSS.METADATA_VALUE;
+    	String cssClass = FhirCSS.DATA_VALUE;
     	String displayText = value;
     	if (!Strings.isNullOrEmpty(label)) {
     		displayText = label;
-    		cssClass = FhirCSS.METADATA_LABEL;
+    		cssClass = FhirCSS.DATA_LABEL;
     	}
         
         List<Element> cellSpans = Lists.newArrayList();
@@ -169,7 +169,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
         } else {
         	String uri = uriToDisplay.get();
         	
-        	uri = Dstu2Fix.fixValuesetLink(uri);
+        	uri = ValuesetLinkFix.fixLink(uri, getResourceVersion());
         	
         	List<Content> linkContents = Lists.newArrayList();
     		linkContents.add(new Text(displayText));
@@ -212,7 +212,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter {
     private Element cell(List<? extends Content> content, int colspan) {
         return Elements.withAttributesAndChildren("td",
                 Lists.newArrayList(
-                        new Attribute("class", FhirCSS.METADATA_CELL),
+                        new Attribute("class", FhirCSS.DATA_CELL),
                         new Attribute("colspan", Integer.toString(colspan))),
                 content);
     }

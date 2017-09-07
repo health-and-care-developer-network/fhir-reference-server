@@ -16,24 +16,27 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.prep.ImplementationGuidePreparer;
-import uk.nhs.fhir.makehtml.prep.OperationDefinitionPreparer;
-import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
-import uk.nhs.fhir.makehtml.prep.ValueSetPreparer;
-import uk.nhs.fhir.makehtml.render.ResourceBuilder;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.UrlValidator;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 
 /**
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain {
-    private static final String fileExtension = ".xml";
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+
+	// Set on startup. Path to folder containing extension files.
+	private static String suppliedResourcesFolderPath = null;
+	
+	public static String getSuppliedResourcesFolderPath() {
+		return suppliedResourcesFolderPath;
+	}
     
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
@@ -43,7 +46,7 @@ public class NewMain {
 	
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static final boolean TEST_LINK_URLS = false;
-
+	
     private final File inputDirectory;
     private final String outPath;
     private final String newBaseURL;
@@ -74,7 +77,7 @@ public class NewMain {
             if (!resourcesPath.endsWith(File.separator)) {
             	resourcesPath += File.separator;
             }
-            FhirIcon.setSuppliedResourcesFolderPath(resourcesPath);
+            suppliedResourcesFolderPath = resourcesPath;
             
             if (!inputDir.endsWith(File.separator)) {
             	inputDir += File.separator;
@@ -85,17 +88,7 @@ public class NewMain {
             
             NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
             
-            ResourceBuilder resourceBuilder =
-            	new ResourceBuilder(
-            		new StructureDefinitionPreparer(),
-            		new ValueSetPreparer(),
-            		new OperationDefinitionPreparer(),
-            		new ImplementationGuidePreparer());	
-            
-            FileProcessor fileProcessor =
-    	    	new FileProcessor(resourceBuilder);
-            
-            instance.process(fileProcessor);
+            instance.process();
         }
     }
 
@@ -104,17 +97,16 @@ public class NewMain {
      *
      * @param directoryPath
      */
-    private void process(FileProcessor fileProcessor) {
+    private void process() {
+    	List<File> potentialFhirFiles = new XmlFileFinder(inputDirectory).findFiles();
     	
-        File[] allProfiles = inputDirectory.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(fileExtension);
-            }
-        });
+    	FhirFileRegistry fhirFileRegistry = cacheParsedFhirFiles(potentialFhirFiles);
 
+        FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
-	        for (File thisFile : allProfiles) {
-	        	fileProcessor.processFile(outPath, newBaseURL, inputDirectory, thisFile);
+        	
+        	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
+	        	fileProcessor.processFile(outPath, newBaseURL, e.getKey(), e.getValue());
 	        }
 	        
 	        if (TEST_LINK_URLS) {
@@ -125,4 +117,14 @@ public class NewMain {
         	e.printStackTrace();
         }
     }
+
+	private FhirFileRegistry cacheParsedFhirFiles(List<File> potentialFhirFiles) {
+		FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
+		
+		for (File xmlFile : potentialFhirFiles) {
+			fhirFileRegistry.register(xmlFile);
+		}
+		
+		return fhirFileRegistry;
+	}
 }

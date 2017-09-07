@@ -2,11 +2,11 @@ package uk.nhs.fhir.makehtml.render.opdef;
 
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.LinkCell;
-import uk.nhs.fhir.makehtml.html.SimpleTextCell;
-import uk.nhs.fhir.makehtml.html.TableRow;
-import uk.nhs.fhir.makehtml.html.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.SimpleTextCell;
+import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.TableRow;
 
 public class OperationDefinitionParameterRowFormatter {
 

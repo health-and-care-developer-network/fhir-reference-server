@@ -17,13 +17,15 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.prep.StructureDefinitionPreparer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
@@ -33,9 +35,8 @@ public class TestStructureDefinition {
 	@Ignore
 	@Test
 	public void testBuildStructureDefinition() throws FileNotFoundException, IOException, ConfigurationException, DataFormatException, ParserConfigurationException {
-		IParser parser = HAPIUtils.sharedFhirContext().newXmlParser();
+		IParser parser = FhirContexts.forVersion(FhirVersion.DSTU2).newXmlParser();
 		try (
-				// TODO KGM 9/May/2017 moved to older strucutre definition example.
 			BufferedReader reader = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("example_structure_definition3.xml").getFile()));
 		) {
 			reader.mark(1);
@@ -46,10 +47,12 @@ public class TestStructureDefinition {
 			}
 			
 			StructureDefinition structureDefinition = (StructureDefinition)parser.parseResource(reader);
-			new StructureDefinitionPreparer().prepare(structureDefinition, null);
+			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition) WrappedResource.fromBaseResource(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
-			for (FormattedOutputSpec formatter : ResourceFormatter.formattersForResource(structureDefinition, "this/path/isnt/used")) {
-				HTMLDocSection sectionHTML = formatter.getFormatter().makeSectionHTML(structureDefinition);
+			
+			for (FormattedOutputSpec<WrappedStructureDefinition> formatSpec : wrappedStructureDefinition.getFormatSpecs("this/path/isnt/used", null)) {
+				ResourceFormatter<WrappedStructureDefinition> formatter = formatSpec.getFormatter();
+				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {
 					doc.addSection(sectionHTML);
 				}

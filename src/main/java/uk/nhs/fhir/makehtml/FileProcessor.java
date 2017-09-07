@@ -1,70 +1,31 @@
 package uk.nhs.fhir.makehtml;
 
-import static java.io.File.separatorChar;
-
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import com.google.common.base.Preconditions;
-
-import ca.uhn.fhir.context.FhirContext;
-import uk.nhs.fhir.makehtml.render.ResourceBuilder;
-import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.makehtml.render.ResourceTextSectionInserter;
-import uk.nhs.fhir.util.HAPIUtils;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 
 public class FileProcessor {
     private static final Logger LOG = Logger.getLogger(FileProcessor.class.getName());
-	
-    private final FhirContext fhirContext;
-    private final ResourceBuilder resourceBuilder;
     
-    public FileProcessor(ResourceBuilder resourceBuilder) {
-    	
-    	this.fhirContext = HAPIUtils.sharedFhirContext();
-    	Preconditions.checkNotNull(resourceBuilder);
-    	
-    	this.resourceBuilder = resourceBuilder;
+    // private final FhirFileParser parser = new FhirFileParser();
+    
+    private final FhirFileRegistry fhirFileRegistry;
+    
+    public FileProcessor(FhirFileRegistry fhirFileRegistry) {
+    	this.fhirFileRegistry = fhirFileRegistry;
     }
     
-	public void processFile(String outPath, String newBaseURL, File folder, File thisFile) throws Exception {
-		if (thisFile.isFile()) {
-			
-		    String inFilePath = thisFile.getPath();
-		    LOG.info("\n\n=========================================\nProcessing file: " + inFilePath + "\n=========================================");
-
-		    IBaseResource resource = parseFile(thisFile);
-
-		    // Persist a copy of the xml file with a rendered version embedded in the text section
-		    String outputDirectoryName = resource.getClass().getSimpleName();
-		    String outDirPath = outPath + outputDirectoryName; 
-			new File(outDirPath).mkdirs();
-			
-			String outFilePath = outDirPath + separatorChar + thisFile.getName();
-			System.out.println("Generating " + outFilePath);
-		    ResourceTextSectionInserter textSectionInserter = new ResourceTextSectionInserter(resourceBuilder);
-		    textSectionInserter.augmentResource(resource, inFilePath, outFilePath, newBaseURL);
-		    
-		    List<FormattedOutputSpec> formatters = ResourceFormatter.formattersForResource(resource, outPath);
-		    for (FormattedOutputSpec formatter : formatters) {
-				System.out.println("Generating " + formatter.getOutputPath(inFilePath));
-		    	formatter.formatAndSave(inFilePath);
-		    }
-		}
-	}
-
-	IBaseResource parseFile(File thisFile) throws ParserConfigurationException, IOException, FileNotFoundException {
-		try (FileReader fr = new FileReader(thisFile)) {
-			IBaseResource resource = fhirContext.newXmlParser().parseResource(fr);
-			return resource;
+	public <T extends WrappedResource<T>> void processFile(String outPath, String newBaseURL, File thisFile, WrappedResource<?> wrappedResource) throws Exception {
+		
+	    String inFilePath = thisFile.getPath();
+	    LOG.info("\n\n=========================================\nProcessing file: " + inFilePath + "\n=========================================");
+		
+	    wrappedResource.saveAugmentedResource(thisFile, wrappedResource, outPath, newBaseURL, fhirFileRegistry);
+		
+		for (FormattedOutputSpec<?> formatter : wrappedResource.getFormatSpecs(outPath, fhirFileRegistry)) {
+			System.out.println("Generating " + formatter.getOutputPath(inFilePath));
+			formatter.formatAndSave(inFilePath, fhirFileRegistry);
 		}
 	}
 }

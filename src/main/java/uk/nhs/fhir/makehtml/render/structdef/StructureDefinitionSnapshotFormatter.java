@@ -2,30 +2,32 @@ package uk.nhs.fhir.makehtml.render.structdef;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Element;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.UnchangedSliceInfoRemover;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.FhirTreeTable;
-import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.TreeTableFormatter;
 
-public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
+public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 	
+	public StructureDefinitionSnapshotFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
+	}
+
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		StructureDefinition structureDefinition = (StructureDefinition)source;
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 
 		HTMLDocSection section = new HTMLDocSection();
 		
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(structureDefinition);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 
-		boolean isExtension = structureDefinition.getConstrainedType().equals("Extension");
+		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
 			FhirTreeData differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
 			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);
@@ -35,7 +37,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter {
 		snapshotTreeData.stripRemovedElements();
 		snapshotTreeData.tidyData();
 		
-		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData);
+		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData, getResourceVersion());
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();
