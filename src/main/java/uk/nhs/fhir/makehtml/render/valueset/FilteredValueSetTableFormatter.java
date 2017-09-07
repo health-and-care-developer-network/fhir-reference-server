@@ -35,7 +35,7 @@ public class FilteredValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 	
 	private Element buildFilteredCodeSystemPanel() {
-		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource);
+		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource, otherResources);
 		List<ValueSetFilteredCodeSystemTableData> rows = tableData.getRows();
 		ValueSetFilteredCodeSystemRowFormatter rowFormatter = new ValueSetFilteredCodeSystemRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();

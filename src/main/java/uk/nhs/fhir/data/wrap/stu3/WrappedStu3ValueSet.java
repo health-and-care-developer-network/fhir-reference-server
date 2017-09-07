@@ -33,6 +33,7 @@ import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class WrappedStu3ValueSet extends WrappedValueSet {
@@ -101,13 +102,22 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 	}
 
 	@Override
-	public List<WrappedConceptMap> getConceptMaps() {
-		return definition
-			.getContained()
-			.stream()
-			.filter(resource -> resource instanceof ConceptMap)
-			.map(resource -> WrappedConceptMap.fromDefinition(resource))
-			.collect(Collectors.toList());
+	public List<WrappedConceptMap> getConceptMaps(FhirFileRegistry otherResources) {
+		List<WrappedConceptMap> conceptMaps = Lists.newArrayList();
+		conceptMaps.addAll(
+			definition
+				.getContained()
+				.stream()
+				.filter(resource -> resource instanceof ConceptMap)
+				.map(resource -> WrappedConceptMap.fromDefinition(resource))
+				.collect(Collectors.toList()));
+
+		Optional<String> valueSetUrl = getUrl();
+		if (valueSetUrl.isPresent()) {
+			 conceptMaps.addAll(otherResources.getConceptMapsForSource(valueSetUrl.get()));
+		}
+		
+		return conceptMaps;
 	}
 
 	@Override

@@ -7,8 +7,7 @@ import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapMetadataFormatter;
-import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapTableFormatter;
+import uk.nhs.fhir.makehtml.render.conceptmap.ConceptMapFormatter;
 
 public class ValueSetFormatter extends ResourceFormatter<WrappedValueSet> {
 
@@ -27,12 +26,9 @@ public class ValueSetFormatter extends ResourceFormatter<WrappedValueSet> {
 		valueSetSection.addSection(metadataPanel);
 		valueSetSection.addSection(conceptTable);
 		
-		for (WrappedConceptMap conceptMap : wrappedResource.getConceptMaps()) {
-			HTMLDocSection conceptMapMetadata = new ConceptMapMetadataFormatter(conceptMap, otherResources).makeSectionHTML();
-			HTMLDocSection conceptMapTableData = new ConceptMapTableFormatter(conceptMap, otherResources).makeSectionHTML();
-
-			valueSetSection.addSection(conceptMapMetadata);
-			valueSetSection.addSection(conceptMapTableData);
+		for (WrappedConceptMap conceptMap : wrappedResource.getConceptMaps(otherResources)) {
+			HTMLDocSection formattedConceptMap = new ConceptMapFormatter(conceptMap, otherResources).makeSectionHTML();
+			valueSetSection.addSection(formattedConceptMap);
 		}
 
 		return valueSetSection;

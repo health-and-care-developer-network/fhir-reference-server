@@ -21,7 +21,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 
 	public abstract Optional<String> getCopyright();
 	public abstract void setCopyright(String copyRight);
-	public abstract List<WrappedConceptMap> getConceptMaps();
+	public abstract List<WrappedConceptMap> getConceptMaps(FhirFileRegistry otherResources);
 	public abstract String getStatus();
 	public abstract List<FhirIdentifier> getIdentifiers();
 	public abstract Optional<String> getOid();

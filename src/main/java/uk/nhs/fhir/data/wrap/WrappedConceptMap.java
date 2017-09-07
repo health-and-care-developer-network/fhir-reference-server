@@ -28,6 +28,7 @@ public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMa
 	public abstract Optional<Date> getDate();
 	public abstract String getSource();
 	public abstract String getTarget();
+	public abstract String getSourceUrl();
 	
 	public abstract List<FhirConceptMapElement> getElements();
 

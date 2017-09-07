@@ -122,6 +122,16 @@ public class WrappedStu3ConceptMap extends WrappedConceptMap {
 	public IBaseResource getWrappedResource() {
 		return definition;
 	}
+	
+	@Override
+	public String getSourceUrl() {
+		try {
+			Reference sourceReference = definition.getSourceReference();
+			return sourceReference.getDisplay();
+		} catch (FHIRException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@Override
 	public IBaseMetaType getSourceMeta() {
@@ -147,5 +157,4 @@ public class WrappedStu3ConceptMap extends WrappedConceptMap {
 			throw new IllegalStateException(e);
 		}
 	}
-
 }

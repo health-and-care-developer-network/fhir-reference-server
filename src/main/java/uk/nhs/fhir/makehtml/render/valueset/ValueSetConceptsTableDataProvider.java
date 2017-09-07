@@ -65,7 +65,7 @@ public class ValueSetConceptsTableDataProvider {
 			
 			String mappedCode = null;
 			
-			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps()) {
+			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(registry)) {
 				for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
 	                if (code.equals(mapElement.getCode())) {
 	                	if (mapElement.getTargets().isEmpty()) {

@@ -84,6 +84,13 @@ public class WrappedDstu2ConceptMap extends WrappedConceptMap {
 	}
 
 	@Override
+	public String getSourceUrl() {
+		// IDatatype source = definition.getSource();
+		// return source.toString();
+		throw new IllegalStateException("Test with real data to ensure toString returns the URL as expected");
+	}
+
+	@Override
 	public List<FhirConceptMapElement> getElements() {
 		List<FhirConceptMapElement> elements = Lists.newArrayList();
 		

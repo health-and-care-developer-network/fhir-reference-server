@@ -13,6 +13,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
+import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 
@@ -96,5 +97,19 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	@Override
 	public Iterator<Entry<File, WrappedResource<?>>> iterator() {
 		return resourcesByFile.entrySet().iterator();
+	}
+
+	public List<WrappedConceptMap> getConceptMapsForSource(String sourceUrl) {
+		return resourcesByFile
+			.values()
+			.stream()
+			.filter(resource -> resource instanceof WrappedConceptMap)
+			.map(resource -> (WrappedConceptMap)resource)
+			.filter(conceptMap -> conceptMapUrlMatches(conceptMap, sourceUrl))
+			.collect(Collectors.toList());
+	}
+	
+	private boolean conceptMapUrlMatches(WrappedConceptMap map, String match) {
+		return map.getSource().equals(match);
 	}
 }
