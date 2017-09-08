@@ -27,6 +27,8 @@ import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.enums.ResourceType.CODESYSTEM;
+import static uk.nhs.fhir.enums.ResourceType.CONCEPTMAP;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -241,6 +243,12 @@ public class PlainContent extends CORSInterceptor {
         if (resourceType == IMPLEMENTATIONGUIDE) {
         	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
+        if (resourceType == CODESYSTEM) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
+        if (resourceType == CONCEPTMAP) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
         
         // Return resource name (for breadcrumb)
         return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
@@ -288,8 +296,9 @@ public class PlainContent extends CORSInterceptor {
     	// Check if we have a nice metadata table from the renderer
     	boolean hasGeneratedMetadataFromRenderer = false;
     	for (SupportingArtefact artefact : metadata.getArtefacts()) {
-    		if (artefact.getArtefactType().equals(ArtefactType.METADATA)) {
+    		if (artefact.getArtefactType().isMetadata()) {
     			hasGeneratedMetadataFromRenderer = true;
+    			context.put( "metadataType", artefact.getArtefactType().name());
     		}
     	}
     	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);

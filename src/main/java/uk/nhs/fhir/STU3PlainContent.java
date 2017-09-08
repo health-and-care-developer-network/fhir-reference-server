@@ -57,6 +57,7 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
@@ -232,13 +233,13 @@ public class STU3PlainContent extends CORSInterceptor {
         if (resourceType == STRUCTUREDEFINITION) {
             content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
         }
-        if (resourceType == VALUESET) {
+        else if (resourceType == VALUESET) {
         	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));
         }
-        if (resourceType == OPERATIONDEFINITION) {
+        else if (resourceType == OPERATIONDEFINITION) {
         	content.append(describeResource(resourceID, baseURL, context, "Operation Description", resourceType));
         }
-        if (resourceType == IMPLEMENTATIONGUIDE) {
+        else {
         	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
         
@@ -288,16 +289,20 @@ public class STU3PlainContent extends CORSInterceptor {
     	// Check if we have a nice metadata table from the renderer
     	boolean hasGeneratedMetadataFromRenderer = false;
     	for (SupportingArtefact artefact : metadata.getArtefacts()) {
-    		if (artefact.getArtefactType().equals(ArtefactType.METADATA)) {
+    		if (artefact.getArtefactType().isMetadata()) {
     			hasGeneratedMetadataFromRenderer = true;
+    			context.put( "metadataType", artefact.getArtefactType().name());
     		}
     	}
     	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
     	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
     	
-    	// Tree view
-    	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
-    	context.put( "treeView", textSection );
+    	// NOTE: We no longer render the text section from a resource...
+    	/*IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
+    	if (helper != null) {
+	    	String textSection = helper.getTextSection(resource);
+	    	context.put( "treeView", textSection );
+    	}*/
     	
     	// Examples
     	ExampleResources examples = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
