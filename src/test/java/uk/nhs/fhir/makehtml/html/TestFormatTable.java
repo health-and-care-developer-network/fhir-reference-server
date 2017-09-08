@@ -27,7 +27,7 @@ public class TestFormatTable {
 	public void testWriteSimpleCell() throws IOException {
 		Element simpleCell = new SimpleTextCell("test_text").makeCell();
 		String simpleCellHTML = HTMLUtil.docToString(new Document(simpleCell), false, false);
-		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\">test_text</td>";
+		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-tree-cell\">test_text</td>";
 		Assert.assertEquals(expected, simpleCellHTML);
 	}
 	
@@ -36,7 +36,7 @@ public class TestFormatTable {
 		LinkDatas data = new LinkDatas(new LinkData(FhirURL.buildOrThrow("http://testURL", FhirVersion.DSTU2), "test_link_text"));
 		Element linkCell = new LinkCell(data).makeCell();
 		String simpleLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
-		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\">" 
+		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"fhir-tree-cell\">" 
 							+ "<a class=\"fhir-link\" href=\"http://testURL\">" 
 								+ "test_link_text" 
 							+ "</a>" 
@@ -49,7 +49,7 @@ public class TestFormatTable {
 		LinkDatas data = new LinkDatas(new LinkData(FhirURL.buildOrThrow("http://testURL", FhirVersion.DSTU2), "test_link_text"));
 		Element linkCell = new LinkCell(data, Sets.newHashSet("cell-class-1", "cell-class-2"), Sets.newHashSet("link-class-1 link-class-2")).makeCell();
 		String formattedLinkCellHTML = HTMLUtil.docToString(new Document(linkCell), false, false);
-		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 cell-class-1\">" 
+		String expected = "<td xmlns=\"http://www.w3.org/1999/xhtml\" class=\"cell-class-2 fhir-tree-cell cell-class-1\">" 
 							+ "<a class=\"link-class-1 link-class-2 fhir-link\" href=\"http://testURL\">" 
 								+ "test_link_text" 
 							+ "</a>" 
@@ -63,8 +63,8 @@ public class TestFormatTable {
 		Element rowElement = row.makeRow();
 		String rowHTML = HTMLUtil.docToString(new Document(rowElement), false, false);
 		String expected = "<tr xmlns=\"http://www.w3.org/1999/xhtml\">"
-							+ "<td>first cell</td>"
-							+ "<td>second cell</td>"
+							+ "<td class=\"fhir-tree-cell\">first cell</td>"
+							+ "<td class=\"fhir-tree-cell\">second cell</td>"
 						+ "</tr>";
 		Assert.assertEquals(expected, rowHTML);
 	}
@@ -91,8 +91,8 @@ public class TestFormatTable {
 							+ "</thead>"
 							+ "<tbody>"
 								+ "<tr>"
-									+ "<td>first cell</td>"
-									+ "<td>second cell</td>"
+									+ "<td class=\"fhir-tree-cell\">first cell</td>"
+									+ "<td class=\"fhir-tree-cell\">second cell</td>"
 								+ "</tr>"
 							+ "</tbody>"
 						+ "</table>";
@@ -124,9 +124,9 @@ public class TestFormatTable {
 								+ "</tr>"
 							+ "</thead>"
 							+ "<tbody>"
-								+ "<tr><td>Search engine</td><td><a class=\"fhir-link\" href=\"https://www.google.com\">Google</a></td></tr>"
-								+ "<tr><td>News</td><td><a class=\"fhir-link\" href=\"http://news.bbc.co.uk\">BBC News</a></td></tr>"
-								+ "<tr><td>Encyclopedia</td><td><a class=\"fhir-link\" href=\"https://www.wikipedia.org\">Wikipedia</a></td></tr>"
+								+ "<tr><td class=\"fhir-tree-cell\">Search engine</td><td class=\"fhir-tree-cell\"><a class=\"fhir-link\" href=\"https://www.google.com\">Google</a></td></tr>"
+								+ "<tr><td class=\"fhir-tree-cell\">News</td><td class=\"fhir-tree-cell\"><a class=\"fhir-link\" href=\"http://news.bbc.co.uk\">BBC News</a></td></tr>"
+								+ "<tr><td class=\"fhir-tree-cell\">Encyclopedia</td><td class=\"fhir-tree-cell\"><a class=\"fhir-link\" href=\"https://www.wikipedia.org\">Wikipedia</a></td></tr>"
 							+ "</tbody>"
 						+ "</table>";
 		Assert.assertEquals(expected, tableHTML);
