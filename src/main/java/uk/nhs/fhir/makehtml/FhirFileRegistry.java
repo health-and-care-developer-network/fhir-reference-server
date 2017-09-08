@@ -1,7 +1,6 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (FhirParsingFailedException e) {
 			System.out.println("Skipping file: " + e.getMessage());
 		}
 	}
