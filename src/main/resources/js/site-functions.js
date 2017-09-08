@@ -35,7 +35,7 @@ function setupLinkInterceptsInTabs() {
 
 // http://localhost:8080/artefact?resourceID=gpconnect-appointment-1&artefactType=DIFFERENTIAL
 function loadTab(tabID, resourceID, resourceVersion, artefactType, baseURL) {
-	$( tabID ).load( baseURL+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
+	$( tabID ).load( fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
 			setupLinkInterceptsInTabs);
 }
 
@@ -46,9 +46,19 @@ function loadMetadata() {
 	metadataType = $('#metadataFromGenerator').attr('metadataType');
 	if (typeof metadataType !== typeof undefined && metadataType !== false) {
 		$('#metadataFromGenerator').load(
-				baseURL+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+metadataType,
+				fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+metadataType,
 				addExpandCollapseForMetadata);
 	}
+}
+
+function fixBaseURL(baseURL) {
+	protocol = window.location.protocol;
+	baseURLprotocol = baseURL.substring(0,6);
+	if (protocol == 'https:' && baseURLprotocol != 'https:' ) {
+		// Need to alter the base URL to be https (we've been tricked by the reverse proxy...)
+		baseURL = baseURL.replace("http://", "https://");
+	}
+	return baseURL;
 }
 
 function loadInitialTab() {
