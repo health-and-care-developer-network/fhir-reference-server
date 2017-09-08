@@ -152,7 +152,7 @@ public class ConceptMapProvider implements IResourceProvider, IResourceHelper {
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CONCEPTMAP);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.CONCEPTMAP);
         return results;
     }
 //</editor-fold>

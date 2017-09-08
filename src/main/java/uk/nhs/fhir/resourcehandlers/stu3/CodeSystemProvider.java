@@ -157,7 +157,7 @@ public class CodeSystemProvider implements IResourceProvider, IResourceHelper {
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CODESYSTEM);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.CODESYSTEM);
         return results;
     }
 //</editor-fold>

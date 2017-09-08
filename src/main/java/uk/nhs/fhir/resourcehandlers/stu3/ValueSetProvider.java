@@ -152,7 +152,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.VALUESET);
         return results;
     }
 //</editor-fold>
