@@ -21,6 +21,8 @@ import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.enums.ResourceType.CODESYSTEM;
+import static uk.nhs.fhir.enums.ResourceType.CONCEPTMAP;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -199,6 +201,14 @@ public class FileCache {
         newList.addAll(cacheFHIRResources(fhirVersion, OPERATIONDEFINITION));
         // Add ImplementationGuides
         newList.addAll(cacheFHIRResources(fhirVersion, IMPLEMENTATIONGUIDE));
+        
+        if (fhirVersion != FHIRVersion.DSTU2) {
+        	// Add CodeSystems
+            newList.addAll(cacheFHIRResources(fhirVersion, CODESYSTEM));
+            // Add ConceptMaps
+            newList.addAll(cacheFHIRResources(fhirVersion, CONCEPTMAP));
+        }
+        
         // Add examples
         HashMap<String, ExampleResources> newExamplesList = cacheExamples(fhirVersion);
         

@@ -16,6 +16,7 @@
 package uk.nhs.fhir.util;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,9 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
+import org.hl7.fhir.dstu3.model.CodeSystem;
+import org.hl7.fhir.dstu3.model.CodeSystem.ConceptDefinitionComponent;
+
 import uk.nhs.fhir.enums.FHIRVersion;
 
 public class FHIRUtils {
@@ -68,14 +72,14 @@ public class FHIRUtils {
      * @return A resource object
      */
     public static IBaseResource loadResourceFromFile(FHIRVersion fhirVersion, final File file) {
-        String resourceFile = FileLoader.loadFile(file);
         IBaseResource resource = null;
         try {
-            
+        	FileReader fr = new FileReader(file);
+        	
         	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
-        		resource = ctxDSTU2.newXmlParser().parseResource(resourceFile);
+        		resource = ctxDSTU2.newXmlParser().parseResource(fr);
         	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
-        		resource = ctxSTU3.newXmlParser().parseResource(resourceFile);
+        		resource = ctxSTU3.newXmlParser().parseResource(fr);
         	}
             String url = null;
             
@@ -110,7 +114,7 @@ public class FHIRUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.fine("Resource loaded - size: " + resourceFile.length() + " from file: " + file.getName());
+        LOG.fine("Resource loaded from file: " + file.getName());
         return resource;
     }
     
@@ -119,6 +123,22 @@ public class FHIRUtils {
     		if (vs.getCompose().getInclude() != null) {
     			List<ComposeInclude> includeList = vs.getCompose().getInclude();
 				for (ComposeInclude includeEntry : includeList) {
+					if (includeEntry.getSystem() != null) {
+						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+							return true;
+						}
+					}
+				}
+    		}
+    	}
+    	return false;
+    }
+    
+    public static boolean isSTU3ValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
+    	if (vs.getCompose() != null) {
+    		if (vs.getCompose().getInclude() != null) {
+    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
+				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
 						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
 							return true;
