@@ -19,12 +19,8 @@ git clone $GITHUB_URL /source/files
 cd /source/files
 git checkout $BRANCH
 
-# Workaround
-echo "Copying extensions..."
-cp -R ./Extensions/* ./StructureDefinitions/
-
-sed -i -- "s|$OLD_URL|$NEW_URL|g" /source/files/$REPO_PATH/*
-
+cd /source/files/$REPO_PATH/
+find . -name \*.xml -exec sed -i -e "s|$OLD_URL|$NEW_URL|g" {} \;
 mkdir -p /generated/$OUT_PATH
 
 if [ $COPY_ONLY == "true" ]
