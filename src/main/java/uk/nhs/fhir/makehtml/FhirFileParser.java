@@ -1,13 +1,13 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
@@ -40,7 +40,7 @@ public class FhirFileParser {
 		return supportedClasses.contains(resource.getClass());
 	}
 	
-	public IBaseResource parseFile(File thisFile) throws IOException {
+	public IBaseResource parseFile(File thisFile) throws FhirParsingFailedException {
 		
 		List<FhirVersion> successfullyParsedVersions = Lists.newArrayList();
 		
@@ -54,28 +54,22 @@ public class FhirFileParser {
 			}
 		}
 		
+		if (successfullyParsedVersions.isEmpty()) {
+			throw new FhirParsingFailedException("Parsing failed for file: " + thisFile.getAbsolutePath());
+		}
+		
 		// Couldn't confirm that any was correct. If we only successfully parsed a single version, use that.
 		if (successfullyParsedVersions.size() == 1) {
 			FhirVersion onlyParsableVersion = successfullyParsedVersions.get(0);
 			return parseFile(FhirContexts.xmlParser(onlyParsableVersion), thisFile, onlyParsableVersion);
 		}
 		
-		// Use directory structure as a final backup. This should hopefully be unnecessary once URLs consistently include Fhir Version.
-		for (String pathPart : thisFile.getAbsolutePath().split("/")) {
-			for (FhirVersion versionToTry : versionsToTry) {
-				if (pathPart.equals(versionToTry.toString())) {
-					IParser xmlParser = FhirContexts.xmlParser(versionToTry);
-					try (FileReader fr = new FileReader(thisFile)) {
-						return xmlParser.parseResource(fr);
-					} catch (IOException | DataFormatException e) {
-						throw new IOException("Error parsing file " + thisFile.getAbsolutePath(), e);
-					}
-				}
-			}
+		// otherwise default to DSTU2
+		try {
+			return parseFile(FhirContexts.xmlParser(FhirVersion.DSTU2), thisFile);
+		} catch (IOException e) {
+			throw new FhirParsingFailedException("Failed default parsing to DSTU2: " + thisFile.getAbsolutePath(), e);
 		}
-		
-		throw new IllegalStateException("Couldn't work out appropriate FHIR version for " + thisFile.getAbsolutePath() + ", successfully parsed for " 
-				+ String.join(", ", successfullyParsedVersions.stream().map(version -> version.toString()).collect(Collectors.toList())));
 	}
 	
 	private IBaseResource tryParse(File thisFile, FhirVersion versionToTry, List<FhirVersion> successfullyParsedVersions) {
@@ -83,14 +77,10 @@ public class FhirFileParser {
 		IBaseResource resource = parseFile(xmlParser, thisFile, versionToTry);
 		
 		if (resource != null) {
-			FhirVersion versionFromResource = getResourceVersion(resource);
+			successfullyParsedVersions.add(versionToTry);
 			
-			if (versionFromResource == null
-			  || versionFromResource.equals(versionToTry)) {
-				successfullyParsedVersions.add(versionToTry);
-			}
-			
-			if (versionToTry.equals(versionFromResource)) {
+			// If the version we found matches the intended version (i.e. the parser version we used) we are done
+			if (versionToTry.equals(getResourceVersion(resource))) {
 				return resource;
 			}
 		}
@@ -258,11 +248,16 @@ public class FhirFileParser {
 	}
 
 	private IBaseResource parseFile(IParser xmlParser, File thisFile, FhirVersion expectedVersion) {
-		try (FileReader fr = new FileReader(thisFile)) {
-			return xmlParser.parseResource(fr);
+		try {
+			return parseFile(xmlParser, thisFile);
 		} catch (IOException | DataFormatException e) {}
 		
 		return null;
 	}
-
+	
+	private IBaseResource parseFile(IParser xmlParser, File thisFile) throws FileNotFoundException, IOException {
+		try (FileReader fr = new FileReader(thisFile)) {
+			return xmlParser.parseResource(fr);
+		}
+	}
 }
