@@ -20,8 +20,7 @@ cd /source/files
 git checkout $BRANCH
 
 cd /source/files/$REPO_PATH/
-find . -name \*.xml | xargs -0 -l sed -i -e "s|$OLD_URL|$NEW_URL|g"
-
+find . -name \*.xml -exec sed -i -e "s|$OLD_URL|$NEW_URL|g" {} \;
 mkdir -p /generated/$OUT_PATH
 
 if [ $COPY_ONLY == "true" ]
