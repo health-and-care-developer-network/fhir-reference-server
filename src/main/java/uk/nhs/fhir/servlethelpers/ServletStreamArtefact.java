@@ -48,9 +48,9 @@ public class ServletStreamArtefact {
         			}
         		}
     		} catch (NullPointerException ex) {
-    			LOG.severe("Unable to find matching artefact - resourceID=" + resourceID + ", version=" + resourceVersion);
+    			LOG.severe("Unable to find matching artefact - type=" + artefactType + ", resourceID=" + resourceID + ", version=" + resourceVersion + ", fhirVersion=" + fhirVersion);
     		}
     	}
-    	LOG.severe("Unable to find matching artefact - resourceID=" + resourceID + ", version=" + resourceVersion);
+    	LOG.severe("Unable to find matching artefact - type=" + artefactType + ", resourceID=" + resourceID + ", version=" + resourceVersion + ", fhirVersion=" + fhirVersion);
 	}
 }

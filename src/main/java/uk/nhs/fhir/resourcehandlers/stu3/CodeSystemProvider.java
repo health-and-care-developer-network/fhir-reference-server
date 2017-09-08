@@ -25,14 +25,18 @@ import java.util.logging.Logger;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.dstu3.model.CodeSystem;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
+import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
+import ca.uhn.fhir.rest.annotation.Validate;
+import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
@@ -43,13 +47,14 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
  * @author Tim Coates
  */
-public class ValueSetProvider implements IResourceProvider, IResourceHelper {
-    private static final Logger LOG = Logger.getLogger(ValueSetProvider.class.getName());
+public class CodeSystemProvider implements IResourceProvider, IResourceHelper {
+    private static final Logger LOG = Logger.getLogger(CodeSystemProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
@@ -61,7 +66,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *
      * @param dataSource
      */
-    public ValueSetProvider(Datasource dataSource) {
+    public CodeSystemProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -75,7 +80,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
         }
         myDataSource = dataSource;
         ctx = FHIRVersion.STU3.getContext();
-        LOG.fine("Created ValueSetProvider handler to respond to requests for ValueSet resource types.");
+        LOG.fine("Created CodeSystemProvider handler to respond to requests for CodeSystem resource types.");
     }
 
     /**
@@ -86,7 +91,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      */
     @Override
     public Class<? extends IBaseResource> getResourceType() {
-        return ValueSet.class;
+        return CodeSystem.class;
     }
 //</editor-fold>
 
@@ -125,8 +130,8 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *    Returns a resource matching this identifier, or null if none exists.
      */
     @Read(version=true)
-    public ValueSet getValueSetById(@IdParam IdType theId) {
-        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(FHIRVersion.STU3, theId);
+    public CodeSystem getValueSetById(@IdParam IdType theId) {
+    	CodeSystem foundItem = (CodeSystem)myDataSource.getResourceByID(FHIRVersion.STU3, theId);
         return foundItem;
     }
     
@@ -144,15 +149,15 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *    This method returns a list of ValueSets where the name matches the supplied parameter.
      */
     @Search()
-    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
-    	LOG.fine("Request for ValueSet objects matching name: " + theName);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.VALUESET, theName.getValue());
+    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = CodeSystem.SP_NAME) StringParam theName) {
+    	LOG.fine("Request for CodeSystem objects matching name: " + theName);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.CODESYSTEM, theName.getValue());
         return foundList;
     }
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CODESYSTEM);
         return results;
     }
 //</editor-fold>
@@ -162,31 +167,25 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     	Narrative textElement = new Narrative();
         textElement.setStatus(NarrativeStatus.GENERATED);
         textElement.setDivAsString("");
-    	ValueSet output = (ValueSet)resource;
+        CodeSystem output = (CodeSystem)resource;
     	output.setText(textElement);
     	return output;
     }
     
     public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
+    	return ((CodeSystem)resource).getText().getDivAsString();
     }
 
     public ResourceEntity getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	CodeSystem profile = (CodeSystem)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
-    	if (resourceName == null) {
-    		resourceName = resourceID;
-    	}
-    	if (FHIRUtils.isSTU3ValueSetSNOMED(profile)) {
-    		displayGroup = "SNOMED CT Code List";
-    	}
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+    	return new ResourceEntity(resourceName, thisFile, ResourceType.CODESYSTEM,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
     }
