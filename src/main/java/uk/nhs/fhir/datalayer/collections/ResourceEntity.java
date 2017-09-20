@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.enums.ResourceStatus;
 import uk.nhs.fhir.enums.ResourceType;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
@@ -17,7 +18,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String displayGroup = null;
 	private boolean example = false;
 	private VersionNumber versionNo = null;
-	private String status = null;
+	private ResourceStatus status = null;
 	ArrayList<SupportingArtefact> artefacts = null;
 	private String extensionCardinality = null;
 	ArrayList<String> extensionContexts = null;
@@ -57,7 +58,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.example = example;
 		this.resourceID = resourceID;
 		this.versionNo = versionNo;
-		this.status = status;
+		this.status = ResourceStatus.getStatus(status);
 		this.artefacts = artefacts;
 		this.extensionCardinality = cardinality;
 		this.extensionContexts = extensionContexts;
@@ -159,11 +160,11 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		return "      ResourceEntity [ID=" + resourceID + ", version=" + versionNo + ", artefacts=" + artefactCount + "]";
 	}
 
-	public String getStatus() {
+	public ResourceStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(ResourceStatus status) {
 		this.status = status;
 	}
 
