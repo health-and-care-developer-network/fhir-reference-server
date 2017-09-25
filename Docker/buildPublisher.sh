@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # Usage:
-# build.sh registryhostname
+# build.sh registryhostname tagname
 
 # Copy jars
 cp -R ../target .
 
 REGISTRY_HOST=$1
 IMAGE_NAME="nhsd/fhir-make-html"
+TAG_NAME=$2
 
 REGISTRY_URL=$REGISTRY_HOST:5000
 
@@ -16,6 +17,11 @@ then
   REGISTRY_PREFIX=""
 else
   REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
+fi
+
+if [ ! -z $TAG_NAME ]
+then
+  IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
 fi
 
 # Build the publisher image
