@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,7 +30,7 @@ import uk.nhs.fhir.util.FhirVersion;
  */
 public class FhirDstu2DataTypes {
 	
-	private static final Map<String, BaseRuntimeElementDefinition<?>> nameToDefinition = Maps.newHashMap();
+	private static final Map<String, Class<?>> nameToDefinitionClass = Maps.newHashMap();
 	static {
 		// The FhirContext accessor methods for nameTo[X] maps don't work properly because they call
 		// toLowerCase even though some keys require uppercase characters. This map allows us to access
@@ -37,16 +39,19 @@ public class FhirDstu2DataTypes {
 		ModelScanner scanner = new ModelScanner(fhirContext, fhirContext.getVersion().getVersion(), null, null);
 
 		for (Entry<String, BaseRuntimeElementDefinition<?>>  entry : scanner.getNameToElementDefinitions().entrySet()) {
-			nameToDefinition.put(entry.getKey().toLowerCase(), entry.getValue());
+			nameToDefinitionClass.put(entry.getKey().toLowerCase(), entry.getValue().getImplementingClass());
 		}
 		for (Entry<String, RuntimeResourceDefinition>  entry : scanner.getNameToResourceDefinition().entrySet()) {
-			nameToDefinition.put(entry.getKey().toLowerCase(), entry.getValue());
+			nameToDefinitionClass.put(entry.getKey().toLowerCase(), entry.getValue().getImplementingClass());
+		}
+		for (Entry<String, Class<? extends IBaseResource>>  entry : scanner.getNameToResourceType().entrySet()) {
+			nameToDefinitionClass.put(entry.getKey().toLowerCase(), entry.getValue());
 		}
 	}
 	
 	public static Optional<Class<?>> getImplementingType(String typeName) {
-		BaseRuntimeElementDefinition<?> definition = nameToDefinition.get(typeName.toLowerCase());
-		return definition == null ? Optional.empty() : Optional.of(definition.getImplementingClass());
+		Class<?> definition = nameToDefinitionClass.get(typeName.toLowerCase());
+		return Optional.ofNullable(definition);
 	}
 
 	public List<Type> knownTypes(List<Type> types) {
@@ -90,8 +95,8 @@ public class FhirDstu2DataTypes {
 			return FhirElementDataType.ELEMENT;
 		}
 		
-		if (nameToDefinition.containsKey(typeName)) {
-			Class<?> implementingClass = nameToDefinition.get(typeName).getImplementingClass();
+		if (nameToDefinitionClass.containsKey(typeName)) {
+			Class<?> implementingClass = nameToDefinitionClass.get(typeName);
 			
 			if (implementsOrExtends(implementingClass, ExtensionDt.class)) {
 				return FhirElementDataType.EXTENSION;
