@@ -51,7 +51,11 @@ public class NewMain {
     private final String outPath;
     private final String newBaseURL;
     
-    private NewMain(File inputDirectory, String outPath, String newBaseURL) {
+    public NewMain(File inputDirectory, String outPath) {
+    	this(inputDirectory, outPath, null);
+    }
+    
+    public NewMain(File inputDirectory, String outPath, String newBaseURL) {
     	this.inputDirectory = inputDirectory;
     	this.outPath = outPath;
     	this.newBaseURL = newBaseURL;
@@ -97,7 +101,7 @@ public class NewMain {
      *
      * @param directoryPath
      */
-    private void process() {
+    public void process() {
     	List<File> potentialFhirFiles = new XmlFileFinder(inputDirectory).findFiles();
     	
     	FhirFileRegistry fhirFileRegistry = cacheParsedFhirFiles(potentialFhirFiles);
