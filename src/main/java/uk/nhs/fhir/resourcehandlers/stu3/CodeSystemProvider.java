@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.CodeSystem;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -149,17 +150,33 @@ public class CodeSystemProvider implements IResourceProvider, IResourceHelper {
      *    This method returns a list of ValueSets where the name matches the supplied parameter.
      */
     @Search()
-    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = CodeSystem.SP_NAME) StringParam theName) {
+    public List<IBaseResource> getCodeSystemsByName(@RequiredParam(name = CodeSystem.SP_NAME) StringParam theName) {
     	LOG.fine("Request for CodeSystem objects matching name: " + theName);
     	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.CODESYSTEM, theName.getValue());
         return foundList;
     }
     
     @Search
-    public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CODESYSTEM);
+    public List<IBaseResource> getAllCodeSystems() {
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.STU3, ResourceType.CODESYSTEM);
         return results;
     }
+    
+    /**
+     * Search by URL, so will respond to queries of the form:
+     * /CodeSystem?url=http://acme.org/fhir/CodeSystem/123
+     *
+     * @param theURL
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByURL(@RequiredParam(name = CodeSystem.SP_URL) StringParam theURL) {
+    	LOG.fine("Request for CodeSystem objects matching URL: " + theURL);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByURL(FHIRVersion.STU3,
+    											ResourceType.CODESYSTEM, theURL.getValue());
+        return foundList;
+    }
+    
 //</editor-fold>
     
     public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
@@ -187,7 +204,7 @@ public class CodeSystemProvider implements IResourceProvider, IResourceHelper {
     	
     	return new ResourceEntity(resourceName, thisFile, ResourceType.CODESYSTEM,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }
 
 }

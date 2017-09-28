@@ -34,6 +34,7 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
@@ -78,6 +79,9 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	ClientType clientType = ClientType.getTypeFromHeaders(request);
+    	
         LOG.info("DSTU2 Requested URI: " + request.getRequestURI());
 
         if(request.getRequestURI().endsWith(".css")) {
@@ -95,7 +99,10 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().startsWith("/Extensions")) {
         	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
-        } else if (request.getRequestURI().equals("/CodeSystem") || request.getRequestURI().equals("/ConceptMap")) {
+        } else if ((clientType == clientType.BROWSER) &&
+        			   (request.getRequestURI().equals("/CodeSystem") ||
+        				request.getRequestURI().equals("/ConceptMap"))
+        		  ) {
         	// There are no CodeSystems for DSTU2, and if this is a browser we haven't decided what
         	// to do with listing these yet anyway, so just redirect to the ValueSets page for now..
         	response.sendRedirect("/ValueSet");

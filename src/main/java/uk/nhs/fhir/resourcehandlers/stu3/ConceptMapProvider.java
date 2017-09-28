@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hl7.fhir.dstu3.model.CodeSystem;
 import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Narrative;
@@ -155,6 +156,21 @@ public class ConceptMapProvider implements IResourceProvider, IResourceHelper {
         List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CONCEPTMAP);
         return results;
     }
+    
+    /**
+     * Search by URL, so will respond to queries of the form:
+     * /ConceptMap?url=http://acme.org/fhir/ConceptMap/123
+     *
+     * @param theURL
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByURL(@RequiredParam(name = ConceptMap.SP_URL) StringParam theURL) {
+    	LOG.fine("Request for ConceptMap objects matching URL: " + theURL);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByURL(FHIRVersion.STU3,
+    											ResourceType.CONCEPTMAP, theURL.getValue());
+        return foundList;
+    }
 //</editor-fold>
     
     public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
@@ -182,7 +198,7 @@ public class ConceptMapProvider implements IResourceProvider, IResourceHelper {
     	
     	return new ResourceEntity(resourceName, thisFile, ResourceType.CONCEPTMAP,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }
 
 }
