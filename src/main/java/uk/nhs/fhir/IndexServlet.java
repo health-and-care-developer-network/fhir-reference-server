@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
+import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FileLoader;
@@ -60,7 +62,14 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		String baseURL = req.getContextPath();
 		StringBuffer content = new StringBuffer();
 		
-		LOG.fine("Requested URL: " + req.getRequestURL());
+		LOG.info("IndexServlet Requested URL: " + req.getRequestURL());
+		
+		/* Check if this is a ReST request (e.g. paging retrieval), and if so delegate back to the RestfulServlet */
+		ClientType clientType = ClientType.getTypeFromHeaders(req);
+		if (clientType == clientType.NON_BROWSER) {
+			RequestDispatcher rd = getServletContext().getNamedDispatcher("uk.nhs.fhir.RestfulServlet");
+			rd.forward(req, resp);
+		}
 		
 		// Load home page template
 		VelocityContext context = new VelocityContext();

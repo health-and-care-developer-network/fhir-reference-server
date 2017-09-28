@@ -165,9 +165,9 @@ public class STU3RestfulServlet extends RestfulServer {
         setServerConformanceProvider(new CustomServerConformanceProvider());
         LOG.fine("Custom Conformance provider added");
         
-        /*FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(2);
+        FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
+        pp.setDefaultPageSize(10);
         pp.setMaximumPageSize(100);
-        setPagingProvider(pp);*/
+        setPagingProvider(pp);
     }
 }

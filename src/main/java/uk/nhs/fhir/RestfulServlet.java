@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -166,9 +167,9 @@ public class RestfulServlet extends RestfulServer {
         setServerConformanceProvider(new CustomServerConformanceProvider());
         LOG.fine("Custom Conformance provider added");
         
-        /*FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(2);
+        FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
+        pp.setDefaultPageSize(10);
         pp.setMaximumPageSize(100);
-        setPagingProvider(pp);*/
+        setPagingProvider(pp);
     }
 }
