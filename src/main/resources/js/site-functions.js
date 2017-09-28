@@ -34,16 +34,35 @@ function setupLinkInterceptsInTabs() {
 }
 
 // http://localhost:8080/artefact?resourceID=gpconnect-appointment-1&artefactType=DIFFERENTIAL
-function loadTab(tabID, resourceID, resourceVersion, artefactType) {
-	$( tabID ).load( "/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
+function loadTab(tabID, resourceID, resourceVersion, artefactType, baseURL) {
+	$( tabID ).load( fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
 			setupLinkInterceptsInTabs);
 }
 
 function loadMetadata() {
+	baseURL = $('#metadataFromGenerator').attr('baseURL');
 	resourceID = $('#metadataFromGenerator').attr('resourceID');
 	resourceVersion = $('#metadataFromGenerator').attr('version');
-	$('#metadataFromGenerator').load("/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType=METADATA",
-			addExpandCollapseForMetadata);
+	metadataType = $('#metadataFromGenerator').attr('metadataType');
+	if (typeof metadataType !== typeof undefined && metadataType !== false) {
+		$('#metadataFromGenerator').load(
+				fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+metadataType,
+				addExpandCollapseForMetadata);
+	}
+}
+
+function fixBaseURL(baseURL) {
+	protocol = window.location.protocol;
+	baseURLprotocol = baseURL.substring(0,6);
+	if (protocol == 'https:' && baseURLprotocol != 'https:' ) {
+		// Need to alter the base URL to be https (we've been tricked by the reverse proxy...)
+		baseURL = baseURL.replace("http://", "https://");
+	}
+	return baseURL;
+}
+
+function loadInitialTab() {
+	$('#firstTab').click();
 }
 
 function addExpandCollapseForMetadata() {
@@ -60,4 +79,5 @@ $( document ).ready(function() {
 	$( "#tabs" ).tabs();
 	setupLinkInterceptsInTabs();
 	loadMetadata();
+	loadInitialTab();
 });

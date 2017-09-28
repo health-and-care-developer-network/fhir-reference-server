@@ -215,9 +215,12 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     public ResourceEntity getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
     	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
-    	String resourceName = profile.getName();
     	String url = profile.getUrl();
+    	String resourceName = profile.getName();
     	String resourceID = getResourceIDFromURL(url, resourceName);
+    	if (resourceName == null) {
+    		resourceName = resourceID;
+    	}
     	if (FHIRUtils.isValueSetSNOMED(profile)) {
     		displayGroup = "SNOMED CT Code List";
     	}
@@ -230,3 +233,4 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     }
 
 }
+ 

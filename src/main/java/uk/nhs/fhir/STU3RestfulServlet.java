@@ -43,6 +43,8 @@ import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
@@ -55,7 +57,7 @@ import uk.nhs.fhir.util.PropertyReader;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/3.0.1/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/3.0.1/*", "/STU3/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
@@ -72,9 +74,16 @@ public class STU3RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.info("Requested URI: " + request.getRequestURI());
+        LOG.info("STU3 Requested URI: " + request.getRequestURI());
+        
+        // Redirect 
+        if (request.getRequestURI().contains("3.0.1")) {
+        	String newURL = request.getRequestURI().replaceAll("\\/3\\.0\\.1\\/", "\\/STU3\\/");
+        	response.sendRedirect(newURL);
+        	return;
+        }
 
-        String requestedPath = request.getRequestURI().substring(6);
+        String requestedPath = request.getRequestURI().substring(5);
         LOG.fine("Request path: " + requestedPath);
         
         if(requestedPath.endsWith(".css")) {
@@ -147,6 +156,8 @@ public class STU3RestfulServlet extends RestfulServer {
         resourceProviders.add(new OperationDefinitionProvider(dataSource));
         resourceProviders.add(new ImplementationGuideProvider(dataSource));
         //resourceProviders.add(new ConformanceProvider(dataSource));
+        resourceProviders.add(new CodeSystemProvider(dataSource));
+        resourceProviders.add(new ConceptMapProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new STU3PlainContent(webber));
         LOG.fine("resourceProviders added");

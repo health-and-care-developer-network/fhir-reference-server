@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -48,8 +48,8 @@ import uk.nhs.fhir.util.PropertyReader;
  *
  * @author Tim Coates
  */
-public class ValueSetProvider implements IResourceProvider, IResourceHelper {
-    private static final Logger LOG = Logger.getLogger(ValueSetProvider.class.getName());
+public class ConceptMapProvider implements IResourceProvider, IResourceHelper {
+    private static final Logger LOG = Logger.getLogger(ConceptMapProvider.class.getName());
     private static String logLevel = PropertyReader.getProperty("logLevel");
 
     Datasource myDataSource = null;
@@ -61,7 +61,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *
      * @param dataSource
      */
-    public ValueSetProvider(Datasource dataSource) {
+    public ConceptMapProvider(Datasource dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("INFO")) {
@@ -75,7 +75,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
         }
         myDataSource = dataSource;
         ctx = FHIRVersion.STU3.getContext();
-        LOG.fine("Created ValueSetProvider handler to respond to requests for ValueSet resource types.");
+        LOG.fine("Created ConceptMapProvider handler to respond to requests for ConceptMap resource types.");
     }
 
     /**
@@ -86,7 +86,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      */
     @Override
     public Class<? extends IBaseResource> getResourceType() {
-        return ValueSet.class;
+        return ConceptMap.class;
     }
 //</editor-fold>
 
@@ -125,8 +125,8 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *    Returns a resource matching this identifier, or null if none exists.
      */
     @Read(version=true)
-    public ValueSet getValueSetById(@IdParam IdType theId) {
-        ValueSet foundItem = (ValueSet)myDataSource.getResourceByID(FHIRVersion.STU3, theId);
+    public ConceptMap getValueSetById(@IdParam IdType theId) {
+    	ConceptMap foundItem = (ConceptMap)myDataSource.getResourceByID(FHIRVersion.STU3, theId);
         return foundItem;
     }
     
@@ -144,31 +144,16 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
      *    This method returns a list of ValueSets where the name matches the supplied parameter.
      */
     @Search()
-    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ValueSet.SP_NAME) StringParam theName) {
-    	LOG.fine("Request for ValueSet objects matching name: " + theName);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.VALUESET, theName.getValue());
+    public List<IBaseResource> getValueSetsByName(@RequiredParam(name = ConceptMap.SP_NAME) StringParam theName) {
+    	LOG.fine("Request for ConceptMap objects matching name: " + theName);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3, ResourceType.CONCEPTMAP, theName.getValue());
         return foundList;
     }
     
     @Search
     public List<IBaseResource> getAllValueSets() {
-        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
+        List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.CONCEPTMAP);
         return results;
-    }
-    
-    /**
-     * Search by URL, so will respond to queries of the form:
-     * /ValueSet?url=http://acme.org/fhir/ValueSet/123
-     *
-     * @param theURL
-     * @return
-     */
-    @Search
-    public List<IBaseResource> searchByURL(@RequiredParam(name = ValueSet.SP_URL) StringParam theURL) {
-    	LOG.fine("Request for ValueSet objects matching URL: " + theURL);
-    	List<IBaseResource> foundList = myDataSource.getResourceMatchByURL(FHIRVersion.STU3,
-    											ResourceType.VALUESET, theURL.getValue());
-        return foundList;
     }
 //</editor-fold>
     
@@ -177,33 +162,27 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     	Narrative textElement = new Narrative();
         textElement.setStatus(NarrativeStatus.GENERATED);
         textElement.setDivAsString("");
-    	ValueSet output = (ValueSet)resource;
+        ConceptMap output = (ConceptMap)resource;
     	output.setText(textElement);
     	return output;
     }
     
     public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
+    	return ((ConceptMap)resource).getText().getDivAsString();
     }
 
     public ResourceEntity getMetadataFromResource(File thisFile) {
-    	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	String displayGroup = "Concept Map";
+    	ConceptMap profile = (ConceptMap)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
-    	if (resourceName == null) {
-    		resourceName = resourceID;
-    	}
-    	if (FHIRUtils.isSTU3ValueSetSNOMED(profile)) {
-    		displayGroup = "SNOMED CT Code List";
-    	}
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+    	return new ResourceEntity(resourceName, thisFile, ResourceType.CONCEPTMAP,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
     }
 
 }

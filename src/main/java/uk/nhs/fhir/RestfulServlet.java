@@ -78,7 +78,7 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.fine("Requested URI: " + request.getRequestURI());
+        LOG.info("DSTU2 Requested URI: " + request.getRequestURI());
 
         if(request.getRequestURI().endsWith(".css")) {
             // Stylesheets
@@ -95,6 +95,11 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().startsWith("/Extensions")) {
         	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
+        } else if (request.getRequestURI().equals("/CodeSystem") || request.getRequestURI().equals("/ConceptMap")) {
+        	// There are no CodeSystems for DSTU2, and if this is a browser we haven't decided what
+        	// to do with listing these yet anyway, so just redirect to the ValueSets page for now..
+        	response.sendRedirect("/ValueSet");
+        	return;
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");

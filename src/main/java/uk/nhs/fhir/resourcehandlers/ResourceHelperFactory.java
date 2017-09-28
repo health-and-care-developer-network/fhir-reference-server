@@ -23,6 +23,12 @@ public class ResourceHelperFactory {
 				return new uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider(null);
 			} else if (resourceType.equals(ResourceType.VALUESET)) {
 				return new uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider(null);
+			} else if (resourceType.equals(ResourceType.OPERATIONDEFINITION)) {
+				return new uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider(null);
+			} else if (resourceType.equals(ResourceType.CODESYSTEM)) {
+				return new uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider(null);
+			} else if (resourceType.equals(ResourceType.CONCEPTMAP)) {
+				return new uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider(null);
 			}
 		}
 		
