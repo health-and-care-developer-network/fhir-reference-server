@@ -27,18 +27,13 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
-import ca.uhn.fhir.rest.annotation.Validate;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
@@ -50,7 +45,6 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
-import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
@@ -186,6 +180,22 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
         List<IBaseResource> results = myDataSource.getAllResourcesOfType(FHIRVersion.DSTU2, ResourceType.VALUESET);
         return results;
     }
+    
+    /**
+     * Search by URL, so will respond to queries of the form:
+     * /ValueSet?url=http://acme.org/fhir/ValueSet/123
+     *
+     * @param theURL
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByURL(@RequiredParam(name = ValueSet.SP_URL) StringParam theURL) {
+    	LOG.fine("Request for ValueSet objects matching URL: " + theURL);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByURL(FHIRVersion.DSTU2,
+    											ResourceType.VALUESET, theURL.getValue());
+        return foundList;
+    }
+    
 //</editor-fold>
     
     public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {

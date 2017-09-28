@@ -22,11 +22,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
-import ca.uhn.fhir.rest.annotation.Validate;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.datalayer.Datasource;
@@ -37,7 +33,6 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.PropertyReader;
-import uk.nhs.fhir.validator.ValidateAny;
 
 /**
  *
@@ -131,6 +126,21 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
     	LOG.fine("Request for OperationDefinition objects matching name: " + theNamePart);
     	List<IBaseResource> foundList = myDataSource.getResourceMatchByName(FHIRVersion.STU3,
     										ResourceType.OPERATIONDEFINITION, theNamePart.getValue());
+        return foundList;
+    }
+    
+    /**
+     * Search by URL, so will respond to queries of the form:
+     * /OperationDefinition?url=http://acme.org/fhir/OperationDefinition/123
+     *
+     * @param theURL
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByURL(@RequiredParam(name = OperationDefinition.SP_URL) StringParam theURL) {
+    	LOG.fine("Request for OperationDefinition objects matching URL: " + theURL);
+    	List<IBaseResource> foundList = myDataSource.getResourceMatchByURL(FHIRVersion.STU3,
+    											ResourceType.OPERATIONDEFINITION, theURL.getValue());
         return foundList;
     }
 
