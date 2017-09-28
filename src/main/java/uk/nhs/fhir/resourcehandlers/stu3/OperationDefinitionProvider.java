@@ -161,7 +161,7 @@ public class OperationDefinitionProvider implements IResourceProvider, IResource
     	
         return new ResourceEntity(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }
 
 }

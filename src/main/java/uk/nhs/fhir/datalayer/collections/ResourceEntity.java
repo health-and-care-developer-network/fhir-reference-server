@@ -24,6 +24,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
 	private FHIRVersion fhirVersion = null;
+	private String url = null;
 	
 	/**
 	 * Create some metadata for the resource
@@ -42,13 +43,14 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	 * @param extensionContexts
 	 * @param extensionDescription
 	 * @param fhirVersion
+	 * @param url
 	 */
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,
 							ArrayList<SupportingArtefact> artefacts, String cardinality,
 							ArrayList<String> extensionContexts, String extensionDescription,
-							FHIRVersion fhirVersion) {
+							FHIRVersion fhirVersion, String url) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -64,6 +66,7 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.extensionContexts = extensionContexts;
 		this.extensionDescription = extensionDescription;
 		this.fhirVersion = fhirVersion;
+		this.setUrl(url);
 	}
 	
 	public String getResourceName() {
@@ -215,5 +218,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 
 	public void setFhirVersion(FHIRVersion fhirVersion) {
 		this.fhirVersion = fhirVersion;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

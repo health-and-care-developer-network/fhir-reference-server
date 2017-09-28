@@ -275,4 +275,10 @@ public class MongoIF implements Datasource {
 	public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
+
+	@Override
+	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType,
+			String theURL) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

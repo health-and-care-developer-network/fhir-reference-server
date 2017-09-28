@@ -145,6 +145,6 @@ public class ImplementationGuideProvider implements IResourceProvider, IResource
         
         return new ResourceEntity(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }
 }

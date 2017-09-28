@@ -216,7 +216,7 @@ public class ValueSetProvider implements IResourceProvider, IResourceHelper {
     	
     	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
 				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2);
+				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }
 
 }

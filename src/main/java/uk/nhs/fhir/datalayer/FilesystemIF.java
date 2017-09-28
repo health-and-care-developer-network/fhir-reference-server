@@ -154,6 +154,17 @@ public class FilesystemIF implements Datasource {
         return list;
     }
     
+	@Override
+	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL) {
+		List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
+        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
+        for (ResourceEntity entry : resourceList) {
+        	if (entry.getUrl().equals(theURL)) {
+        		matches.add(getResourceByID(fhirVersion, entry.getResourceID()));
+        	}
+        }		
+		return matches;
+	}
 
     /**
      * Gets a full list of StructureDefinition objects. Not especially performant.

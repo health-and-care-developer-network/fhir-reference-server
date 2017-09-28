@@ -95,6 +95,13 @@ public interface Datasource {
     List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart);
 
     /**
+     * This is the method to do a search based on URL
+     * @param theURL
+     * @return
+     */
+    List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL);
+    
+    /**
      * Gets a full list of StructureDefinition objects
      *
      * @return

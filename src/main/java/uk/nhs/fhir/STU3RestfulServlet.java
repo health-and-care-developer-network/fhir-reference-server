@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
@@ -152,5 +153,10 @@ public class STU3RestfulServlet extends RestfulServer {
         
         setServerConformanceProvider(new CustomServerConformanceProvider());
         LOG.fine("Custom Conformance provider added");
+        
+        /*FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
+        pp.setDefaultPageSize(2);
+        pp.setMaximumPageSize(100);
+        setPagingProvider(pp);*/
     }
 }

@@ -145,6 +145,21 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
     	List<IBaseResource> foundList = myDatasource.getResourceMatchByName(FHIRVersion.DSTU2, ResourceType.STRUCTUREDEFINITION, theNamePart.getValue());
         return foundList;
     }
+    
+    /**
+     * Search by URL, so will respond to queries of the form:
+     * /StructureDefinition?url=http://acme.org/fhir/StructureDefinition/123
+     *
+     * @param theURL
+     * @return
+     */
+    @Search
+    public List<IBaseResource> searchByURL(@RequiredParam(name = StructureDefinition.SP_URL) StringParam theURL) {
+    	LOG.fine("Request for StructureDefinition objects matching URL: " + theURL);
+    	List<IBaseResource> foundList = myDatasource.getResourceMatchByURL(FHIRVersion.DSTU2,
+    											ResourceType.STRUCTUREDEFINITION, theURL.getValue());
+        return foundList;
+    }
 
     /**
      * Overall search, will return ALL Structure Definitions so responds to: /StructureDefinition
@@ -232,7 +247,7 @@ public class StrutureDefinitionProvider implements IResourceProvider, IResourceH
         return new ResourceEntity(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 							extension, baseType, displayGroup, false,
 							resourceID, versionNo, status, null, extensionCardinality,
-							extensionContexts, extensionDescription, FHIRVersion.DSTU2);
+							extensionContexts, extensionDescription, FHIRVersion.DSTU2, url);
     }
     
 }

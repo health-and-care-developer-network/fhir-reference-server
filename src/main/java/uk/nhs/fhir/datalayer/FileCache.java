@@ -345,7 +345,7 @@ public class FileCache {
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
 	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
-	            								null, true, resourceID, null, null, null, null, null, null, fhirVersion);
+	            								null, true, resourceID, null, null, null, null, null, null, fhirVersion, null);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
 	            	                    	examplesList.get(profileResourceID).add(newEntity);
