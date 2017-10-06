@@ -1,9 +1,6 @@
 package uk.nhs.fhir.enums;
 
-import java.util.Comparator;
 import java.util.logging.Logger;
-
-import ca.uhn.fhir.rest.method.RequestDetails;
 
 /**
  * This is an enum to hold the type of a supporting artefact that sits alongside a FHIR resource

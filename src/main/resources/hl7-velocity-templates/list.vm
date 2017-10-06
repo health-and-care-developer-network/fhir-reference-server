@@ -9,8 +9,11 @@
 			<h3>$group</h3>
 			<ul>
 				#foreach( $resource in $list )
-					<li><a href="$resource.getFhirVersion().getUrlPrefix()$resourceType/$resource.getResourceID()">$resource.getResourceName()</a> 
-										$resource.getFhirVersion().getLabel()</li>
+					<li class="resource-status-$resource.getStatus()">
+						<a href="$resource.getFhirVersion().getUrlPrefix()$resourceType/$resource.getResourceID()">$resource.getResourceName()</a> 
+							$resource.getFhirVersion().getLabel()
+							$resource.getStatus().getStatusLabel()
+					</li>
 				#end
 			</ul>
 	#end
