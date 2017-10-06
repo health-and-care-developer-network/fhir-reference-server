@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,15 +36,9 @@ import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.CustomServerConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.OrganizationProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
@@ -164,12 +156,12 @@ public class RestfulServlet extends RestfulServer {
         registerInterceptor(new PlainContent(webber));
         LOG.fine("resourceProviders added");
         
-        setServerConformanceProvider(new CustomServerConformanceProvider());
-        LOG.fine("Custom Conformance provider added");
+        //setServerConformanceProvider(new CustomServerConformanceProvider());
+        //LOG.fine("Custom Conformance provider added");
         
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(10);
-        pp.setMaximumPageSize(100);
+        pp.setDefaultPageSize(Integer.parseInt(PropertyReader.getProperty("defaultPageSize")));
+        pp.setMaximumPageSize(Integer.parseInt(PropertyReader.getProperty("maximumPageSize")));
         setPagingProvider(pp);
     }
 }

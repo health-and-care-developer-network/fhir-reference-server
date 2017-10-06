@@ -27,7 +27,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
@@ -35,6 +34,11 @@ import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
 import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
@@ -42,12 +46,6 @@ import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
-import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
-import uk.nhs.fhir.resourcehandlers.stu3.CustomServerConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
-import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -162,12 +160,12 @@ public class STU3RestfulServlet extends RestfulServer {
         registerInterceptor(new STU3PlainContent(webber));
         LOG.fine("resourceProviders added");
         
-        setServerConformanceProvider(new CustomServerConformanceProvider());
-        LOG.fine("Custom Conformance provider added");
+        //setServerConformanceProvider(new CustomServerConformanceProvider());
+        //LOG.fine("Custom Conformance provider added");
         
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(10);
-        pp.setMaximumPageSize(100);
+        pp.setDefaultPageSize(Integer.parseInt(PropertyReader.getProperty("defaultPageSize")));
+        pp.setMaximumPageSize(Integer.parseInt(PropertyReader.getProperty("maximumPageSize")));
         setPagingProvider(pp);
     }
 }

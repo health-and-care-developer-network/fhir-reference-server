@@ -69,6 +69,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		if (clientType == clientType.NON_BROWSER) {
 			RequestDispatcher rd = getServletContext().getNamedDispatcher("uk.nhs.fhir.RestfulServlet");
 			rd.forward(req, resp);
+			return;
 		}
 		
 		// Load home page template
