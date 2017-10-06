@@ -71,7 +71,7 @@ public class FilesystemIF implements Datasource {
     	ResourceEntity entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
-	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
+	    	LOG.fine("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
 	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;
@@ -142,27 +142,76 @@ public class FilesystemIF implements Datasource {
      * @param theNamePart
      * @return 
      */
-    public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+    public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType,
+    				String theNamePart, int theFromIndex, int theToIndex) {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
         List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
 
+        int counter = 0;
         for(ResourceEntity entity : matchingIDs) {
-        	list.add(getResourceByID(fhirVersion, entity.getResourceID()));
+        	if (counter >= theFromIndex && counter < theToIndex) {
+        		list.add(getResourceByID(fhirVersion, entity.getResourceID()));
+        	}
+        	counter++;
         }
         return list;
     }
-    
 
+    /**
+     * This is the method to count the number of matches based on name, ie to find where
+     * name:contains=[parameter]
+     * 
+     * @param theNamePart
+     * @return 
+     */
+    public int getResourceCountByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+        LOG.info("Getting the count of " + resourceType.name() + " resources with name containing: " + theNamePart);
+        List<ResourceEntity> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
+        return matchingIDs.size();
+    }
+
+    
+	@Override
+	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL,
+															int theFromIndex, int theToIndex) {
+		List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
+        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
+        int counter = 0;
+        for (ResourceEntity entry : resourceList) {
+        	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
+        		if (counter >= theFromIndex && counter < theToIndex) {
+        			matches.add(getResourceByID(fhirVersion, entry.getResourceID()));
+        		}
+        		counter++;
+        	}
+        }		
+		return matches;
+	}
+
+	@Override
+	public int getResourceCountByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL) {
+		List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
+        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
+        int counter = 0;
+        for (ResourceEntity entry : resourceList) {
+        	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
+        		counter++;
+        	}
+        }		
+		return counter;
+	}
+	
     /**
      * Gets a full list of StructureDefinition objects. Not especially performant.
      * 
      * @return 
      */
-    public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType,
+    													int theFromIndex, int theToIndex) {
         LOG.info("Getting all resources of type: " + resourceType.name());
-        return FileCache.getResources(fhirVersion, resourceType);
+        return FileCache.getResources(fhirVersion, resourceType, theFromIndex, theToIndex);
     }
     
     /**
@@ -231,17 +280,16 @@ public class FilesystemIF implements Datasource {
         String pattern = "(.*)" + theNamePart + "(.*)";
         
         for (ResourceEntity entry : resourceList) {
-        	
-        	String resourceName = entry.getResourceName();
-        	
-        	// Create a Pattern object
-            Pattern r = Pattern.compile(pattern);
-
-            // Now create matcher object.
-            Matcher m = r.matcher(resourceName);
-            if (m.find()) {
-               matches.add(entry);
-            }
+        	if (entry.getResourceType().equals(resourceType)) {
+	        	String resourceName = entry.getResourceName();
+	        	// Create a Pattern object
+	            Pattern r = Pattern.compile(pattern);
+	            // Now create matcher object.
+	            Matcher m = r.matcher(resourceName);
+	            if (m.find()) {
+	               matches.add(entry);
+	            }
+        	}
         }
         LOG.fine("Returning matches");
         return matches;
@@ -276,5 +324,18 @@ public class FilesystemIF implements Datasource {
 			}
 		}
 		return results;
+	}
+	
+	@Override
+	public int getResourceCount(FHIRVersion fhirVersion, ResourceType resourceType) {
+		int count = 0;
+		List<ResourceEntity> list = FileCache.getResourceList(fhirVersion);
+		for (ResourceEntity entry : list) {
+			ResourceType type = entry.getResourceType();
+			if (type == resourceType) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

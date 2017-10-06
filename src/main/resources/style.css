@@ -1,7 +1,30 @@
-span.stu3, span.dstu2 {
+span.stu3, span.dstu2, span.status-draft, span.status-active, span.status-retired, span.status-unknown {
     border-radius: 8px;
     font-size: 8pt;
     color: white;
+}
+
+span.status-draft {
+    background: #babdb6;
+    border: solid #babdb6;
+}
+
+span.status-active {
+    background: #008000;
+    border: solid #008000;
+}
+
+span.status-retired, span.status-unknown {
+    background: #ef2929;
+    border: solid #ef2929;
+}
+
+li.resource-status-retired a {
+    text-decoration: line-through;
+}
+
+li.resource-status-active a {
+	font-weight: bold;
 }
 
 span.dstu2 {

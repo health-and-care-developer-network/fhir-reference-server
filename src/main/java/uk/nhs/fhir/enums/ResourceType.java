@@ -3,9 +3,7 @@ package uk.nhs.fhir.enums;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-
-import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**

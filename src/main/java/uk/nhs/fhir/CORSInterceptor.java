@@ -22,11 +22,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.TagList;
-import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
+
+
+
 
 /**
  * Class used to add CORS headers for responses to allow them to be used across origins
@@ -43,13 +46,14 @@ public class CORSInterceptor extends InterceptorAdapter {
     	return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
 	}
     
-    @Override
-	public boolean outgoingResponse(RequestDetails theRequestDetails, Bundle theResponseObject,
+    // Removed in HAPI 3.0.0
+    //@Override
+	/*public boolean outgoingResponse(RequestDetails theRequestDetails, Bundle theResponseObject,
 			HttpServletRequest theServletRequest, HttpServletResponse theServletResponse)
 			throws AuthenticationException {
     	addCORSResponseHeaders(theServletResponse);
 		return super.outgoingResponse(theRequestDetails, theResponseObject, theServletRequest, theServletResponse);
-	}
+	}*/
 
 	@Override
 	public boolean outgoingResponse(RequestDetails theRequestDetails, HttpServletRequest theServletRequest,

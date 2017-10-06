@@ -92,14 +92,41 @@ public interface Datasource {
      * @param theNamePart
      * @return
      */
-    List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart);
+    List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType,
+    						String theNamePart, int theFromIndex, int theToIndex);
 
+    /**
+     * This is the method to count the number of matches based on name, ie to find where
+     * name:contains=[parameter]
+     * 
+     * @param theNamePart
+     * @return 
+     */
+
+    int getResourceCountByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart);
+    
+    /**
+     * This is the method to do a search based on URL
+     * @param theURL
+     * @return
+     */
+    List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL,
+    												int theFromIndex, int theToIndex);
+    
+    /**
+     * This is the method to return the number of matches for a URL
+     * @param theURL
+     * @return
+     */
+    int getResourceCountByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL);
+    
     /**
      * Gets a full list of StructureDefinition objects
      *
      * @return
      */
-    List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType);
+    List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType,
+    												int theFromIndex, int theToIndex);
 
     /**
      * Gets a full list of names for the web view of /StructureDefinition
@@ -158,4 +185,12 @@ public interface Datasource {
      * @return
      */
     HashMap<String,Integer> getResourceTypeCounts();
+    
+    /**
+     * Gets the counts of resources for a specific type and FHIR version
+     * @param fhirVersion
+     * @param resourceType
+     * @return
+     */
+    int getResourceCount(FHIRVersion fhirVersion, ResourceType resourceType);
 }
