@@ -3,7 +3,7 @@
 
 	<table id="extensionTable">
 		<tr>
-			<th>Version</th>
+			<th width="140">Version</th>
 			<th>ID</th>
 			<th>Description</th>
 			<th><a href="https://www.hl7.org/fhir/defining-extensions.html#cardinality">Card.</a></th>
@@ -13,7 +13,7 @@
 		
 		#foreach( $extension in $extensions )
 		<tr>
-			<td>$extension.getFhirVersion().getLabel()</td>
+			<td>$extension.getFhirVersion().getLabel()&nbsp;$extension.getStatus().getStatusLabel()</td>
 			<td><a href="/$extension.getFhirVersion().getUrlPrefix()StructureDefinition/$extension.getResourceID()">$extension.getResourceName()</a></td>
 			<td>$!extension.getExtensionDescription()</td>
 			<td>$!extension.getExtensionCardinality()</td>
