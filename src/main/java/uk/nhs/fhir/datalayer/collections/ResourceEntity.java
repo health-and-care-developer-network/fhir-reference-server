@@ -3,9 +3,9 @@ package uk.nhs.fhir.datalayer.collections;
 import java.io.File;
 import java.util.ArrayList;
 
-import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceStatus;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.FHIRVersion;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String resourceName = null;

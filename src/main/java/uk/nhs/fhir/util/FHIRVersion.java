@@ -1,4 +1,4 @@
-package uk.nhs.fhir.enums;
+package uk.nhs.fhir.util;
 
 import ca.uhn.fhir.context.FhirContext;
 

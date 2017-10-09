@@ -135,8 +135,13 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
 		<ul><li>	You are here: &nbsp;
 #parse( "/velocity-templates/breadcrumbs.vm" )
 </div><!--end breadcrumbs-->
-<div id="api_list"><div class="wrapper cf container">$page-content<div><div>&nbsp;</div>
-		</div><!-- end api list -->
+<div id="api_list"><div class="wrapper cf container">#parse($contentTemplateName)
+#if($nonTemplatedContent)
+$nonTemplatedContent
+#end
+	</div>
+	</div>
+	<!-- end api list -->
 	</div><!--end main_content-->
 </div><!-- end main -->
 

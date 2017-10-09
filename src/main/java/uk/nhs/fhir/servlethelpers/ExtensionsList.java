@@ -16,62 +16,42 @@
 package uk.nhs.fhir.servlethelpers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-
-import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.html.ExtensionsListPageTemplate;
+import uk.nhs.fhir.html.ExtensionsListProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.PageTemplateHelper;
-import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FHIRVersion;
 
 public class ExtensionsList {
 	
 	private static final Logger LOG = Logger.getLogger(ExtensionsList.class.getName());
-	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
-	private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
+	
+	private static ExtensionsListProvider extensionsListProvider = null;
+	
+	public static void setResourceHandler(ExtensionsListProvider webHandler) {
+		extensionsListProvider = webHandler;
+	}
 	
 	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
 								FHIRVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
-		
-		PrintWriter outputStream = null;
-		String baseURL = req.getContextPath();
-		StringBuffer content = new StringBuffer();
-		
 		LOG.fine("Requested URL: " + req.getRequestURL());
 		
-		// Load home page template
-		VelocityContext context = new VelocityContext();
-    	
-    	Template template = null;
-    	try {
-    	  template = Velocity.getTemplate(templateDirectory + "extensions.vm");
-    	} catch( Exception e ) {
-    		e.printStackTrace();
-    	}
-    	
-    	// Put content into template
-    	context.put( "baseURL", baseURL );
-    	context.put( "extensions", webHandler.getExtensions() );
-    	
-    	StringWriter sw = new StringWriter();
-    	template.merge( context, sw );
-    	content.append(sw.toString());
+		String baseUrl = req.getContextPath();
+		List<ResourceEntity> extensions = extensionsListProvider.getExtensions();
+		ExtensionsListPageTemplate extensionsPage = new ExtensionsListPageTemplate(baseUrl, extensions);
+		String renderedExtensionsPage = extensionsPage.getHtml();
 		
 		// Initialise the output
         resp.setStatus(200);
         resp.setContentType("text/html");
-		outputStream = resp.getWriter();
 		
-		// Put the content into our template and stream to the response
-		outputStream.append(templateHelper.wrapContentInTemplate("Extension Registry", null, content, baseURL));
+		resp.getWriter().append(renderedExtensionsPage);
 	}
 }

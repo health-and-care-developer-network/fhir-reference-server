@@ -17,9 +17,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FHIRVersion;
 
 /**
  *

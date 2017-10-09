@@ -33,8 +33,10 @@ import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.html.ExtensionsListProvider;
+import uk.nhs.fhir.html.ResourceCountsProvider;
+import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
@@ -42,7 +44,7 @@ import uk.nhs.fhir.util.FhirServerProperties;
  * @author Tim Coates
  * @author Adam Hatherly
  */
-public class ResourceWebHandler {
+public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider {
     private static final Logger LOG = Logger.getLogger(ResourceWebHandler.class.getName());
     private static String logLevel = FhirServerProperties.getProperty("logLevel");
     private FHIRVersion fhirVersion = null;
@@ -94,6 +96,7 @@ public class ResourceWebHandler {
         return myResourceList;
     }
     
+    @Override
     public List<ResourceEntity> getExtensions() {
         LOG.fine("Called: ResourceWebHandler.getExtensions()");
         

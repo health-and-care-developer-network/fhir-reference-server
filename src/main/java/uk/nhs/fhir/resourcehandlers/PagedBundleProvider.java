@@ -9,8 +9,8 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.util.FHIRVersion;
 
 public class PagedBundleProvider implements IBundleProvider {
 	
