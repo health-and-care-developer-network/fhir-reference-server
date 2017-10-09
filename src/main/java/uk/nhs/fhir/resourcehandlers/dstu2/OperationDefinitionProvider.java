@@ -14,7 +14,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
@@ -27,7 +27,7 @@ import uk.nhs.fhir.util.FHIRUtils;
  */
 public class OperationDefinitionProvider extends AbstractResourceProviderDSTU2 {
 
-    public OperationDefinitionProvider(Datasource dataSource) {
+    public OperationDefinitionProvider(FilesystemIF dataSource) {
     	super(dataSource);
         ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.OPERATIONDEFINITION;

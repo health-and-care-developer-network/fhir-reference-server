@@ -22,11 +22,12 @@ import java.util.logging.Logger;
  * Convenience class to read configuration from a property file
  * @author Adam Hatherly
  */
-public class PropertyReader implements GlobalConstants {
-	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());
+public class FhirServerProperties {
+	
+	private static final String PROPERTY_FILE = "config.properties";
+	private static final Logger logger = Logger.getLogger(FhirServerProperties.class.getName());
 	
     private static Properties defaultProperties;
-    private static String home;
 
     // When this class is loaded by the JVM, immediately read the property file
     static {
@@ -50,7 +51,7 @@ public class PropertyReader implements GlobalConstants {
         InputStream in = null;
         
         try {
-        	in = PropertyReader.class.getClassLoader().getResourceAsStream(filename);
+        	in = FhirServerProperties.class.getClassLoader().getResourceAsStream(filename);
             if (in != null) {
             	props.load(in);
             	in.close();

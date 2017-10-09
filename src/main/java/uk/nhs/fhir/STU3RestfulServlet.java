@@ -31,22 +31,21 @@ import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
-import uk.nhs.fhir.datalayer.DataSourceFactory;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.stu3.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -60,9 +59,9 @@ public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
     private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
-    private static String logLevel = PropertyReader.getProperty("logLevel");
+    private static String logLevel = FhirServerProperties.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
-    private static Datasource dataSource = null;
+    private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
     private static RawResourceRender myRawResourceRenderer = null;
 
@@ -89,7 +88,7 @@ public class STU3RestfulServlet extends RestfulServer {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         } else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
         } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
@@ -136,7 +135,7 @@ public class STU3RestfulServlet extends RestfulServer {
         
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
-        dataSource = DataSourceFactory.getDataSource();
+        dataSource = new FilesystemIF();
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
@@ -144,7 +143,7 @@ public class STU3RestfulServlet extends RestfulServer {
         IndexServlet.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionProvider(dataSource));
+        resourceProviders.add(new StructureDefinitionProvider(dataSource));
         //resourceProviders.add(new PatientProvider(dataSource));
         //resourceProviders.add(new DocumentReferenceProvider(dataSource));
         //resourceProviders.add(new PractitionerProvider(dataSource));
@@ -164,8 +163,8 @@ public class STU3RestfulServlet extends RestfulServer {
         //LOG.fine("Custom Conformance provider added");
         
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(Integer.parseInt(PropertyReader.getProperty("defaultPageSize")));
-        pp.setMaximumPageSize(Integer.parseInt(PropertyReader.getProperty("maximumPageSize")));
+        pp.setDefaultPageSize(Integer.parseInt(FhirServerProperties.getProperty("defaultPageSize")));
+        pp.setMaximumPageSize(Integer.parseInt(FhirServerProperties.getProperty("maximumPageSize")));
         setPagingProvider(pp);
     }
 }

@@ -31,8 +31,7 @@ import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
-import uk.nhs.fhir.datalayer.DataSourceFactory;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
@@ -46,7 +45,7 @@ import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -60,9 +59,9 @@ public class RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(RestfulServlet.class.getName());
     private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
-    private static String logLevel = PropertyReader.getProperty("logLevel");
+    private static String logLevel = FhirServerProperties.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
-    private static Datasource dataSource = null;
+    private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
     private static RawResourceRender myRawResourceRenderer = null;
 
@@ -82,7 +81,7 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         } else if (request.getRequestURI().endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", PropertyReader.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
         } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
@@ -92,7 +91,7 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().startsWith("/Extensions")) {
         	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
-        } else if ((clientType == clientType.BROWSER) &&
+        } else if ((clientType == ClientType.BROWSER) &&
         			   (request.getRequestURI().equals("/CodeSystem") ||
         				request.getRequestURI().equals("/ConceptMap"))
         		  ) {
@@ -134,7 +133,7 @@ public class RestfulServlet extends RestfulServer {
         
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
-        dataSource = DataSourceFactory.getDataSource();
+        dataSource = new FilesystemIF();
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
@@ -160,8 +159,8 @@ public class RestfulServlet extends RestfulServer {
         //LOG.fine("Custom Conformance provider added");
         
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(Integer.parseInt(PropertyReader.getProperty("defaultPageSize")));
-        pp.setMaximumPageSize(Integer.parseInt(PropertyReader.getProperty("maximumPageSize")));
+        pp.setDefaultPageSize(Integer.parseInt(FhirServerProperties.getProperty("defaultPageSize")));
+        pp.setMaximumPageSize(Integer.parseInt(FhirServerProperties.getProperty("maximumPageSize")));
         setPagingProvider(pp);
     }
 }

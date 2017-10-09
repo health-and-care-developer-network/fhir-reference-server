@@ -35,16 +35,16 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  *
  * @author Tim Coates
  */
-public class FilesystemIF implements Datasource {
+public class FilesystemIF {
     private static final Logger LOG = Logger.getLogger(FilesystemIF.class.getName());
 
-    private static String logLevel = PropertyReader.getProperty("logLevel");
+    private static String logLevel = FhirServerProperties.getProperty("logLevel");
 
     /**
      * Constructor, we simply set the logging level, and log that we've been instantiated.
@@ -172,8 +172,6 @@ public class FilesystemIF implements Datasource {
         return matchingIDs.size();
     }
 
-    
-	@Override
 	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL,
 															int theFromIndex, int theToIndex) {
 		List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
@@ -190,10 +188,8 @@ public class FilesystemIF implements Datasource {
 		return matches;
 	}
 
-	@Override
 	public int getResourceCountByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL) {
 		List<ResourceEntity> resourceList = FileCache.getResourceList(fhirVersion);
-        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
         int counter = 0;
         for (ResourceEntity entry : resourceList) {
         	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
@@ -255,7 +251,6 @@ public class FilesystemIF implements Datasource {
      * Gets a full list of resource names grouped by the broad category of the resource
      * for the web view of /[ResourceType] requests.
      */
-    @Override
 	public HashMap<String, List<ResourceEntity>> getAllResourceNamesByCategory(ResourceType resourceType) {
     	LOG.info("Getting all Resource Names by category");
         return FileCache.getGroupedNameList(resourceType);
@@ -295,17 +290,14 @@ public class FilesystemIF implements Datasource {
         return matches;
     }
     
-	@Override
 	public ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID) {
 		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	
-	@Override
 	public ResourceEntity getExampleByName(FHIRVersion fhirVersion, String resourceFilename) {
 		return FileCache.getExampleByName(fhirVersion, resourceFilename);
 	}
 
-	@Override
 	public HashMap<String, Integer> getResourceTypeCounts() {
 		HashMap<String, Integer> results = new HashMap<String, Integer>();
 		for (FHIRVersion fhirVersion : FHIRVersion.values()) {
@@ -326,7 +318,6 @@ public class FilesystemIF implements Datasource {
 		return results;
 	}
 	
-	@Override
 	public int getResourceCount(FHIRVersion fhirVersion, ResourceType resourceType) {
 		int count = 0;
 		List<ResourceEntity> list = FileCache.getResourceList(fhirVersion);

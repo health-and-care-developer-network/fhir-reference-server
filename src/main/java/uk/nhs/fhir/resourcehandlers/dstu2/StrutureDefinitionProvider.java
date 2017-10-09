@@ -29,7 +29,7 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
@@ -46,7 +46,7 @@ public class StrutureDefinitionProvider extends AbstractResourceProviderDSTU2 {
      * Constructor, which tell us which data source and FHIR version we're working with.
      * @param dataSource
      */
-    public StrutureDefinitionProvider(Datasource dataSource) {
+    public StrutureDefinitionProvider(FilesystemIF dataSource) {
         super(dataSource);
         ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.STRUCTUREDEFINITION;

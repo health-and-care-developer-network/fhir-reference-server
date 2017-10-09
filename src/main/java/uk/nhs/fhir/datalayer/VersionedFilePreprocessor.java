@@ -5,7 +5,6 @@ import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -17,13 +16,13 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
+import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PropertyReader;
 
 public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = Logger.getLogger(VersionedFilePreprocessor.class.getName());
-	private static String fileExtension = PropertyReader.getProperty("fileExtension");
+	private static String fileExtension = FhirServerProperties.getProperty("fileExtension");
 	
 
 	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
@@ -38,14 +37,13 @@ public class VersionedFilePreprocessor {
 		FileUtils.forceMkdir(new File(versioned_path));
 		
 		// Now, look in the root path for this resource type to see if we have any files to process
-        ArrayList<ResourceEntity> newFileList = new ArrayList<ResourceEntity>();
         String path = resourceType.getFilesystemPath(fhirVersion);
         File folder = new File(path);
-            File[] fileList = folder.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(fileExtension);
-                }
-            });
+        File[] fileList = folder.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(fileExtension);
+            }
+        });
         
         if (fileList != null) {
 	        for (File thisFile : fileList) {

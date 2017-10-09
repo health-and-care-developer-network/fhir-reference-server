@@ -3,7 +3,6 @@ package uk.nhs.fhir.util;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -12,20 +11,13 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
-
-import static uk.nhs.fhir.enums.ResourceType.*;
-
 public class PageTemplateHelper {
 	
 	private static final Logger LOG = Logger.getLogger(PageTemplateHelper.class.getName());
-	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
+	private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
     
     public PageTemplateHelper() {
-    	Velocity.init(PropertyReader.getProperties());
+    	Velocity.init(FhirServerProperties.getProperties());
     }
     
     public String wrapContentInTemplate(String resourceType, String resourceName, StringBuffer content, String baseURL) {

@@ -24,7 +24,7 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.FHIRVersion;
@@ -37,7 +37,7 @@ import uk.nhs.fhir.util.FHIRUtils;
  */
 public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 
-	public ValueSetProvider(Datasource dataSource) {
+	public ValueSetProvider(FilesystemIF dataSource) {
 		super(dataSource);
         ctx = FHIRVersion.STU3.getContext();
         resourceType = ResourceType.VALUESET;

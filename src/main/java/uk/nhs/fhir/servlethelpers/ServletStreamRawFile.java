@@ -3,16 +3,10 @@ package uk.nhs.fhir.servlethelpers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
-
-import uk.nhs.fhir.RestfulServlet;
 
 public class ServletStreamRawFile {
 	

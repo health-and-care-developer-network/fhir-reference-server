@@ -60,7 +60,7 @@ import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  * Class used to generate html content when a request comes from a browser.
@@ -74,14 +74,14 @@ public class STU3PlainContent extends CORSInterceptor {
     ResourceWebHandler myWebHandler = null;
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
-    private static String guidesPath = PropertyReader.getProperty("guidesPath");
-    private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
+    private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
+    private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
 
     public STU3PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         myRawResourceRenderer = new RawResourceRender(webber);
         templateHelper = new PageTemplateHelper();
-        Velocity.init(PropertyReader.getProperties());
+        Velocity.init(FhirServerProperties.getProperties());
     }
     
     @Override

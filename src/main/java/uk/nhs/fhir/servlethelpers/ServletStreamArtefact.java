@@ -2,9 +2,6 @@ package uk.nhs.fhir.servlethelpers;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 
 import ca.uhn.fhir.model.primitive.IdDt;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.enums.FHIRVersion;
@@ -22,7 +19,7 @@ public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
 	
 	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response,
-										FHIRVersion fhirVersion, Datasource dataSource) throws IOException {
+										FHIRVersion fhirVersion, FilesystemIF dataSource) throws IOException {
     	
 		// Load a supporting artefact
     	String resourceID = request.getParameter("resourceID");

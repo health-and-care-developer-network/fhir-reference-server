@@ -31,14 +31,13 @@ import org.apache.velocity.app.Velocity;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.PageTemplateHelper;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 public class ExtensionsList {
 	
-	private static final long serialVersionUID = 2388212531827651285L;
 	private static final Logger LOG = Logger.getLogger(ExtensionsList.class.getName());
 	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
-	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
+	private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
 	
 	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
 								FHIRVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {

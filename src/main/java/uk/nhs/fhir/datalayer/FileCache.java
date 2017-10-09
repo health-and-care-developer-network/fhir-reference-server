@@ -52,7 +52,7 @@ import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  * Holds an in-memory cache of metadata about FHIR resources loaded from the filesystem.
@@ -68,8 +68,8 @@ public class FileCache {
     private static HashMap<FHIRVersion, HashMap<String, ResourceEntity>> examplesListByName = null;
     
     private static long lastUpdated = 0;
-    private static long updateInterval = Long.parseLong(PropertyReader.getProperty("cacheReloadIntervalMS"));
-    private static String fileExtension = PropertyReader.getProperty("fileExtension");
+    private static long updateInterval = Long.parseLong(FhirServerProperties.getProperty("cacheReloadIntervalMS"));
+    private static String fileExtension = FhirServerProperties.getProperty("fileExtension");
 
 
     /**
@@ -87,7 +87,7 @@ public class FileCache {
         		if (!names.contains(entry.getLatest().getResourceName()))
         			names.add(entry.getLatest().getResourceName());
         }
-        ArrayList<String> nameList = new ArrayList(names);
+        ArrayList<String> nameList = new ArrayList<>(names);
         return nameList;
     }
     
@@ -509,7 +509,7 @@ public class FileCache {
 	}
 
     
-    private static void printCacheContent(FHIRVersion fhirVersion) {
+    /*private static void printCacheContent(FHIRVersion fhirVersion) {
     	addMessage(" ===  ===  ===   Cache Contents for "+fhirVersion+"   === === ===");
     	LOG.fine("Cache loaded - entries:");
     	for (ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
@@ -528,5 +528,5 @@ public class FileCache {
     		}
     	}
     	addMessage(" ===  ===  ===  End Cache Contents === === ===");
-    }
+    }*/
 }

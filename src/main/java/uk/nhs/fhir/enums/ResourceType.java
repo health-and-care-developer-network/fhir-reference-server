@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
  * This is an enum to hold whether the request is from a browser or not. It can be initialised using
@@ -37,7 +37,7 @@ public enum ResourceType {
 			if (this.filesystemPath == null) {
 				this.filesystemPath = new HashMap<FHIRVersion, String>();
 			}
-			this.filesystemPath.put(fhirVersion, PropertyReader.getProperty("Path-"+displayName+"-"+fhirVersion));
+			this.filesystemPath.put(fhirVersion, FhirServerProperties.getProperty("Path-"+displayName+"-"+fhirVersion));
 		}
 	}
 	

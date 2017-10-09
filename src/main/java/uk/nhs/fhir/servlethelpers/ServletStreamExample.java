@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
@@ -23,7 +23,7 @@ public class ServletStreamExample {
 	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
 	
 	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
-			FHIRVersion fhirVersion, Datasource dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
+			FHIRVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
     	
 		// Parse the URL
 		String exampleName = request.getRequestURI().substring(10);

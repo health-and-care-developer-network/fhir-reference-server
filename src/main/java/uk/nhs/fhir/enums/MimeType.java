@@ -3,8 +3,6 @@ package uk.nhs.fhir.enums;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * This is an enum to hold whether the request was for XML, JSON, or something else. It can be
  * initialised using getTypeFromHeader to identify the type requested from the value of a

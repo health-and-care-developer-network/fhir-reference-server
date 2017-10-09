@@ -3,7 +3,7 @@ package uk.nhs.fhir.datalayer.collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-public class ResourceEntityWithMultipleVersions implements Comparable {
+public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
 	
 	private static final Logger LOG = Logger.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
@@ -64,7 +64,7 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 	 * Allow resources to be sorted by name
 	 */
 	@Override
-	public int compareTo(Object arg0) {
+	public int compareTo(ResourceEntityWithMultipleVersions arg0) {
 		ResourceEntityWithMultipleVersions other = (ResourceEntityWithMultipleVersions)arg0;
 		return this.getLatest().compareTo(other.getLatest());
 	}

@@ -31,11 +31,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import uk.nhs.fhir.enums.ClientType;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 @WebServlet(urlPatterns = {"/index.html", ""}, displayName = "FHIR Server Home Page", loadOnStartup = 1)
 public class IndexServlet extends javax.servlet.http.HttpServlet {
@@ -44,7 +42,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 	private static final Logger LOG = Logger.getLogger(IndexServlet.class.getName());
 	PageTemplateHelper templateHelper = null;
 	private static ResourceWebHandler myWebHandler = null;
-	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
+	private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
 	
 	protected static void setResourceHandler(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
@@ -66,7 +64,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		
 		/* Check if this is a ReST request (e.g. paging retrieval), and if so delegate back to the RestfulServlet */
 		ClientType clientType = ClientType.getTypeFromHeaders(req);
-		if (clientType == clientType.NON_BROWSER) {
+		if (clientType == ClientType.NON_BROWSER) {
 			RequestDispatcher rd = getServletContext().getNamedDispatcher("uk.nhs.fhir.RestfulServlet");
 			rd.forward(req, resp);
 			return;

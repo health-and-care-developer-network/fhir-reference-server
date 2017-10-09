@@ -5,7 +5,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
 
 /**
@@ -15,7 +15,7 @@ import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
  */
 public abstract class AbstractResourceProviderDSTU2 extends AbstractResourceProvider {
 
-	public AbstractResourceProviderDSTU2(Datasource dataSource) {
+	public AbstractResourceProviderDSTU2(FilesystemIF dataSource) {
 		super(dataSource);
 	}
 

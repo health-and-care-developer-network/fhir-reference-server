@@ -29,7 +29,7 @@ import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.StringParam;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -48,7 +48,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
      *
      * @param dataSource
      */
-    public ValueSetProvider(Datasource dataSource) {
+    public ValueSetProvider(FilesystemIF dataSource) {
     	super(dataSource);
         ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.VALUESET;
@@ -71,9 +71,8 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     @Search()
     public List<ValueSet> getValueSetsByCode(@RequiredParam(name = ValueSet.SP_CODE) StringParam theCode) {
         List<ValueSet> results = new ArrayList<ValueSet>();
-        ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
         
-        List<String> ids = codeCache.findCode(theCode.getValue());
+        List<String> ids = ValueSetCodesCache.findCode(theCode.getValue());
         for(String theID : ids) {
             results.add((ValueSet)myDatasource.getResourceByID(FHIRVersion.DSTU2, theID));
         }

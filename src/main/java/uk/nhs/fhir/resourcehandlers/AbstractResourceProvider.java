@@ -7,31 +7,28 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 public abstract class AbstractResourceProvider implements IResourceProvider, IResourceHelper {
 
 	private static final Logger LOG = Logger.getLogger(AbstractResourceProvider.class.getName());
-    private static String logLevel = PropertyReader.getProperty("logLevel");
+    private static String logLevel = FhirServerProperties.getProperty("logLevel");
 
-    protected Datasource myDatasource = null;
+    protected FilesystemIF myDatasource = null;
     protected FhirContext ctx = null;
     protected ResourceType resourceType = null;
     protected FHIRVersion fhirVersion = null;
     protected Class<? extends IBaseResource> fhirClass = null;
 
-    public AbstractResourceProvider(Datasource dataSource) {
+    public AbstractResourceProvider(FilesystemIF dataSource) {
         LOG.setLevel(Level.INFO);
 
         if(logLevel.equals("FINE")) {

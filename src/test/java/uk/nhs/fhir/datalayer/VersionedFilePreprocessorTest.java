@@ -1,14 +1,12 @@
 package uk.nhs.fhir.datalayer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-import uk.nhs.fhir.enums.ResourceType;
 
 public class VersionedFilePreprocessorTest {
 

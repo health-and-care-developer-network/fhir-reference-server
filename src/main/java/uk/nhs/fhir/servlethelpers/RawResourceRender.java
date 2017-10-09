@@ -20,12 +20,12 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.PropertyReader;
+import uk.nhs.fhir.util.FhirServerProperties;
 
 public class RawResourceRender {
 	
 	ResourceWebHandler myWebHandler = null;
-	private static String templateDirectory = PropertyReader.getProperty("templateDirectory");
+	private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
 	
 	public RawResourceRender(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;

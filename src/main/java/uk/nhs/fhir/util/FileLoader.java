@@ -51,7 +51,7 @@ public class FileLoader {
      */
     public static String loadFile(final File file) {
     	logger.fine("Loading file: " + file.getAbsolutePath());
-        String defaultEncoding = PropertyReader.getProperty("fileEncoding");
+        String defaultEncoding = FhirServerProperties.getProperty("fileEncoding");
     	InputStream inputStream;
     	Reader inputStreamReader;
     	ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();

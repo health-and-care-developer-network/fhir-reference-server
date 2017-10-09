@@ -30,9 +30,6 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import org.hl7.fhir.dstu3.model.CodeSystem;
-import org.hl7.fhir.dstu3.model.CodeSystem.ConceptDefinitionComponent;
-
 import uk.nhs.fhir.enums.FHIRVersion;
 
 public class FHIRUtils {
@@ -57,12 +54,9 @@ public class FHIRUtils {
     private static FhirContext ctxDSTU2 = FHIRVersion.DSTU2.getContext();
     private static FhirContext ctxSTU3 = FHIRVersion.STU3.getContext();
     
-    private static String profilePath = PropertyReader.getProperty("profilePath");
-    private static String valueSetPath = PropertyReader.getProperty("valusetPath");
-    private static String logLevel = PropertyReader.getProperty("logLevel");
-    private static String examplesPath = PropertyReader.getProperty("examplesPath");
+    private static String logLevel = FhirServerProperties.getProperty("logLevel");
     
-    private static String snomedCTcodeSystem = PropertyReader.getProperty("snomedCTcodeSystem");
+    private static String snomedCTcodeSystem = FhirServerProperties.getProperty("snomedCTcodeSystem");
 
 
     /**
