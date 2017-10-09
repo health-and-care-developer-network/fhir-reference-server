@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRVersion;
@@ -28,7 +28,7 @@ public class ServletStreamExample {
 		// Parse the URL
 		String exampleName = request.getRequestURI().substring(10);
 		
-		ResourceEntity exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
+		ResourceMetadata exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
 		
 		if (exampleEntity != null) {
 			// We've found a matching example - stream it back

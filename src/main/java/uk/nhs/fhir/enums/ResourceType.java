@@ -1,6 +1,8 @@
 package uk.nhs.fhir.enums;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -28,6 +30,20 @@ public enum ResourceType {
 	OTHER("Other", "Other");
 	
 	private static final Logger LOG = Logger.getLogger(ResourceType.class.getName());
+
+	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
+	private static final ResourceType[] STU3_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM};
+	
+	public static List<ResourceType> typesForFhirVersion(FHIRVersion fhirVersion) {
+		switch (fhirVersion) {
+		case DSTU2:
+			return Arrays.asList(DSTU2_TYPES);
+		case STU3:
+			return Arrays.asList(STU3_TYPES);
+		default:
+			throw new IllegalStateException("Don't know which resource types apply to version " + fhirVersion.toString());
+		}
+	}
 	
 	private ResourceType(String displayName, String hapiName) {
 		this.displayName = displayName;

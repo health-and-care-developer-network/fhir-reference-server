@@ -5,15 +5,15 @@ import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 
 public class ExtensionsListPageTemplate extends VelocityTemplate {
 
 	private final String baseUrl;
-	private final List<ResourceEntity> extensions;
+	private final List<ResourceMetadata> extensions;
 	
-	public ExtensionsListPageTemplate(String baseUrl, List<ResourceEntity> extensions) {
-		super("extensions.vm", Optional.empty(), Optional.empty(), Optional.of("Extension Registry"), baseUrl);
+	public ExtensionsListPageTemplate(String baseUrl, List<ResourceMetadata> extensions) {
+		super("extensions.vm", Optional.empty(), Optional.of("Extension Registry"), Optional.empty(), baseUrl);
 		this.baseUrl = baseUrl;
 		this.extensions = extensions;
 	}

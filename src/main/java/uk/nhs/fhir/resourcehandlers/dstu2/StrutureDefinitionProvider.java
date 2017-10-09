@@ -30,7 +30,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -67,7 +67,7 @@ public class StrutureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     	return ((StructureDefinition)resource).getText().getDivAsString();
     }
     
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String resourceName = null;
     	String baseType = null;
     	boolean extension = false;
@@ -123,7 +123,7 @@ public class StrutureDefinitionProvider extends AbstractResourceProviderDSTU2 {
         VersionNumber versionNo = new VersionNumber(profile.getVersion());
         String status = profile.getStatus();
         
-        return new ResourceEntity(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 							extension, baseType, displayGroup, false,
 							resourceID, versionNo, status, null, extensionCardinality,
 							extensionContexts, extensionDescription, FHIRVersion.DSTU2, url);

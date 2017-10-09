@@ -48,7 +48,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
@@ -246,7 +246,7 @@ public class STU3PlainContent extends CORSInterceptor {
     
     
     private String makeResourceURL(IdType resourceID, String baseURL) {
-    	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
+    	ResourceMetadata entity = myWebHandler.getResourceEntityByID(resourceID);
     	return entity.getVersionedUrl(baseURL);
     }
     
@@ -276,11 +276,11 @@ public class STU3PlainContent extends CORSInterceptor {
     	
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
-    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
+    	HashMap<VersionNumber, ResourceMetadata> list = entity.getVersionList();
     	context.put( "versions", list );
     	
     	// Resource metadata
-    	ResourceEntity metadata = myWebHandler.getResourceEntityByID(resourceID);
+    	ResourceMetadata metadata = myWebHandler.getResourceEntityByID(resourceID);
     	context.put( "metadata", metadata );
     	
     	// Check if we have a nice metadata table from the renderer
@@ -333,7 +333,7 @@ public class STU3PlainContent extends CORSInterceptor {
     	if (params.containsKey("name") || params.containsKey("name:contains")) {
             
     		// We are showing a list of matching resources for the specified name query
-    		List<ResourceEntity> list = null;
+    		List<ResourceMetadata> list = null;
     		
     		if (params.containsKey("name")) {
             	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
@@ -358,7 +358,7 @@ public class STU3PlainContent extends CORSInterceptor {
     		
         } else {
         	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
-        	HashMap<String, List<ResourceEntity>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
+        	HashMap<String, List<ResourceMetadata>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
         	
         	try {
         	  template = Velocity.getTemplate(templateDirectory + "list.vm");

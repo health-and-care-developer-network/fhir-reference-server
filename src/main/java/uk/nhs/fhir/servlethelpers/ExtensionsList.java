@@ -23,7 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.html.ExtensionsListPageTemplate;
 import uk.nhs.fhir.html.ExtensionsListProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
@@ -44,7 +44,7 @@ public class ExtensionsList {
 		LOG.fine("Requested URL: " + req.getRequestURL());
 		
 		String baseUrl = req.getContextPath();
-		List<ResourceEntity> extensions = extensionsListProvider.getExtensions();
+		List<ResourceMetadata> extensions = extensionsListProvider.getExtensions();
 		ExtensionsListPageTemplate extensionsPage = new ExtensionsListPageTemplate(baseUrl, extensions);
 		String renderedExtensionsPage = extensionsPage.getHtml();
 		

@@ -15,7 +15,7 @@ import org.hl7.fhir.dstu3.model.OperationDefinition;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -48,7 +48,7 @@ public class OperationDefinitionProvider extends AbstractResourceProviderSTU3 {
     	return ((OperationDefinition)resource).getText().getDivAsString();
     }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	
     	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = operation.getName();
@@ -58,7 +58,7 @@ public class OperationDefinitionProvider extends AbstractResourceProviderSTU3 {
         VersionNumber versionNo = new VersionNumber(operation.getVersion());
         String status = operation.getStatus().name();
     	
-        return new ResourceEntity(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }

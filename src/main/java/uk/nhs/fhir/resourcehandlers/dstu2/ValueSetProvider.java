@@ -31,7 +31,7 @@ import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.StringParam;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -93,7 +93,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     	return ((ValueSet)resource).getText().getDivAsString();
     }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
     	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
     	String url = profile.getUrl();
@@ -108,7 +108,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+    	return new ResourceMetadata(resourceName, thisFile, ResourceType.VALUESET,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }

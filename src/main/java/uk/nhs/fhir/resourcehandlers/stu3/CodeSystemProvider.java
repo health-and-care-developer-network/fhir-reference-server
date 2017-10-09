@@ -25,7 +25,7 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -59,7 +59,7 @@ public class CodeSystemProvider extends AbstractResourceProviderSTU3 {
     	return ((CodeSystem)resource).getText().getDivAsString();
     }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
     	CodeSystem profile = (CodeSystem)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = profile.getName();
@@ -68,7 +68,7 @@ public class CodeSystemProvider extends AbstractResourceProviderSTU3 {
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.CODESYSTEM,
+    	return new ResourceMetadata(resourceName, thisFile, ResourceType.CODESYSTEM,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }

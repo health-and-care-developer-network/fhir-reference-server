@@ -7,20 +7,20 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	
 	private static final Logger LOG = Logger.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
-	HashMap<VersionNumber,ResourceEntity> versionList = new HashMap<VersionNumber,ResourceEntity>();
+	HashMap<VersionNumber,ResourceMetadata> versionList = new HashMap<VersionNumber,ResourceMetadata>();
 	VersionNumber latest = null;
 	VersionNumber latestActive = null;
 	VersionNumber latestDraft = null;
 	String resourceID = null;
 	String resourceName = null;
 	
-	public ResourceEntityWithMultipleVersions(ResourceEntity entity) {
+	public ResourceEntityWithMultipleVersions(ResourceMetadata entity) {
 		this.resourceID = entity.getResourceID();
 		this.resourceName = entity.getResourceName();
 		add(entity);
 	}
 	
-	public void add(ResourceEntity entity) {
+	public void add(ResourceMetadata entity) {
 		latest = largestVersion(latest, entity.getVersionNo());
 		if (entity.getStatus().equals("active")) {
 			latestActive = largestVersion(latestActive, entity.getVersionNo());
@@ -30,11 +30,11 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 		versionList.put(entity.getVersionNo(), entity);
 	}
 	
-	public ResourceEntity getLatest() {
+	public ResourceMetadata getLatest() {
 		return versionList.get(latest);
 	}
 	
-	public ResourceEntity getSpecificVersion(VersionNumber version) {
+	public ResourceMetadata getSpecificVersion(VersionNumber version) {
 		if (versionList.containsKey(version)) {
 			LOG.fine("Found requested version - returning");
 			return versionList.get(version);
@@ -66,7 +66,7 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	@Override
 	public int compareTo(ResourceEntityWithMultipleVersions arg0) {
 		ResourceEntityWithMultipleVersions other = (ResourceEntityWithMultipleVersions)arg0;
-		return this.getLatest().compareTo(other.getLatest());
+		return ResourceMetadata.BY_RESOURCE_NAME.compare(this.getLatest(), other.getLatest());
 	}
 
 	public String getResourceID() {
@@ -86,7 +86,7 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 		return result;
 	}
 
-	public HashMap<VersionNumber, ResourceEntity> getVersionList() {
+	public HashMap<VersionNumber, ResourceMetadata> getVersionList() {
 		return versionList;
 	}
 }

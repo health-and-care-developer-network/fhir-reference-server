@@ -11,7 +11,7 @@ import org.apache.commons.io.FileUtils;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.util.FHIRVersion;
 
@@ -33,7 +33,7 @@ public class ServletStreamArtefact {
     			theId = theId.withVersion(resourceVersion);
     		}
     		try {
-    			ResourceEntity entity = dataSource.getResourceEntityByID(fhirVersion, theId);
+    			ResourceMetadata entity = dataSource.getResourceEntityByID(fhirVersion, theId);
     			for (SupportingArtefact artefact : entity.getArtefacts()) {
         			if (artefact.getArtefactType().name().equals(artefactType)) {
         				// We've found a matching artefact - stream it back

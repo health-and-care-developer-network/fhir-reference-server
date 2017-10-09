@@ -15,7 +15,7 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -49,7 +49,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
     	return ((ImplementationGuide)resource).getText().getDivAsString();
     }
     
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = guide.getName();
     	String url = guide.getUrl();
@@ -58,7 +58,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
         VersionNumber versionNo = new VersionNumber(guide.getVersion());
         String status = guide.getStatus().name();
     	
-        return new ResourceEntity(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }

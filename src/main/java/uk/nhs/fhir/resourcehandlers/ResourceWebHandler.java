@@ -31,7 +31,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.html.ExtensionsListProvider;
@@ -72,7 +72,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     
     
     
-    public HashMap<String, List<ResourceEntity>> getAGroupedListOfResources(ResourceType resourceType) {
+    public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.fine("Called: ResourceWebHandler.getAlGroupedNames()");
         
         if (resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
@@ -88,16 +88,16 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return null;
     }
 
-    public List<ResourceEntity> getAllNames(ResourceType resourceType, String namePart) {
+    public List<ResourceMetadata> getAllNames(ResourceType resourceType, String namePart) {
         LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
         
-        List<ResourceEntity> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, namePart);
+        List<ResourceMetadata> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, namePart);
         
         return myResourceList;
     }
     
     @Override
-    public List<ResourceEntity> getExtensions() {
+    public List<ResourceMetadata> getExtensions() {
         LOG.fine("Called: ResourceWebHandler.getExtensions()");
         
         return myDataSource.getExtensions();
@@ -115,13 +115,13 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return myDataSource.getVersionsByID(fhirVersion, id);
     }
     
-    public ResourceEntity getResourceEntityByID(IdDt theId) {
+    public ResourceMetadata getResourceEntityByID(IdDt theId) {
         LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
         
         return myDataSource.getResourceEntityByID(fhirVersion, theId);
     }
     
-    public ResourceEntity getResourceEntityByID(IdType theId) {
+    public ResourceMetadata getResourceEntityByID(IdType theId) {
         LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
         
         return myDataSource.getResourceEntityByID(fhirVersion, theId);

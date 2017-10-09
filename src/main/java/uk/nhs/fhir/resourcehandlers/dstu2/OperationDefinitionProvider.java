@@ -15,7 +15,7 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -48,7 +48,7 @@ public class OperationDefinitionProvider extends AbstractResourceProviderDSTU2 {
     	return ((OperationDefinition)resource).getText().getDivAsString();
     }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	OperationDefinition operation = (OperationDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
     	String resourceName = operation.getName();
     	String url = operation.getUrl();
@@ -57,7 +57,7 @@ public class OperationDefinitionProvider extends AbstractResourceProviderDSTU2 {
         VersionNumber versionNo = new VersionNumber(operation.getVersion());
         String status = operation.getStatus();
         
-        return new ResourceEntity(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.OPERATIONDEFINITION,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }

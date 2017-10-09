@@ -15,7 +15,7 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -49,7 +49,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
     	return ((Conformance)resource).getText().getDivAsString();
     }
     
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	Conformance operation = (Conformance)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
     	String resourceName = operation.getName();
     	String url = operation.getUrl();
@@ -58,7 +58,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
         VersionNumber versionNo = new VersionNumber(operation.getVersion());
         String status = operation.getStatus();
         
-        return new ResourceEntity(resourceName, thisFile, ResourceType.CONFORMANCE,
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.CONFORMANCE,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }
