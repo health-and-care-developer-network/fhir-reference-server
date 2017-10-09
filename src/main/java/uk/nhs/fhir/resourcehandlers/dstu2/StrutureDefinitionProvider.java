@@ -48,7 +48,6 @@ public class StrutureDefinitionProvider extends AbstractResourceProviderDSTU2 {
      */
     public StrutureDefinitionProvider(FilesystemIF dataSource) {
         super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.STRUCTUREDEFINITION;
         fhirVersion = FHIRVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.StructureDefinition.class;

@@ -50,7 +50,6 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
      */
     public ValueSetProvider(FilesystemIF dataSource) {
     	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.VALUESET;
         fhirVersion = FHIRVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.ValueSet.class;

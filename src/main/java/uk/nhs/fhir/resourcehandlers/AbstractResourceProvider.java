@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
@@ -23,7 +22,6 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
     private static String logLevel = FhirServerProperties.getProperty("logLevel");
 
     protected FilesystemIF myDatasource = null;
-    protected FhirContext ctx = null;
     protected ResourceType resourceType = null;
     protected FHIRVersion fhirVersion = null;
     protected Class<? extends IBaseResource> fhirClass = null;

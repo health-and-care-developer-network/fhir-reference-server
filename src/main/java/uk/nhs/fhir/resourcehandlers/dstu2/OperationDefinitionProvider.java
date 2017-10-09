@@ -29,7 +29,6 @@ public class OperationDefinitionProvider extends AbstractResourceProviderDSTU2 {
 
     public OperationDefinitionProvider(FilesystemIF dataSource) {
     	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.OPERATIONDEFINITION;
         fhirVersion = FHIRVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.OperationDefinition.class;

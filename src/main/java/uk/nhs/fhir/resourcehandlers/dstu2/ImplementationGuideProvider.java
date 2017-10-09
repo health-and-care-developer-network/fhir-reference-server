@@ -29,7 +29,6 @@ public class ImplementationGuideProvider extends AbstractResourceProviderDSTU2 {
 
     public ImplementationGuideProvider(FilesystemIF dataSource) {
     	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.IMPLEMENTATIONGUIDE;
         fhirVersion = FHIRVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.ImplementationGuide.class;

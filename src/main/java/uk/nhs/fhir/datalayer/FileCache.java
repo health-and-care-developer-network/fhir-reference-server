@@ -96,7 +96,7 @@ public class FileCache {
      * @return
      */
     public static List<ResourceEntity> getExtensions(FHIRVersion fhirVersion)  {
-    	List<ResourceEntity> results = new ArrayList<ResourceEntity>();
+    	List<ResourceEntity> results = new ArrayList<>();
     	if(updateRequired()) {
             updateCache();
         }
@@ -134,7 +134,7 @@ public class FileCache {
 			                    List<ResourceEntity> resultEntry = result.get(group);
 			                    resultEntry.add(entry.getLatest());
 			                } else {
-			                    List<ResourceEntity> resultEntry = new ArrayList<ResourceEntity>();
+			                    List<ResourceEntity> resultEntry = new ArrayList<>();
 			                    resultEntry.add(entry.getLatest());
 			                    result.put(group, resultEntry);
 			                }
@@ -163,7 +163,7 @@ public class FileCache {
         }
         // Load each resource file and put them in a list to return
         int counter = 0;
-        ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
+        ArrayList<IBaseResource> allFiles = new ArrayList<>();
         for (ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType) {
         		if (counter >= theFromIndex && counter < theToIndex) {
@@ -266,7 +266,7 @@ public class FileCache {
 		addMessage("Started loading " + resourceType + " resources into cache");
     	
         // Now, read the resources from the versioned path into our cache
-    	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<ResourceEntityWithMultipleVersions>();
+    	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<>();
     	String path = resourceType.getVersionedFilesystemPath(fhirVersion);
     	LOG.fine("Reading pre-processed files from path: " + path);
         File folder = new File(path);
@@ -391,7 +391,7 @@ public class FileCache {
     }
     
     private static ArrayList<SupportingArtefact> processSupportingArtefacts(File resourceFile, ResourceType resourceType) {
-    	ArrayList<SupportingArtefact> artefacts = new ArrayList<SupportingArtefact>();
+    	ArrayList<SupportingArtefact> artefacts = new ArrayList<>();
 		
 		String resourceFilename = FileLoader.removeFileExtension(resourceFile.getName());
 		File dir = new File(resourceFile.getParent());
@@ -487,7 +487,7 @@ public class FileCache {
             updateCache();
         }
 		
-		List<ResourceEntity> latestResourcesList = new ArrayList<ResourceEntity>();
+		List<ResourceEntity> latestResourcesList = new ArrayList<>();
 		for (ResourceEntityWithMultipleVersions item : resourceList.get(fhirVersion)) {
 			latestResourcesList.add(item.getLatest());
 		}

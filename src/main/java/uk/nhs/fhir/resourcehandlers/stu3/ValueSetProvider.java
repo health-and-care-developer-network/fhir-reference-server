@@ -39,7 +39,6 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 
 	public ValueSetProvider(FilesystemIF dataSource) {
 		super(dataSource);
-        ctx = FHIRVersion.STU3.getContext();
         resourceType = ResourceType.VALUESET;
         fhirVersion = FHIRVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.ValueSet.class;

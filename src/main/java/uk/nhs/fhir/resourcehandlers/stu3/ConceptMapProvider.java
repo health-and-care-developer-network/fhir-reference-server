@@ -40,7 +40,6 @@ public class ConceptMapProvider extends AbstractResourceProviderSTU3 {
 	
 	public ConceptMapProvider(FilesystemIF dataSource) {
 		super(dataSource);
-        ctx = FHIRVersion.STU3.getContext();
         resourceType = ResourceType.CONCEPTMAP;
         fhirVersion = FHIRVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.ConceptMap.class;

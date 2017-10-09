@@ -40,7 +40,6 @@ public class CodeSystemProvider extends AbstractResourceProviderSTU3 {
 	
 	public CodeSystemProvider(FilesystemIF dataSource) {
 		super(dataSource);
-        ctx = FHIRVersion.STU3.getContext();
         resourceType = ResourceType.CODESYSTEM;
         fhirVersion = FHIRVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.CodeSystem.class;

@@ -29,7 +29,6 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
 
     public ConformanceProvider(FilesystemIF dataSource) {
     	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
         resourceType = ResourceType.CONFORMANCE;
         fhirVersion = FHIRVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.Conformance.class;
