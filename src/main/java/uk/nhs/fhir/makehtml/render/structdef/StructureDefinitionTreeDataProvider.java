@@ -79,20 +79,49 @@ public class StructureDefinitionTreeDataProvider {
 		// but the snapshot name is unchanged.
 		if (matchingNodes.size() == 0) {
 			String differentialPath = differentialNode.getPath();
-			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
 			
-			List<FhirTreeNode> matchingUnchangedChoiceNodes = Lists.newArrayList();
-			if (choiceSuffix.isPresent()) {
-				String suffix = choiceSuffix.get();
-				String choicePath = differentialPath.substring(0, differentialPath.lastIndexOf(suffix)) + "[x]";
-				matchingUnchangedChoiceNodes = findMatchingSnapshotNodes(choicePath, searchRoot);
+			String[] differentialPathElements = differentialPath.split("\\.");
+			String confirmedSnapshotPath = "";
+			FhirTreeNode localSearchRoot = searchRoot;
+			
+			for (String differentialPathElement : differentialPathElements) {
+				String possibleSnapshotElementPath = confirmedSnapshotPath;
+				if (!confirmedSnapshotPath.isEmpty()) {
+					possibleSnapshotElementPath += ".";
+				}
+				possibleSnapshotElementPath += differentialPathElement;
 				
-				// This workaround is necessary due to an error in the Forge Tool (apparently fixed for STU3), so we should potentially highlight it.
-				if (matchingUnchangedChoiceNodes.size() > 0) {
-					RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + choicePath);
-					matchingNodes = matchingUnchangedChoiceNodes;
+				List<FhirTreeNode> possibleAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
+				if (possibleAncestorNodes.size() == 1) {
+					localSearchRoot = possibleAncestorNodes.get(0);
+					confirmedSnapshotPath = possibleSnapshotElementPath;
+				} else if (possibleAncestorNodes.isEmpty()) {
+					// try to match up with use of a choice suffix
+					final String possibleMatchingSnapshotElementPath = possibleSnapshotElementPath;
+					Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> possibleMatchingSnapshotElementPath.endsWith(suffix)).findFirst();
+					if (choiceSuffix.isPresent()) {
+						String suffix = choiceSuffix.get();
+						possibleSnapshotElementPath = possibleSnapshotElementPath.substring(0, possibleSnapshotElementPath.length() - suffix.length()) + "[x]";
+						
+						List<FhirTreeNode> possibleChoiceAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
+						if (possibleChoiceAncestorNodes.isEmpty()) {
+							throw new IllegalStateException("Didn't find any matching paths, even after choice substitution to \"[x]\": " + differentialPath);
+						} else if (possibleChoiceAncestorNodes.size() == 1) {
+							confirmedSnapshotPath = possibleSnapshotElementPath;
+							searchRoot = possibleChoiceAncestorNodes.get(0);
+						} else {
+							throw new IllegalStateException("Found multiple possible matching resolved choice nodes in snapshot - implement match on discriminator? " + differentialPath);
+						}
+					} else {
+						throw new IllegalStateException("No matching paths found, and not a resolved choice node: " + differentialPath);
+					}
+				} else {
+					throw new IllegalStateException("Multiple matches on name - need finer grained handling (discriminators?) " + differentialPath);
 				}
 			}
+			
+			RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}
 		
 		if (matchingNodes.size() == 1) {
