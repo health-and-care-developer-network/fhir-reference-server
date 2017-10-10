@@ -33,6 +33,12 @@
     
     <dependencies>
         
+    	<dependency>
+    		<groupId>uk.nhs.fhir</groupId>
+  			<artifactId>data-structures</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		
         <!-- Next two are required for FHIR validation routines -->
         <dependency>
             <groupId>com.phloc</groupId>
@@ -79,6 +85,7 @@
             <version>3.0.0</version>
             <type>jar</type>
         </dependency>
+        
         <!-- MongoDB libraries in case we opt to store files in MongoDB instead of file system -->
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -86,12 +93,14 @@
             <version>3.3.0</version>
             <type>jar</type>
         </dependency>
+        
         <!-- <dependency>
             <groupId>org.hl7.fhir</groupId>
             <artifactId>validator</artifactId>
             <version>1.0</version>
             <type>jar</type>
         </dependency> -->
+        
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

@@ -13,7 +13,7 @@
 		
 		#foreach( $extension in $extensions )
 		<tr>
-			<td>$extension.getFhirVersion().getLabel()&nbsp;$extension.getStatus().getStatusLabel()</td>
+			<td>$extension.getFhirVersionLabel()&nbsp;$extension.getStatus().getStatusLabel()</td>
 			<td><a href="/$extension.getFhirVersion().getUrlPrefix()StructureDefinition/$extension.getResourceID()">$extension.getResourceName()</a></td>
 			<td>$!extension.getExtensionDescription()</td>
 			<td>$!extension.getExtensionCardinality()</td>

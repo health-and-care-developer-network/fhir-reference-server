@@ -3,17 +3,15 @@ package uk.nhs.fhir.util;
 import ca.uhn.fhir.context.FhirContext;
 
 public enum FHIRVersion {
-	DSTU2("", "<span class='dstu2'>DSTU2</span>"),
-	STU3("STU3/", "<span class='stu3'>STU3</span>");
+	DSTU2(""),
+	STU3("STU3/");
 	
 	private String urlPrefix = null;
-	private String label = null;
 	private static FhirContext fhirContextDSTU2 = FhirContext.forDstu2();
 	private static FhirContext fhirContextSTU3 = FhirContext.forDstu3();
 	
-	private FHIRVersion(String urlPrefix, String label) {
+	private FHIRVersion(String urlPrefix) {
 		this.urlPrefix = urlPrefix;
-		this.label = label;
 	}
 	
 	public FhirContext getContext() {
@@ -27,9 +25,5 @@ public enum FHIRVersion {
 
 	public final String getUrlPrefix() {
 		return urlPrefix;
-	}
-
-	public String getLabel() {
-		return label;
 	}
 }

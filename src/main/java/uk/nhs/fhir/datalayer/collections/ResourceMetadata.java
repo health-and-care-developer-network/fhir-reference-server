@@ -232,4 +232,9 @@ public class ResourceMetadata {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+	public String getFhirVersionLabel() {
+		String fhirVersion = getFhirVersion().toString();
+		return "<span class='" + fhirVersion.toLowerCase() + "'>" + fhirVersion.toUpperCase() + "</span>";
+	}
 }
