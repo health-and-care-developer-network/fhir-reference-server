@@ -40,13 +40,13 @@ import uk.nhs.fhir.util.FHIRVersion;
  *
  * @author Tim Coates
  */
-public class StrutureDefinitionProvider extends AbstractResourceProviderDSTU2 {
+public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     
 	/**
      * Constructor, which tell us which data source and FHIR version we're working with.
      * @param dataSource
      */
-    public StrutureDefinitionProvider(FilesystemIF dataSource) {
+    public StructureDefinitionProvider(FilesystemIF dataSource) {
         super(dataSource);
         resourceType = ResourceType.STRUCTUREDEFINITION;
         fhirVersion = FHIRVersion.DSTU2;

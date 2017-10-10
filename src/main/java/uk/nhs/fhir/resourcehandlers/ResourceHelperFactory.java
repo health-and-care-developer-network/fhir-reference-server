@@ -8,7 +8,7 @@ public class ResourceHelperFactory {
 	public static IResourceHelper getResourceHelper(FHIRVersion fhirVersion, ResourceType resourceType) {
 		if (fhirVersion.equals(FHIRVersion.DSTU2)) {
 			if (resourceType.equals(ResourceType.STRUCTUREDEFINITION)) {
-				return new uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider(null);
+				return new uk.nhs.fhir.resourcehandlers.dstu2.StructureDefinitionProvider(null);
 			} else if (resourceType.equals(ResourceType.VALUESET)) {
 				return new uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider(null);
 			} else if (resourceType.equals(ResourceType.OPERATIONDEFINITION)) {

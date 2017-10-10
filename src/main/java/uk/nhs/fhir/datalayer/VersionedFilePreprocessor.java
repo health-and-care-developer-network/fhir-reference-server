@@ -3,15 +3,13 @@ package uk.nhs.fhir.datalayer;
 import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
+import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
@@ -19,26 +17,21 @@ import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FHIRVersion;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = Logger.getLogger(VersionedFilePreprocessor.class.getName());
-	private static String fileExtension = FhirServerProperties.getProperty("fileExtension");
-	private static final FilenameFilter XML_FILE_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith(fileExtension);
-        }
-    };
 
+	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();  
+	
 	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
 		logStart(fhirVersion, resourceType);
 		
 		String outputDirectory = ensureVersionedFolderExists(fhirVersion, resourceType);
 		
         String resourcePath = resourceType.getFilesystemPath(fhirVersion);
-		List<File> fileList = findXmlFiles(resourcePath);
+		List<File> fileList = resourceFileFinder.findFiles(resourcePath);
         
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
@@ -99,18 +92,6 @@ public class VersionedFilePreprocessor {
 		FileUtils.forceMkdir(new File(versionedPath));
 		return versionedPath;
 	}
-
-	private static List<File> findXmlFiles(String versionDirectoryPath) {
-        File folder = new File(versionDirectoryPath);
-        
-        File[] fileList = folder.listFiles(XML_FILE_FILTER);
-        
-        if (fileList == null) {
-        	return new ArrayList<>();
-        } else {
-        	return Arrays.asList(fileList);
-        }
-	}
 	
 	/**
 	 * If the FHIR resoutce also has other generated resources (e.g. details view, diff, bindings, etc.) then also
@@ -131,7 +112,8 @@ public class VersionedFilePreprocessor {
 		File targetDir = new File(newDir + "/" + newName);
 		//System.out.println(targetDir.getAbsolutePath());
 		
-		if(resourceDir.exists() && resourceDir.isDirectory()) { 
+		if(resourceDir.exists()
+		  && resourceDir.isDirectory()) { 
 			try {
 				// Create target dir
 				FileUtils.forceMkdir(targetDir);

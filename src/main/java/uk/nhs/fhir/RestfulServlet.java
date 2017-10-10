@@ -37,7 +37,7 @@ import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
+import uk.nhs.fhir.resourcehandlers.dstu2.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
@@ -142,7 +142,7 @@ public class RestfulServlet extends RestfulServer {
         ExtensionsList.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-        resourceProviders.add(new StrutureDefinitionProvider(dataSource));
+        resourceProviders.add(new StructureDefinitionProvider(dataSource));
         //resourceProviders.add(new PatientProvider(dataSource));
         //resourceProviders.add(new DocumentReferenceProvider(dataSource));
         //resourceProviders.add(new PractitionerProvider(dataSource));

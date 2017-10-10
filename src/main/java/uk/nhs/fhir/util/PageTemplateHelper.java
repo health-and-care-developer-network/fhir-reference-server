@@ -25,13 +25,13 @@ public class PageTemplateHelper {
     	
     	Template template = null;
     	try {
-    	  template = Velocity.getTemplate(templateDirectory + "index.vm");
+    	  template = Velocity.getTemplate(templateDirectory + "app-shell.vm");
     	} catch( Exception e ) {
     		e.printStackTrace();
     	}
     	
     	// Put content into template
-    	context.put( "page-content", content.toString() );
+    	context.put( "nonTemplatedContent", content.toString() );
     	context.put( "resourceType", resourceType );
     	context.put( "resourceName", resourceName );
     	context.put( "baseURL", baseURL );
