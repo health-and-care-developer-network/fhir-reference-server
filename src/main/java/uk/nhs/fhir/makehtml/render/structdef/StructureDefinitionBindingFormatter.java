@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;

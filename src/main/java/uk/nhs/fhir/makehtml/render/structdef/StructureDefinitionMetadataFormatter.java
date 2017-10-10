@@ -13,7 +13,7 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;

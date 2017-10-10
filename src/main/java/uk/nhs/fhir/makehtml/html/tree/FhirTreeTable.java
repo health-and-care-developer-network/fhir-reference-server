@@ -19,7 +19,6 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.data.url.UrlValidator;
 import uk.nhs.fhir.makehtml.RendererError;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
@@ -34,6 +33,7 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.UrlValidator;
 
 public class FhirTreeTable {
 	

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;

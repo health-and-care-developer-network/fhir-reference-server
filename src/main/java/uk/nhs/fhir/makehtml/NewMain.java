@@ -22,8 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.url.UrlValidator;
+import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.util.UrlValidator;
 
 /**
  * @author tim.coates@hscic.gov.uk
@@ -40,12 +41,21 @@ public class NewMain {
     
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
+	static {
+		RendererError.STRICT = STRICT;
+	}
 	
 	// convert any links with host fhir.hl7.org.uk into relative links
 	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
+	static {
+		FullFhirURL.FHIR_HL7_ORG_LINKS_LOCAL = FHIR_HL7_ORG_LINKS_LOCAL;
+	}
 	
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static final boolean TEST_LINK_URLS = false;
+	static {
+		FullFhirURL.TEST_LINK_URLS = TEST_LINK_URLS;
+	}
 	
     private final File inputDirectory;
     private final String outPath;

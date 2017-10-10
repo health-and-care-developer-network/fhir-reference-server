@@ -1,4 +1,4 @@
-package uk.nhs.fhir.data.url;
+package uk.nhs.fhir.util;
 
 import java.io.IOException;
 import java.util.List;

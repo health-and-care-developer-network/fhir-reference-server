@@ -101,6 +101,9 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 			identifierSystem = identifier.getSystem().orElse(BLANK);
 			identifierType = identifier.getValue().orElse(BLANK);
 		}
+		
+		Optional<Boolean> isImmutable = source.getImmutable();
+		String immutableDesc = isImmutable.isPresent() ? isImmutable.get().toString() : BLANK;
 
         Element colgroup = Elements.newElement("colgroup");
         int columns = 4;
@@ -128,12 +131,13 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 				labelledValueCell("Experimental", experimental, 1)));
 
 		if (!Strings.isNullOrEmpty(identifierSystem)
-		  || !Strings.isNullOrEmpty(identifierType)) {
+		  || !Strings.isNullOrEmpty(identifierType)
+		  || !immutableDesc.trim().isEmpty()) {
 			tableContent.add(
 				Elements.withChildren("tr",
 					labelledValueCell("Identifier system", identifierSystem, 1, true),
 					labelledValueCell("Identifier", identifierType, 1, true),
-					TableCell.empty().makeCell(),
+					labelledValueCell("Immutable", identifierSystem, 1, true),
 					TableCell.empty().makeCell()));
 		}
 		

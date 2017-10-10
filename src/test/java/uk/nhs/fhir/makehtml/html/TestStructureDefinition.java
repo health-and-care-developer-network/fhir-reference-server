@@ -23,6 +23,7 @@ import uk.nhs.fhir.makehtml.FormattedOutputSpec;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.makehtml.render.ResourceFormatterFactory;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
@@ -50,8 +51,8 @@ public class TestStructureDefinition {
 			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition) WrappedResource.fromBaseResource(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
 			
-			for (FormattedOutputSpec<WrappedStructureDefinition> formatSpec : wrappedStructureDefinition.getFormatSpecs("this/path/isnt/used", null)) {
-				ResourceFormatter<WrappedStructureDefinition> formatter = formatSpec.getFormatter();
+			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, "this/path/isnt/used", null)) {
+				ResourceFormatter<?> formatter = formatSpec.getFormatter();
 				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {
 					doc.addSection(sectionHTML);

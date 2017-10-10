@@ -12,7 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;

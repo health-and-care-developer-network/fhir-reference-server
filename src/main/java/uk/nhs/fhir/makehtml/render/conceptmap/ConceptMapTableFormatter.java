@@ -11,7 +11,7 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
 import uk.nhs.fhir.data.url.FhirURL;
