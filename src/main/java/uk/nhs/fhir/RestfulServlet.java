@@ -32,6 +32,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
+import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
@@ -133,7 +134,7 @@ public class RestfulServlet extends RestfulServer {
         
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
-        dataSource = new FilesystemIF();
+        dataSource = SharedDataSource.get();
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         

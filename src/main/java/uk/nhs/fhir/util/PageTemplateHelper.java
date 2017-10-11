@@ -1,7 +1,6 @@
 package uk.nhs.fhir.util;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
@@ -41,16 +40,14 @@ public class PageTemplateHelper {
     	return sw.toString();
     }
     
-    public void streamTemplatedHTMLresponse(HttpServletResponse theResponse, String resourceType,
-    									String resourceName, StringBuffer content, String baseURL) {
+    public void setResponseTextualSuccess(HttpServletResponse theResponse, String wrappedContent) {
     	try {
 	    	// Initialise the output
-	    	PrintWriter outputStream = null;
 	        theResponse.setStatus(200);
 	        theResponse.setContentType("text/html");
-			outputStream = theResponse.getWriter();
+	        
 	        // Send the content to the output
-	        outputStream.append(wrapContentInTemplate(resourceType, resourceName, content, baseURL));
+			theResponse.getWriter().append(wrappedContent);
     	} catch (IOException e) {
     		LOG.severe(e.getMessage());
 		}

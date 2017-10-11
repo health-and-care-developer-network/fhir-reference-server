@@ -10,7 +10,7 @@ public class HomePageTemplate extends VelocityTemplate {
 	private final HashMap<String, Integer> resourceCounts;
 
 	public HomePageTemplate(String baseUrl, HashMap<String, Integer> resourceCounts) {
-		super("home.vm", Optional.empty(), Optional.empty(), Optional.empty(), baseUrl);
+		super(Optional.of("home.vm"), Optional.empty(), Optional.empty(), Optional.empty(), baseUrl);
 		this.baseUrl = baseUrl;
 		this.resourceCounts = resourceCounts;
 	}

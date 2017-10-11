@@ -35,7 +35,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
     }
     
     
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    public IBaseResource removeTextSection(IBaseResource resource) {
     	// Clear out the generated text
         Narrative textElement = new Narrative();
         textElement.setStatus(NarrativeStatus.GENERATED);

@@ -45,7 +45,7 @@ public class ConceptMapProvider extends AbstractResourceProviderSTU3 {
         fhirClass = org.hl7.fhir.dstu3.model.ConceptMap.class;
     }
     
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    public IBaseResource removeTextSection(IBaseResource resource) {
     	// Clear out the generated text
     	Narrative textElement = new Narrative();
         textElement.setStatus(NarrativeStatus.GENERATED);

@@ -35,7 +35,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
     }
     
     
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    public IBaseResource removeTextSection(IBaseResource resource) {
     	// Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);

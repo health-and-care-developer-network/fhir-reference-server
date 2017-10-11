@@ -32,6 +32,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
+import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
@@ -43,7 +44,6 @@ import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
-import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 
@@ -54,7 +54,7 @@ import uk.nhs.fhir.util.FhirServerProperties;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/3.0.1/*", "/STU3/*"}, displayName = "STU3 FHIR Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/STU3/*", "/3.0.1/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
@@ -64,7 +64,7 @@ public class STU3RestfulServlet extends RestfulServer {
     private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
     private static RawResourceRender myRawResourceRenderer = null;
-
+    
     //private static String css = FileLoader.loadFileOnClasspath("/style.css");
     //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
 
@@ -72,27 +72,11 @@ public class STU3RestfulServlet extends RestfulServer {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.info("STU3 Requested URI: " + request.getRequestURI());
-        
-        // Redirect 
-        if (request.getRequestURI().contains("3.0.1")) {
-        	String newURL = request.getRequestURI().replaceAll("\\/3\\.0\\.1\\/", "\\/STU3\\/");
-        	response.sendRedirect(newURL);
-        	return;
-        }
 
         String requestedPath = request.getRequestURI().substring(5);
         LOG.fine("Request path: " + requestedPath);
         
-        if(requestedPath.endsWith(".css")) {
-            // Stylesheets
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
-        } else if (requestedPath.endsWith("favicon.ico")) {
-        	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
-        } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
-        	// Image and JS files
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
-        } else if (requestedPath.startsWith("/artefact")) {
+        if (requestedPath.startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
         } else if (requestedPath.startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
@@ -135,7 +119,7 @@ public class STU3RestfulServlet extends RestfulServer {
         
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
-        dataSource = new FilesystemIF();
+        dataSource = SharedDataSource.get();
         webber = new ResourceWebHandler(dataSource, fhirVersion);
         myRawResourceRenderer = new RawResourceRender(webber);
         
@@ -157,6 +141,7 @@ public class STU3RestfulServlet extends RestfulServer {
         resourceProviders.add(new ConceptMapProvider(dataSource));
         setResourceProviders(resourceProviders);
         registerInterceptor(new STU3PlainContent(webber));
+        registerInterceptor(new RedirectionInterceptor("3.0.1", "STU3"));
         LOG.fine("resourceProviders added");
         
         //setServerConformanceProvider(new CustomServerConformanceProvider());

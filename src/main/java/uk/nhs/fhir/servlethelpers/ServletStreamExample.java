@@ -4,6 +4,7 @@ import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.html.RawResourceTemplate;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.PageTemplateHelper;
@@ -42,7 +44,7 @@ public class ServletStreamExample {
 			MimeType mimeType = null;
 			
 			// Indent XML
-			if (srcFile.getName().endsWith("xml") || srcFile.getName().endsWith("XML")) {
+			if (srcFile.getName().toLowerCase().endsWith("xml")) {
 				mimeType = MimeType.XML;
 				try {
 					String prettyPrinted = ServletUtils.prettyPrintXML(fileContent);
@@ -53,16 +55,17 @@ public class ServletStreamExample {
 				}
 				// Pretty print XML
 				fileContent = syntaxHighlight(fileContent);
-			} else if (srcFile.getName().endsWith("json") || srcFile.getName().endsWith("json")) {
+			} else if (srcFile.getName().toLowerCase().endsWith("json")) {
 				mimeType = MimeType.JSON;
 			} else {
 				mimeType = MimeType.UNKNOWN_MIME;
 			}
 			
-			StringBuffer sb = new StringBuffer();
-			myRawResourceRenderer.renderSingleWrappedRAWResource(fileContent, sb, mimeType);
+			String resourceType = ResourceType.EXAMPLES.toString();
+			String baseURL = request.getContextPath();
+			String wrappedContent = new RawResourceTemplate(Optional.empty(), Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
 			
-			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES.toString(), exampleName, sb, request.getContextPath());
+			templateHelper.setResponseTextualSuccess(response, wrappedContent);
 		} else {
 			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
 			response.setStatus(404);

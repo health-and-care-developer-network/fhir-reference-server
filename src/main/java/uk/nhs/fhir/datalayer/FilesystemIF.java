@@ -26,11 +26,12 @@ import java.util.regex.Pattern;
 
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -67,29 +68,11 @@ public class FilesystemIF {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdDt theId) {
+    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IIdType theId) {
     	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
 	    	LOG.fine("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
-	        
-	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
-	        return foundResource;
-    	} else {
-    		return null;
-    	}
-    }
-    
-    /**
-     * Gets a specific one, optionally also with a specific version
-     * @param id
-     * @return 
-     */
-    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IdType theId) {
-    	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
-    	if (entry != null) {
-	    	File path = entry.getResourceFile();
-	    	LOG.info("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
 	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;

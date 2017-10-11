@@ -34,7 +34,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderDSTU2 {
         fhirClass = ca.uhn.fhir.model.dstu2.resource.ImplementationGuide.class;
     }
         
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
+    public IBaseResource removeTextSection(IBaseResource resource) {
     	// Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);

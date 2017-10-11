@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,10 +46,12 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import uk.nhs.fhir.datalayer.ResourceNameProvider;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
@@ -57,6 +60,7 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.html.RawResourceTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
@@ -75,6 +79,7 @@ public class PlainContent extends CORSInterceptor {
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
     ResourceWebHandler myWebHandler = null;
+    private final ResourceNameProvider resourceNameProvider;
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
@@ -85,6 +90,8 @@ public class PlainContent extends CORSInterceptor {
         myRawResourceRenderer = new RawResourceRender(webber);
         templateHelper = new PageTemplateHelper();
         Velocity.init(FhirServerProperties.getProperties());
+
+		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
     }
     
     @Override
@@ -122,38 +129,37 @@ public class PlainContent extends CORSInterceptor {
             	return true;
             }
         }
-
-        StringBuffer content = new StringBuffer();
         
-
         LOG.fine("FHIR Operation: " + operation);
         LOG.fine("Format to return to browser: " + mimeType.toString());
-        
-        boolean showList = true;
-        String resourceName = null;
-        
-        if (operation != null) {
-        	if (operation == READ || operation == VREAD) {
-	        	if (mimeType == XML || mimeType == JSON) {
-	        		resourceName = myRawResourceRenderer.renderSingleWrappedRAWResource(
-	        										theRequestDetails, content, fhirVersion, resourceType, mimeType);
-	        		showList = false;
-	        	} else {
-	        		resourceName = renderSingleResource(theRequestDetails, content, resourceType);
-	        		showList = false;
-	        	}
-	        }
-        }
-        
-        // We either don't have an operation, or we don't understand the operation, so
-        // return a list of resources instead
-        if (showList) {
-        	content.append(renderListOfResources(theRequestDetails, resourceType));
-        }
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
-        templateHelper.streamTemplatedHTMLresponse(theResponse, resourceType.toString(), resourceName, content, baseURL);
         
+        if (READ.equals(operation) 
+          || VREAD.equals(operation)) {
+        	if (mimeType == XML || mimeType == JSON) {
+        		String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
+
+                IIdType resourceID = theRequestDetails.getId();
+            	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+                String wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResource(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
+                
+                templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+        	} else {
+                StringBuffer content = new StringBuffer();
+        		String resourceName = renderSingleResource(theRequestDetails, content, resourceType);
+                String wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), resourceName, content, baseURL);
+				templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+        	}
+        } else {
+            // We either don't have an operation, or we don't understand the operation, so
+            // return a list of resources instead
+            StringBuffer content = new StringBuffer();
+            content.append(renderListOfResources(theRequestDetails, resourceType));
+            String wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), null, content, baseURL);
+            templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+        }
+
         return false;
     }
     
@@ -190,10 +196,10 @@ public class PlainContent extends CORSInterceptor {
         // If this is a request from a browser for the conformance resource, render and wrap it in HTML
         if (operation != null) {
         	if (operation == METADATA && clientType == BROWSER) {
-	    		StringBuffer content = new StringBuffer();
-	    		renderConformance(content, theResponseObject, mimeType);
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		templateHelper.streamTemplatedHTMLresponse(theServletResponse, CONFORMANCE.toString(), null, content, baseURL);
+	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
+                
+	    		templateHelper.setResponseTextualSuccess(theServletResponse, wrappedContent);
 	    		return false;
     		}
         }
@@ -203,15 +209,10 @@ public class PlainContent extends CORSInterceptor {
 		return true;
 	}
     
-    private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
+    private String renderConformance(IBaseResource conformance, MimeType mimeType, String baseURL) {
     	LOG.fine("Attempting to render conformance statement");
-    	String resourceContent = null;
-    	if (mimeType == JSON) {
-    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, new IdDt(), fhirVersion);
-    	} else {
-    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, new IdDt(), fhirVersion);
-    	}
-    	myRawResourceRenderer.renderSingleWrappedRAWResource(resourceContent, content, mimeType);
+    	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
+    	return new RawResourceTemplate(Optional.empty(), Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
     }
 
     /**

@@ -17,13 +17,13 @@ public abstract class VelocityTemplate {
 	private static final AppShellTemplate sharedShellTemplate = new AppShellTemplate();
 	protected abstract void updateContext(VelocityContext context);
 
-	private final String contentTemplateName;
+	private final Optional<String> contentTemplateName;
 	private final Optional<String> resourceType;
 	private final Optional<String> resourceName;
 	private final Optional<String> nonTemplatedContent;
 	private final String baseURL;
 	
-	public VelocityTemplate(String contentTemplateName, Optional<String> nonTemplatedContent, Optional<String> resourceType, Optional<String> resourceName, String baseURL) {
+	public VelocityTemplate(Optional<String> contentTemplateName, Optional<String> nonTemplatedContent, Optional<String> resourceType, Optional<String> resourceName, String baseURL) {
 		this.contentTemplateName = contentTemplateName;
 		this.nonTemplatedContent = nonTemplatedContent;
 		this.resourceType = resourceType;
@@ -32,9 +32,8 @@ public abstract class VelocityTemplate {
 	}
 	
 	public String getHtml() {
-		VelocityContext context = sharedShellTemplate.getContext(Optional.of(contentTemplateName), resourceType, resourceName, nonTemplatedContent, baseURL);
+		VelocityContext context = sharedShellTemplate.getContext(contentTemplateName, resourceType, resourceName, nonTemplatedContent, baseURL);
 		updateContext(context);
 		return sharedShellTemplate.merge(context);
 	}
-	
 }

@@ -27,12 +27,13 @@ import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.html.ExtensionsListProvider;
 import uk.nhs.fhir.html.ResourceCountsProvider;
@@ -114,7 +115,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         
         return myDataSource.getVersionsByID(fhirVersion, id);
     }
-    
+
     public ResourceMetadata getResourceEntityByID(IdDt theId) {
         LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IdDt id)");
         
@@ -126,17 +127,9 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         
         return myDataSource.getResourceEntityByID(fhirVersion, theId);
     }
-    
-    public IBaseResource getResourceByID(IdDt id) {
-        LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
-        
-        IBaseResource resource = myDataSource.getResourceByID(fhirVersion, id);
-        
-        return resource;
-    }
 
-    public IBaseResource getResourceByID(IdType id) {
-        LOG.fine("Called: ResourceWebHandler.getResourceByID(IdDt id)");
+    public IBaseResource getResourceByID(IIdType id) {
+        LOG.fine("Called: ResourceWebHandler.getResourceByID(IIdType id)");
         
         IBaseResource resource = myDataSource.getResourceByID(fhirVersion, id);
         return resource;
