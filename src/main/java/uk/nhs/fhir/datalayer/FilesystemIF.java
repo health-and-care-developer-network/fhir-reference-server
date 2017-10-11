@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
@@ -81,7 +80,7 @@ public class FilesystemIF {
     	}
     }
     
-    public ResourceMetadata getResourceEntityByID(FHIRVersion fhirVersion, IdDt theId) {
+    public ResourceMetadata getResourceEntityByID(FHIRVersion fhirVersion, IIdType theId) {
     	if (theId.hasVersionIdPart()) {
     		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
     		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getSpecificVersion(version);
@@ -91,21 +90,7 @@ public class FilesystemIF {
     	
     }
     
-    public ResourceMetadata getResourceEntityByID(FHIRVersion fhirVersion, IdType theId) {
-    	if (theId.hasVersionIdPart()) {
-    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
-    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getSpecificVersion(version);
-    	} else {
-    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getLatest();
-    	}
-    	
-    }
-    
-    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdDt theId) {
-    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
-    }
-    
-    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId) {
+    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IIdType theId) {
     	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     }
 

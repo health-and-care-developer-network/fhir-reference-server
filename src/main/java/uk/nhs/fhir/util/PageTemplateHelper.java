@@ -19,7 +19,7 @@ public class PageTemplateHelper {
     	Velocity.init(FhirServerProperties.getProperties());
     }
     
-    public String wrapContentInTemplate(String resourceType, String resourceName, StringBuffer content, String baseURL) {
+    public String wrapContentInTemplate(String resourceType, String resourceName, StringBuilder content, String baseURL) {
     	VelocityContext context = new VelocityContext();
     	
     	Template template = null;

@@ -22,13 +22,8 @@ import static uk.nhs.fhir.enums.ClientType.BROWSER;
 import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
 import static uk.nhs.fhir.enums.MimeType.JSON;
 import static uk.nhs.fhir.enums.MimeType.XML;
-import static uk.nhs.fhir.enums.ResourceType.CODESYSTEM;
-import static uk.nhs.fhir.enums.ResourceType.CONCEPTMAP;
 import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -53,21 +48,22 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.datalayer.ResourceNameProvider;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
+import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.html.RawResourceTemplate;
+import uk.nhs.fhir.html.ResourceWithMetadataTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
-import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FileLoader;
+import uk.nhs.fhir.util.PageTemplateHelper;
 
 /**
  * Class used to generate html content when a request comes from a browser.
@@ -107,7 +103,8 @@ public class PlainContent extends CORSInterceptor {
         LOG.info("Request received - operation: " + operation.toString() + ", type: " + resourceType.toString());
         
         // First, check if this is a request for a markdown or text file from the ImplementationGuide directory..
-        if ((operation == READ || operation == VREAD) && resourceType == IMPLEMENTATIONGUIDE) {
+        if ((operation == READ || operation == VREAD) 
+          && resourceType == IMPLEMENTATIONGUIDE) {
         	String resourceName = theRequestDetails.getId().getIdPart();
         	if (resourceName.endsWith(".md") || resourceName.endsWith(".txt")) {
         		streamFileDirectly(theResponse, resourceName);
@@ -135,31 +132,28 @@ public class PlainContent extends CORSInterceptor {
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
         
+        String wrappedContent;
         if (READ.equals(operation) 
           || VREAD.equals(operation)) {
+            String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
+            
         	if (mimeType == XML || mimeType == JSON) {
-        		String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
-
                 IIdType resourceID = theRequestDetails.getId();
             	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
-                String wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResource(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
+                wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResource(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
                 
-                templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
         	} else {
-                StringBuffer content = new StringBuffer();
-        		String resourceName = renderSingleResource(theRequestDetails, content, resourceType);
-                String wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), resourceName, content, baseURL);
-				templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+                wrappedContent = renderSingleResource(theRequestDetails, resourceName, resourceType);
         	}
         } else {
             // We either don't have an operation, or we don't understand the operation, so
             // return a list of resources instead
-            StringBuffer content = new StringBuffer();
+            StringBuilder content = new StringBuilder();
             content.append(renderListOfResources(theRequestDetails, resourceType));
-            String wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), null, content, baseURL);
-            templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+            wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), null, content, baseURL);
         }
 
+        templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
         return false;
     }
     
@@ -223,42 +217,35 @@ public class PlainContent extends CORSInterceptor {
      * @param content
      * @param resourceType
      */
-    private String renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
-
-    	VelocityContext context = new VelocityContext();
+    private String renderSingleResource(RequestDetails theRequestDetails, String resourceName, ResourceType resourceType) {
     	
     	String baseURL = theRequestDetails.getServerBaseForRequest();
 
         IdDt resourceID = (IdDt)theRequestDetails.getId();
         
-        if (resourceType == STRUCTUREDEFINITION) {
-            content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
-        }
-        if (resourceType == VALUESET) {
-        	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));
-        }
-        if (resourceType == OPERATIONDEFINITION) {
-        	content.append(describeResource(resourceID, baseURL, context, "Operation Description", resourceType));
-        }
-        if (resourceType == IMPLEMENTATIONGUIDE) {
-        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
-        }
-        if (resourceType == CODESYSTEM) {
-        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
-        }
-        if (resourceType == CONCEPTMAP) {
-        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
-        }
+        String firstTabName = getFirstTabName(resourceType);
         
-        // Return resource name (for breadcrumb)
-        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
+		return describeResource(resourceName, resourceID, baseURL, firstTabName, resourceType);
     }
-    
-    
-    private String makeResourceURL(IdDt resourceID, String baseURL) {
-    	ResourceMetadata entity = myWebHandler.getResourceEntityByID(resourceID);
-    	return entity.getVersionedUrl(baseURL);
-    }
+
+	String getFirstTabName(ResourceType resourceType) {
+        switch (resourceType) {
+	        case STRUCTUREDEFINITION:
+				return "Snapshot";
+	        case VALUESET:
+	        	return "Entries";
+	        case OPERATIONDEFINITION:
+	        	return "Operation Description";
+	        case IMPLEMENTATIONGUIDE:
+	        	return "Description";
+	        case CODESYSTEM:
+	        	return "Description";
+	        case CONCEPTMAP:
+	        	return "Description";
+        	default:
+	        	throw new IllegalStateException("Unhandled resource type: " + resourceType.toString());
+        }
+	}
     
     /**
      * Code in here to create the HTML response to a request for a
@@ -267,58 +254,37 @@ public class PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
-    private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    private String describeResource(String resourceName, IIdType resourceID, String baseURL, String firstTabName, ResourceType resourceType) {
     	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
-    	
-    	Template template = null;
-    	try {
-    	  template = Velocity.getTemplate(templateDirectory + "resource-with-metadata.vm");
-    	} catch( Exception e ) {
-    		e.printStackTrace();
-    	}
-    	
-    	// Values to insert into template
-    	context.put( "resource", resource );
-    	context.put( "type", resourceType );
-    	context.put( "baseURL", baseURL );
-    	context.put( "firstTabName", firstTabName );
-    	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
-    	
+
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
-    	HashMap<VersionNumber, ResourceMetadata> list = entity.getVersionList();
-    	context.put( "versions", list );
-    	
+    	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
+
     	// Resource metadata
-    	ResourceMetadata metadata = myWebHandler.getResourceEntityByID(resourceID);
-    	context.put( "metadata", metadata );
-    	
+    	ResourceMetadata resourceMetadata = myWebHandler.getResourceEntityByID(resourceID);
+
     	// Check if we have a nice metadata table from the renderer
-    	boolean hasGeneratedMetadataFromRenderer = false;
-    	for (SupportingArtefact artefact : metadata.getArtefacts()) {
-    		if (artefact.getArtefactType().isMetadata()) {
-    			hasGeneratedMetadataFromRenderer = true;
-    			context.put( "metadataType", artefact.getArtefactType().name());
-    		}
-    	}
-    	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
-    	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
-    	
+    	Optional<SupportingArtefact> metadataArtefact = 
+			resourceMetadata.getArtefacts()
+				.stream()
+				.filter(artefact -> artefact.getArtefactType().isMetadata())
+				.findAny();
+    	LOG.fine("Has metadata from renderer: " + metadataArtefact.isPresent());
+
     	// Tree view
     	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
-    	context.put( "treeView", textSection );
-    	
+
     	// Examples
-    	ExampleResources examples = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
-    	if (examples != null) {
-    		if (examples.size() > 0) {
-    			context.put( "examples", examples );
-    		}
-    	}
+    	ExampleResources examplesList = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	Optional<ExampleResources> examples = 
+    		(examplesList == null 
+    		  || examplesList.isEmpty()) ? 
+    			Optional.empty() : 
+    			Optional.of(examplesList);
     	
-    	StringWriter sw = new StringWriter();
-    	template.merge( context, sw );
-    	return sw.toString();
+    	return new ResourceWithMetadataTemplate(resourceType.toString(), resourceName, baseURL, resource, firstTabName,
+    		versionsList, resourceMetadata, metadataArtefact, textSection, examples).getHtml();
     }
     
     /**

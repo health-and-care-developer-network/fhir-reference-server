@@ -21,7 +21,7 @@ public abstract class VelocityTemplate {
 	private final Optional<String> resourceType;
 	private final Optional<String> resourceName;
 	private final Optional<String> nonTemplatedContent;
-	private final String baseURL;
+	protected final String baseURL;
 	
 	public VelocityTemplate(Optional<String> contentTemplateName, Optional<String> nonTemplatedContent, Optional<String> resourceType, Optional<String> resourceName, String baseURL) {
 		this.contentTemplateName = contentTemplateName;
