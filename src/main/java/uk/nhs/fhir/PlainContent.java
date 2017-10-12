@@ -282,6 +282,7 @@ public class PlainContent extends CORSInterceptor {
     	context.put( "baseURL", baseURL );
     	context.put( "firstTabName", firstTabName );
     	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	context.put( "fhirVersion", fhirVersion);
     	
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
