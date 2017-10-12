@@ -29,6 +29,7 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.html.HomePageTemplate;
 import uk.nhs.fhir.html.ResourceCountsProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.ServletUtils;
 
 @WebServlet(urlPatterns = {"/index.html", ""}, displayName = "FHIR Server Home Page", loadOnStartup = 1)
 public class IndexServlet extends javax.servlet.http.HttpServlet {
@@ -63,10 +64,6 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
     	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
 		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml();
     	
-        resp.setStatus(200);
-        resp.setContentType("text/html");
-		
-		// Put the content into our template and stream to the response
-		resp.getWriter().append(content);
+		ServletUtils.setResponseSuccess(resp, "text/html", content);
 	}
 }

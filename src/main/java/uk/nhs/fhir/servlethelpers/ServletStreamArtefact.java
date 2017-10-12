@@ -7,13 +7,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
-
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.util.FHIRVersion;
+import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
@@ -37,10 +36,8 @@ public class ServletStreamArtefact {
     			for (SupportingArtefact artefact : entity.getArtefacts()) {
         			if (artefact.getArtefactType().name().equals(artefactType)) {
         				// We've found a matching artefact - stream it back
-        				response.setStatus(200);
-        				response.setContentType("text/html");
         				File srcFile = artefact.getFilename();
-        			    FileUtils.copyFile(srcFile, response.getOutputStream());
+        			    ServletUtils.setResponseSuccess(response, "text/html", srcFile);
         			    return;
         			}
         		}

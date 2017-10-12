@@ -25,9 +25,7 @@ import static uk.nhs.fhir.enums.MimeType.XML;
 import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +35,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -56,14 +51,15 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.html.RawResourceTemplate;
+import uk.nhs.fhir.html.ResourceListTemplate;
 import uk.nhs.fhir.html.ResourceWithMetadataTemplate;
+import uk.nhs.fhir.html.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
-import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PageTemplateHelper;
+import uk.nhs.fhir.util.ServletUtils;
 
 /**
  * Class used to generate html content when a request comes from a browser.
@@ -77,15 +73,11 @@ public class STU3PlainContent extends CORSInterceptor {
     ResourceWebHandler myWebHandler = null;
     private final ResourceNameProvider resourceNameProvider;
     RawResourceRender myRawResourceRenderer = null;
-    PageTemplateHelper templateHelper = null;
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
-    private static String templateDirectory = FhirServerProperties.getProperty("templateDirectory");
 
     public STU3PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         myRawResourceRenderer = new RawResourceRender(webber);
-        templateHelper = new PageTemplateHelper();
-        Velocity.init(FhirServerProperties.getProperties());
 
 		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
     }
@@ -148,14 +140,54 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
         } else {
             // We either don't have an operation, or we don't understand the operation, so
             // return a list of resources instead
-            StringBuilder content = new StringBuilder();
-            content.append(renderListOfResources(theRequestDetails, resourceType));
-            wrappedContent = templateHelper.wrapContentInTemplate(resourceType.toString(), null, content, baseURL);
+        	
+        	Map<String, String[]> params = theRequestDetails.getParameters();
+
+        	if (params.containsKey("name")
+        	  || params.containsKey("name:contains")) {
+                wrappedContent = renderSearchResults(theRequestDetails, resourceType);
+        	} else {
+                wrappedContent = renderResourceList(theRequestDetails, resourceType);
+        	}
         }
 
-        templateHelper.setResponseTextualSuccess(theResponse, wrappedContent);
+        ServletUtils.setResponseSuccess(theResponse, "text/html", wrappedContent);
         return false;
     }
+    
+    private String renderSearchResults(RequestDetails theRequestDetails, ResourceType resourceType) {
+		
+		Map<String, String[]> params = theRequestDetails.getParameters();
+		
+		// We are showing a list of matching resources for the specified name query
+		List<ResourceMetadata> list;
+		if (params.containsKey("name")) {
+        	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
+        } else if (params.containsKey("name:contains")) {
+        	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
+        } else {
+        	throw new IllegalStateException("Expected name or name:contains to be present in params");
+        }
+
+        String baseURL = theRequestDetails.getServerBaseForRequest();
+
+		return new SearchResultsTemplate(resourceType, baseURL, list).getHtml();
+	}
+
+	/**
+     * e.g. http://host/fhir/StructureDefinition
+     * @param theRequestDetails
+     * @param resourceType
+     * @return
+     */
+    private String renderResourceList(RequestDetails theRequestDetails, ResourceType resourceType) {
+        String baseURL = theRequestDetails.getServerBaseForRequest();
+    	
+    	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
+    	HashMap<String, List<ResourceMetadata>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
+    	
+    	return new ResourceListTemplate(resourceType, baseURL, groupedResources).getHtml();
+	}
     
     /**
      * Method to stream a file directly from the guide directory to the client (for files referenced
@@ -165,18 +197,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
     	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
-		try {
-	    	// Initialise the output
-	    	PrintWriter outputStream = null;
-	        theResponse.setStatus(200);
-	        theResponse.setContentType("text/plain");
-			outputStream = theResponse.getWriter();
-	        // Send the file directly to the output
-	        String content = FileLoader.loadFile(guidesPath + "/" + filename);
-			outputStream.append(content);
-    	} catch (IOException e) {
-    		LOG.severe(e.getMessage());
-		}
+		ServletUtils.setResponseSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
     }
     
     @Override
@@ -193,7 +214,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
 
-	    		templateHelper.setResponseTextualSuccess(theServletResponse, wrappedContent);
+	    		ServletUtils.setResponseSuccess(theServletResponse, "text/html", wrappedContent);
 	    		return false;
     		}
         }
@@ -278,68 +299,5 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
     	
     	return new ResourceWithMetadataTemplate(resourceType.toString(), resourceName, baseURL, resource, firstTabName,
     		versionsList, resourceMetadata, metadataArtefact, textSection, examples).getHtml();
-    }
-    
-    /**
-     * Code called to render a list of resources. for example in response to a
-     * url like http://host/fhir/StructureDefinition
-     *
-     * @param theRequestDetails
-     * @param content
-     * @param resourceType
-     */
-    private String renderListOfResources(RequestDetails theRequestDetails, ResourceType resourceType) {
-    	
-    	VelocityContext context = new VelocityContext();
-    	Template template = null;
-    	String baseURL = theRequestDetails.getServerBaseForRequest();
-    	
-    	Map<String, String[]> params = theRequestDetails.getParameters();
-    	
-    	if (params.containsKey("name") || params.containsKey("name:contains")) {
-            
-    		// We are showing a list of matching resources for the specified name query
-    		List<ResourceMetadata> list = null;
-    		
-    		if (params.containsKey("name")) {
-            	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
-            } else if (params.containsKey("name:contains")) {
-            	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
-            }
-
-            try {
-          	  template = Velocity.getTemplate(templateDirectory + "search-results.vm");
-          	} catch( Exception e ) {
-          		e.printStackTrace();
-          	}
-          	
-          	// Put content into template
-          	context.put( "list", list );
-          	context.put( "resourceType", resourceType );
-          	context.put( "baseURL", baseURL );
-          	
-          	StringWriter sw = new StringWriter();
-          	template.merge( context, sw );
-          	return sw.toString();
-    		
-        } else {
-        	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
-        	HashMap<String, List<ResourceMetadata>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
-        	
-        	try {
-        	  template = Velocity.getTemplate(templateDirectory + "list.vm");
-        	} catch( Exception e ) {
-        		e.printStackTrace();
-        	}
-        	
-        	// Put content into template
-        	context.put( "groupedResources", groupedResources );
-        	context.put( "resourceType", resourceType );
-        	context.put( "baseURL", baseURL );
-        	
-        	StringWriter sw = new StringWriter();
-        	template.merge( context, sw );
-        	return sw.toString();
-        }
     }
 }

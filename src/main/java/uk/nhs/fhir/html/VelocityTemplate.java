@@ -18,7 +18,7 @@ public abstract class VelocityTemplate {
 	protected abstract void updateContext(VelocityContext context);
 
 	private final Optional<String> contentTemplateName;
-	private final Optional<String> resourceType;
+	protected final Optional<String> resourceType;
 	private final Optional<String> resourceName;
 	private final Optional<String> nonTemplatedContent;
 	protected final String baseURL;

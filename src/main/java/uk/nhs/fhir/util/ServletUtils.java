@@ -1,9 +1,13 @@
 package uk.nhs.fhir.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -13,7 +17,11 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.FileUtils;
+
 public class ServletUtils {
+	
+	private static final Logger LOG = Logger.getLogger(ServletUtils.class.getName());
 	
     /**
      * Simple XML syntax highlight
@@ -43,5 +51,27 @@ public class ServletUtils {
     	String xmlString = result.getWriter().toString();
     	return xmlString;
     }
+    
+    public static void setResponseSuccess(HttpServletResponse response, String contentType, String wrappedContent) {
+    	try {
+    		response.getWriter().append(wrappedContent);
+
+			response.setStatus(200);
+			response.setContentType(contentType);
+    	} catch (IOException e) {
+    		LOG.severe(e.getMessage());
+		}
+    }
+
+	public static void setResponseSuccess(HttpServletResponse response, String contentType, File contentFile) {
+		try {
+			FileUtils.copyFile(contentFile, response.getOutputStream());
+
+			response.setStatus(200);
+			response.setContentType(contentType);
+    	} catch (IOException e) {
+    		LOG.severe(e.getMessage());
+		}
+	}
 
 }

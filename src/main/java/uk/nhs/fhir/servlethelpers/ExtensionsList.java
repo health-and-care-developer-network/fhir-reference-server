@@ -28,6 +28,7 @@ import uk.nhs.fhir.html.ExtensionsListPageTemplate;
 import uk.nhs.fhir.html.ExtensionsListProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FHIRVersion;
+import uk.nhs.fhir.util.ServletUtils;
 
 public class ExtensionsList {
 	
@@ -48,10 +49,6 @@ public class ExtensionsList {
 		ExtensionsListPageTemplate extensionsPage = new ExtensionsListPageTemplate(baseUrl, extensions);
 		String renderedExtensionsPage = extensionsPage.getHtml();
 		
-		// Initialise the output
-        resp.setStatus(200);
-        resp.setContentType("text/html");
-		
-		resp.getWriter().append(renderedExtensionsPage);
+		ServletUtils.setResponseSuccess(resp, "text/html", renderedExtensionsPage);
 	}
 }

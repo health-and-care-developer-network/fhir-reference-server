@@ -17,12 +17,10 @@ import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.html.RawResourceTemplate;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamExample {
 	private static final Logger LOG = Logger.getLogger(ServletStreamExample.class.getName());
-	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
 	
 	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
 			FHIRVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
@@ -34,11 +32,7 @@ public class ServletStreamExample {
 		
 		if (exampleEntity != null) {
 			// We've found a matching example - stream it back
-			response.setStatus(200);
-			//response.setContentType("text/html");
 			File srcFile = exampleEntity.getResourceFile();
-			
-		    //FileUtils.copyFile(srcFile, response.getOutputStream());
 			
 			String fileContent = FileLoader.loadFile(srcFile);
 			MimeType mimeType = null;
@@ -65,7 +59,7 @@ public class ServletStreamExample {
 			String baseURL = request.getContextPath();
 			String wrappedContent = new RawResourceTemplate(Optional.empty(), Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
 			
-			templateHelper.setResponseTextualSuccess(response, wrappedContent);
+			ServletUtils.setResponseSuccess(response, "text/html", wrappedContent);
 		} else {
 			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
 			response.setStatus(404);

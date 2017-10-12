@@ -16,7 +16,6 @@
 package uk.nhs.fhir;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -47,6 +46,7 @@ import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.ServletUtils;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -101,10 +101,8 @@ public class RestfulServlet extends RestfulServer {
         	response.sendRedirect("/ValueSet");
         	return;
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
-	    	response.setStatus(200);
-			response.setContentType("text/plain");
-			PrintWriter outputStream = response.getWriter();
-	        outputStream.write(DataLoaderMessages.getProfileLoadMessages());
+        	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
+			ServletUtils.setResponseSuccess(response, "text/plain", profileLoadMessages);
         } else {
             super.doGet(request, response);
         }
