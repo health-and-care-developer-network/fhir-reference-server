@@ -13,8 +13,12 @@
 	          <tbody>
 	          <tr>
 	            <td class="fhir-metadata-cell">
+	              #if( $type != "StructureDefinition" )
 	              <span class="fhir-metadata-label">FHIR Version:</span>
-	              <span class="fhir-metadata-value">$!resource.getStructureFhirVersionEnum()</span>
+	              <span class="fhir-metadata-value">$!fhirVersion</span>
+	              #else
+	              &nbsp;
+	              #end
 	            </td>
 	            <td class="fhir-metadata-cell" rowspan="2">
 	              <span class="fhir-metadata-label"><u>Version History</u></span>

@@ -16,8 +16,8 @@
 		            <span class="fhir-metadata-value">$!resource.getName()</span>
 				</td>
 	            <td class="fhir-metadata-cell">
-		            <span class="fhir-metadata-label">FHIR Version:</span>
-		            <span class="fhir-metadata-value">$!resource.getStructureFhirVersionEnum()</span>
+	            	<span class="fhir-metadata-label">FHIR Version:</span>
+		            <span class="fhir-metadata-value">$!fhirVersion</span>
 				</td>
 			  </tr>
 			  <tr>

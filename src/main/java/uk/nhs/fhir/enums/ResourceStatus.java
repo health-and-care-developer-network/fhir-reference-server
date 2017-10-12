@@ -19,6 +19,7 @@ public enum ResourceStatus {
 	}
 	
 	public static ResourceStatus getStatus(String status) {
+		status = status.toLowerCase();
 		for (ResourceStatus resourceStatus : ResourceStatus.values()) {
 			if (resourceStatus.name().equals(status)) {
 				return resourceStatus;
