@@ -1,6 +1,5 @@
 <div class='fhirServerGeneratedContent'>
-	<div class='fhirServerWarning'>Warning: This FHIR Server is currently experimental and is provided for reference during development of new services against published profiles only. You should not make direct calls to this server from live systems.</div>
-
+	
 	<table id="extensionTable">
 		<tr>
 			<th width="140">Version</th>
