@@ -14,7 +14,7 @@ import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.html.RawResourceTemplate;
+import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.ServletUtils;
@@ -59,7 +59,7 @@ public class ServletStreamExample {
 			String baseURL = request.getContextPath();
 			String wrappedContent = new RawResourceTemplate(Optional.empty(), Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
 			
-			ServletUtils.setResponseSuccess(response, "text/html", wrappedContent);
+			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {
 			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
 			response.setStatus(404);

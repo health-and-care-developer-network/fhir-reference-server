@@ -1,10 +1,11 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page.raw;
 
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 
 import uk.nhs.fhir.enums.MimeType;
+import uk.nhs.fhir.page.VelocityTemplate;
 
 public class RawResourceTemplate extends VelocityTemplate {
 

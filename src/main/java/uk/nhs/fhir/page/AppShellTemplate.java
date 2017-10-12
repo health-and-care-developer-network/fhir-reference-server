@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page;
 
 import java.io.StringWriter;
 import java.util.Optional;

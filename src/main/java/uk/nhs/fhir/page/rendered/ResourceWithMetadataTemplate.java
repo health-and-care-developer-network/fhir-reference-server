@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page.rendered;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -10,6 +10,7 @@ import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
+import uk.nhs.fhir.page.VelocityTemplate;
 
 public class ResourceWithMetadataTemplate extends VelocityTemplate {
 

@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page;
 
 @SuppressWarnings("serial")
 public class VelocityTemplateLoadFailed extends IllegalStateException {

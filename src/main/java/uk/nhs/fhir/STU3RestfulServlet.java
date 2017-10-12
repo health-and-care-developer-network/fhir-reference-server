@@ -32,6 +32,7 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
+import uk.nhs.fhir.page.extensions.ExtensionsListRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
@@ -39,7 +40,6 @@ import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
-import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
@@ -81,10 +81,10 @@ public class STU3RestfulServlet extends RestfulServer {
         } else if (requestedPath.startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (requestedPath.startsWith("/Extensions")) {
-        	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
+        	ExtensionsListRenderer.loadExtensions(request, response, fhirVersion, webber);
         } else if (requestedPath.equals("/dataLoadStatusReport")) {
         	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
-			ServletUtils.setResponseSuccess(response, "text/plain", profileLoadMessages);
+			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);
         } else {
             super.doGet(request, response);
         }

@@ -52,7 +52,7 @@ public class ServletUtils {
     	return xmlString;
     }
     
-    public static void setResponseSuccess(HttpServletResponse response, String contentType, String wrappedContent) {
+    public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, String wrappedContent) {
     	try {
     		response.getWriter().append(wrappedContent);
 
@@ -63,7 +63,7 @@ public class ServletUtils {
 		}
     }
 
-	public static void setResponseSuccess(HttpServletResponse response, String contentType, File contentFile) {
+	public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, File contentFile) {
 		try {
 			FileUtils.copyFile(contentFile, response.getOutputStream());
 

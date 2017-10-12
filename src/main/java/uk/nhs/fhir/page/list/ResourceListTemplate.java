@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page.list;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.apache.velocity.VelocityContext;
 
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.page.VelocityTemplate;
 
 public class ResourceListTemplate extends VelocityTemplate {
 	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)

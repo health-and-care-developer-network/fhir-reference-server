@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.servlethelpers;
+package uk.nhs.fhir.page.extensions;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,15 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.html.ExtensionsListPageTemplate;
-import uk.nhs.fhir.html.ExtensionsListProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
-public class ExtensionsList {
+public class ExtensionsListRenderer {
 	
-	private static final Logger LOG = Logger.getLogger(ExtensionsList.class.getName());
+	private static final Logger LOG = Logger.getLogger(ExtensionsListRenderer.class.getName());
 	
 	private static ExtensionsListProvider extensionsListProvider = null;
 	
@@ -49,6 +47,6 @@ public class ExtensionsList {
 		ExtensionsListPageTemplate extensionsPage = new ExtensionsListPageTemplate(baseUrl, extensions);
 		String renderedExtensionsPage = extensionsPage.getHtml();
 		
-		ServletUtils.setResponseSuccess(resp, "text/html", renderedExtensionsPage);
+		ServletUtils.setResponseContentForSuccess(resp, "text/html", renderedExtensionsPage);
 	}
 }

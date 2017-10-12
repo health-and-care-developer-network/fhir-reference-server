@@ -1,4 +1,4 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page.home;
 
 import java.util.HashMap;
 

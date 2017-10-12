@@ -50,10 +50,10 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.html.RawResourceTemplate;
-import uk.nhs.fhir.html.ResourceListTemplate;
-import uk.nhs.fhir.html.ResourceWithMetadataTemplate;
-import uk.nhs.fhir.html.SearchResultsTemplate;
+import uk.nhs.fhir.page.list.ResourceListRenderer;
+import uk.nhs.fhir.page.raw.RawResourceTemplate;
+import uk.nhs.fhir.page.rendered.ResourceWithMetadataTemplate;
+import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
@@ -75,11 +75,13 @@ public class PlainContent extends CORSInterceptor {
     private final ResourceNameProvider resourceNameProvider;
     RawResourceRender myRawResourceRenderer = null;
     PageTemplateHelper templateHelper = null;
+	private final ResourceListRenderer myResourceListRenderer;
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         myRawResourceRenderer = new RawResourceRender(webber);
+        myResourceListRenderer = new ResourceListRenderer(myWebHandler);
 
 		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
     }
@@ -149,11 +151,11 @@ public class PlainContent extends CORSInterceptor {
         	  || params.containsKey("name:contains")) {
                 wrappedContent = renderSearchResults(theRequestDetails, resourceType);
         	} else {
-                wrappedContent = renderResourceList(theRequestDetails, resourceType);
+                wrappedContent = myResourceListRenderer.renderResourceList(theRequestDetails, resourceType);
         	}
         }
 
-        ServletUtils.setResponseSuccess(theResponse, "text/html", wrappedContent);
+        ServletUtils.setResponseContentForSuccess(theResponse, "text/html", wrappedContent);
         return false;
     }
     
@@ -182,21 +184,6 @@ public class PlainContent extends CORSInterceptor {
 	}
 
 	/**
-     * e.g. http://host/fhir/StructureDefinition
-     * @param theRequestDetails
-     * @param resourceType
-     * @return
-     */
-    private String renderResourceList(RequestDetails theRequestDetails, ResourceType resourceType) {
-        String baseURL = theRequestDetails.getServerBaseForRequest();
-    	
-    	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
-    	HashMap<String, List<ResourceMetadata>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
-    	
-    	return new ResourceListTemplate(resourceType, baseURL, groupedResources).getHtml();
-	}
-
-	/**
      * Method to stream a file directly from the guide directory to the client (for files referenced
      * in ImplementationGuide resources)
      * @param theResponse
@@ -204,7 +191,7 @@ public class PlainContent extends CORSInterceptor {
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
     	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
-		ServletUtils.setResponseSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
+		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
     }
     
     @Override
@@ -217,11 +204,12 @@ public class PlainContent extends CORSInterceptor {
         
         // If this is a request from a browser for the conformance resource, render and wrap it in HTML
         if (operation != null) {
-        	if (operation == METADATA && clientType == BROWSER) {
+        	if (operation == METADATA
+        	  && clientType == BROWSER) {
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
                 
-	    		ServletUtils.setResponseSuccess(theServletResponse, "text/html", wrappedContent);
+	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
 	    		return false;
     		}
         }

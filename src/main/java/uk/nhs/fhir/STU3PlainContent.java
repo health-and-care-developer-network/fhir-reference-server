@@ -50,10 +50,10 @@ import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.html.RawResourceTemplate;
-import uk.nhs.fhir.html.ResourceListTemplate;
-import uk.nhs.fhir.html.ResourceWithMetadataTemplate;
-import uk.nhs.fhir.html.SearchResultsTemplate;
+import uk.nhs.fhir.page.list.ResourceListTemplate;
+import uk.nhs.fhir.page.raw.RawResourceTemplate;
+import uk.nhs.fhir.page.rendered.ResourceWithMetadataTemplate;
+import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
@@ -151,7 +151,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
         	}
         }
 
-        ServletUtils.setResponseSuccess(theResponse, "text/html", wrappedContent);
+        ServletUtils.setResponseContentForSuccess(theResponse, "text/html", wrappedContent);
         return false;
     }
     
@@ -197,7 +197,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
     	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
-		ServletUtils.setResponseSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
+		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
     }
     
     @Override
@@ -214,7 +214,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
 
-	    		ServletUtils.setResponseSuccess(theServletResponse, "text/html", wrappedContent);
+	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
 	    		return false;
     		}
         }

@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uk.nhs.fhir.enums.ClientType;
-import uk.nhs.fhir.html.HomePageTemplate;
-import uk.nhs.fhir.html.ResourceCountsProvider;
+import uk.nhs.fhir.page.home.HomePageTemplate;
+import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.ServletUtils;
 
@@ -60,10 +60,11 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 			return;
 		}
     	
+		// Render the home page
 		String baseUrl = req.getContextPath();
     	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
 		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml();
     	
-		ServletUtils.setResponseSuccess(resp, "text/html", content);
+		ServletUtils.setResponseContentForSuccess(resp, "text/html", content);
 	}
 }

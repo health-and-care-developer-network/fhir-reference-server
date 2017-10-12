@@ -37,7 +37,7 @@ public class ServletStreamArtefact {
         			if (artefact.getArtefactType().name().equals(artefactType)) {
         				// We've found a matching artefact - stream it back
         				File srcFile = artefact.getFilename();
-        			    ServletUtils.setResponseSuccess(response, "text/html", srcFile);
+        			    ServletUtils.setResponseContentForSuccess(response, "text/html", srcFile);
         			    return;
         			}
         		}

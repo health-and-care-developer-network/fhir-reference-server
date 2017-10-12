@@ -33,13 +33,13 @@ import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
+import uk.nhs.fhir.page.extensions.ExtensionsListRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
-import uk.nhs.fhir.servlethelpers.ExtensionsList;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
@@ -91,7 +91,7 @@ public class RestfulServlet extends RestfulServer {
         } else if (request.getRequestURI().startsWith("/Examples/")) {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().startsWith("/Extensions")) {
-        	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
+        	ExtensionsListRenderer.loadExtensions(request, response, fhirVersion, webber);
         } else if ((clientType == ClientType.BROWSER) &&
         			   (request.getRequestURI().equals("/CodeSystem") ||
         				request.getRequestURI().equals("/ConceptMap"))
@@ -102,7 +102,7 @@ public class RestfulServlet extends RestfulServer {
         	return;
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
         	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
-			ServletUtils.setResponseSuccess(response, "text/plain", profileLoadMessages);
+			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);
         } else {
             super.doGet(request, response);
         }
@@ -138,7 +138,7 @@ public class RestfulServlet extends RestfulServer {
         
         // Pass our resource handler to the other servlet
         IndexServlet.setResourceHandler(webber);
-        ExtensionsList.setResourceHandler(webber);
+        ExtensionsListRenderer.setResourceHandler(webber);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StructureDefinitionProvider(dataSource));

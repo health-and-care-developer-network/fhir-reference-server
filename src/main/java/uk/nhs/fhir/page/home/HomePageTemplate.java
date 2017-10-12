@@ -1,9 +1,11 @@
-package uk.nhs.fhir.html;
+package uk.nhs.fhir.page.home;
 
 import java.util.HashMap;
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
+
+import uk.nhs.fhir.page.VelocityTemplate;
 
 public class HomePageTemplate extends VelocityTemplate {
 	private final String baseUrl;
