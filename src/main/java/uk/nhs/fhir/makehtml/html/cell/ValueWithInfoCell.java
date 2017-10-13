@@ -34,10 +34,17 @@ public class ValueWithInfoCell extends TableCell {
 	public Element makeCell() {
 		List<Content> valueDataNodes = Lists.newArrayList();
 		if (!value.isEmpty()) {
+			String valueForDisplay;
+			if (value.contains(" | ")) {
+				valueForDisplay = value; 
+			} else {
+				valueForDisplay = StringUtil.capitaliseLowerCase(value); 
+			}
+			
 			valueDataNodes.add(
 				Elements.withAttributeAndText("div", 
 					new Attribute("class", FhirCSS.INFO_NAME_BOLD), 
-					StringUtil.capitaliseLowerCase(value)));
+					valueForDisplay));
 		}
 		
 		
