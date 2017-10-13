@@ -32,6 +32,7 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 	
@@ -150,7 +151,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     	Optional<String> uriToDisplay = Optional.empty();
     	if (!Strings.isNullOrEmpty(uriOverride)) {
     		uriToDisplay = Optional.of(uriOverride);
-    	} else if (value.startsWith("http://") || value.startsWith("https://")) {
+    	} else if (StringUtil.looksLikeUrl(value)) {
     		uriToDisplay = Optional.of(value);
     	}
     	

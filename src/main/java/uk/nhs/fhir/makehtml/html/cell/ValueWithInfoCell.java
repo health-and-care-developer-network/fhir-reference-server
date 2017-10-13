@@ -34,10 +34,17 @@ public class ValueWithInfoCell extends TableCell {
 	public Element makeCell() {
 		List<Content> valueDataNodes = Lists.newArrayList();
 		if (!value.isEmpty()) {
+			String valueForDisplay;
+			if (value.contains(" | ")) {
+				valueForDisplay = value; 
+			} else {
+				valueForDisplay = StringUtil.capitaliseLowerCase(value); 
+			}
+			
 			valueDataNodes.add(
 				Elements.withAttributeAndText("div", 
 					new Attribute("class", FhirCSS.INFO_NAME_BOLD), 
-					StringUtil.capitaliseLowerCase(value)));
+					valueForDisplay));
 		}
 		
 		
@@ -85,7 +92,15 @@ public class ValueWithInfoCell extends TableCell {
 		
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {
-			constraintInfoText.add(new Text(StringUtil.capitaliseLowerCase(description)));
+			String displayText;
+			if (StringUtil.looksLikeUrl(description)) {
+				//don't capitalise
+				displayText = description;
+			} else {
+				displayText = StringUtil.capitaliseLowerCase(description);
+			}
+			
+			constraintInfoText.add(new Text(displayText));
 		}
 		
 		if (bracketLink) {

@@ -309,7 +309,7 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 	}
 	
 	private Element valueSpan(String value, boolean alwaysLargeText, boolean reference , boolean internal, String hint) {
-		boolean url = (value.startsWith("http://") || value.startsWith("https://"))
+		boolean url = StringUtil.looksLikeUrl(value)
 		  && new UrlValidator().testSingleUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 20;
 		String fhirMetadataClass = FhirCSS.DATA_VALUE;

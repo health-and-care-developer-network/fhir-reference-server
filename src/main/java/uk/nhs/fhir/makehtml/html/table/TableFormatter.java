@@ -20,6 +20,7 @@ import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
+import uk.nhs.fhir.util.StringUtil;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
@@ -97,7 +98,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	}
 	
 	protected Element valueSpan(String value, boolean alwaysLargeText) {
-		boolean url = (value.startsWith("http://") || value.startsWith("https://"));
+		boolean url = StringUtil.looksLikeUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 25;
 		String fhirMetadataClass = FhirCSS.DATA_VALUE;
 		if (!largeText) fhirMetadataClass += " " + FhirCSS.DATA_VALUE_SMALLTEXT;
