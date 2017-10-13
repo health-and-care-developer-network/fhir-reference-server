@@ -11,12 +11,14 @@
   			<artifactId>data-structures</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
+  		
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-validation-resources-dstu2</artifactId>
 			<version>2.5</version>
 			<type>jar</type>
 		</dependency>
+		
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -48,6 +50,12 @@
         	<groupId>org.jdom</groupId>
         	<artifactId>jdom2</artifactId>
         	<version>2.0.6</version>
+        </dependency>
+        <!-- used by UrlValidator, was included by an earlier version of HAPI -->
+        <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+          <version>4.5.3</version>
         </dependency>
     </dependencies>
     <properties>
