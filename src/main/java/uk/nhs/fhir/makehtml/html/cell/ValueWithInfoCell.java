@@ -92,7 +92,15 @@ public class ValueWithInfoCell extends TableCell {
 		
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {
-			constraintInfoText.add(new Text(StringUtil.capitaliseLowerCase(description)));
+			String displayText;
+			if (StringUtil.looksLikeUrl(description)) {
+				//don't capitalise
+				displayText = description;
+			} else {
+				displayText = StringUtil.capitaliseLowerCase(description);
+			}
+			
+			constraintInfoText.add(new Text(displayText));
 		}
 		
 		if (bracketLink) {

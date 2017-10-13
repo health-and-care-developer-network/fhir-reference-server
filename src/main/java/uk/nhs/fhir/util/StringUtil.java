@@ -97,4 +97,9 @@ public class StringUtil {
 		
 		return Optional.empty();
 	}
+	
+	public static boolean looksLikeUrl(String s) {
+		return s.startsWith("https://")
+		  || s.startsWith("http://");
+	}
 }
