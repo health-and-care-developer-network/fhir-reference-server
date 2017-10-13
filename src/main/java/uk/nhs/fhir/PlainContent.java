@@ -22,12 +22,9 @@ import static uk.nhs.fhir.enums.ClientType.BROWSER;
 import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
 import static uk.nhs.fhir.enums.MimeType.JSON;
 import static uk.nhs.fhir.enums.MimeType.XML;
-import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -38,28 +35,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.datalayer.ResourceNameProvider;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.page.list.ResourceListRenderer;
-import uk.nhs.fhir.page.raw.RawResourceTemplate;
-import uk.nhs.fhir.page.rendered.ResourceWithMetadataTemplate;
-import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
+import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
+import uk.nhs.fhir.page.searchresults.SearchResultsRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
-import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.ServletUtils;
 
 /**
@@ -70,19 +58,24 @@ import uk.nhs.fhir.util.ServletUtils;
 public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
-    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
-    ResourceWebHandler myWebHandler = null;
-    private final ResourceNameProvider resourceNameProvider;
-    RawResourceRender myRawResourceRenderer = null;
-    PageTemplateHelper templateHelper = null;
-	private final ResourceListRenderer myResourceListRenderer;
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
+    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
+    
+    private final ResourceWebHandler myWebHandler;
+    private final ResourceNameProvider resourceNameProvider;
+    private final RawResourceRender myRawResourceRenderer;
+	private final ResourceListRenderer myResourceListRenderer;
+	private final ResourcePageRenderer myResourcePageRenderer;
+	private final SearchResultsRenderer mySearchResultsRenderer;
+	
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
         myRawResourceRenderer = new RawResourceRender(webber);
         myResourceListRenderer = new ResourceListRenderer(myWebHandler);
-
+        myResourcePageRenderer = new ResourcePageRenderer(fhirVersion, myWebHandler);
+        mySearchResultsRenderer = new SearchResultsRenderer(myWebHandler);
+        
 		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
     }
     
@@ -102,8 +95,10 @@ public class PlainContent extends CORSInterceptor {
         if (isReadImplementationGuideRequest(operation, resourceType)) {
         	String resourceName = theRequestDetails.getId().getIdPart();
         	
-        	if (resourceName.endsWith(".md") || resourceName.endsWith(".txt")) {
-        		streamFileDirectly(theResponse, resourceName);
+        	if (resourceName.endsWith(".md") 
+        	  || resourceName.endsWith(".txt")) {
+            	LOG.fine("Request for a file from the ImplementationGuide path: " + resourceName);
+        		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + resourceName));
         		return false;
         	}
         }
@@ -128,18 +123,17 @@ public class PlainContent extends CORSInterceptor {
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
         
-        String wrappedContent;
+        String content;
         if (READ.equals(operation) 
           || VREAD.equals(operation)) {
             String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
+            IIdType resourceID = theRequestDetails.getId();
             
         	if (mimeType == XML || mimeType == JSON) {
-                IIdType resourceID = theRequestDetails.getId();
             	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
-                wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResource(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
-                
+                content = myRawResourceRenderer.renderSingleWrappedRAWResourceWithoutText(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
         	} else {
-                wrappedContent = renderSingleResource(theRequestDetails, resourceName, resourceType);
+                content = myResourcePageRenderer.renderSingleResource(baseURL, resourceID, resourceName, resourceType);
         	}
         } else {
             // We either don't have an operation, or we don't understand the operation, so
@@ -149,13 +143,13 @@ public class PlainContent extends CORSInterceptor {
 
         	if (params.containsKey("name")
         	  || params.containsKey("name:contains")) {
-                wrappedContent = renderSearchResults(theRequestDetails, resourceType);
+                content = mySearchResultsRenderer.renderSearchResults(theRequestDetails, resourceType);
         	} else {
-                wrappedContent = myResourceListRenderer.renderResourceList(theRequestDetails, resourceType);
+                content = myResourceListRenderer.renderResourceList(theRequestDetails, resourceType);
         	}
         }
 
-        ServletUtils.setResponseContentForSuccess(theResponse, "text/html", wrappedContent);
+        ServletUtils.setResponseContentForSuccess(theResponse, "text/html", content);
         return false;
     }
     
@@ -163,36 +157,6 @@ public class PlainContent extends CORSInterceptor {
     	return (operation.equals(READ) || operation.equals(VREAD)) 
     	  && resourceType.equals(IMPLEMENTATIONGUIDE);
 	}
-
-	private String renderSearchResults(RequestDetails theRequestDetails, ResourceType resourceType) {
-		
-		Map<String, String[]> params = theRequestDetails.getParameters();
-		
-		// We are showing a list of matching resources for the specified name query
-		List<ResourceMetadata> list;
-		if (params.containsKey("name")) {
-        	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
-        } else if (params.containsKey("name:contains")) {
-        	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
-        } else {
-        	throw new IllegalStateException("Expected name or name:contains to be present in params");
-        }
-
-        String baseURL = theRequestDetails.getServerBaseForRequest();
-
-		return new SearchResultsTemplate(resourceType, baseURL, list).getHtml();
-	}
-
-	/**
-     * Method to stream a file directly from the guide directory to the client (for files referenced
-     * in ImplementationGuide resources)
-     * @param theResponse
-     * @param filename
-     */
-    private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
-    	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
-		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
-    }
     
     @Override
     public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) {
@@ -207,9 +171,12 @@ public class PlainContent extends CORSInterceptor {
         	if (operation == METADATA
         	  && clientType == BROWSER) {
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
+	    		LOG.fine("Attempting to render conformance statement");
+	    		Optional<String> resourceName = Optional.empty();
+	    		String renderedConformance = myRawResourceRenderer.renderSingleWrappedRAWResource(theResponseObject, fhirVersion, 
+	    				resourceName, ResourceType.CONFORMANCE, baseURL, mimeType);
                 
-	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
+	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", renderedConformance);
 	    		return false;
     		}
         }
@@ -218,88 +185,4 @@ public class PlainContent extends CORSInterceptor {
 		addCORSResponseHeaders(theServletResponse);
 		return true;
 	}
-    
-    private String renderConformance(IBaseResource conformance, MimeType mimeType, String baseURL) {
-    	LOG.fine("Attempting to render conformance statement");
-    	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
-    	return new RawResourceTemplate(Optional.empty(), Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
-    }
-
-    /**
-     * Code used to display a single resource as HTML when requested by a
-     * browser.
-     *
-     * @param theRequestDetails
-     * @param content
-     * @param resourceType
-     */
-    private String renderSingleResource(RequestDetails theRequestDetails, String resourceName, ResourceType resourceType) {
-    	
-    	String baseURL = theRequestDetails.getServerBaseForRequest();
-
-        IdDt resourceID = (IdDt)theRequestDetails.getId();
-        
-        String firstTabName = getFirstTabName(resourceType);
-        
-		return describeResource(resourceName, resourceID, baseURL, firstTabName, resourceType);
-    }
-
-	String getFirstTabName(ResourceType resourceType) {
-        switch (resourceType) {
-	        case STRUCTUREDEFINITION:
-				return "Snapshot";
-	        case VALUESET:
-	        	return "Entries";
-	        case OPERATIONDEFINITION:
-	        	return "Operation Description";
-	        case IMPLEMENTATIONGUIDE:
-	        	return "Description";
-	        case CODESYSTEM:
-	        	return "Description";
-	        case CONCEPTMAP:
-	        	return "Description";
-        	default:
-	        	throw new IllegalStateException("Unhandled resource type: " + resourceType.toString());
-        }
-	}
-    
-    /**
-     * Code in here to create the HTML response to a request for a
-     * StructureDefinition we hold.
-     *
-     * @param resourceID Name of the SD we need to describe.
-     * @return
-     */
-    private String describeResource(String resourceName, IIdType resourceID, String baseURL, String firstTabName, ResourceType resourceType) {
-    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
-
-    	// List of versions
-    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
-    	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
-
-    	// Resource metadata
-    	ResourceMetadata resourceMetadata = myWebHandler.getResourceEntityByID(resourceID);
-
-    	// Check if we have a nice metadata table from the renderer
-    	Optional<SupportingArtefact> metadataArtefact = 
-			resourceMetadata.getArtefacts()
-				.stream()
-				.filter(artefact -> artefact.getArtefactType().isMetadata())
-				.findAny();
-    	LOG.fine("Has metadata from renderer: " + metadataArtefact.isPresent());
-
-    	// Tree view
-    	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
-
-    	// Examples
-    	ExampleResources examplesList = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
-    	Optional<ExampleResources> examples = 
-    		(examplesList == null 
-    		  || examplesList.isEmpty()) ? 
-    			Optional.empty() : 
-    			Optional.of(examplesList);
-    	
-    	return new ResourceWithMetadataTemplate(resourceType.toString(), resourceName, baseURL, resource, firstTabName,
-    		versionsList, resourceMetadata, metadataArtefact, textSection, examples).getHtml();
-    }
 }

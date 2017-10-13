@@ -67,13 +67,15 @@ import uk.nhs.fhir.util.ServletUtils;
  * @author Tim Coates, Adam Hatherly
  */
 public class STU3PlainContent extends CORSInterceptor {
-
     private static final Logger LOG = Logger.getLogger(STU3PlainContent.class.getName());
+    
+    private static final String guidesPath = FhirServerProperties.getProperty("guidesPath");
+
     private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
-    ResourceWebHandler myWebHandler = null;
+    
+    private final ResourceWebHandler myWebHandler;
     private final ResourceNameProvider resourceNameProvider;
-    RawResourceRender myRawResourceRenderer = null;
-    private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
+    private final RawResourceRender myRawResourceRenderer;
 
     public STU3PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
@@ -132,7 +134,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
         	if (mimeType == XML || mimeType == JSON) {
                 IIdType resourceID = theRequestDetails.getId();
             	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
-                wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResource(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
+                wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResourceWithoutText(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
                 
         	} else {
                 wrappedContent = renderSingleResource(theRequestDetails, resourceName, resourceType);

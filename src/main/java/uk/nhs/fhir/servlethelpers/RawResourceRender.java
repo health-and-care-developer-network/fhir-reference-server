@@ -24,14 +24,17 @@ public class RawResourceRender {
 		myWebHandler = webHandler;
 	}
 
-    public String renderSingleWrappedRAWResource(IBaseResource resource, FHIRVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
+    public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FHIRVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	// Clear out the generated text
     	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
         resource = helper.removeTextSection(resource);
         
-        String rawResource = getRawResource(resource, mimeType, fhirVersion);
-        
-        return new RawResourceTemplate(Optional.empty(), Optional.of(resourceType.toString()), Optional.of(resourceName), baseURL, rawResource, mimeType).getHtml();
+        return renderSingleWrappedRAWResource(resource, fhirVersion, Optional.of(resourceName), resourceType, baseURL, mimeType);
+    }
+    
+    public String renderSingleWrappedRAWResource(IBaseResource resource, FHIRVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
+    	String rawResource = getRawResource(resource, mimeType, fhirVersion);
+        return new RawResourceTemplate(Optional.empty(), Optional.of(resourceType.toString()), resourceName, baseURL, rawResource, mimeType).getHtml();
     }
     
     public String getRawResource(IBaseResource resource, MimeType mimeType, FHIRVersion fhirVersion) {
