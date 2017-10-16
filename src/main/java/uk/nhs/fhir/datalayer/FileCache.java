@@ -21,6 +21,8 @@ import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
 import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.enums.ResourceType.CODESYSTEM;
+import static uk.nhs.fhir.enums.ResourceType.CONCEPTMAP;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -154,16 +156,21 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List<IBaseResource> getResources(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public static List<IBaseResource> getResources(FHIRVersion fhirVersion, ResourceType resourceType,
+    												int theFromIndex, int theToIndex) {
         if(updateRequired()) {
             updateCache();
         }
         // Load each resource file and put them in a list to return
+        int counter = 0;
         ArrayList<IBaseResource> allFiles = new ArrayList<IBaseResource>();
         for (ResourceEntityWithMultipleVersions entry : resourceList.get(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType) {
-        		IBaseResource vs = FHIRUtils.loadResourceFromFile(fhirVersion, entry.getLatest().getResourceFile());
-        		allFiles.add(vs);
+        		if (counter >= theFromIndex && counter < theToIndex) {
+	        		IBaseResource vs = FHIRUtils.loadResourceFromFile(fhirVersion, entry.getLatest().getResourceFile());
+	        		allFiles.add(vs);
+        		}
+        		counter++;
         	}
         }
         return allFiles;
@@ -199,6 +206,14 @@ public class FileCache {
         newList.addAll(cacheFHIRResources(fhirVersion, OPERATIONDEFINITION));
         // Add ImplementationGuides
         newList.addAll(cacheFHIRResources(fhirVersion, IMPLEMENTATIONGUIDE));
+        
+        if (fhirVersion != FHIRVersion.DSTU2) {
+        	// Add CodeSystems
+            newList.addAll(cacheFHIRResources(fhirVersion, CODESYSTEM));
+            // Add ConceptMaps
+            newList.addAll(cacheFHIRResources(fhirVersion, CONCEPTMAP));
+        }
+        
         // Add examples
         HashMap<String, ExampleResources> newExamplesList = cacheExamples(fhirVersion);
         
@@ -345,7 +360,7 @@ public class FileCache {
 
 	            	                    // Load the examples into a different in-memory cache for later look-up
 	            	                    ResourceEntity newEntity = new ResourceEntity(thisFile.getName(), thisFile, EXAMPLES, false, null,
-	            								null, true, resourceID, null, null, null, null, null, null, fhirVersion);
+	            								null, true, resourceID, null, null, null, null, null, null, fhirVersion, null);
 	            		                
 	            	                    if (examplesList.containsKey(profileResourceID)) {
 	            	                    	examplesList.get(profileResourceID).add(newEntity);

@@ -19,9 +19,9 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
 
+import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.datalayer.Datasource;
@@ -35,47 +35,41 @@ import uk.nhs.fhir.util.FHIRUtils;
  *
  * @author Tim Coates
  */
-public class ValueSetProvider extends AbstractResourceProviderSTU3 {
+public class ConceptMapProvider extends AbstractResourceProviderSTU3 {
 
-	public ValueSetProvider(Datasource dataSource) {
+	
+	public ConceptMapProvider(Datasource dataSource) {
 		super(dataSource);
         ctx = FHIRVersion.STU3.getContext();
-        resourceType = ResourceType.VALUESET;
+        resourceType = ResourceType.CONCEPTMAP;
         fhirVersion = FHIRVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.ValueSet.class;
+        fhirClass = org.hl7.fhir.dstu3.model.ConceptMap.class;
     }
-
     
     public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
     	// Clear out the generated text
     	Narrative textElement = new Narrative();
         textElement.setStatus(NarrativeStatus.GENERATED);
         textElement.setDivAsString("");
-    	ValueSet output = (ValueSet)resource;
+        ConceptMap output = (ConceptMap)resource;
     	output.setText(textElement);
     	return output;
     }
     
     public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
+    	return ((ConceptMap)resource).getText().getDivAsString();
     }
 
     public ResourceEntity getMetadataFromResource(File thisFile) {
-    	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	String displayGroup = "Concept Map";
+    	ConceptMap profile = (ConceptMap)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
-    	if (resourceName == null) {
-    		resourceName = resourceID;
-    	}
-    	if (FHIRUtils.isSTU3ValueSetSNOMED(profile)) {
-    		displayGroup = "SNOMED CT Code List";
-    	}
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
+    	return new ResourceEntity(resourceName, thisFile, ResourceType.CONCEPTMAP,
 				false, null, displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
     }

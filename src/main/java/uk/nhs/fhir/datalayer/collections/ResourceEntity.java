@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.enums.ResourceStatus;
 import uk.nhs.fhir.enums.ResourceType;
 
 public class ResourceEntity implements Comparable<ResourceEntity> {
@@ -17,12 +18,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	private String displayGroup = null;
 	private boolean example = false;
 	private VersionNumber versionNo = null;
-	private String status = null;
+	private ResourceStatus status = null;
 	ArrayList<SupportingArtefact> artefacts = null;
 	private String extensionCardinality = null;
 	ArrayList<String> extensionContexts = null;
 	private String extensionDescription = null;
 	private FHIRVersion fhirVersion = null;
+	private String url = null;
 	
 	/**
 	 * Create some metadata for the resource
@@ -41,13 +43,14 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 	 * @param extensionContexts
 	 * @param extensionDescription
 	 * @param fhirVersion
+	 * @param url
 	 */
 	public ResourceEntity(String resourceName, File resourceFile, ResourceType resourceType,
 							boolean extension, String baseType, String displayGroup, boolean example,
 							String resourceID, VersionNumber versionNo, String status,
 							ArrayList<SupportingArtefact> artefacts, String cardinality,
 							ArrayList<String> extensionContexts, String extensionDescription,
-							FHIRVersion fhirVersion) {
+							FHIRVersion fhirVersion, String url) {
 		this.resourceName = resourceName;
 		this.resourceFile = resourceFile;
 		this.resourceType = resourceType;
@@ -57,12 +60,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		this.example = example;
 		this.resourceID = resourceID;
 		this.versionNo = versionNo;
-		this.status = status;
+		this.status = ResourceStatus.getStatus(status);
 		this.artefacts = artefacts;
 		this.extensionCardinality = cardinality;
 		this.extensionContexts = extensionContexts;
 		this.extensionDescription = extensionDescription;
 		this.fhirVersion = fhirVersion;
+		this.setUrl(url);
 	}
 	
 	public String getResourceName() {
@@ -159,11 +163,11 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 		return "      ResourceEntity [ID=" + resourceID + ", version=" + versionNo + ", artefacts=" + artefactCount + "]";
 	}
 
-	public String getStatus() {
+	public ResourceStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(ResourceStatus status) {
 		this.status = status;
 	}
 
@@ -214,5 +218,13 @@ public class ResourceEntity implements Comparable<ResourceEntity> {
 
 	public void setFhirVersion(FHIRVersion fhirVersion) {
 		this.fhirVersion = fhirVersion;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

@@ -1,5 +1,6 @@
 	<div class='metadataSection'>
-		<div id='metadataFromGenerator' resourceID='$metadata.getResourceID()', version='$metadata.getVersionNo()'></div>
+		<div id='metadataFromGenerator' resourceID='$metadata.getResourceID()'
+				 version='$metadata.getVersionNo()' baseURL='$baseURL'></div>
 
         <div class="fhir-panel" id="versionMetadata">
           <div class="fhir-panel-body">
@@ -15,8 +16,8 @@
 		            <span class="fhir-metadata-value">$!resource.getName()</span>
 				</td>
 	            <td class="fhir-metadata-cell">
-		            <span class="fhir-metadata-label">FHIR Version:</span>
-		            <span class="fhir-metadata-value">$!resource.getStructureFhirVersionEnum()</span>
+	            	<span class="fhir-metadata-label">FHIR Version:</span>
+		            <span class="fhir-metadata-value">$!fhirVersion</span>
 				</td>
 			  </tr>
 			  <tr>

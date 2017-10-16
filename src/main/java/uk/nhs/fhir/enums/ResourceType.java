@@ -3,9 +3,7 @@ package uk.nhs.fhir.enums;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-
-import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.util.PropertyReader;
 
 /**
@@ -20,6 +18,11 @@ public enum ResourceType {
 	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition"),
 	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide"),
 	CONFORMANCE("Conformance", "Conformance"),
+	
+	// Added for STU3
+	CONCEPTMAP("ConceptMap", "ConceptMap"),
+	CODESYSTEM("CodeSystem", "CodeSystem"),
+	
 	EXAMPLES("Examples", "Examples"),
 	OTHER("Other", "Other");
 	
@@ -78,6 +81,10 @@ public enum ResourceType {
     		return IMPLEMENTATIONGUIDE;
     	} else if (hapiName.equals(CONFORMANCE.hapiName)) {
     		return CONFORMANCE;
+    	} else if (hapiName.equals(CODESYSTEM.hapiName)) {
+    		return CODESYSTEM;
+    	} else if (hapiName.equals(CONCEPTMAP.hapiName)) {
+    		return CONCEPTMAP;
     	}
     	return OTHER;
     }

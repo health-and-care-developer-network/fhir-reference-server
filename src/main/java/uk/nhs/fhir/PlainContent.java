@@ -22,6 +22,8 @@ import static uk.nhs.fhir.enums.ClientType.BROWSER;
 import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
 import static uk.nhs.fhir.enums.MimeType.JSON;
 import static uk.nhs.fhir.enums.MimeType.XML;
+import static uk.nhs.fhir.enums.ResourceType.CODESYSTEM;
+import static uk.nhs.fhir.enums.ResourceType.CONCEPTMAP;
 import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
 import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
@@ -46,13 +48,12 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
-import ca.uhn.fhir.rest.method.RequestDetails;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntity;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
 import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ArtefactType;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.enums.MimeType;
@@ -241,6 +242,12 @@ public class PlainContent extends CORSInterceptor {
         if (resourceType == IMPLEMENTATIONGUIDE) {
         	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
         }
+        if (resourceType == CODESYSTEM) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
+        if (resourceType == CONCEPTMAP) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
         
         // Return resource name (for breadcrumb)
         return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
@@ -275,6 +282,7 @@ public class PlainContent extends CORSInterceptor {
     	context.put( "baseURL", baseURL );
     	context.put( "firstTabName", firstTabName );
     	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	context.put( "fhirVersion", fhirVersion);
     	
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
@@ -288,8 +296,9 @@ public class PlainContent extends CORSInterceptor {
     	// Check if we have a nice metadata table from the renderer
     	boolean hasGeneratedMetadataFromRenderer = false;
     	for (SupportingArtefact artefact : metadata.getArtefacts()) {
-    		if (artefact.getArtefactType().equals(ArtefactType.METADATA)) {
+    		if (artefact.getArtefactType().isMetadata()) {
     			hasGeneratedMetadataFromRenderer = true;
+    			context.put( "metadataType", artefact.getArtefactType().name());
     		}
     	}
     	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);

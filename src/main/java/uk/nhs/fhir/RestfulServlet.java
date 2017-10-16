@@ -22,28 +22,23 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.DataSourceFactory;
 import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.FHIRVersion;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.resourcehandlers.dstu2.BundleProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.CustomServerConformanceProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.DocumentReferenceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.OrganizationProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PatientProvider;
-import uk.nhs.fhir.resourcehandlers.dstu2.PractitionerProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.ExtensionsList;
@@ -77,7 +72,10 @@ public class RestfulServlet extends RestfulServer {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.fine("Requested URI: " + request.getRequestURI());
+    	
+    	ClientType clientType = ClientType.getTypeFromHeaders(request);
+    	
+        LOG.info("DSTU2 Requested URI: " + request.getRequestURI());
 
         if(request.getRequestURI().endsWith(".css")) {
             // Stylesheets
@@ -94,6 +92,14 @@ public class RestfulServlet extends RestfulServer {
         	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
         } else if (request.getRequestURI().startsWith("/Extensions")) {
         	ExtensionsList.loadExtensions(request, response, fhirVersion, webber);
+        } else if ((clientType == clientType.BROWSER) &&
+        			   (request.getRequestURI().equals("/CodeSystem") ||
+        				request.getRequestURI().equals("/ConceptMap"))
+        		  ) {
+        	// There are no CodeSystems for DSTU2, and if this is a browser we haven't decided what
+        	// to do with listing these yet anyway, so just redirect to the ValueSets page for now..
+        	response.sendRedirect("/ValueSet");
+        	return;
         } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
 	    	response.setStatus(200);
 			response.setContentType("text/plain");
@@ -150,7 +156,12 @@ public class RestfulServlet extends RestfulServer {
         registerInterceptor(new PlainContent(webber));
         LOG.fine("resourceProviders added");
         
-        setServerConformanceProvider(new CustomServerConformanceProvider());
-        LOG.fine("Custom Conformance provider added");
+        //setServerConformanceProvider(new CustomServerConformanceProvider());
+        //LOG.fine("Custom Conformance provider added");
+        
+        FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
+        pp.setDefaultPageSize(Integer.parseInt(PropertyReader.getProperty("defaultPageSize")));
+        pp.setMaximumPageSize(Integer.parseInt(PropertyReader.getProperty("maximumPageSize")));
+        setPagingProvider(pp);
     }
 }

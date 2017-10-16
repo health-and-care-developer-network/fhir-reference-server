@@ -130,8 +130,11 @@ public class MongoIF implements Datasource {
 	 * @see uk.nhs.fhir.datalayer.Datasource#getAll()
 	 */
     @Override
-	public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType) {
+	public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType,
+										int theFromIndex, int theToIndex) {
         LOG.info("Getting all resources of type:" + resourceType.name());
+        
+        //TODO Implement pagination
         
         List<IBaseResource> list = new ArrayList<IBaseResource>();
         
@@ -222,7 +225,8 @@ public class MongoIF implements Datasource {
 	}
 
 	@Override
-	public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+	public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType,
+												String theNamePart, int start, int end) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -273,6 +277,27 @@ public class MongoIF implements Datasource {
 
 	@Override
 	public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IdType theId) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType,
+			String theURL, int start, int end) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int getResourceCount(FHIRVersion fhirVersion, ResourceType resourceType) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int getResourceCountByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int getResourceCountByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
