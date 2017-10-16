@@ -230,7 +230,7 @@ String baseURL = theRequestDetails.getServerBaseForRequest();
     	LOG.fine("Attempting to render conformance statement");
     	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
     	
-    	return new RawResourceTemplate(Optional.empty(), Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
+    	return new RawResourceTemplate(Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
     }
 
     /**

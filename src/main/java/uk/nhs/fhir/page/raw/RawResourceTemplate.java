@@ -12,9 +12,8 @@ public class RawResourceTemplate extends VelocityTemplate {
 	private final String rawResource;
 	private final MimeType mimeType;
 	
-	public RawResourceTemplate(Optional<String> nonTemplatedContent,
-			Optional<String> resourceType, Optional<String> resourceName, String baseURL, String rawResource, MimeType mimeType) {
-		super(Optional.of("raw-resource.vm"), nonTemplatedContent, resourceType, resourceName, baseURL);
+	public RawResourceTemplate(Optional<String> resourceType, Optional<String> resourceName, String baseURL, String rawResource, MimeType mimeType) {
+		super("raw-resource.vm", resourceType, resourceName, baseURL);
 		
 		this.rawResource = rawResource;
 		this.mimeType = mimeType;

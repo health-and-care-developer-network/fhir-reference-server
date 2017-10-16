@@ -15,14 +15,14 @@ public class ResourceListTemplate extends VelocityTemplate {
 	private final HashMap<String, List<ResourceMetadata>> groupedResources;
 	
 	public ResourceListTemplate(ResourceType resourceType, String baseURL, HashMap<String, List<ResourceMetadata>> groupedResources) {
-		super(Optional.of("list.vm"), Optional.empty(), Optional.of(resourceType.toString()), Optional.empty(), baseURL);
+		super("list.vm", Optional.of(resourceType.toString()), Optional.empty(), baseURL);
 		this.groupedResources = groupedResources;
 	}
 
 	@Override
 	protected void updateContext(VelocityContext context) {
     	context.put( "groupedResources", groupedResources );
-    	context.put( "resourceType", resourceType );
+    	context.put( "resourceType", resourceType.get() );
     	context.put( "baseURL", baseURL );
 	}
 

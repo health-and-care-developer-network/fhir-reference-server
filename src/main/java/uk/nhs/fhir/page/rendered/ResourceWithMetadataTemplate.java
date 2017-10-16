@@ -25,7 +25,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	public ResourceWithMetadataTemplate(String resourceType, String resourceName, String baseURL, IBaseResource resource,
 			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
 			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<ExampleResources> examples) {
-		super(Optional.of("resource-with-metadata.vm"), Optional.empty(), Optional.of(resourceType), Optional.of(resourceName), baseURL);
+		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName), baseURL);
 		this.resource = resource;
 		this.firstTabName = firstTabName;
 		this.versionsList = versionsList;

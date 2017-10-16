@@ -57,7 +57,7 @@ public class ServletStreamExample {
 			
 			String resourceType = ResourceType.EXAMPLES.toString();
 			String baseURL = request.getContextPath();
-			String wrappedContent = new RawResourceTemplate(Optional.empty(), Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
+			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {

@@ -14,7 +14,7 @@ public class ExtensionsListPageTemplate extends VelocityTemplate {
 	private final List<ResourceMetadata> extensions;
 	
 	public ExtensionsListPageTemplate(String baseUrl, List<ResourceMetadata> extensions) {
-		super(Optional.of("extensions.vm"), Optional.empty(), Optional.of("Extension Registry"), Optional.empty(), baseUrl);
+		super("extensions.vm", Optional.of("Extension Registry"), Optional.empty(), baseUrl);
 		this.baseUrl = baseUrl;
 		this.extensions = extensions;
 	}

@@ -25,12 +25,11 @@ public class AppShellTemplate {
     	}
 	}
 	
-	public VelocityContext getContext(Optional<String> contentTemplateName, Optional<String> resourceType, Optional<String> resourceName, 
-			Optional<String> nonTemplatedContent, String baseURL) {
+	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName, 
+			String baseURL) {
 		VelocityContext context = new VelocityContext();
 
-    	context.put( "contentTemplateName", contentTemplateName.isPresent() ? templateDirectory + contentTemplateName.get() : null );
-		context.put( "nonTemplatedContent", nonTemplatedContent.orElse(null) );
+    	context.put( "contentTemplateName", templateDirectory + contentTemplateName );
     	context.put( "resourceType", resourceType.orElse(null) );
     	context.put( "resourceName", resourceName.orElse(null) );
     	context.put( "baseURL", baseURL );

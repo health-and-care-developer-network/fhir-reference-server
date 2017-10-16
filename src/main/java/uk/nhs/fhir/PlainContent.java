@@ -129,7 +129,8 @@ public class PlainContent extends CORSInterceptor {
             String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
             IIdType resourceID = theRequestDetails.getId();
             
-        	if (mimeType == XML || mimeType == JSON) {
+        	if (mimeType == XML 
+        	  || mimeType == JSON) {
             	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
                 content = myRawResourceRenderer.renderSingleWrappedRAWResourceWithoutText(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
         	} else {

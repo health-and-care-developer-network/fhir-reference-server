@@ -34,7 +34,7 @@ public class RawResourceRender {
     
     public String renderSingleWrappedRAWResource(IBaseResource resource, FHIRVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	String rawResource = getRawResource(resource, mimeType, fhirVersion);
-        return new RawResourceTemplate(Optional.empty(), Optional.of(resourceType.toString()), resourceName, baseURL, rawResource, mimeType).getHtml();
+        return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, baseURL, rawResource, mimeType).getHtml();
     }
     
     public String getRawResource(IBaseResource resource, MimeType mimeType, FHIRVersion fhirVersion) {
