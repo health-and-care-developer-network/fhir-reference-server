@@ -8,30 +8,35 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.makehtml.data.FhirIcon;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
+import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		FhirTreeNode node = new FhirTreeNode(
-			FhirIcon.ELEMENT,
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,
 			"1",
-			Lists.newArrayList(new SimpleLinkData(FhirURL.buildOrThrow("http://www.example.com"), "testlink")),
+			new LinkDatas(new LinkData(FhirURL.buildOrThrow("http://www.example.com", FhirVersion.DSTU2), "testlink")),
 			"root info",
 			Lists.newArrayList(),
-			"path.to.resource");
+			"path.to.resource",
+			FhirElementDataType.ELEMENT,
+			FhirVersion.DSTU2);
 		FhirTreeData data = new FhirTreeData(node);
 		
-		FhirTreeTable fhirTreeTable = new FhirTreeTable(data);
+		FhirTreeTable fhirTreeTable = new FhirTreeTable(data, FhirVersion.DSTU2);
 		fhirTreeTable.stripRemovedElements();
 		Table table = fhirTreeTable.asTable();
 		

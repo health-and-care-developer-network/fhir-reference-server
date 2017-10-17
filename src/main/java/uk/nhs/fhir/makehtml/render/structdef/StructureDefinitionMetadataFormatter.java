@@ -7,43 +7,36 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
-import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Contact;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Mapping;
-import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.data.FhirVersion;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.FhirPanel;
-import uk.nhs.fhir.makehtml.html.MetadataTableFormatter;
-import uk.nhs.fhir.makehtml.html.Table;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.FhirContacts;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
+import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.makehtml.html.table.Table;
+import uk.nhs.fhir.makehtml.html.table.TableFormatter;
+import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.util.StringUtil;
 
-public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter {
+public class StructureDefinitionMetadataFormatter extends TableFormatter<WrappedStructureDefinition> {
+
+	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
+		super(wrappedResource, otherResources);
+	}
 
 	@Override
-	public HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException {
-		StructureDefinition structureDefinition = (StructureDefinition)source;
+	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
 		
-		Element metadataPanel = getMetadataTable(structureDefinition);
+		Element metadataPanel = getMetadataTable(wrappedResource);
 		section.addBodyElement(metadataPanel);
 		
 		getStyles().forEach(section::addStyle);
@@ -53,32 +46,32 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		return section;
 	}
 	
-	public Element getMetadataTable(StructureDefinition source) {
+	public Element getMetadataTable(WrappedStructureDefinition structureDefinition) {
 		
-		// These are all required and so should always be present
-		String name = source.getName();
-		String url = source.getUrl();
-		String kind = source.getKind();
+		String name = structureDefinition.getName();
+		String url = structureDefinition.getUrl().get();
+		String kind = structureDefinition.getKind();
 		
-		String status = source.getStatus();
-		Boolean isAbstract = source.getAbstract();
+		String status = structureDefinition.getStatus();
+		Boolean isAbstract = structureDefinition.getAbstract();
 		String displayIsAbstract = isAbstract ? "Yes" : "No";
 		
-		Optional<String> constrainedType = Optional.ofNullable(source.getConstrainedType());
+		Optional<String> constrainedType = structureDefinition.getConstrainedType();
 		
 		Optional<String> displayBaseUrl = Optional.empty();
-		String origBaseUrl = source.getBase();
+		String origBaseUrl = structureDefinition.getBase();
 		if (origBaseUrl != null) {
 			if (origBaseUrl.equals("http://hl7.org/fhir/StructureDefinition/Extension")) {
 				displayBaseUrl = Optional.of("http://hl7.org/fhir/extensibility.html#extension");
 			} else {
-				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_DSTU2 + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
+				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_FHIR + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
 			}
 		}
 		
-		// version is kept in a meta tag
-		Optional<String> version = Optional.ofNullable(source.getVersion());
-		Optional<String> display = Optional.ofNullable(source.getDisplay());
+		Optional<String> version = structureDefinition.getVersion();
+		Optional<String> display = structureDefinition.getDisplay();
+		
+		Optional<String> description = structureDefinition.getDescription();
 		
 		// never used in NHS Digital profiles
 		/*
@@ -90,75 +83,34 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 			displayExperimental = experimental ? "Yes" : "No";
 		}*/
 		
-		Optional<String> publisher = Optional.ofNullable(source.getPublisher());
+		Optional<String> publisher = structureDefinition.getPublisher();
 		
 		
-		Date date = source.getDate();
+		Optional<Date> date = structureDefinition.getDate();
 		Optional<String> displayDate = 
-			(date == null) ?
-				Optional.empty() : 
-				Optional.of(StringUtil.dateToString(date));
+			date.isPresent() ?
+				Optional.of(StringUtil.dateToString(date.get())) :
+				Optional.empty();
 		
-		// never used for NHS Digital StructureDefinitions
-		/*
-		Optional<String> requirements = Optional.ofNullable(source.getRequirements());
-		*/
-		Optional<String> copyrightInfo = Optional.ofNullable(source.getCopyright());
+		Optional<String> copyrightInfo = structureDefinition.getCopyright();
 		
-		Optional<String> fhirVersionDesc = Optional.empty();
-		if (!Strings.isNullOrEmpty(source.getFhirVersion())) {
-			fhirVersionDesc = Optional.of(FhirVersion.forString(source.getFhirVersion()).getDesc());
-		}
+		Optional<String> fhirVersionDesc = structureDefinition.getFhirVersion();
 		
-		Optional<String> contextType = Optional.ofNullable(source.getContextType());
+		Optional<String> contextType = structureDefinition.getContextType();
 		
-		List<List<Content>> identifierCells = Lists.newArrayList();
-		for (IdentifierDt identifier : source.getIdentifier()) {
-			List<Content> identifierCell = Lists.newArrayList();
-			identifierCells.add(identifierCell);
-			
-			Optional<String> use = Optional.ofNullable(identifier.getUse());
-			Optional<String> type = Optional.ofNullable(identifier.getType().getText());
-			Optional<String> system = Optional.ofNullable(identifier.getSystem());
-			Optional<String> value = Optional.ofNullable(identifier.getValue());
-			Optional<PeriodDt> period = Optional.ofNullable(identifier.getPeriod());
-			ResourceReferenceDt assigner = identifier.getAssigner();
-			
-			throw new NotImplementedException("Identifier");
-		}
+		List<FhirContacts> publishingOrgContacts = structureDefinition.getContacts();
 		
-		List<Content> publishingOrgContacts = getPublishingOrgContactsContents(source);
+		List<String> useContexts = structureDefinition.getUseContexts();
 		
-		List<String> useContexts = Lists.newArrayList();
-		for (CodeableConceptDt useContext : source.getUseContext()) {
-			for (CodingDt coding : useContext.getCoding()) {
-				// think text should be enough
-			}
-			
-			String text = useContext.getText();
-			useContexts.add(text);
-		}
-		
-		List<String> indexingCodes = Lists.newArrayList();
-		for (CodingDt code : source.getCode()) {
-			indexingCodes.add(code.getCode());
-		}
-		
-		List<Mapping> mappings = source.getMapping();
+		// JE - information only relevant to the base resource - not relevant to the profile
+		/*List<FhirMapping> mappings = structureDefinition.getMappings();
 		List<Content> externalSpecMappings = Lists.newArrayList();
 		boolean multipleMappings = mappings.size() >= 2;
 		if (multipleMappings) {
-			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_BLOCK_TITLE), "External Specifications"));
+			externalSpecMappings.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_BLOCK_TITLE), "External Specifications"));
 		}
-		for (Mapping mapping : mappings) {
-			// always present
-			String identity = mapping.getIdentity();
-			
-			Optional<String> mappingUri = Optional.ofNullable(mapping.getUri());
-			Optional<String> mappingName = Optional.ofNullable(mapping.getName());
-			Optional<String> mappingComments = Optional.ofNullable(mapping.getComments());
-			
-			String displayName = mappingName.orElse(identity);
+		for (FhirMapping mapping : mappings) {
+			String displayName = mapping.getName().orElse(mapping.getIdentity());
 			
 			if (!externalSpecMappings.isEmpty()) {
 				externalSpecMappings.add(Elements.newElement("br"));
@@ -167,32 +119,18 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 			displayName += ": ";
 			
 			externalSpecMappings.add(
-				Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), displayName));
-			if (mappingUri.isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_VALUE), mappingUri.get()));
+				Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_LABEL), displayName));
+			if (mapping.getUri().isPresent()) {
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_VALUE), mapping.getUri().get()));
 			}
-			if (mappingComments.isPresent()) {
-				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_VALUE), "(" + mappingComments.get() + ")"));
+			if (mapping.getComments().isPresent()) {
+				externalSpecMappings.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.DATA_VALUE), "(" + mapping.getComments().get() + ")"));
 			}
-		}
+		}*/
 		
-		List<String> useLocationContexts = Lists.newArrayList();
-		for (StringDt context : source.getContext()) {
-			useLocationContexts.add(context.getValue());
-		}
+		List<String> useLocationContexts = structureDefinition.getUseLocationContexts();
 		
-		Element colgroup = Elements.newElement("colgroup");
-		int columns = 4;
-		Preconditions.checkState(100 % columns == 0, "Table column count divides 100% evenly");
-		
-		int percentPerColumn = 100/columns;
-		
-		for (int i=0; i<columns; i++) {
-			colgroup.addContent(
-				Elements.withAttributes("col", 
-					Lists.newArrayList(
-						new Attribute("width", Integer.toString(percentPerColumn) + "%"))));
-		}
+		Element colgroup = getColGroup(4);
 		
 		List<Element> tableContent = Lists.newArrayList(colgroup);
 		
@@ -202,15 +140,22 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				labelledValueCell("URL", url, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Version", StringUtil.firstPresent(getVersionId(source), version), 1),
+				labelledValueCell("Version", StringUtil.firstPresent(structureDefinition.getVersionId(), version), 1),
 				labelledValueCell("Constrained type", constrainedType, 1),
 				labelledValueCell("Constrained URL", displayBaseUrl, 1),
 				labelledValueCell("Status", status, 1)));
+		
+		if (description.isPresent()) {
+			tableContent.add(
+				Elements.withChildren("tr",
+					labelledValueCell("Description", description.get(), 4, true)));
+		}
+		
 		tableContent.add(
 			Elements.withChildren("tr",
 				labelledValueCell("Published by", publisher, 1),
 				labelledValueCell("Created date", displayDate, 1),
-				labelledValueCell("Last updated", getLastUpdated(source), 1),
+				labelledValueCell("Last updated", structureDefinition.getLastUpdated(), 1),
 				labelledValueCell("Kind", StringUtil.capitaliseLowerCase(kind), 1)));
 		tableContent.add(
 			Elements.withChildren("tr",
@@ -220,20 +165,18 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 				labelledValueCell("Context type", contextType, 2)));
 		
 		if (!publishingOrgContacts.isEmpty()) {
+			List<Content> renderedPublishingOrgContacts = new FhirContactRenderer().getPublishingOrgContactsContents(publishingOrgContacts);
 			tableContent.add(
 				Elements.withChild("tr", 
-					cell(publishingOrgContacts, 4)));
+					cell(renderedPublishingOrgContacts, 4)));
 		}
 		
-		if (!externalSpecMappings.isEmpty()) {
+		// JE - don't want to show this
+		/*if (!externalSpecMappings.isEmpty()) {
 			tableContent.add(
 				Elements.withChild("tr", 
 					cell(externalSpecMappings, 4)));
-		}
-		
-		if (!indexingCodes.isEmpty()) {
-			throw new NotImplementedException("Code");
-		}
+		}*/
 		
 		if (!useContexts.isEmpty()) {
 			throw new NotImplementedException("UseContext");
@@ -264,37 +207,5 @@ public class StructureDefinitionMetadataFormatter extends MetadataTableFormatter
 		FhirPanel panel = new FhirPanel(panelTitle, table);
 		
 		return panel.makePanel();
-	}
-
-	List<Content> getPublishingOrgContactsContents(StructureDefinition source) {
-		List<Content> publishingOrgContacts = Lists.newArrayList();
-		for (Contact contact : source.getContact()) {			
-			Optional<String> individualName  = Optional.ofNullable(contact.getName());
-			List<ContactPointDt> individualTelecoms = contact.getTelecom();
-			if (!individualTelecoms.isEmpty()) {
-				if (!publishingOrgContacts.isEmpty()) {
-					publishingOrgContacts.add(Elements.newElement("br"));
-				}
-				
-				String telecomDesc = individualName.isPresent() ? individualName.get() : "General";
-				publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), telecomDesc));
-				if (individualTelecoms.size() == 1) {
-					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.TELECOM_NAME), ": "));
-					publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), individualTelecoms.get(0).getValue()));
-				} else {
-					for (ContactPointDt individualTelecom : individualTelecoms) {
-						publishingOrgContacts.add(Elements.newElement("br"));
-						publishingOrgContacts.add(Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_VALUE), "\t" + individualTelecom.getValue()));
-					}
-				}
-			}
-		}
-		
-		if (!publishingOrgContacts.isEmpty()) {
-			publishingOrgContacts.add(0, Elements.withAttributeAndText("span", new Attribute("class", FhirCSS.METADATA_LABEL), "Contacts"));
-			publishingOrgContacts.add(1, Elements.newElement("br"));
-		}
-		
-		return publishingOrgContacts;
 	}
 }

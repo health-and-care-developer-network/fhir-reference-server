@@ -3,6 +3,9 @@ package uk.nhs.fhir.makehtml.data;
 import org.junit.Test;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 
 public class TestFhirTreeData {
 	

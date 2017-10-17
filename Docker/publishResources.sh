@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path copy_only
+# publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path copy_only docker_tagname
 
 # Note: If copy_only is passed as "true" then the renderer will not be called, the specified files will just be copied directly to
 # the output directory. This would typically be used to copy examples across.
@@ -15,8 +15,14 @@ REGISTRY_HOST=$6
 TARGET_HOST=$7
 OUT_PATH=$8
 COPY_ONLY=$9
+TAG_NAME=${10}
  
 IMAGE_NAME="nhsd/fhir-make-html"
+
+if [ ! -z $TAG_NAME ]
+then
+  IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
+fi
 
 if [ -z $REGISTRY_HOST ]
 then

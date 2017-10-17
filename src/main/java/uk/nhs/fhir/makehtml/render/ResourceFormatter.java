@@ -1,66 +1,25 @@
 package uk.nhs.fhir.makehtml.render;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirVersion;
 
-import com.google.common.collect.Lists;
-
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.data.ResourceSectionType;
-import uk.nhs.fhir.makehtml.render.opdef.OperationDefinitionFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionBindingFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionDetailsFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionDifferentialFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionMetadataFormatter;
-import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
-import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
-import uk.nhs.fhir.util.FhirDocLinkFactory;
-
-// KGM 13/Apr/2017 Added ValueSet
-
-public abstract class ResourceFormatter {
-	public abstract HTMLDocSection makeSectionHTML(IBaseResource source) throws ParserConfigurationException;
-
-	public ResourceSectionType resourceSectionType = ResourceSectionType.TREEVIEW;
-
-	protected final FhirDocLinkFactory fhirDocLinkFactory = new FhirDocLinkFactory();
+public abstract class ResourceFormatter<T extends WrappedResource<T>> {
 	
-	public static List<FormattedOutputSpec> formattersForResource(IBaseResource resource, String baseOutputDirectory) {
-		// e.g. my_outputs/StructureDefinition
-		String outputDirectory = baseOutputDirectory + resource.getClass().getSimpleName() + File.separator;
-		
-		if (resource instanceof OperationDefinition) {
-			return Lists.newArrayList(
-				new FormattedOutputSpec(resource, new OperationDefinitionFormatter(), outputDirectory, "render.html"));
-		} else if (resource instanceof StructureDefinition) {
-			
-			ArrayList<FormattedOutputSpec> structureDefinitionFormatters = Lists.newArrayList(
-				new FormattedOutputSpec(resource, new StructureDefinitionMetadataFormatter(), outputDirectory, "metadata.html"),
-				new FormattedOutputSpec(resource, new StructureDefinitionSnapshotFormatter(), outputDirectory, "snapshot.html"),
-				new FormattedOutputSpec(resource, new StructureDefinitionBindingFormatter(), outputDirectory, "bindings.html"),
-				new FormattedOutputSpec(resource, new StructureDefinitionDetailsFormatter(), outputDirectory, "details.html"));
-			
-			StructureDefinition sd = (StructureDefinition)resource;
-			if (!sd.getConstrainedType().equals("Extension")) {
-				structureDefinitionFormatters.add(
-					new FormattedOutputSpec(resource, new StructureDefinitionDifferentialFormatter(), outputDirectory, "differential.html"));
-			}
-
-			return structureDefinitionFormatters;
-			
-		} else if (resource instanceof ValueSet) {
-			return Lists.newArrayList(
-				new FormattedOutputSpec(resource, new ValueSetFormatter(), outputDirectory, "render.html"));
-		}
-
-		return null;
+	protected final T wrappedResource;
+	protected final FhirFileRegistry otherResources;
+	
+	public ResourceFormatter(T wrappedResource, FhirFileRegistry otherResources) {
+		this.wrappedResource = wrappedResource;
+		this.otherResources = otherResources;
 	}
+	
+	public abstract HTMLDocSection makeSectionHTML() throws ParserConfigurationException;
+	
+	protected FhirVersion getResourceVersion() {
+		return wrappedResource.getImplicitFhirVersion();
+	}
+
 }

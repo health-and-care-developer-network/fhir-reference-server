@@ -7,46 +7,36 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
-import uk.nhs.fhir.makehtml.SkipRenderGenerationException;
-import uk.nhs.fhir.makehtml.data.FhirTreeData;
-import uk.nhs.fhir.makehtml.data.FhirTreeDataBuilder;
-import uk.nhs.fhir.makehtml.data.FhirTreeNode;
-import uk.nhs.fhir.makehtml.data.FhirTreeNodeBuilder;
-import uk.nhs.fhir.makehtml.data.FhirTreeTableContent;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.NestedLinkData;
-import uk.nhs.fhir.makehtml.data.SimpleLinkData;
-import uk.nhs.fhir.makehtml.data.SlicingInfo;
-import uk.nhs.fhir.makehtml.html.RendererError;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.RendererError;
 
 public class StructureDefinitionTreeDataProvider {
 	
-	private final StructureDefinition source;
+	private final WrappedStructureDefinition source;
+	private final FhirFileRegistry registry;
+	
 	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
 			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
 			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
-	public StructureDefinitionTreeDataProvider(StructureDefinition source) {
+	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source, FhirFileRegistry registry) {
 		this.source = source;
+		this.registry = registry;
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-
-		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder();
+		FhirTreeData snapshotTree = source.getSnapshotTree(registry);
 		
-		Snapshot snapshot = source.getSnapshot();
-		List<ElementDefinitionDt> snapshotElements = snapshot.getElement();
-		for (ElementDefinitionDt elementDefinition : snapshotElements) {
-			fhirTreeBuilder.addElementDefinition(elementDefinition, false);
-		}
+		snapshotTree.resolveLinkedNodes();
+		snapshotTree.cacheSlicingDiscriminators();
 		
-		FhirTreeData tree = fhirTreeBuilder.getTree();
-		
-		return tree;
+		return snapshotTree;
 	}
 	
 	public FhirTreeData getDifferentialTreeData() {
@@ -54,17 +44,12 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeDataBuilder fhirTreeBuilder = new FhirTreeDataBuilder(new FhirTreeNodeBuilder());
-		
-		List<ElementDefinitionDt> differentialElements = source.getDifferential().getElement();
-		for (ElementDefinitionDt differentialElement : differentialElements) {
-			fhirTreeBuilder.addElementDefinition(differentialElement, true);
-		}
-		
-		FhirTreeData differentialTree = fhirTreeBuilder.getTree();
-		//differentialTree.dumpTreeStructure();
+		FhirTreeData differentialTree = source.getDifferentialTree(registry);
 		
 		addBackupNodes(differentialTree, backupTreeData);
+		
+		differentialTree.resolveLinkedNodes();
+		differentialTree.cacheSlicingDiscriminators();
 		
 		return differentialTree;
 	}
@@ -88,25 +73,55 @@ public class StructureDefinitionTreeDataProvider {
 			searchRoot = getFirstSlicedParent(differentialNode).getBackupNode().get();
 		}
 		
+		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
+		
 		// Workaround for a Forge bug which means the differential node for the profiled choice is correctly renamed
 		// but the snapshot name is unchanged.
-		List<FhirTreeNode> matchingNodes = findMatchingSnapshotNodes(differentialNode.getPath(), searchRoot);
 		if (matchingNodes.size() == 0) {
 			String differentialPath = differentialNode.getPath();
-			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
 			
-			List<FhirTreeNode> matchingUnchangedChoiceNodes = Lists.newArrayList();
-			if (choiceSuffix.isPresent()) {
-				String suffix = choiceSuffix.get();
-				String choicePath = differentialPath.substring(0, differentialPath.lastIndexOf(suffix)) + "[x]";
-				matchingUnchangedChoiceNodes = findMatchingSnapshotNodes(choicePath, searchRoot);
+			String[] differentialPathElements = differentialPath.split("\\.");
+			String confirmedSnapshotPath = "";
+			FhirTreeNode localSearchRoot = searchRoot;
+			
+			for (String differentialPathElement : differentialPathElements) {
+				String possibleSnapshotElementPath = confirmedSnapshotPath;
+				if (!confirmedSnapshotPath.isEmpty()) {
+					possibleSnapshotElementPath += ".";
+				}
+				possibleSnapshotElementPath += differentialPathElement;
 				
-				// This workaround is necessary due to an error in the Forge Tool (apparently fixed for STU3), so we should potentially highlight it.
-				if (matchingUnchangedChoiceNodes.size() > 0) {
-					RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + choicePath);
-					matchingNodes = matchingUnchangedChoiceNodes;
+				List<FhirTreeNode> possibleAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
+				if (possibleAncestorNodes.size() == 1) {
+					localSearchRoot = possibleAncestorNodes.get(0);
+					confirmedSnapshotPath = possibleSnapshotElementPath;
+				} else if (possibleAncestorNodes.isEmpty()) {
+					// try to match up with use of a choice suffix
+					final String possibleMatchingSnapshotElementPath = possibleSnapshotElementPath;
+					Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> possibleMatchingSnapshotElementPath.endsWith(suffix)).findFirst();
+					if (choiceSuffix.isPresent()) {
+						String suffix = choiceSuffix.get();
+						possibleSnapshotElementPath = possibleSnapshotElementPath.substring(0, possibleSnapshotElementPath.length() - suffix.length()) + "[x]";
+						
+						List<FhirTreeNode> possibleChoiceAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
+						if (possibleChoiceAncestorNodes.isEmpty()) {
+							throw new IllegalStateException("Didn't find any matching paths, even after choice substitution to \"[x]\": " + differentialPath);
+						} else if (possibleChoiceAncestorNodes.size() == 1) {
+							confirmedSnapshotPath = possibleSnapshotElementPath;
+							searchRoot = possibleChoiceAncestorNodes.get(0);
+						} else {
+							throw new IllegalStateException("Found multiple possible matching resolved choice nodes in snapshot - implement match on discriminator? " + differentialPath);
+						}
+					} else {
+						throw new IllegalStateException("No matching paths found, and not a resolved choice node: " + differentialPath);
+					}
+				} else {
+					throw new IllegalStateException("Multiple matches on name - need finer grained handling (discriminators?) " + differentialPath);
 				}
 			}
+			
+			RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}
 		
 		if (matchingNodes.size() == 1) {
@@ -148,7 +163,7 @@ public class StructureDefinitionTreeDataProvider {
 			if (choiceSuffix.isPresent()) {
 				
 			}
-			throw new SkipRenderGenerationException("No nodes matched for differential element path " + differentialNode.getPath());
+			throw new IllegalStateException("No nodes matched for differential element path " + differentialNode.getPath());
 		} else {
 			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + differentialNode.getPath() + ", but first wasn't a slicing node");
 		}
@@ -176,22 +191,36 @@ public class StructureDefinitionTreeDataProvider {
 			return null;
 		}
 		
-		FhirTreeTableContent ancestorParent = ancestor.getParent();
+		while (ancestor != null) {
+			
+			if (ancestor.hasSlicingSibling()
+			  || ancestor.hasSlicingInfo()
+			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingSibling())
+			  || (ancestor.hasBackupNode() && ancestor.getBackupNode().get().hasSlicingInfo())) {
+				if (!(ancestor instanceof FhirTreeNode)) {
+					throw new IllegalStateException("First sliced ancestor is a dummy node (" + ancestor.getPath() + " for " + node.getPath());
+				} else {
+					return (FhirTreeNode)ancestor;
+				}
+			}
+			
+			ancestor = ancestor.getParent();
+		}
+		
+		/*FhirTreeTableContent ancestorParent = ancestor.getParent();
 		
 		while (ancestorParent != null) {
-			if (ancestor instanceof FhirTreeNode) {
-				String nodePath = ancestor.getPath();
-				for (FhirTreeTableContent child : ancestorParent.getChildren()) {
-					if (child.getPath().equals(nodePath)
-					  && child.hasSlicingInfo()) {
-						return (FhirTreeNode)ancestor;
-					}
+			String ancestorPath = ancestor.getPath();
+			for (FhirTreeTableContent child : ancestorParent.getChildren()) {
+				if (child.getPath().equals(ancestorPath)
+				  && child.hasSlicingInfo()) {
+					return (FhirTreeNode)ancestor;
 				}
 			}
 			
 			ancestor = ancestorParent;
 			ancestorParent = ancestor.getParent();
-		}
+		}*/
 		
 		return null;
 	}
@@ -220,16 +249,16 @@ public class StructureDefinitionTreeDataProvider {
 
 	private List<FhirTreeNode> filterOnNameIfPresent(FhirTreeTableContent element, List<FhirTreeNode> toFilter) {
 		if (element instanceof FhirTreeNode 
-		  && ((FhirTreeNode)element).getName().isPresent()
-		  && !((FhirTreeNode)element).getName().get().isEmpty()) {
+		  && ((FhirTreeNode)element).getSliceName().isPresent()
+		  && !((FhirTreeNode)element).getSliceName().get().isEmpty()) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)element;
-			String name = fhirTreeNode.getName().get();
+			String name = fhirTreeNode.getSliceName().get();
 			
 			List<FhirTreeNode> nameMatches = Lists.newArrayList();
 			
 			for (FhirTreeNode node : toFilter) {
-				if (node.getName().isPresent()
-				  && node.getName().get().equals(name)) {
+				if (node.getSliceName().isPresent()
+				  && node.getSliceName().get().equals(name)) {
 					nameMatches.add(node);
 				}
 			}
@@ -283,39 +312,18 @@ public class StructureDefinitionTreeDataProvider {
 	private boolean matchesOnDiscriminator(String discriminatorPath, FhirTreeNode element, FhirTreeNode pathMatch) {
 		if (element.getPathName().equals("extension")
 		  && discriminatorPath.equals("url")) {
-			for (LinkData typeLinkToMatch : element.getTypeLinks()) {
-				if (typeLinkToMatch instanceof NestedLinkData
-				  && typeLinkToMatch.getPrimaryLinkData().getText().equals("Extension")
-				  && ((NestedLinkData) typeLinkToMatch).getNestedLinks().size() == 1) {
-					SimpleLinkData nestedLinkToMatch = ((NestedLinkData)typeLinkToMatch).getNestedLinks().get(0);
-					FhirURL urlToMatch = nestedLinkToMatch.getURL();
-					
-					for (LinkData typeLink : pathMatch.getTypeLinks()) {
-						if (typeLink instanceof NestedLinkData
-						  && typeLink.getPrimaryLinkData().getText().equals("Extension")) {
-							for (LinkData nestedLink : ((NestedLinkData)typeLink).getNestedLinks()) {
-								if (nestedLink.getURL().equals(urlToMatch)) {
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-			
+			Set<FhirURL> elementUrlDiscriminators = element.getExtensionUrlDiscriminators();
+			Set<FhirURL> pathMatchUrlDiscriminators = pathMatch.getExtensionUrlDiscriminators();
+			return elementUrlDiscriminators.equals(pathMatchUrlDiscriminators);
 		}
 		
 		// most nodes
 		String fullDiscriminatorPath = element.getPath() + "." + discriminatorPath;
-		Optional<FhirTreeTableContent> discriminatorDescendant = findUniqueDescendantMatchingPath(element, fullDiscriminatorPath);
-		Optional<FhirTreeTableContent> pathMatchDiscriminatorDescendant = findUniqueDescendantMatchingPath(pathMatch, fullDiscriminatorPath);
-		if (discriminatorDescendant.isPresent()
+		Optional<FhirTreeTableContent> discriminatorDescendant = element.findUniqueDescendantMatchingPath(fullDiscriminatorPath);
+		Optional<FhirTreeTableContent> pathMatchDiscriminatorDescendant = pathMatch.findUniqueDescendantMatchingPath(fullDiscriminatorPath);
+		return discriminatorDescendant.isPresent()
 		  && pathMatchDiscriminatorDescendant.isPresent()
-		  && discriminatorFixedValueMatchesLink(discriminatorDescendant.get(), pathMatchDiscriminatorDescendant.get())) {
-			return true;
-		}
-		
-		return false;
+		  && discriminatorFixedValueMatchesLink(discriminatorDescendant.get(), pathMatchDiscriminatorDescendant.get());
 	}
 
 	private boolean discriminatorFixedValueMatchesLink(FhirTreeTableContent discriminatorDescendant, FhirTreeTableContent pathMatchDiscriminatorDescendant) {
@@ -339,31 +347,5 @@ public class StructureDefinitionTreeDataProvider {
 		String fixedValue = discriminatorDescendant.getFixedValue().get();
 		String matchFixedValue = pathMatchDiscriminatorDescendant.getFixedValue().get();
 		return matchFixedValue.equals(fixedValue);
-	}
-
-	Optional<FhirTreeTableContent> findUniqueDescendantMatchingPath(FhirTreeNode searchRoot, String fullDiscriminatorPath) {
-		List<FhirTreeTableContent> childNodesMatchingDiscriminatorPath = Lists.newArrayList();
-		for (FhirTreeTableContent descendantNode : new FhirTreeData(searchRoot)) {
-			if (descendantNode.getPath().equals(fullDiscriminatorPath)) {
-				if (descendantNode instanceof FhirTreeNode) {
-					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)descendantNode;
-					childNodesMatchingDiscriminatorPath.add(matchedFhirTreeNode);
-				} else {
-					throw new IllegalStateException("Snapshot tree contains a Dummy node");
-				}
-			}
-		}
-		
-		FhirTreeTableContent discriminatorDescendant;
-		if (childNodesMatchingDiscriminatorPath.size() == 1) {
-			discriminatorDescendant = childNodesMatchingDiscriminatorPath.get(0);
-		} else if (childNodesMatchingDiscriminatorPath.size() == 0) {
-			discriminatorDescendant = null;
-		} else {
-			throw new IllegalStateException("Multiple descendants matching discriminator " + fullDiscriminatorPath 
-					+ " found for element at " + searchRoot.getPath());
-		}
-		
-		return Optional.ofNullable(discriminatorDescendant);
 	}
 }

@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml.render.structdef;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,18 +12,21 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.FhirURLConstants;
-import uk.nhs.fhir.makehtml.data.BindingInfo;
-import uk.nhs.fhir.makehtml.data.ConstraintInfo;
-import uk.nhs.fhir.makehtml.data.FhirURL;
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.ResourceFlags;
-import uk.nhs.fhir.makehtml.data.SlicingInfo;
-import uk.nhs.fhir.makehtml.html.FhirCSS;
-import uk.nhs.fhir.makehtml.html.LinkCell;
+import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.BindingInfo;
+import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.url.FhirURL;
+import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
+import uk.nhs.fhir.makehtml.html.style.CSSTag;
+import uk.nhs.fhir.makehtml.html.style.FhirCSS;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
@@ -34,7 +36,7 @@ public class StructureDefinitionDetails {
 	private final Optional<String> definition;
 	private final String cardinality;
 	private final Optional<BindingInfo> binding;
-	private final List<LinkData> typeLinks;
+	private final LinkDatas typeLinks;
 	private final Optional<String> requirements;
 	private final List<String> aliases;
 	private final ResourceFlags resourceFlags;
@@ -42,11 +44,14 @@ public class StructureDefinitionDetails {
 	private final Optional<SlicingInfo> slicing;
 	private final List<ConstraintInfo> inheritedConstraints;
 	private final List<ConstraintInfo> profileConstraints;
+	private final Optional<String> linkedNodeKey;
+	private final List<FhirElementMapping> mappings;
+	private final FhirVersion version;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
-			List<LinkData> typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
+			LinkDatas typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
-			List<ConstraintInfo> profileConstraints) {
+			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings, FhirVersion version) {
 		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
@@ -60,15 +65,19 @@ public class StructureDefinitionDetails {
 		this.slicing = slicing;
 		this.inheritedConstraints = inheritedConstraints;
 		this.profileConstraints = profileConstraints;
+		this.linkedNodeKey = linkedNodeKey;
+		this.mappings = mappings;
+		this.version = version;
+		// add any new fields to assertEqualTo below
 	}
 
 	public void addContent(List<Element> tableContent) {
 		tableContent.add(getHeaderRow(key));
 		
 		addDataIfPresent(tableContent, "Definition", definition);
-		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#cardinality"), cardinality);
+		addLabelWithLinkDataRow(tableContent, "Cardinality", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#cardinality", version), cardinality);
 		addBindingRowIfPresent(tableContent);
-		tableContent.add(getLinkRow("Type", FhirURL.createOrThrow(FhirURLConstants.HL7_DATATYPES), typeLinks));
+		addTypeRow(tableContent);
 		addDataIfPresent(tableContent, "Requirements", requirements);
 		addListDataIfPresent(tableContent, "Alternate Names", aliases);
 		addChoiceNoteIfPresent(tableContent);
@@ -76,27 +85,24 @@ public class StructureDefinitionDetails {
 		addDataIfPresent(tableContent, "Comments", comments);
 		addConstraints(tableContent);
 		addSlicing(tableContent);
+		addMappings(tableContent);
 	}
 
 	private void addChoiceNoteIfPresent(List<Element> tableContent) {
-		try {
-			if (pathName.endsWith("[x]")) {
-				tableContent.add(
-					getDataRow(
-						dataCell("[x] Note", FhirCSS.DETAILS_DATA_CELL), 
-						Elements.withAttributeAndChildren("td", 
-							new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
-							Lists.newArrayList(
-								new Text("See "),
-								Elements.withAttributesAndText("a",
-									Lists.newArrayList(
-										new Attribute("href", new FhirURL(FhirURLConstants.HL7_FORMATS + "#choice").toLinkString()),
-										new Attribute("class", FhirCSS.LINK)), 
-									"Choice of Data Types"),
-								new Text(" for further information about how to use [x]")))));
-			}
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(e);
+		if (pathName.endsWith("[x]")) {
+			tableContent.add(
+				getDataRow(
+					dataCell("[x] Note", FhirCSS.DETAILS_DATA_CELL), 
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
+						Lists.newArrayList(
+							new Text("See "),
+							Elements.withAttributesAndText("a",
+								Lists.newArrayList(
+									new Attribute("href", FhirURL.buildOrThrow(FhirURLConstants.HL7_FORMATS + "#choice", version).toLinkString()),
+									new Attribute("class", FhirCSS.LINK)), 
+								"Choice of Data Types"),
+							new Text(" for further information about how to use [x]")))));
 		}
 	}
 
@@ -188,20 +194,28 @@ public class StructureDefinitionDetails {
 			
 			bindingInfo += " (" + info.getStrength() + ")";
 			
-			addLabelWithLinkDataRow(tableContent, "Binding", FhirURL.createOrThrow(FhirURLConstants.HL7_TERMINOLOGIES), bindingInfo);
+			addLabelWithLinkDataRow(tableContent, "Binding", FhirURL.buildOrThrow(FhirURLConstants.versionBase(version) + "/terminologies.html", version), bindingInfo);
 		}
 	}
 	
-	private Element getLinkRow(String title, FhirURL titleLink, List<LinkData> linkDatas) {
-		return Elements.withAttributeAndChildren("tr", 
-			new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
-				Lists.newArrayList(
-					linkCell(title, titleLink),
-					linkCell(linkDatas)));
+	private void addTypeRow(List<Element> tableContent) {
+		Element typeLinkCell;
+		if (!typeLinks.isEmpty()) {
+			typeLinkCell = linkCell(typeLinks);
+		} else {
+			throw new IllegalStateException("No typeLinks or linked Node present for " + pathName);
+		}
+		
+		tableContent.add(
+			Elements.withAttributeAndChildren("tr", 
+				new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
+					Lists.newArrayList(
+						linkCell("Type", FhirURL.buildOrThrow(FhirURLConstants.HL7_DATATYPES, version)),
+						typeLinkCell)));
 	}
 	
-	private Element linkCell(List<LinkData> linkDatas) {
-		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet(), false, false).makeCell();
+	private Element linkCell(LinkDatas linkDatas) {
+		return new LinkCell(linkDatas, Sets.newHashSet(FhirCSS.DETAILS_DATA_CELL), Sets.newHashSet()).makeCell();
 	}
 
 	private void addListDataIfPresent(List<Element> tableContent, String label, List<String> listData) {
@@ -211,10 +225,10 @@ public class StructureDefinitionDetails {
 	}
 
 	private void addResourceFlags(List<Element> tableContent) {
-		addDataIfTrue(tableContent, "Summary", FhirURL.createOrThrow(FhirURLConstants.HL7_SEARCH + "#summary"), resourceFlags.isSummary());
-		addDataIfTrue(tableContent, "Modifier", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#ismodifier"), resourceFlags.isModifier());
-		//addDataIfTrue(tableContent, "Is Constrained", FhirURL.createOrThrow(HTMLConstants.HL7_CONFORMANCE + "#constraints"), resourceFlags.isConstrained()); // implied by Invariants entry
-		addDataIfTrue(tableContent, "Must-Support", FhirURL.createOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#mustSupport"), resourceFlags.isMustSupport());
+		addDataIfTrue(tableContent, "Summary", FhirURL.buildOrThrow(FhirURLConstants.HL7_SEARCH + "#summary", version), resourceFlags.isSummary());
+		addDataIfTrue(tableContent, "Modifier", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#ismodifier", version), resourceFlags.isModifier());
+		//addDataIfTrue(tableContent, "Is Constrained", FhirURL.createOrThrow(HTMLConstants.HL7_CONFORMANCE + "#constraints", version), resourceFlags.isConstrained()); // implied by Invariants entry
+		addDataIfTrue(tableContent, "Must-Support", FhirURL.buildOrThrow(FhirURLConstants.HL7_CONFORMANCE + "#mustSupport", version), resourceFlags.isMustSupport());
 	}
 
 	private void addDataIfTrue(List<Element> tableContent, String label, FhirURL url, boolean condition) {
@@ -293,6 +307,39 @@ public class StructureDefinitionDetails {
 		}
 	}
 
+	private void addMappings(List<Element> tableContent) {
+		List<Content> mappingInfos = Lists.newArrayList();
+		
+		for (FhirElementMapping mapping : getMappings()) {
+			
+			String value = mapping.getMap();
+			
+			if (value.equals("n/a")
+			  || value.equals("N/A")) {
+				continue;
+			}
+			
+			if (!mappingInfos.isEmpty()) {
+				mappingInfos.add(Elements.newElement("br"));
+			}
+			mappingInfos.add(Elements.withText("b", mapping.getIdentity() + ": "));
+			mappingInfos.add(new Text(value));
+			
+			if (mapping.getLanguage().isPresent()) {
+				throw new IllegalStateException("How should we display mapping language?");
+			}
+		}
+		
+		if (!mappingInfos.isEmpty()) {
+			tableContent.add(
+				getDataRow(
+					dataCell("Mappings", FhirCSS.DETAILS_DATA_CELL),
+					Elements.withAttributeAndChildren("td", 
+						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
+						mappingInfos)));
+		}
+	}
+
 	public Optional<String> getDefinition() {
 		return definition;
 	}
@@ -305,7 +352,7 @@ public class StructureDefinitionDetails {
 		return binding;
 	}
 
-	public List<LinkData> getTypeLinks() {
+	public LinkDatas getTypeLinks() {
 		return typeLinks;
 	}
 
@@ -332,6 +379,14 @@ public class StructureDefinitionDetails {
 	public List<ConstraintInfo> getProfileConstraints() {
 		return profileConstraints;
 	}
+	
+	public Optional<String> getLinkedNodeKey() {
+		return linkedNodeKey;
+	}
+
+	private List<FhirElementMapping> getMappings() {
+		return mappings;
+	}
 
 	public void assertEqualTo(StructureDefinitionDetails detail) {
 
@@ -344,8 +399,8 @@ public class StructureDefinitionDetails {
 		if (!getBindingInfo().equals(detail.getBindingInfo())) {
 			throw new IllegalStateException("Same key, different binding info (" + key + ").");
 		}
-		if (!getTypeLinks().stream().allMatch(link -> detail.getTypeLinks().contains(link))) {
-			throw new IllegalStateException("Same key, different types info (" + key + ").");
+		if (!getTypeLinks().equals(detail.getTypeLinks())) {
+			throw new IllegalStateException("Same key, different type links info (" + key + ").");
 		}
 		if (!getRequirements().equals(detail.getRequirements())) {
 			throw new IllegalStateException("Same key, different requirements info (" + key + ").");
@@ -365,6 +420,15 @@ public class StructureDefinitionDetails {
 		if (!getProfileConstraints().stream().allMatch(constraint -> detail.getProfileConstraints().contains(constraint))) {
 			throw new IllegalStateException("Same key, different profile constraints info (" + key + ").");
 		}
+		if (!getLinkedNodeKey().equals(detail.getLinkedNodeKey())) {
+			throw new IllegalStateException("Same key, different linked node key info (" + key + ").");
+		}
+		if (!getMappings().stream().allMatch(mapping -> detail.getMappings().contains(mapping))) {
+			throw new IllegalStateException("Same key, different mappings (" + key + ").");
+		}
+		if (!version.equals(detail.version)) {
+			throw new IllegalStateException("Same key, different FHIR version(" + key + ").");
+		}
 	}
 
 	public static List<CSSStyleBlock> getStyles() {
@@ -373,7 +437,7 @@ public class StructureDefinitionDetails {
 		iconStyles.add(
 				new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.LIST),
 					Lists.newArrayList(
-						new CSSRule("margin", "0px"))));
+						new CSSRule(CSSTag.MARGIN, "0px"))));
 			
 		return iconStyles;
 	}

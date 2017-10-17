@@ -2,21 +2,21 @@ package uk.nhs.fhir.makehtml.render.opdef;
 
 import java.util.List;
 
-import uk.nhs.fhir.makehtml.data.LinkData;
-import uk.nhs.fhir.makehtml.data.ResourceInfo;
+import uk.nhs.fhir.data.ResourceInfo;
+import uk.nhs.fhir.data.url.LinkDatas;
 
 public class OperationDefinitionParameterTableData {
 	
 	private final String rowTitle;
 	private final String cardinality;
-	private final LinkData typeLink;
+	private final LinkDatas typeLink;
 	private final String value;
 	private final List<ResourceInfo> resourceFlags;
 	
 	public OperationDefinitionParameterTableData(
 		String rowTitle, 
 		String cardinality, 
-		LinkData typeLink, 
+		LinkDatas typeLink, 
 		String value, 
 		List<ResourceInfo> resourceFlags) {
 		this.rowTitle = rowTitle;
@@ -34,7 +34,7 @@ public class OperationDefinitionParameterTableData {
 		return cardinality;
 	}
 	
-	public LinkData getTypeLink() {
+	public LinkDatas getTypeLink() {
 		return typeLink;
 	}
 	
