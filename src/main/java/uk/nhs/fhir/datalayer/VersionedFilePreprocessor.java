@@ -9,14 +9,14 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
@@ -94,7 +94,7 @@ public class VersionedFilePreprocessor {
 	}
 	
 	/**
-	 * If the FHIR resoutce also has other generated resources (e.g. details view, diff, bindings, etc.) then also
+	 * If the FHIR resource also has other generated resources (e.g. details view, diff, bindings, etc.) then also
 	 * copy those into the relevant versioned directory along with our resource
 	 * 
 	 * @param oldFile Original filename

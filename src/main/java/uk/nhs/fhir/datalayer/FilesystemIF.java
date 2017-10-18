@@ -28,13 +28,13 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 /**
@@ -81,11 +81,15 @@ public class FilesystemIF {
     }
     
     public ResourceMetadata getResourceEntityByID(FHIRVersion fhirVersion, IIdType theId) {
-    	if (theId.hasVersionIdPart()) {
-    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
-    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getSpecificVersion(version);
+    	String idPart = theId.getIdPart();
+		String versionIdPart = theId.getVersionIdPart();
+		ResourceEntityWithMultipleVersions getversionsByID = FileCache.getversionsByID(fhirVersion, idPart, versionIdPart);
+		
+		if (theId.hasVersionIdPart()) {
+    		VersionNumber version = new VersionNumber(versionIdPart);
+    		return getversionsByID.getSpecificVersion(version);
     	} else {
-    		return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart()).getLatest();
+    		return getversionsByID.getLatest();
     	}
     	
     }

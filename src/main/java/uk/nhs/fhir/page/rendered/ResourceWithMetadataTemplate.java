@@ -6,10 +6,10 @@ import java.util.Optional;
 import org.apache.velocity.VelocityContext;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.SupportingArtefact;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.page.VelocityTemplate;
 
 public class ResourceWithMetadataTemplate extends VelocityTemplate {

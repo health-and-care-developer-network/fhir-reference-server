@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 
 public class ResourceListRenderer {
 	

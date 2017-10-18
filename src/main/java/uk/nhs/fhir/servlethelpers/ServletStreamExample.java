@@ -10,12 +10,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
 import uk.nhs.fhir.enums.MimeType;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.ServletUtils;
 

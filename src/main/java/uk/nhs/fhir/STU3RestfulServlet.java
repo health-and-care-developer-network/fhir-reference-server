@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
@@ -43,7 +44,6 @@ import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.ServletUtils;
 

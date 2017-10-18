@@ -18,12 +18,12 @@ package uk.nhs.fhir;
 import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
 import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.READ;
 import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.VREAD;
+import static uk.nhs.fhir.data.metadata.ResourceType.CONFORMANCE;
+import static uk.nhs.fhir.data.metadata.ResourceType.IMPLEMENTATIONGUIDE;
 import static uk.nhs.fhir.enums.ClientType.BROWSER;
 import static uk.nhs.fhir.enums.ClientType.NON_BROWSER;
 import static uk.nhs.fhir.enums.MimeType.JSON;
 import static uk.nhs.fhir.enums.MimeType.XML;
-import static uk.nhs.fhir.enums.ResourceType.CONFORMANCE;
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
 
 import java.io.File;
 import java.util.HashMap;
@@ -41,15 +41,16 @@ import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.SupportingArtefact;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.ResourceNameProvider;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.page.list.ResourceListTemplate;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.page.rendered.ResourceWithMetadataTemplate;
@@ -57,7 +58,6 @@ import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.ServletUtils;
 
@@ -92,7 +92,10 @@ public class STU3PlainContent extends CORSInterceptor {
     	MimeType mimeType = MimeType.getTypeFromHeader(theRequest.getParameter("_format"));
         ClientType clientType = ClientType.getTypeFromHeaders(theRequest);
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
-        ResourceType resourceType = ResourceType.getTypeFromRequest(theRequestDetails);
+        
+        String typeInRequest = theRequestDetails.getResourceName();
+    	LOG.fine("Detecting type of resource: " + typeInRequest);
+    	ResourceType resourceType = ResourceType.getTypeFromHAPIName(typeInRequest);
         
         LOG.info("Request received - operation: " + operation.toString() + ", type: " + resourceType.toString());
         
@@ -115,16 +118,14 @@ public class STU3PlainContent extends CORSInterceptor {
         
         // If they have asked for the conformance profile then let this one through - it
         // will be caught and handled by the outgoingResponse handler instead
-        if (operation != null) {
-            if (operation == METADATA) {
-            	return true;
-            }
+        if (METADATA.equals(operation)) {
+        	return true;
         }
 
         LOG.fine("FHIR Operation: " + operation);
         LOG.fine("Format to return to browser: " + mimeType.toString());
         
-String baseURL = theRequestDetails.getServerBaseForRequest();
+        String baseURL = theRequestDetails.getServerBaseForRequest();
         
         String wrappedContent;
         if (READ.equals(operation) 

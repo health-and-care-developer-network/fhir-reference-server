@@ -20,6 +20,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
@@ -29,12 +30,12 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 
 /**
  *
@@ -68,18 +69,19 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {
-    	String resourceName = null;
-    	String baseType = null;
-    	boolean extension = false;
-    	String extensionCardinality = null;
-    	ArrayList<String> extensionContexts = new ArrayList<String>();
-    	String extensionDescription = null;
-    	
     	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
-    	resourceName = profile.getName();
-    	extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
-        
+    	String resourceName = profile.getName();
+    	boolean extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
+
+    	String baseType;
+    	String extensionCardinality;
+    	List<String> extensionContexts;
+    	String extensionDescription;
     	if (!extension) {
+    		extensionCardinality = null;
+    		extensionContexts = new ArrayList<String>();
+			extensionDescription = null;
+    		
     		baseType = profile.getConstrainedType();
     	} else {
     		// Extra metadata for extensions
@@ -99,24 +101,23 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     		}
     		
     		List<ElementDefinitionDt> diffElements = profile.getDifferential().getElement();
-    		boolean isSimple = false;
-    		if (diffElements.size() == 3) {
-    			if (diffElements.get(1).getPath().equals("Extension.url")) {
-    				isSimple = true;
-    				// It is a simple extension, so we can also find a type
-    				List<Type> typeList = diffElements.get(2).getType();
-    				if (typeList.size() == 1) {
-    					baseType = typeList.get(0).getCode();
-    				} else {
-    					baseType = "(choice)";
-    				}
-    			}
+    		baseType = null;
+    		if (diffElements.size() == 3
+    		  && diffElements.get(1).getPath().equals("Extension.url")) {
+				// It is a simple extension, so we can also find a type
+				List<Type> typeList = diffElements.get(2).getType();
+				if (typeList.size() == 1) {
+					baseType = typeList.get(0).getCode();
+				} else {
+					baseType = "(choice)";
+				}
     		}
-    		if (!isSimple) {
+    		if (baseType == null) {
     			baseType = "(complex)";
     		}
     	
     	}
+    	
         String url = profile.getUrl();
         String resourceID = getResourceIDFromURL(url, resourceName);
         String displayGroup = baseType;
@@ -124,7 +125,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
         String status = profile.getStatus();
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
-							extension, baseType, displayGroup, false,
+							extension, Optional.of(baseType), displayGroup, false,
 							resourceID, versionNo, status, null, extensionCardinality,
 							extensionContexts, extensionDescription, FHIRVersion.DSTU2, url);
     }

@@ -8,13 +8,13 @@ import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FHIRVersion;
 
 public class RawResourceRender {
 	

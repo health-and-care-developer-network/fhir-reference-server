@@ -15,10 +15,10 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
-import static uk.nhs.fhir.enums.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.enums.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.enums.ResourceType.VALUESET;
+import static uk.nhs.fhir.data.metadata.ResourceType.IMPLEMENTATIONGUIDE;
+import static uk.nhs.fhir.data.metadata.ResourceType.OPERATIONDEFINITION;
+import static uk.nhs.fhir.data.metadata.ResourceType.STRUCTUREDEFINITION;
+import static uk.nhs.fhir.data.metadata.ResourceType.VALUESET;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +28,15 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 /**

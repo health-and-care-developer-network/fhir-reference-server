@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
 
 public interface IResourceHelper {
 	public IBaseResource removeTextSection(IBaseResource resource);

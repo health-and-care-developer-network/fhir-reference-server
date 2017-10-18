@@ -3,8 +3,8 @@ package uk.nhs.fhir;
 import javax.servlet.ServletException;
 
 import ca.uhn.fhir.rest.server.RestfulServer;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 

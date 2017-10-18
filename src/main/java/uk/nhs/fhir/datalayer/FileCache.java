@@ -15,8 +15,8 @@
  */
 package uk.nhs.fhir.datalayer;
 
+import static uk.nhs.fhir.data.metadata.ResourceType.EXAMPLES;
 import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
-import static uk.nhs.fhir.enums.ResourceType.EXAMPLES;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -32,19 +33,19 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.primitive.IdDt;
+import uk.nhs.fhir.data.metadata.ArtefactType;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.SupportingArtefact;
+import uk.nhs.fhir.data.metadata.SupportingArtefact.OrderByWeight;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact;
-import uk.nhs.fhir.datalayer.collections.SupportingArtefact.OrderByWeight;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ArtefactType;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FileLoader;
 
@@ -355,7 +356,7 @@ public class FileCache {
             	                    							profileParts[profileParts.length-1];
 
             	                    // Load the examples into a different in-memory cache for later look-up
-            	                    ResourceMetadata newEntity = new ResourceMetadata(thisFile.getName(), thisFile, EXAMPLES, false, null,
+            	                    ResourceMetadata newEntity = new ResourceMetadata(thisFile.getName(), thisFile, EXAMPLES, false, Optional.empty(),
             								null, true, resourceID, null, null, null, null, null, null, fhirVersion, null);
             		                
             	                    if (examplesList.containsKey(profileResourceID)) {

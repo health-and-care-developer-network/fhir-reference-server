@@ -1,7 +1,7 @@
 package uk.nhs.fhir.resourcehandlers;
 
-import uk.nhs.fhir.enums.ResourceType;
-import uk.nhs.fhir.util.FHIRVersion;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceType;
 
 public class ResourceHelperFactory {
 

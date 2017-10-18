@@ -5,7 +5,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 
 public class ResourceNameProvider {

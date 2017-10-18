@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import uk.nhs.fhir.data.metadata.VersionNumber;
+
 public class VersionNumberTest {
 
 	@Test

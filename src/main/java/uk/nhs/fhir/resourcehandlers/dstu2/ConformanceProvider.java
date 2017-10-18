@@ -8,18 +8,19 @@ package uk.nhs.fhir.resourcehandlers.dstu2;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 
 /**
  *
@@ -59,7 +60,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
         String status = operation.getStatus();
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.CONFORMANCE,
-				false, null, displayGroup, false,
+				false, Optional.empty(), displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
     }
 }

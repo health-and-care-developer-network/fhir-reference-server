@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.page.VelocityTemplate;
 
 public class ExtensionsListPageTemplate extends VelocityTemplate {

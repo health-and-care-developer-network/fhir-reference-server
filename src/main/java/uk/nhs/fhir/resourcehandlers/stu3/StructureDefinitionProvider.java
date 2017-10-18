@@ -20,6 +20,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
@@ -29,12 +30,12 @@ import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import uk.nhs.fhir.data.metadata.FHIRVersion;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ResourceMetadata;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FHIRVersion;
 
 /**
  *
@@ -122,7 +123,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
         String status = profile.getStatus().name();
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
-				extension, baseType, displayGroup, false,
+				extension, Optional.of(baseType), displayGroup, false,
 				resourceID, versionNo, status, null, extensionCardinality,
 				extensionContexts, extensionDescription, FHIRVersion.STU3, url);
     }
