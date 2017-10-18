@@ -47,7 +47,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	}
 	
 	protected Element labelledValueCell(String label, Optional<String> value, int colspan) {
-		String displayValue = value.isPresent() ? value.get() : BLANK;
+		String displayValue = value.orElse(BLANK);
 		return labelledValueCell(label, displayValue, colspan);
 	}
 	

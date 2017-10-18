@@ -16,7 +16,8 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,15 +58,15 @@ public class NewMain {
 		FullFhirURL.TEST_LINK_URLS = TEST_LINK_URLS;
 	}
 	
-    private final File inputDirectory;
+    private final Path inputDirectory;
     private final String outPath;
     private final String newBaseURL;
     
-    public NewMain(File inputDirectory, String outPath) {
+    public NewMain(Path inputDirectory, String outPath) {
     	this(inputDirectory, outPath, null);
     }
     
-    public NewMain(File inputDirectory, String outPath, String newBaseURL) {
+    public NewMain(Path inputDirectory, String outPath, String newBaseURL) {
     	this.inputDirectory = inputDirectory;
     	this.outPath = outPath;
     	this.newBaseURL = newBaseURL;
@@ -100,7 +101,7 @@ public class NewMain {
             	outputDir += File.separator;
             }
             
-            NewMain instance = new NewMain(new File(inputDir), outputDir, newBaseURL);
+            NewMain instance = new NewMain(Paths.get(inputDir), outputDir, newBaseURL);
             
             instance.process();
         }
@@ -112,15 +113,14 @@ public class NewMain {
      * @param directoryPath
      */
     public void process() {
-    	List<File> potentialFhirFiles = new XmlFileFinder(inputDirectory).findFiles();
-    	
-    	FhirFileRegistry fhirFileRegistry = cacheParsedFhirFiles(potentialFhirFiles);
+    	FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(inputDirectory).collect();
 
         FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
-        	
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
-	        	fileProcessor.processFile(outPath, newBaseURL, e.getKey(), e.getValue());
+	        	File sourceFile = e.getKey();
+				WrappedResource<?> parsedResource = e.getValue();
+				fileProcessor.processFile(outPath, newBaseURL, sourceFile, parsedResource);
 	        }
 	        
 	        if (TEST_LINK_URLS) {
@@ -131,14 +131,4 @@ public class NewMain {
         	e.printStackTrace();
         }
     }
-
-	private FhirFileRegistry cacheParsedFhirFiles(List<File> potentialFhirFiles) {
-		FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
-		
-		for (File xmlFile : potentialFhirFiles) {
-			fhirFileRegistry.register(xmlFile);
-		}
-		
-		return fhirFileRegistry;
-	}
 }

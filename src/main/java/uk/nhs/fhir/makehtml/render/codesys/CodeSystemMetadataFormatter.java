@@ -57,15 +57,15 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		String valueSet = codeSystem.getValueSet().orElse(BLANK);
 		String status = codeSystem.getStatus();
 		Optional<Boolean> experimental = codeSystem.getExperimental();
-		String experimentalDesc = experimental.isPresent() ? experimental.get() ? "yes" : "no" : BLANK;
+		String experimentalDesc = experimental.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		String description = codeSystem.getDescription().orElse(BLANK);
 		String purpose = codeSystem.getPurpose().orElse(BLANK);
 		Optional<Boolean> caseSensitive = codeSystem.getCaseSensitive();
-		String caseSensitiveDesc = caseSensitive.isPresent() ? caseSensitive.get() ? "yes" : "no" : BLANK;
+		String caseSensitiveDesc = caseSensitive.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		Optional<Boolean> compositional = codeSystem.getCompositional();
-		String compositionalDesc = compositional.isPresent() ? compositional.get() ? "yes" : "no" : BLANK;
+		String compositionalDesc = compositional.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		String content = codeSystem.getContent().orElse(BLANK);
 		
@@ -150,6 +150,10 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		FhirPanel panel = new FhirPanel(panelTitle, table);
 		
 		return panel.makePanel();
+	}
+	
+	private static String boolDesc(boolean bool) {
+		return bool ? "yes" : "no";
 	}
 	
 }
