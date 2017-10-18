@@ -3,15 +3,20 @@ package uk.nhs.fhir.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FhirResourceMetadataStore implements Store<FhirResourceMetadata> {
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.metadata.index.FhirResourceIndex;
+
+public class FhirResourceMetadataStore implements Store<ResourceMetadata> {
 
 	private final List<FhirResourceIndex> resourceIndices = new ArrayList<>();
 	
 	@Override
-	public void populate(Iterable<FhirResourceMetadata> supplier) {
-		for (FhirResourceMetadata metadata : supplier) {
+	public void populate(Iterable<ResourceMetadata> supplier) {
+		for (ResourceMetadata metadata : supplier) {
 			for (FhirResourceIndex index : resourceIndices) {
-				index.add(metadata);
+				if (index.accept(metadata)) {
+					index.addUnique(metadata);
+				}
 			}
 		}
 	}

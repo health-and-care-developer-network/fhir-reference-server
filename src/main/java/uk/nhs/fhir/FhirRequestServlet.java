@@ -3,7 +3,6 @@ package uk.nhs.fhir;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
