@@ -11,10 +11,10 @@ import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class AbstractResourceProvider implements IResourceProvider, IResourceHelper {
 
@@ -23,7 +23,7 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
 
     protected FilesystemIF myDatasource = null;
     protected ResourceType resourceType = null;
-    protected FHIRVersion fhirVersion = null;
+    protected FhirVersion fhirVersion = null;
     protected Class<? extends IBaseResource> fhirClass = null;
 
     public AbstractResourceProvider(FilesystemIF dataSource) {

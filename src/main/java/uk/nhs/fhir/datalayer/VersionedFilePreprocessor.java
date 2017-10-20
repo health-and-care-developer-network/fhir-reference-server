@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -17,6 +16,7 @@ import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.DateUtils;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
@@ -25,7 +25,7 @@ public class VersionedFilePreprocessor {
 
 	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();  
 	
-	protected static void copyFHIRResourcesIntoVersionedDirectory(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
+	protected static void copyFHIRResourcesIntoVersionedDirectory(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
 		logStart(fhirVersion, resourceType);
 		
 		String outputDirectory = ensureVersionedFolderExists(fhirVersion, resourceType);
@@ -80,14 +80,14 @@ public class VersionedFilePreprocessor {
         addMessage("--------------------------------------------------------------------------------------");
     }
 
-	private static void logStart(FHIRVersion fhirVersion, ResourceType resourceType) {
+	private static void logStart(FhirVersion fhirVersion, ResourceType resourceType) {
 		//profileLoadMessages.clear();
 		LOG.fine("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 	}
 
-	private static String ensureVersionedFolderExists(FHIRVersion fhirVersion, ResourceType resourceType) throws IOException {
+	private static String ensureVersionedFolderExists(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
 		String versionedPath = resourceType.getVersionedFilesystemPath(fhirVersion);
 		FileUtils.forceMkdir(new File(versionedPath));
 		return versionedPath;

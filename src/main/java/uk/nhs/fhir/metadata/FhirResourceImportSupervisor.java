@@ -10,7 +10,7 @@ import com.google.common.collect.Streams;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.datalayer.DefaultFhirFileLocator;
-import uk.nhs.fhir.datalayer.FhirFileLocator;
+import uk.nhs.fhir.datalayer.AbstractFhirFileLocator;
 import uk.nhs.fhir.makehtml.FhirResourceCollector;
 import uk.nhs.fhir.metadata.index.SimpleFhirResourceList;
 import uk.nhs.fhir.util.FhirVersion;
@@ -20,16 +20,17 @@ public class FhirResourceImportSupervisor {
 	private final FhirResourceMetadataStore resourceMetadataCache;
 	
 	private static final FhirVersion[] supportedVersions = new FhirVersion[]{FhirVersion.DSTU2, FhirVersion.STU3};
-	private final Map<FhirVersion, FhirResourceCollector> importedResourceFinders = Maps.newConcurrentMap();
+	private final Map<FhirVersion, FhirResourceCollector> importedResourceFinders;
 	
 	public FhirResourceImportSupervisor(Path fhirImportSource) {
 		this(fhirImportSource, new DefaultFhirFileLocator());
 	}
 	
-	public FhirResourceImportSupervisor(Path fhirImportSource, FhirFileLocator fhirImportDestination) {
+	public FhirResourceImportSupervisor(Path fhirImportSource, AbstractFhirFileLocator fhirImportDestination) {
 		VersionedFolderImportWriter versionedFolderImportWriter = new VersionedFolderImportWriter(fhirImportDestination);
 		this.importer = new FhirResourceImporter(fhirImportSource, versionedFolderImportWriter);
 		
+		importedResourceFinders = Maps.newConcurrentMap();
 		for (FhirVersion version : supportedVersions) {
 			importedResourceFinders.put(version, new FhirResourceCollector(fhirImportDestination.getRoot(version)));
 		}

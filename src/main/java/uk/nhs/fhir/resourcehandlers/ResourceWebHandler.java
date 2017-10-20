@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
@@ -38,6 +37,7 @@ import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -47,11 +47,11 @@ import uk.nhs.fhir.util.FhirServerProperties;
 public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider, GroupedResourcesProvider {
     private static final Logger LOG = Logger.getLogger(ResourceWebHandler.class.getName());
     private static String logLevel = FhirServerProperties.getProperty("logLevel");
-    private FHIRVersion fhirVersion = null;
+    private FhirVersion fhirVersion = null;
     
     FilesystemIF myDataSource = null;
 
-    public ResourceWebHandler(FilesystemIF dataSource, FHIRVersion fhirVersion) {
+    public ResourceWebHandler(FilesystemIF dataSource, FhirVersion fhirVersion) {
     	
         LOG.setLevel(Level.INFO);
 

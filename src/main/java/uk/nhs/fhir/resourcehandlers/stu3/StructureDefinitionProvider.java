@@ -30,12 +30,12 @@ import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -46,7 +46,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
 	public StructureDefinitionProvider(FilesystemIF dataSource) {
 		super(dataSource);
         resourceType = ResourceType.STRUCTUREDEFINITION;
-        fhirVersion = FHIRVersion.STU3;
+        fhirVersion = FhirVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.StructureDefinition.class;
     }
 
@@ -74,7 +74,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
     	String extensionDescription = null;
     	
     	org.hl7.fhir.dstu3.model.StructureDefinition profile =
-    			(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    			(org.hl7.fhir.dstu3.model.StructureDefinition)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	resourceName = profile.getName();
     	extension = (profile.getBaseDefinition().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
         
@@ -125,7 +125,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 				extension, Optional.of(baseType), displayGroup, false,
 				resourceID, versionNo, status, null, extensionCardinality,
-				extensionContexts, extensionDescription, FHIRVersion.STU3, url);
+				extensionContexts, extensionDescription, FhirVersion.STU3, url);
     }
 
 }

@@ -8,17 +8,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ca.uhn.fhir.model.primitive.IdDt;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.datalayer.FilesystemIF;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamArtefact {
 	private static final Logger LOG = Logger.getLogger(ServletStreamArtefact.class.getName());
 	
 	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response,
-										FHIRVersion fhirVersion, FilesystemIF dataSource) throws IOException {
+										FhirVersion fhirVersion, FilesystemIF dataSource) throws IOException {
     	
 		// Load a supporting artefact
     	String resourceID = request.getParameter("resourceID");

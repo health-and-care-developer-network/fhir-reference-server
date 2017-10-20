@@ -30,7 +30,6 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 
 public class FHIRUtils {
 
@@ -51,8 +50,8 @@ public class FHIRUtils {
 
     private static final Logger LOG = Logger.getLogger(FHIRUtils.class.getName());
 
-    private static FhirContext ctxDSTU2 = FHIRVersion.DSTU2.getContext();
-    private static FhirContext ctxSTU3 = FHIRVersion.STU3.getContext();
+    private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
+    private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
     
     private static String logLevel = FhirServerProperties.getProperty("logLevel");
     
@@ -65,14 +64,14 @@ public class FHIRUtils {
      * @param file File object pointing to the file we want to load
      * @return A resource object
      */
-    public static IBaseResource loadResourceFromFile(FHIRVersion fhirVersion, final File file) {
+    public static IBaseResource loadResourceFromFile(FhirVersion fhirVersion, final File file) {
         IBaseResource resource = null;
         try {
         	FileReader fr = new FileReader(file);
         	
-        	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+        	if (fhirVersion.equals(FhirVersion.DSTU2)) {
         		resource = ctxDSTU2.newXmlParser().parseResource(fr);
-        	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+        	} else if (fhirVersion.equals(FhirVersion.STU3)) {
         		resource = ctxSTU3.newXmlParser().parseResource(fr);
         	}
             String url = null;

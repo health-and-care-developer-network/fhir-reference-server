@@ -8,9 +8,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class PagedBundleProvider implements IBundleProvider {
 	
@@ -22,12 +22,12 @@ public class PagedBundleProvider implements IBundleProvider {
 	
 	private int searchType = 0;
 	private FilesystemIF dataSource = null;
-	private FHIRVersion fhirVersion = null;
+	private FhirVersion fhirVersion = null;
 	private ResourceType resourceType = null;
 	private String searchParam = null;
 	
 	public PagedBundleProvider(int searchType, FilesystemIF dataSource,
-									FHIRVersion fhirVersion, ResourceType resourceType,
+									FhirVersion fhirVersion, ResourceType resourceType,
 									String searchParam) {
 		this.searchType = searchType;
 		this.dataSource = dataSource;
@@ -40,7 +40,7 @@ public class PagedBundleProvider implements IBundleProvider {
 	}
 	
 	public PagedBundleProvider(int searchType, FilesystemIF dataSource,
-									FHIRVersion fhirVersion, ResourceType resourceType) {
+									FhirVersion fhirVersion, ResourceType resourceType) {
 		this.searchType = searchType;
 		this.dataSource = dataSource;
 		this.fhirVersion = fhirVersion;

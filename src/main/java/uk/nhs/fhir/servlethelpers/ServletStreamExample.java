@@ -10,12 +10,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.ServletUtils;
 
@@ -23,7 +23,7 @@ public class ServletStreamExample {
 	private static final Logger LOG = Logger.getLogger(ServletStreamExample.class.getName());
 	
 	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
-			FHIRVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
+			FhirVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
     	
 		// Parse the URL
 		String exampleName = request.getRequestURI().substring(10);
@@ -61,7 +61,7 @@ public class ServletStreamExample {
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {
-			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
+			LOG.severe("Unable to find example: " + exampleName + ", FhirVersion=" + fhirVersion);
 			response.setStatus(404);
 		}
 	}

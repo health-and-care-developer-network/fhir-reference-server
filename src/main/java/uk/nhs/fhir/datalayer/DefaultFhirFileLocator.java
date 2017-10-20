@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class DefaultFhirFileLocator implements FhirFileLocator {
+public class DefaultFhirFileLocator extends AbstractFhirFileLocator {
 
 	private static final String PROP_ROOT_PATH = "defaultResourceRootPath";
 	private static final String DSTU2_DIRECTORY = "NHSDigital";

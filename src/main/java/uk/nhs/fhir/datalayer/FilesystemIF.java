@@ -28,7 +28,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.model.primitive.IdDt;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -36,6 +35,7 @@ import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -67,7 +67,7 @@ public class FilesystemIF {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(FHIRVersion fhirVersion, IIdType theId) {
+    public IBaseResource getResourceByID(FhirVersion fhirVersion, IIdType theId) {
     	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
@@ -80,7 +80,7 @@ public class FilesystemIF {
     	}
     }
     
-    public ResourceMetadata getResourceEntityByID(FHIRVersion fhirVersion, IIdType theId) {
+    public ResourceMetadata getResourceEntityByID(FhirVersion fhirVersion, IIdType theId) {
     	String idPart = theId.getIdPart();
 		String versionIdPart = theId.getVersionIdPart();
 		ResourceEntityWithMultipleVersions getversionsByID = FileCache.getversionsByID(fhirVersion, idPart, versionIdPart);
@@ -94,7 +94,7 @@ public class FilesystemIF {
     	
     }
     
-    public ResourceEntityWithMultipleVersions getVersionsByID(FHIRVersion fhirVersion, IIdType theId) {
+    public ResourceEntityWithMultipleVersions getVersionsByID(FhirVersion fhirVersion, IIdType theId) {
     	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     }
 
@@ -103,7 +103,7 @@ public class FilesystemIF {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(FHIRVersion fhirVersion, String id) {
+    public IBaseResource getResourceByID(FhirVersion fhirVersion, String id) {
     	return getResourceByID(fhirVersion, new IdDt(id));
     }
     
@@ -114,7 +114,7 @@ public class FilesystemIF {
      * @param theNamePart
      * @return 
      */
-    public List<IBaseResource> getResourceMatchByName(FHIRVersion fhirVersion, ResourceType resourceType,
+    public List<IBaseResource> getResourceMatchByName(FhirVersion fhirVersion, ResourceType resourceType,
     				String theNamePart, int theFromIndex, int theToIndex) {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
@@ -138,13 +138,13 @@ public class FilesystemIF {
      * @param theNamePart
      * @return 
      */
-    public int getResourceCountByName(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+    public int getResourceCountByName(FhirVersion fhirVersion, ResourceType resourceType, String theNamePart) {
         LOG.info("Getting the count of " + resourceType.name() + " resources with name containing: " + theNamePart);
         List<ResourceMetadata> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
         return matchingIDs.size();
     }
 
-	public List<IBaseResource> getResourceMatchByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL,
+	public List<IBaseResource> getResourceMatchByURL(FhirVersion fhirVersion, ResourceType resourceType, String theURL,
 															int theFromIndex, int theToIndex) {
 		List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
         ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
@@ -160,7 +160,7 @@ public class FilesystemIF {
 		return matches;
 	}
 
-	public int getResourceCountByURL(FHIRVersion fhirVersion, ResourceType resourceType, String theURL) {
+	public int getResourceCountByURL(FhirVersion fhirVersion, ResourceType resourceType, String theURL) {
 		List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
         int counter = 0;
         for (ResourceMetadata entry : resourceList) {
@@ -176,7 +176,7 @@ public class FilesystemIF {
      * 
      * @return 
      */
-    public List<IBaseResource> getAllResourcesOfType(FHIRVersion fhirVersion, ResourceType resourceType,
+    public List<IBaseResource> getAllResourcesOfType(FhirVersion fhirVersion, ResourceType resourceType,
     													int theFromIndex, int theToIndex) {
         LOG.info("Getting all resources of type: " + resourceType.name());
         return FileCache.getResources(fhirVersion, resourceType, theFromIndex, theToIndex);
@@ -187,7 +187,7 @@ public class FilesystemIF {
      * 
      * @return 
      */
-    public List<String> getAllResourceNames(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public List<String> getAllResourceNames(FhirVersion fhirVersion, ResourceType resourceType) {
         LOG.info("Getting all Resource Names for type: " + resourceType.name());
         return FileCache.getResourceNameList(fhirVersion, resourceType);
     }
@@ -201,7 +201,7 @@ public class FilesystemIF {
         
     	List<ResourceMetadata> result = new ArrayList<ResourceMetadata>();
     	
-    	for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+    	for (FhirVersion fhirVersion : FhirVersion.values()) {
     		result.addAll(FileCache.getExtensions(fhirVersion));
     	}
     	
@@ -235,7 +235,7 @@ public class FilesystemIF {
      * @param theNamePart
      * @return a list of IDs of matching resources
      */
-    public List<ResourceMetadata> getAllResourceIDforResourcesMatchingNamePattern(FHIRVersion fhirVersion, ResourceType resourceType, String theNamePart) {
+    public List<ResourceMetadata> getAllResourceIDforResourcesMatchingNamePattern(FhirVersion fhirVersion, ResourceType resourceType, String theNamePart) {
         LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
         
         // Get full list of profiles first
@@ -262,17 +262,17 @@ public class FilesystemIF {
         return matches;
     }
     
-	public ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID) {
+	public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
 		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	
-	public ResourceMetadata getExampleByName(FHIRVersion fhirVersion, String resourceFilename) {
+	public ResourceMetadata getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
 		return FileCache.getExampleByName(fhirVersion, resourceFilename);
 	}
 
 	public HashMap<String, Integer> getResourceTypeCounts() {
 		HashMap<String, Integer> results = new HashMap<String, Integer>();
-		for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+		for (FhirVersion fhirVersion : FhirVersion.values()) {
 			List<ResourceMetadata> list = FileCache.getResourceList(fhirVersion);
 			for (ResourceMetadata entry : list) {
 				String type = entry.getResourceType().toString();
@@ -290,7 +290,7 @@ public class FilesystemIF {
 		return results;
 	}
 	
-	public int getResourceCount(FHIRVersion fhirVersion, ResourceType resourceType) {
+	public int getResourceCount(FhirVersion fhirVersion, ResourceType resourceType) {
 		int count = 0;
 		List<ResourceMetadata> list = FileCache.getResourceList(fhirVersion);
 		for (ResourceMetadata entry : list) {

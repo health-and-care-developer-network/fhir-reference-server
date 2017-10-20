@@ -25,12 +25,12 @@ import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -41,7 +41,7 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 	public ValueSetProvider(FilesystemIF dataSource) {
 		super(dataSource);
         resourceType = ResourceType.VALUESET;
-        fhirVersion = FHIRVersion.STU3;
+        fhirVersion = FhirVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.ValueSet.class;
     }
 
@@ -62,7 +62,7 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
@@ -77,7 +77,7 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
     	
     	return new ResourceMetadata(resourceName, thisFile, ResourceType.VALUESET,
 				false, Optional.empty(), displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.STU3, url);
     }
 
 }

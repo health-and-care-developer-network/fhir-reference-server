@@ -23,9 +23,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ExtensionsListRenderer {
@@ -39,7 +39,7 @@ public class ExtensionsListRenderer {
 	}
 	
 	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
-								FHIRVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
+								FhirVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
 		LOG.fine("Requested URL: " + req.getRequestURL());
 		
 		String baseUrl = req.getContextPath();

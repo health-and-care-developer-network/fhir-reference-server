@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
@@ -44,7 +43,9 @@ import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
+import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 /**
@@ -58,7 +59,7 @@ import uk.nhs.fhir.util.ServletUtils;
 public class STU3RestfulServlet extends RestfulServer {
 
     private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
-    private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
+    private static final FhirVersion fhirVersion = FhirVersion.STU3;
     private static String logLevel = FhirServerProperties.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     private static FilesystemIF dataSource = null;
@@ -100,7 +101,7 @@ public class STU3RestfulServlet extends RestfulServer {
     protected void initialize() throws ServletException {
     	
     	// Explicitly set this as an STU3 FHIR server
-    	super.setFhirContext(FHIRVersion.STU3.getContext());
+    	super.setFhirContext(FhirContexts.forVersion(FhirVersion.STU3));
 
         // We set our logging level based on the config file property.
         LOG.setLevel(Level.INFO);

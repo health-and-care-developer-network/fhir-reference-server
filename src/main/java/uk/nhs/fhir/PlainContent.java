@@ -37,7 +37,6 @@ import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.ResourceNameProvider;
 import uk.nhs.fhir.enums.ClientType;
@@ -48,6 +47,7 @@ import uk.nhs.fhir.page.searchresults.SearchResultsRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 /**
@@ -59,7 +59,7 @@ public class PlainContent extends CORSInterceptor {
 
     private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
-    private static final FHIRVersion fhirVersion = FHIRVersion.DSTU2;
+    private static final FhirVersion fhirVersion = FhirVersion.DSTU2;
     
     private final ResourceWebHandler myWebHandler;
     private final ResourceNameProvider resourceNameProvider;

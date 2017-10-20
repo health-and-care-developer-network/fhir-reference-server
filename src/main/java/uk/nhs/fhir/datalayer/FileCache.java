@@ -34,7 +34,6 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.data.metadata.ArtefactType;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
@@ -47,6 +46,7 @@ import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 
 /**
@@ -60,9 +60,9 @@ public class FileCache {
     private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
     
     // Singleton object to act as a cache of the files in the profiles and valueset directories
-    private static HashMap<FHIRVersion, List<ResourceEntityWithMultipleVersions>> resourceListByFhirVersion = null;
-    private static HashMap<FHIRVersion, HashMap<String, ExampleResources>> examplesListByFhirVersion = null;
-    private static HashMap<FHIRVersion, HashMap<String, ResourceMetadata>> examplesListByName = null;
+    private static HashMap<FhirVersion, List<ResourceEntityWithMultipleVersions>> resourceListByFhirVersion = null;
+    private static HashMap<FhirVersion, HashMap<String, ExampleResources>> examplesListByFhirVersion = null;
+    private static HashMap<FhirVersion, HashMap<String, ResourceMetadata>> examplesListByName = null;
     
     private static long lastUpdated = 0;
     private static long updateInterval = Long.parseLong(FhirServerProperties.getProperty("cacheReloadIntervalMS"));
@@ -79,12 +79,12 @@ public class FileCache {
     
     private synchronized static void updateCache() {
         if(updateRequired()) {
-        	updateCacheForSpecificFHIRVersion(FHIRVersion.DSTU2);
-        	updateCacheForSpecificFHIRVersion(FHIRVersion.STU3);
+        	updateCacheForSpecificFhirVersion(FhirVersion.DSTU2);
+        	updateCacheForSpecificFhirVersion(FhirVersion.STU3);
         }
     }
     
-    private static void updateCacheForSpecificFHIRVersion(FHIRVersion fhirVersion) {
+    private static void updateCacheForSpecificFhirVersion(FhirVersion fhirVersion) {
     	DataLoaderMessages.clearProfileLoadMessages();
         LOG.fine("Updating cache from filesystem");
         
@@ -95,11 +95,9 @@ public class FileCache {
         
         updateResourcesList(fhirVersion, newResourcesList);
         updateExamplesList(fhirVersion, newExamplesList);
-        
-        //printCacheContent(fhirVersion);
     }
 
-	static ArrayList<ResourceEntityWithMultipleVersions> cacheResources(FHIRVersion fhirVersion) {
+	static ArrayList<ResourceEntityWithMultipleVersions> cacheResources(FhirVersion fhirVersion) {
 		ArrayList<ResourceEntityWithMultipleVersions> newList = new ArrayList<>();
         for (ResourceType resourceType : ResourceType.typesForFhirVersion(fhirVersion)) {
         	newList.addAll(cacheFHIRResources(fhirVersion, resourceType));
@@ -107,7 +105,7 @@ public class FileCache {
 		return newList;
 	}
     
-    private static ArrayList<ResourceEntityWithMultipleVersions> cacheFHIRResources(FHIRVersion fhirVersion, ResourceType resourceType){
+    private static ArrayList<ResourceEntityWithMultipleVersions> cacheFHIRResources(FhirVersion fhirVersion, ResourceType resourceType){
     	
     	// Call pre-processor to copy files into the versioned directory
     	try {
@@ -121,9 +119,9 @@ public class FileCache {
     	
         // Now, read the resources from the versioned path into our cache
     	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<>();
-    	String path = resourceType.getVersionedFilesystemPath(fhirVersion);
-    	LOG.fine("Reading pre-processed files from path: " + path);
-        List<File> fileList = resourceFileFinder.findFiles(path);
+    	String sourcePathForResourceAndVersion = resourceType.getVersionedFilesystemPath(fhirVersion);
+    	LOG.fine("Reading pre-processed files from path: " + sourcePathForResourceAndVersion);
+        List<File> fileList = resourceFileFinder.findFiles(sourcePathForResourceAndVersion);
         
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
@@ -200,7 +198,7 @@ public class FileCache {
 		}
     }
     
-    private static HashMap<String, ExampleResources> cacheExamples(FHIRVersion fhirVersion){
+    private static HashMap<String, ExampleResources> cacheExamples(FhirVersion fhirVersion){
     	
     	LOG.fine("Started loading example resources into cache");
 		addMessage("Started loading example resources into cache");
@@ -274,7 +272,7 @@ public class FileCache {
         return examplesList;
     }
 
-	static void updateResourcesList(FHIRVersion fhirVersion,
+	static void updateResourcesList(FhirVersion fhirVersion,
 			ArrayList<ResourceEntityWithMultipleVersions> newResourcesList) {
 		// Swap out for our new list
         ensureResourceListByFhirVersion();
@@ -283,11 +281,11 @@ public class FileCache {
 
 	static void ensureResourceListByFhirVersion() {
 		if (resourceListByFhirVersion == null) {
-        	resourceListByFhirVersion = new HashMap<FHIRVersion, List<ResourceEntityWithMultipleVersions>>();
+        	resourceListByFhirVersion = new HashMap<FhirVersion, List<ResourceEntityWithMultipleVersions>>();
         }
 	}
 
-	static void updateExamplesList(FHIRVersion fhirVersion, HashMap<String, ExampleResources> newExamplesList) {
+	static void updateExamplesList(FhirVersion fhirVersion, HashMap<String, ExampleResources> newExamplesList) {
 		ensureExamplesListByFhirVersionExists(fhirVersion, newExamplesList);
         examplesListByFhirVersion.put(fhirVersion, newExamplesList);
         
@@ -295,16 +293,16 @@ public class FileCache {
         examplesListByName.put(fhirVersion, buildExampleListByName(newExamplesList));
 	}
 
-	static void ensureExamplesListByFhirVersionExists(FHIRVersion fhirVersion,
+	static void ensureExamplesListByFhirVersionExists(FhirVersion fhirVersion,
 			HashMap<String, ExampleResources> newExamplesList) {
 		if (examplesListByFhirVersion == null) {
-        	examplesListByFhirVersion = new HashMap<FHIRVersion, HashMap<String, ExampleResources>>();
+        	examplesListByFhirVersion = new HashMap<FhirVersion, HashMap<String, ExampleResources>>();
         }
 	}
 
 	static void ensureExamplesListByNameExists() {
 		if (examplesListByName == null) {
-        	examplesListByName = new HashMap<FHIRVersion, HashMap<String, ResourceMetadata>>();
+        	examplesListByName = new HashMap<FhirVersion, HashMap<String, ResourceMetadata>>();
         }
 	}
     
@@ -336,7 +334,7 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List<String> getResourceNameList(FHIRVersion fhirVersion, ResourceType resourceType) {
+    public static List<String> getResourceNameList(FhirVersion fhirVersion, ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
@@ -354,7 +352,7 @@ public class FileCache {
      * Get a list of all extensions to show in the extensions registry
      * @return
      */
-    public static List<ResourceMetadata> getExtensions(FHIRVersion fhirVersion)  {
+    public static List<ResourceMetadata> getExtensions(FhirVersion fhirVersion)  {
     	List<ResourceMetadata> results = new ArrayList<>();
     	if(updateRequired()) {
             updateCache();
@@ -381,7 +379,7 @@ public class FileCache {
         LOG.fine("Creating HashMap");
         HashMap<String, List<ResourceMetadata>> result = new HashMap<String, List<ResourceMetadata>>();
         try {
-            for (FHIRVersion fhirVersion : FHIRVersion.values()) {
+            for (FhirVersion fhirVersion : FhirVersion.values()) {
 	        	for(ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
 	            	if (entry.getLatest().getResourceType() == resourceType) {
 		            	boolean isExtension = entry.getLatest().isExtension();
@@ -415,7 +413,7 @@ public class FileCache {
      * 
      * @return 
      */
-    public static List<IBaseResource> getResources(FHIRVersion fhirVersion, ResourceType resourceType,
+    public static List<IBaseResource> getResources(FhirVersion fhirVersion, ResourceType resourceType,
     												int theFromIndex, int theToIndex) {
         if(updateRequired()) {
             updateCache();
@@ -435,7 +433,7 @@ public class FileCache {
         return allFiles;
     }
     
-    public static ResourceMetadata getSingleResourceByID(FHIRVersion fhirVersion, String idPart, String versionPart) {
+    public static ResourceMetadata getSingleResourceByID(FhirVersion fhirVersion, String idPart, String versionPart) {
         if(updateRequired()) {
             updateCache();
         }
@@ -456,7 +454,7 @@ public class FileCache {
     	return null;
     }
     
-    public static ResourceEntityWithMultipleVersions getversionsByID(FHIRVersion fhirVersion, String idPart, String versionPart) {
+    public static ResourceEntityWithMultipleVersions getversionsByID(FhirVersion fhirVersion, String idPart, String versionPart) {
         if(updateRequired()) {
             updateCache();
         }
@@ -469,7 +467,7 @@ public class FileCache {
     	return null;
     }
     
-    public static ResourceMetadata getSingleResourceByName(FHIRVersion fhirVersion, String name) {
+    public static ResourceMetadata getSingleResourceByName(FhirVersion fhirVersion, String name) {
         if(updateRequired()) {
             updateCache();
         }
@@ -481,7 +479,7 @@ public class FileCache {
     	return null;
     }
 
-	public static List<ResourceMetadata> getResourceList(FHIRVersion fhirVersion) {
+	public static List<ResourceMetadata> getResourceList(FhirVersion fhirVersion) {
 		if(updateRequired()) {
             updateCache();
         }
@@ -496,14 +494,14 @@ public class FileCache {
 	
 	
 	
-	public static ExampleResources getExamples(FHIRVersion fhirVersion, String resourceTypeAndID) {
+	public static ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
 		if(updateRequired()) {
             updateCache();
         }
 		return examplesListByFhirVersion.get(fhirVersion).get(resourceTypeAndID);
 	}
 	
-	public static ResourceMetadata getExampleByName(FHIRVersion fhirVersion, String resourceFilename) {
+	public static ResourceMetadata getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
 		if(updateRequired()) {
             updateCache();
         }

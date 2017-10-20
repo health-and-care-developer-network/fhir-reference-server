@@ -8,13 +8,14 @@ import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class RawResourceRender {
 	
@@ -24,7 +25,7 @@ public class RawResourceRender {
 		myWebHandler = webHandler;
 	}
 
-    public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FHIRVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
+    public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FhirVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	// Clear out the generated text
     	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
         resource = helper.removeTextSection(resource);
@@ -32,13 +33,13 @@ public class RawResourceRender {
         return renderSingleWrappedRAWResource(resource, fhirVersion, Optional.of(resourceName), resourceType, baseURL, mimeType);
     }
     
-    public String renderSingleWrappedRAWResource(IBaseResource resource, FHIRVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
+    public String renderSingleWrappedRAWResource(IBaseResource resource, FhirVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	String rawResource = getRawResource(resource, mimeType, fhirVersion);
         return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, baseURL, rawResource, mimeType).getHtml();
     }
     
-    public String getRawResource(IBaseResource resource, MimeType mimeType, FHIRVersion fhirVersion) {
-    	FhirContext fhirContext = fhirVersion.getContext();
+    public String getRawResource(IBaseResource resource, MimeType mimeType, FhirVersion fhirVersion) {
+    	FhirContext fhirContext = FhirContexts.forVersion(fhirVersion);
     	if (mimeType == JSON) {
         	return getResourceAsJSON(resource, fhirContext);
         } else {

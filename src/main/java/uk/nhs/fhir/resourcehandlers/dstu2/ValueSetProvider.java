@@ -30,13 +30,13 @@ import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.StringParam;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -52,7 +52,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     public ValueSetProvider(FilesystemIF dataSource) {
     	super(dataSource);
         resourceType = ResourceType.VALUESET;
-        fhirVersion = FHIRVersion.DSTU2;
+        fhirVersion = FhirVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.ValueSet.class;
     }
 
@@ -74,7 +74,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
         
         List<String> ids = ValueSetCodesCache.findCode(theCode.getValue());
         for(String theID : ids) {
-            results.add((ValueSet)myDatasource.getResourceByID(FHIRVersion.DSTU2, theID));
+            results.add((ValueSet)myDatasource.getResourceByID(FhirVersion.DSTU2, theID));
         }
         return results;
     }
@@ -96,7 +96,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FhirVersion.DSTU2, thisFile);
     	String url = profile.getUrl();
     	String resourceName = profile.getName();
     	String resourceID = getResourceIDFromURL(url, resourceName);
@@ -111,7 +111,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     	
     	return new ResourceMetadata(resourceName, thisFile, ResourceType.VALUESET,
 				false, Optional.empty(), displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.DSTU2, url);
     }
 
 }

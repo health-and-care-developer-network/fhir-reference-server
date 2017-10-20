@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
@@ -16,15 +15,16 @@ import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourcePageRenderer {
     
 	private static final Logger LOG = Logger.getLogger(ResourcePageRenderer.class.getName());
 	
-	private final FHIRVersion fhirVersion;
+	private final FhirVersion fhirVersion;
 	private final ResourceWebHandler resourceWebHandler;
 	
-	public ResourcePageRenderer(FHIRVersion fhirVersion, ResourceWebHandler resourceWebHandler) {
+	public ResourcePageRenderer(FhirVersion fhirVersion, ResourceWebHandler resourceWebHandler) {
 		this.fhirVersion = fhirVersion;
 		this.resourceWebHandler = resourceWebHandler;
 	}

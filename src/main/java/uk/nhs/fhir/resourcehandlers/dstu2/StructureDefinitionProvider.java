@@ -30,12 +30,12 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.model.primitive.StringDt;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -50,7 +50,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     public StructureDefinitionProvider(FilesystemIF dataSource) {
         super(dataSource);
         resourceType = ResourceType.STRUCTUREDEFINITION;
-        fhirVersion = FHIRVersion.DSTU2;
+        fhirVersion = FhirVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.StructureDefinition.class;
     }
 
@@ -69,7 +69,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {
-    	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	StructureDefinition profile = (StructureDefinition)FHIRUtils.loadResourceFromFile(FhirVersion.DSTU2, thisFile);
     	String resourceName = profile.getName();
     	boolean extension = (profile.getBase().equals("http://hl7.org/fhir/StructureDefinition/Extension"));
 
@@ -127,7 +127,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderDSTU2 {
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 							extension, Optional.of(baseType), displayGroup, false,
 							resourceID, versionNo, status, null, extensionCardinality,
-							extensionContexts, extensionDescription, FHIRVersion.DSTU2, url);
+							extensionContexts, extensionDescription, FhirVersion.DSTU2, url);
     }
     
 }

@@ -41,7 +41,6 @@ import org.hl7.fhir.instance.model.api.IIdType;
 
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
@@ -59,6 +58,7 @@ import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 /**
@@ -71,7 +71,7 @@ public class STU3PlainContent extends CORSInterceptor {
     
     private static final String guidesPath = FhirServerProperties.getProperty("guidesPath");
 
-    private static final FHIRVersion fhirVersion = FHIRVersion.STU3;
+    private static final FhirVersion fhirVersion = FhirVersion.STU3;
     
     private final ResourceWebHandler myWebHandler;
     private final ResourceNameProvider resourceNameProvider;

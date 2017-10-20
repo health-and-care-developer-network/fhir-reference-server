@@ -15,12 +15,12 @@ import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -31,7 +31,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
 	public ImplementationGuideProvider(FilesystemIF dataSource) {
 		super(dataSource);
         resourceType = ResourceType.IMPLEMENTATIONGUIDE;
-        fhirVersion = FHIRVersion.STU3;
+        fhirVersion = FhirVersion.STU3;
         fhirClass = org.hl7.fhir.dstu3.model.ImplementationGuide.class;
     }
     
@@ -51,7 +51,7 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {
-    	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	String resourceName = guide.getName();
     	String url = guide.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
@@ -61,6 +61,6 @@ public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
     	
         return new ResourceMetadata(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
 				false, Optional.empty(), displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.STU3, url);
     }
 }

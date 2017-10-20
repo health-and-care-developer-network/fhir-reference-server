@@ -11,7 +11,7 @@ import org.apache.commons.io.FileUtils;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.datalayer.FhirFileLocator;
+import uk.nhs.fhir.datalayer.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 
@@ -21,9 +21,9 @@ public class VersionedFolderImportWriter implements ImportListener {
 	
 	private static final String versionedFolder = "versioned";
 	
-	private final FhirFileLocator fhirImportDestination;
+	private final AbstractFhirFileLocator fhirImportDestination;
 	
-	public VersionedFolderImportWriter(FhirFileLocator fhirImportDestination) {
+	public VersionedFolderImportWriter(AbstractFhirFileLocator fhirImportDestination) {
 		this.fhirImportDestination = fhirImportDestination;
 	}
 	

@@ -15,12 +15,12 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.data.metadata.FHIRVersion;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -31,7 +31,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
     public ConformanceProvider(FilesystemIF dataSource) {
     	super(dataSource);
         resourceType = ResourceType.CONFORMANCE;
-        fhirVersion = FHIRVersion.DSTU2;
+        fhirVersion = FhirVersion.DSTU2;
         fhirClass = ca.uhn.fhir.model.dstu2.resource.Conformance.class;
     }
     
@@ -51,7 +51,7 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {
-    	Conformance operation = (Conformance)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	Conformance operation = (Conformance)FHIRUtils.loadResourceFromFile(FhirVersion.DSTU2, thisFile);
     	String resourceName = operation.getName();
     	String url = operation.getUrl();
         String resourceID = getResourceIDFromURL(url, resourceName);
@@ -61,6 +61,6 @@ public class ConformanceProvider extends AbstractResourceProviderDSTU2 {
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.CONFORMANCE,
 				false, Optional.empty(), displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.DSTU2, url);
     }
 }
