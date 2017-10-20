@@ -4,6 +4,7 @@ import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -12,9 +13,10 @@ import org.apache.commons.io.FileUtils;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.resourcehandlers.IResourceHelper;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
+import uk.nhs.fhir.makehtml.FhirFileParser;
+import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
@@ -23,14 +25,25 @@ public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = Logger.getLogger(VersionedFilePreprocessor.class.getName());
 
-	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();  
+	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
+	private static final FhirFileParser parser = new FhirFileParser();
+
+	private AbstractFhirFileLocator fhirFileLocator;  
 	
-	protected static void copyFHIRResourcesIntoVersionedDirectory(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
+	public VersionedFilePreprocessor(AbstractFhirFileLocator versionedFileLocator) {
+		this.fhirFileLocator = versionedFileLocator;
+	}
+
+	public void setFhirFileLocator(AbstractFhirFileLocator versionedFileLocator) {
+		this.fhirFileLocator = versionedFileLocator;
+	}
+
+	protected void copyFHIRResourcesIntoVersionedDirectory(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
 		logStart(fhirVersion, resourceType);
 		
 		String outputDirectory = ensureVersionedFolderExists(fhirVersion, resourceType);
 		
-        String resourcePath = resourceType.getFilesystemPath(fhirVersion);
+        String resourcePath = fhirFileLocator.getSourcePathForResourceType(resourceType, fhirVersion).toString();
 		List<File> fileList = resourceFileFinder.findFiles(resourcePath);
         
         for (File thisFile : fileList) {
@@ -41,9 +54,7 @@ public class VersionedFilePreprocessor {
                 VersionNumber versionNo = null; 
                 		
                 try {
-                	
-                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
-                	ResourceMetadata newEntity = helper.getMetadataFromResource(thisFile);
+                	ResourceMetadata newEntity = WrappedResource.fromBaseResource(parser.parseFile(thisFile)).getMetadata(thisFile);
                 	resourceID = newEntity.getResourceID();
                 	versionNo = newEntity.getVersionNo();
                 	
@@ -71,7 +82,7 @@ public class VersionedFilePreprocessor {
                 	FileUtils.copyFile(thisFile, newFile);
                 	
                 	// And also copy other resources (diffs, details, bindings, etc).
-                	copyOtherResources(thisFile, newFile);
+                	copyOtherResources(thisFile.toPath(), newFile.toPath());
                 }
             }
         }
@@ -80,15 +91,15 @@ public class VersionedFilePreprocessor {
         addMessage("--------------------------------------------------------------------------------------");
     }
 
-	private static void logStart(FhirVersion fhirVersion, ResourceType resourceType) {
+	private void logStart(FhirVersion fhirVersion, ResourceType resourceType) {
 		//profileLoadMessages.clear();
 		LOG.fine("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 	}
 
-	private static String ensureVersionedFolderExists(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
-		String versionedPath = resourceType.getVersionedFilesystemPath(fhirVersion);
+	private String ensureVersionedFolderExists(FhirVersion fhirVersion, ResourceType resourceType) throws IOException {
+		String versionedPath = fhirFileLocator.getDestinationPathForResourceType(resourceType, fhirVersion).toString();
 		FileUtils.forceMkdir(new File(versionedPath));
 		return versionedPath;
 	}
@@ -97,29 +108,28 @@ public class VersionedFilePreprocessor {
 	 * If the FHIR resource also has other generated resources (e.g. details view, diff, bindings, etc.) then also
 	 * copy those into the relevant versioned directory along with our resource
 	 * 
-	 * @param oldFile Original filename
-	 * @param newFile New filename of resource
+	 * @param source Original filename
+	 * @param dest New filename of resource
 	 */
-	protected static void copyOtherResources(File oldFile, File newFile) {
+	protected void copyOtherResources(Path source, Path dest) {
 		
-		String oldDir = oldFile.getParent();
-		String oldName = FileLoader.removeFileExtension(oldFile.getName());
-		File resourceDir = new File(oldDir + "/" + oldName);
-		//System.out.println(resourceDir.getAbsolutePath());
+		Path oldDir = source.getParent();
+		String oldName = FileLoader.removeFileExtension(source.getFileName().toString());
+		File sourceDir = oldDir.resolve(oldName).toFile();
 		
-		String newDir = newFile.getParent();
-		String newName = FileLoader.removeFileExtension(newFile.getName());
-		File targetDir = new File(newDir + "/" + newName);
+		Path newDir = dest.getParent();
+		String newName = FileLoader.removeFileExtension(dest.getFileName().toString());
+		File targetDir = newDir.resolve(newName).toFile();
 		//System.out.println(targetDir.getAbsolutePath());
 		
-		if(resourceDir.exists()
-		  && resourceDir.isDirectory()) { 
+		if(sourceDir.exists()
+		  && sourceDir.isDirectory()) { 
 			try {
 				// Create target dir
-				FileUtils.forceMkdir(targetDir);
+				FileUtils.forceMkdir(sourceDir);
 				
 				// Now, loop through and copy any files into the target directory
-	            File[] fileList = resourceDir.listFiles();
+	            File[] fileList = sourceDir.listFiles();
 	            if (fileList != null) {
 	    	        for (File thisFile : fileList) {
 	    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);

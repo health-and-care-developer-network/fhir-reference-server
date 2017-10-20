@@ -25,29 +25,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.primitive.IdDt;
-import uk.nhs.fhir.data.metadata.ArtefactType;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
-import uk.nhs.fhir.data.metadata.SupportingArtefact;
-import uk.nhs.fhir.data.metadata.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.resourcehandlers.IResourceHelper;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
+import uk.nhs.fhir.makehtml.FhirFileParser;
+import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 
 /**
  * Holds an in-memory cache of metadata about FHIR resources loaded from the filesystem.
@@ -58,29 +58,48 @@ public class FileCache {
     private static final Logger LOG = Logger.getLogger(FileCache.class.getName());
 
     private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
+    private static final FhirFileParser parser = new FhirFileParser();
+    
+    private static AbstractFhirFileLocator fhirFileLocator = new PropertiesFhirFileLocator();
+    private static final VersionedFilePreprocessor preprocessor = new VersionedFilePreprocessor(fhirFileLocator);
+    public static void setVersionedFileLocator(AbstractFhirFileLocator versionedFileLocator) {
+    	FileCache.fhirFileLocator = versionedFileLocator;
+    	preprocessor.setFhirFileLocator(versionedFileLocator);
+    }
     
     // Singleton object to act as a cache of the files in the profiles and valueset directories
-    private static HashMap<FhirVersion, List<ResourceEntityWithMultipleVersions>> resourceListByFhirVersion = null;
-    private static HashMap<FhirVersion, HashMap<String, ExampleResources>> examplesListByFhirVersion = null;
-    private static HashMap<FhirVersion, HashMap<String, ResourceMetadata>> examplesListByName = null;
+    private static Map<FhirVersion, List<ResourceEntityWithMultipleVersions>> resourceListByFhirVersion = null;
+    private static Map<FhirVersion, Map<String, ExampleResources>> examplesListByFhirVersion = null;
+    private static Map<FhirVersion, Map<String, ResourceMetadata>> examplesListByName = null;
     
-    private static long lastUpdated = 0;
-    private static long updateInterval = Long.parseLong(FhirServerProperties.getProperty("cacheReloadIntervalMS"));
-
+    private static boolean cacheNeedsUpdating = true;
+    
+    public static void invalidateCache() {
+    	cacheNeedsUpdating = true;
+    }
+    
+    public static void clearCache() {
+    	resourceListByFhirVersion = null;
+    	examplesListByFhirVersion = null;
+    	examplesListByName = null;
+    	cacheNeedsUpdating = true;
+    }
+    
     private static boolean updateRequired() {
-        long currentTime = System.currentTimeMillis();
-        if(resourceListByFhirVersion == null || (currentTime > (lastUpdated + updateInterval))) {
+        if (cacheNeedsUpdating) {
             LOG.fine("Cache needs updating");
             return true;
+        } else {
+        	LOG.fine("Using Cache");
+        	return false;
         }
-        LOG.fine("Using Cache");
-        return false;
     }
     
     private synchronized static void updateCache() {
         if(updateRequired()) {
         	updateCacheForSpecificFhirVersion(FhirVersion.DSTU2);
         	updateCacheForSpecificFhirVersion(FhirVersion.STU3);
+        	cacheNeedsUpdating = false;
         }
     }
     
@@ -88,17 +107,15 @@ public class FileCache {
     	DataLoaderMessages.clearProfileLoadMessages();
         LOG.fine("Updating cache from filesystem");
         
-        lastUpdated = System.currentTimeMillis();
-        
-        ArrayList<ResourceEntityWithMultipleVersions> newResourcesList = cacheResources(fhirVersion);
+        List<ResourceEntityWithMultipleVersions> newResourcesList = cacheResources(fhirVersion);
         HashMap<String, ExampleResources> newExamplesList = cacheExamples(fhirVersion);
         
         updateResourcesList(fhirVersion, newResourcesList);
         updateExamplesList(fhirVersion, newExamplesList);
     }
 
-	static ArrayList<ResourceEntityWithMultipleVersions> cacheResources(FhirVersion fhirVersion) {
-		ArrayList<ResourceEntityWithMultipleVersions> newList = new ArrayList<>();
+	static List<ResourceEntityWithMultipleVersions> cacheResources(FhirVersion fhirVersion) {
+		List<ResourceEntityWithMultipleVersions> newList = Lists.newCopyOnWriteArrayList();
         for (ResourceType resourceType : ResourceType.typesForFhirVersion(fhirVersion)) {
         	newList.addAll(cacheFHIRResources(fhirVersion, resourceType));
         }
@@ -109,7 +126,7 @@ public class FileCache {
     	
     	// Call pre-processor to copy files into the versioned directory
     	try {
-    		VersionedFilePreprocessor.copyFHIRResourcesIntoVersionedDirectory(fhirVersion, resourceType);
+    		preprocessor.copyFHIRResourcesIntoVersionedDirectory(fhirVersion, resourceType);
     	} catch (IOException e) {
     		LOG.severe("Unable to pre-process files into versioned directory! - error: " + e.getMessage());
     	}
@@ -119,7 +136,7 @@ public class FileCache {
     	
         // Now, read the resources from the versioned path into our cache
     	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<>();
-    	String sourcePathForResourceAndVersion = resourceType.getVersionedFilesystemPath(fhirVersion);
+    	String sourcePathForResourceAndVersion = fhirFileLocator.getDestinationPathForResourceType(resourceType, fhirVersion).toString();
     	LOG.fine("Reading pre-processed files from path: " + sourcePathForResourceAndVersion);
         List<File> fileList = resourceFileFinder.findFiles(sourcePathForResourceAndVersion);
         
@@ -128,17 +145,15 @@ public class FileCache {
                 LOG.fine("Reading " + resourceType + " ResourceEntity into cache: " + thisFile.getName());
                 
                 try {
-                	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
-                	ResourceMetadata newEntity = helper.getMetadataFromResource(thisFile);           
-                	// Load into the main cache for profiles
-	                ArrayList<SupportingArtefact> artefacts = processSupportingArtefacts(thisFile, resourceType);
-	                // Sort artefacts by weight so they display in the correct order
-	                Collections.sort(artefacts, new OrderByWeight());
-	                newEntity.setArtefacts(artefacts);
-	                
-	                addToResourceList(newFileList,newEntity);
-	                
-	                addMessage("  - Loading " + resourceType + " resource with ID: " + newEntity.getResourceID() + " and version: " + newEntity.getVersionNo());
+                	WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parser.parseFile(thisFile));
+                	
+                	if (wrappedResource.getImplicitFhirVersion().equals(fhirVersion)) {
+    					ResourceMetadata newEntity = wrappedResource.getMetadata(thisFile);
+    	                
+    	                addToResourceList(newFileList,newEntity);
+    	                
+    	                addMessage("  - Loading " + resourceType + " resource with ID: " + newEntity.getResourceID() + " and version: " + newEntity.getVersionNo());
+                	}
 
                 } catch (Exception ex) {
                 	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
@@ -153,31 +168,6 @@ public class FileCache {
         LOG.fine("Finished reading resources into cache");
         return newFileList;
     }
-    
-    private static ArrayList<SupportingArtefact> processSupportingArtefacts(File resourceFile, ResourceType resourceType) {
-    	ArrayList<SupportingArtefact> artefacts = new ArrayList<>();
-		
-		String resourceFilename = FileLoader.removeFileExtension(resourceFile.getName());
-		File dir = new File(resourceFile.getParent());
-		File artefactDir = new File(dir.getAbsolutePath() + "/" + resourceFilename);
-		LOG.fine("Looking for artefacts in directory:" + artefactDir.getAbsolutePath());
-		
-		if(artefactDir.exists() && artefactDir.isDirectory()) { 
-			// Now, loop through and find any artefact files
-            File[] fileList = artefactDir.listFiles();
-            if (fileList != null) {
-    	        for (File thisFile : fileList) {
-    	        	// Add this to our list of artefacts (if we can identify what it is!
-    	        	ArtefactType type = ArtefactType.getFromFilename(resourceType, thisFile.getName());
-    	        	if (type != null) {
-    	        		SupportingArtefact artefact = new SupportingArtefact(thisFile, type); 
-    	        		artefacts.add(artefact);
-    	        	}
-    	        }
-            }
-		}
-		return artefacts;
-	}
     
     private static void addToResourceList(ArrayList<ResourceEntityWithMultipleVersions> list,
     										ResourceMetadata entry) {
@@ -205,7 +195,7 @@ public class FileCache {
     	
         // Now, read the resources into our cache
 		HashMap<String, ExampleResources> examplesList = new HashMap<String, ExampleResources>();
-        String path = EXAMPLES.getFilesystemPath(fhirVersion);
+        String path = fhirFileLocator.getDestinationPathForResourceType(EXAMPLES, fhirVersion).toString();
         List<File> fileList = resourceFileFinder.findFiles(path);
         
         for (File thisFile : fileList) {
@@ -272,8 +262,7 @@ public class FileCache {
         return examplesList;
     }
 
-	static void updateResourcesList(FhirVersion fhirVersion,
-			ArrayList<ResourceEntityWithMultipleVersions> newResourcesList) {
+	static void updateResourcesList(FhirVersion fhirVersion, List<ResourceEntityWithMultipleVersions> newResourcesList) {
 		// Swap out for our new list
         ensureResourceListByFhirVersion();
         resourceListByFhirVersion.put(fhirVersion, newResourcesList);
@@ -281,28 +270,27 @@ public class FileCache {
 
 	static void ensureResourceListByFhirVersion() {
 		if (resourceListByFhirVersion == null) {
-        	resourceListByFhirVersion = new HashMap<FhirVersion, List<ResourceEntityWithMultipleVersions>>();
+        	resourceListByFhirVersion = Maps.newConcurrentMap();
         }
 	}
 
-	static void updateExamplesList(FhirVersion fhirVersion, HashMap<String, ExampleResources> newExamplesList) {
-		ensureExamplesListByFhirVersionExists(fhirVersion, newExamplesList);
+	static void updateExamplesList(FhirVersion fhirVersion, Map<String, ExampleResources> newExamplesList) {
+		ensureExamplesListByFhirVersionExists(fhirVersion);
         examplesListByFhirVersion.put(fhirVersion, newExamplesList);
         
         ensureExamplesListByNameExists();
         examplesListByName.put(fhirVersion, buildExampleListByName(newExamplesList));
 	}
 
-	static void ensureExamplesListByFhirVersionExists(FhirVersion fhirVersion,
-			HashMap<String, ExampleResources> newExamplesList) {
+	static void ensureExamplesListByFhirVersionExists(FhirVersion fhirVersion) {
 		if (examplesListByFhirVersion == null) {
-        	examplesListByFhirVersion = new HashMap<FhirVersion, HashMap<String, ExampleResources>>();
+        	examplesListByFhirVersion = Maps.newConcurrentMap();
         }
 	}
 
 	static void ensureExamplesListByNameExists() {
 		if (examplesListByName == null) {
-        	examplesListByName = new HashMap<FhirVersion, HashMap<String, ResourceMetadata>>();
+        	examplesListByName = Maps.newConcurrentMap();
         }
 	}
     
@@ -312,8 +300,8 @@ public class FileCache {
      * @param oldList
      * @return
      */
-    private static HashMap<String, ResourceMetadata> buildExampleListByName(HashMap<String, ExampleResources> oldList) {
-    	HashMap<String, ResourceMetadata> newList = new HashMap<String, ResourceMetadata>();
+    private static Map<String, ResourceMetadata> buildExampleListByName(Map<String, ExampleResources> oldList) {
+    	Map<String, ResourceMetadata> newList = Maps.newConcurrentMap();
     	for (String key : oldList.keySet()) {
     		ExampleResources examples = oldList.get(key);
     		for (ResourceMetadata example : examples) {
@@ -379,7 +367,7 @@ public class FileCache {
         LOG.fine("Creating HashMap");
         HashMap<String, List<ResourceMetadata>> result = new HashMap<String, List<ResourceMetadata>>();
         try {
-            for (FhirVersion fhirVersion : FhirVersion.values()) {
+            for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
 	        	for(ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
 	            	if (entry.getLatest().getResourceType() == resourceType) {
 		            	boolean isExtension = entry.getLatest().isExtension();

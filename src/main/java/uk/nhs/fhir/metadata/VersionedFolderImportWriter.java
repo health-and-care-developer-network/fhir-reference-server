@@ -9,9 +9,10 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.datalayer.AbstractFhirFileLocator;
+import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 
@@ -19,12 +20,10 @@ public class VersionedFolderImportWriter implements ImportListener {
 
 	private static final Logger LOG = Logger.getLogger(VersionedFolderImportWriter.class.getName());
 	
-	private static final String versionedFolder = "versioned";
-	
-	private final AbstractFhirFileLocator fhirImportDestination;
+	private final AbstractFhirFileLocator fhirFileLocator;
 	
 	public VersionedFolderImportWriter(AbstractFhirFileLocator fhirImportDestination) {
-		this.fhirImportDestination = fhirImportDestination;
+		this.fhirFileLocator = fhirImportDestination;
 	}
 	
 	@Override
@@ -60,8 +59,8 @@ public class VersionedFolderImportWriter implements ImportListener {
 	
 	private Path getVersionedFilesystemPath(WrappedResource<?> resource) {
 		FhirVersion fhirVersion = resource.getImplicitFhirVersion();
-		String resourceFolderName = resource.getOutputFolderName();
-		return fhirImportDestination.getRoot(fhirVersion).resolve(resourceFolderName).resolve(versionedFolder);
+		ResourceType resourceType = resource.getResourceType();
+		return fhirFileLocator.getDestinationPathForResourceType(resourceType, fhirVersion);
 	}
 	
 	private void copyOtherResources(File oldFile, File newFile) {
@@ -74,7 +73,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 		String newName = FileLoader.removeFileExtension(newFile.getName());
 		File targetDir = new File(newDir + "/" + newName);
 		
-		if(resourceDir.exists()
+		if (resourceDir.exists()
 		  && resourceDir.isDirectory()) { 
 			try {
 				FileUtils.forceMkdir(targetDir);

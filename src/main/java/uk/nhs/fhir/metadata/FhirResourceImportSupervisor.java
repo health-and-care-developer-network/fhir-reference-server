@@ -9,21 +9,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
-import uk.nhs.fhir.datalayer.DefaultFhirFileLocator;
-import uk.nhs.fhir.datalayer.AbstractFhirFileLocator;
+import uk.nhs.fhir.datalayer.PropertiesFhirFileLocator;
 import uk.nhs.fhir.makehtml.FhirResourceCollector;
 import uk.nhs.fhir.metadata.index.SimpleFhirResourceList;
+import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirResourceImportSupervisor {
 	private final FhirResourceImporter importer;
 	private final FhirResourceMetadataStore resourceMetadataCache;
 	
-	private static final FhirVersion[] supportedVersions = new FhirVersion[]{FhirVersion.DSTU2, FhirVersion.STU3};
 	private final Map<FhirVersion, FhirResourceCollector> importedResourceFinders;
 	
 	public FhirResourceImportSupervisor(Path fhirImportSource) {
-		this(fhirImportSource, new DefaultFhirFileLocator());
+		this(fhirImportSource, new PropertiesFhirFileLocator());
 	}
 	
 	public FhirResourceImportSupervisor(Path fhirImportSource, AbstractFhirFileLocator fhirImportDestination) {
@@ -31,8 +30,8 @@ public class FhirResourceImportSupervisor {
 		this.importer = new FhirResourceImporter(fhirImportSource, versionedFolderImportWriter);
 		
 		importedResourceFinders = Maps.newConcurrentMap();
-		for (FhirVersion version : supportedVersions) {
-			importedResourceFinders.put(version, new FhirResourceCollector(fhirImportDestination.getRoot(version)));
+		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
+			importedResourceFinders.put(version, new FhirResourceCollector(fhirImportDestination.getSourceRoot(version)));
 		}
 		
 		resourceMetadataCache = new FhirResourceMetadataStore();
@@ -51,7 +50,7 @@ public class FhirResourceImportSupervisor {
 	public void importAndCacheMetadata() {
 		importer.doImport();
 		
-		for (FhirVersion version : supportedVersions) {
+		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			
 			List<ResourceMetadata> resourceMetadatas = 
 				Streams.stream(importedResourceFinders.get(version).collect())

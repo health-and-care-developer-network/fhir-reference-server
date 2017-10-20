@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class FhirServerProperties {
 	
-	private static final String PROPERTY_FILE = "config.properties";
+	private static final String PROPERTY_FILE = "fhirserver.config.properties";
 	private static final Logger logger = Logger.getLogger(FhirServerProperties.class.getName());
 	
     private static Properties defaultProperties;

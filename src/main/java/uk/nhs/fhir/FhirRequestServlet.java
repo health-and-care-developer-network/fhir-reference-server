@@ -22,12 +22,10 @@ public class FhirRequestServlet extends HttpServlet {
 	
 	private final Map<FhirVersion, FhirRequestHandler> delegateHandlers = new ConcurrentHashMap<>();
 	
-	private static final FhirVersion[] supportedVersions = new FhirVersion[]{FhirVersion.DSTU2, FhirVersion.STU3};
-	
 	public FhirRequestServlet() {
 		FilesystemIF dataSource = SharedDataSource.get();
 		
-		for (FhirVersion version : supportedVersions) {
+		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			delegateHandlers.put(version, new FhirRequestHandler(version, dataSource));
 		}
 	}

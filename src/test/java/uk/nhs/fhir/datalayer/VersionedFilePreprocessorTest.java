@@ -20,7 +20,7 @@ public class VersionedFilePreprocessorTest {
 	
 	@Test
 	public void testCopyOtherResources() throws IOException {
-		VersionedFilePreprocessor.copyOtherResources(incomingFile, outgoingFile);
+		new VersionedFilePreprocessor(new PropertiesFhirFileLocator()).copyOtherResources(incomingFile.toPath(), outgoingFile.toPath());
 		
 		// Check the supporting resources have been copied properly
 		assertTrue(expectedFile1.exists());

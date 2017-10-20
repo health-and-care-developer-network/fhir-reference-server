@@ -19,13 +19,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
@@ -34,7 +34,6 @@ import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.util.FHIRUtils;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
@@ -42,26 +41,12 @@ import uk.nhs.fhir.util.FhirVersion;
  * @author Tim Coates
  */
 public class FilesystemIF {
-    private static final Logger LOG = Logger.getLogger(FilesystemIF.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FilesystemIF.class.getName());
 
-    private static String logLevel = FhirServerProperties.getProperty("logLevel");
-
-    /**
-     * Constructor, we simply set the logging level, and log that we've been instantiated.
-     * 
-     */
     public FilesystemIF() {
-        LOG.setLevel(Level.INFO);
-
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
         LOG.info("FilesystemIF instantiated, using filesystem datasource.");
     }
-
+    
     /**
      * Gets a specific one, optionally also with a specific version (DSTU2 variant)
      * @param id
@@ -71,7 +56,7 @@ public class FilesystemIF {
     	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
-	    	LOG.fine("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
+	    	LOG.debug("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
 	        
 	    	IBaseResource foundResource = FHIRUtils.loadResourceFromFile(fhirVersion, path);
 	        return foundResource;
@@ -201,7 +186,7 @@ public class FilesystemIF {
         
     	List<ResourceMetadata> result = new ArrayList<ResourceMetadata>();
     	
-    	for (FhirVersion fhirVersion : FhirVersion.values()) {
+    	for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
     		result.addAll(FileCache.getExtensions(fhirVersion));
     	}
     	
@@ -258,7 +243,7 @@ public class FilesystemIF {
 	            }
         	}
         }
-        LOG.fine("Returning matches");
+        LOG.debug("Returning matches");
         return matches;
     }
     
@@ -272,7 +257,7 @@ public class FilesystemIF {
 
 	public HashMap<String, Integer> getResourceTypeCounts() {
 		HashMap<String, Integer> results = new HashMap<String, Integer>();
-		for (FhirVersion fhirVersion : FhirVersion.values()) {
+		for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
 			List<ResourceMetadata> list = FileCache.getResourceList(fhirVersion);
 			for (ResourceMetadata entry : list) {
 				String type = entry.getResourceType().toString();
