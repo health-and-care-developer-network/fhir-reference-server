@@ -40,7 +40,7 @@ public class FileProcessor {
 	    saveAugmentedResource(thisFile, wrappedResource, renderingFileLocator, newBaseURL, fhirFileRegistry);
 		
 		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(wrappedResource, renderingFileLocator, fhirFileRegistry)) {
-			System.out.println("Generating " + formatter.getOutputPath(inFilePath).toString());
+			LOG.info("Generating " + formatter.getOutputPath(inFilePath).toString());
 			formatter.formatAndSave(inFilePath, fhirFileRegistry);
 		}
 	}
@@ -54,7 +54,7 @@ public class FileProcessor {
 		outDirPath.toFile().mkdirs();
 		
 		Path outFilePath = outDirPath.resolve(inFile.getName());
-		System.out.println("Generating " + outFilePath.toString());
+		LOG.info("Generating " + outFilePath.toString());
 	    
 	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL, registry);
 	}

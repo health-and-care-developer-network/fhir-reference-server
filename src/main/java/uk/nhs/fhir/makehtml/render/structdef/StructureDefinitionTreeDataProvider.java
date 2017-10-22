@@ -233,7 +233,6 @@ public class StructureDefinitionTreeDataProvider {
 		List<FhirTreeNode> matchingNodes = Lists.newArrayList();
 		
 		for (FhirTreeTableContent node : new FhirTreeData(searchRoot)) {
-			//System.out.println(node.getPath());
 			if (node.getPath().equals(differentialPath)) {
 				if (node instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)node;

@@ -6,6 +6,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.ResourceInfo;
@@ -36,6 +39,8 @@ import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
 
 public class FhirTreeTable {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FhirTreeTable.class);
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = uk.nhs.fhir.makehtml.html.tree.Style.DOTTED;
@@ -259,7 +264,7 @@ public class FhirTreeTable {
 		boolean hasScheme = description.startsWith("http://") || description.startsWith("https://");
 		
 		if (!hasScheme && description.contains("/")) {
-			System.out.println("Should this be a link? " + description);
+			LOG.warn("Should this be a link? " + description);
 		}
 		
 		return hasScheme;

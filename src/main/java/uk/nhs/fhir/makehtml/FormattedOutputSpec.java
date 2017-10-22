@@ -6,6 +6,9 @@ import java.nio.file.Path;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
@@ -14,6 +17,9 @@ import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FileUtils;
 
 public class FormattedOutputSpec<T extends WrappedResource<T>> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FormattedOutputSpec.class);
+	
 	private final ResourceFormatter<T> formatter;
 	private final Path typedOutputDirectory;
 	private final String filename; // used to generate file name
@@ -31,7 +37,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 		
 		if (sectionHTML == null) {
-			System.out.println("No section returned by formatter - skipping " + outputPath);
+			LOG.debug("No section returned by formatter - skipping " + outputPath);
 			return;
 		}
 		
