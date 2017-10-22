@@ -16,7 +16,9 @@ package uk.nhs.fhir.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience class to read configuration from a property file
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
 public class FhirServerProperties {
 	
 	private static final String PROPERTY_FILE = "fhirserver.config.properties";
-	private static final Logger logger = Logger.getLogger(FhirServerProperties.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(FhirServerProperties.class.getName());
 	
     private static Properties defaultProperties;
 
@@ -35,6 +37,7 @@ public class FhirServerProperties {
     	
     	String configFile = System.getenv("CONFIG_FILE");
     	if (configFile == null) {
+    		
     		initialise(defaultProperties, PROPERTY_FILE);
     	} else if (configFile.length() == 0) {
     		initialise(defaultProperties, PROPERTY_FILE);
@@ -57,7 +60,7 @@ public class FhirServerProperties {
             	in.close();
             }
         } catch (Exception ex) {
-       		logger.severe("Config file not found: " + filename);
+        	LOG.error("Config file not found: " + filename);
         } finally {
             try {
                 if (in != null) {

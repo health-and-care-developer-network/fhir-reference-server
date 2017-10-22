@@ -3,6 +3,9 @@ package uk.nhs.fhir.datalayer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirServerProperties;
@@ -14,11 +17,18 @@ import uk.nhs.fhir.util.FhirVersion;
  */
 public class PropertiesFhirFileLocator extends AbstractFhirFileLocator {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PropertiesFhirFileLocator.class);
+	
 	private static final String PROP_ROOT_PATH = "defaultResourceRootPath";
 	private static final String DSTU2_DIRECTORY = "NHSDigital";
 	private static final String STU3_DIRECTORY = "NHSDigitalSTU3";
 	
-	private final Path rootDirFromProperties = Paths.get(FhirServerProperties.getProperty(PROP_ROOT_PATH));
+	private final Path rootDirFromProperties;
+	public PropertiesFhirFileLocator() {
+		String property = FhirServerProperties.getProperty(PROP_ROOT_PATH);
+		LOG.info("Root path: " + property);
+		rootDirFromProperties = Paths.get(property);
+	}
 	
 	@Override
 	public Path getSourceRoot(FhirVersion fhirVersion) {
