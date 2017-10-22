@@ -27,6 +27,7 @@ import uk.nhs.fhir.makehtml.render.ResourceFormatterFactory;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.SimpleFhirFileLocator;
 
 public class TestStructureDefinition {
 	private int BOM = 0xFEFF;
@@ -51,7 +52,9 @@ public class TestStructureDefinition {
 			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition) WrappedResource.fromBaseResource(structureDefinition);
 			SectionedHTMLDoc doc = new SectionedHTMLDoc();
 			
-			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, "this/path/isnt/used", null)) {
+			SimpleFhirFileLocator renderingFileLocator = new SimpleFhirFileLocator(Paths.get("this/path/isnt/used"), Paths.get("this/path/isnt/used"));
+			
+			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, renderingFileLocator, null)) {
 				ResourceFormatter<?> formatter = formatSpec.getFormatter();
 				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {

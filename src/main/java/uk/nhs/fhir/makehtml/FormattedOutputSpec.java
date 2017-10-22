@@ -2,6 +2,7 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -13,13 +14,11 @@ import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FileUtils;
 
 public class FormattedOutputSpec<T extends WrappedResource<T>> {
-	private final T resource;
 	private final ResourceFormatter<T> formatter;
-	private final String typedOutputDirectory;
+	private final Path typedOutputDirectory;
 	private final String filename; // used to generate file name
 	
-	public FormattedOutputSpec(T resource, ResourceFormatter<T> formatter, String outputDirectory, String filename) {
-		this.resource = resource;
+	public FormattedOutputSpec(ResourceFormatter<T> formatter, Path outputDirectory, String filename) {
 		this.formatter = formatter;
 		this.typedOutputDirectory = outputDirectory;
 		this.filename = filename;
@@ -27,7 +26,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 
 	public void formatAndSave(String inputPath, FhirFileRegistry otherResources) throws ParserConfigurationException, IOException {
 		ensureOutputDirectoryExists(inputPath);
-		String outputPath = getOutputPath(inputPath);
+		Path outputPath = getOutputPath(inputPath);
 		
 		HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 		
@@ -40,22 +39,22 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		outputDoc.addSection(sectionHTML);
 		String outputString = HTMLUtil.docToString(outputDoc.getHTML(), true, false);
 		
-		if (!FileUtils.writeFile(outputPath, outputString.getBytes("UTF-8"))) {
+		if (!FileUtils.writeFile(outputPath.toFile(), outputString.getBytes("UTF-8"))) {
 			throw new IllegalStateException("Failed to write file " + outputPath);
 		}
 	}
 
-	public String getOutputDirectory(String inputPath) {
+	public Path getOutputDirectory(String inputPath) {
 		String inputFileName = inputPath.substring(inputPath.lastIndexOf(File.separatorChar) + 1, inputPath.lastIndexOf(".xml"));
-		return typedOutputDirectory + resource.getOutputFolderName() + File.separator + inputFileName + File.separator;
+		return typedOutputDirectory.resolve(inputFileName);
 	}
 	
-	public String getOutputPath(String inputPath) {
-		return getOutputDirectory(inputPath) + filename;
+	public Path getOutputPath(String inputPath) {
+		return getOutputDirectory(inputPath).resolve(filename);
 	}
 
 	private void ensureOutputDirectoryExists(String inputPath) {
-		File directory = new File(getOutputDirectory(inputPath));
+		File directory = getOutputDirectory(inputPath).toFile();
 		if (!directory.exists()) {
 			directory.mkdirs();
 		}

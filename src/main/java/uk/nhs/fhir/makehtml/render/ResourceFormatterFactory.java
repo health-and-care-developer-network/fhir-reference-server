@@ -1,5 +1,6 @@
 package uk.nhs.fhir.makehtml.render;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -27,6 +28,7 @@ import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
 import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
+import uk.nhs.fhir.util.SimpleFhirFileLocator;
 
 public class ResourceFormatterFactory {
 	public ResourceFormatter<?> defaultFormatter(WrappedResource<?> wrappedResource, FhirFileRegistry otherResources) {
@@ -45,36 +47,38 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, String outputDirectory, FhirFileRegistry otherResources) {
+	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, SimpleFhirFileLocator renderingFileLocator, FhirFileRegistry otherResources) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
+		
+		Path outputDirectory = renderingFileLocator.getDestinationPathForResourceType(wrappedResource.getResourceType(), wrappedResource.getImplicitFhirVersion());
 		
 		if (wrappedResource instanceof WrappedConceptMap) {
 			WrappedConceptMap wrappedConceptMap = (WrappedConceptMap)wrappedResource;
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedConceptMap, new ConceptMapFormatter(wrappedConceptMap, otherResources), outputDirectory, "full.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedConceptMap, new ConceptMapMetadataFormatter(wrappedConceptMap, otherResources), outputDirectory, "metadata.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedConceptMap, new ConceptMapTableFormatter(wrappedConceptMap, otherResources), outputDirectory, "mappings.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new ConceptMapFormatter(wrappedConceptMap, otherResources), outputDirectory, "full.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new ConceptMapMetadataFormatter(wrappedConceptMap, otherResources), outputDirectory, "metadata.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new ConceptMapTableFormatter(wrappedConceptMap, otherResources), outputDirectory, "mappings.html"));
 		} else if (wrappedResource instanceof WrappedCodeSystem) {
 			WrappedCodeSystem wrappedCodeSystem = (WrappedCodeSystem)wrappedResource;
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedCodeSystem, new CodeSystemMetadataFormatter(wrappedCodeSystem, otherResources), outputDirectory, "metadata.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedCodeSystem, new CodeSystemFiltersTableFormatter(wrappedCodeSystem, otherResources), outputDirectory, "filters.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedCodeSystem, new CodeSystemConceptTableFormatter(wrappedCodeSystem, otherResources), outputDirectory, "concepts.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(wrappedCodeSystem, new CodeSystemFormatter(wrappedCodeSystem, otherResources), outputDirectory, "codesystem-full.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new CodeSystemMetadataFormatter(wrappedCodeSystem, otherResources), outputDirectory, "metadata.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new CodeSystemFiltersTableFormatter(wrappedCodeSystem, otherResources), outputDirectory, "filters.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new CodeSystemConceptTableFormatter(wrappedCodeSystem, otherResources), outputDirectory, "concepts.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new CodeSystemFormatter(wrappedCodeSystem, otherResources), outputDirectory, "codesystem-full.html"));
 		} else if (wrappedResource instanceof WrappedOperationDefinition) {
 			WrappedOperationDefinition wrappedOperationDefinition = (WrappedOperationDefinition)wrappedResource;
-			formatSpecs.add(new FormattedOutputSpec<WrappedOperationDefinition>(wrappedOperationDefinition, new OperationDefinitionFormatter(wrappedOperationDefinition, otherResources), outputDirectory, "render.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new OperationDefinitionFormatter(wrappedOperationDefinition, otherResources), outputDirectory, "render.html"));
 		} else if (wrappedResource instanceof WrappedValueSet) {
 			WrappedValueSet wrappedValueSet = (WrappedValueSet)wrappedResource;
-			formatSpecs.add(new FormattedOutputSpec<WrappedValueSet>(wrappedValueSet, new ValueSetFormatter(wrappedValueSet, otherResources), outputDirectory, "render.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new ValueSetFormatter(wrappedValueSet, otherResources), outputDirectory, "render.html"));
 		} else if (wrappedResource instanceof WrappedStructureDefinition) {
 			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition)wrappedResource;
-			formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionMetadataFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "metadata.html"));
-			formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionSnapshotFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "snapshot.html"));
-			formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionBindingFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "bindings.html"));
-			formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionDetailsFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "details.html"));
-			formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "full.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionMetadataFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "metadata.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionSnapshotFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "snapshot.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "bindings.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "details.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "full.html"));
 			
 			if (!wrappedStructureDefinition.getConstrainedType().equals("Extension")) {
-				formatSpecs.add(new FormattedOutputSpec<WrappedStructureDefinition>(wrappedStructureDefinition, new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "differential.html"));
+				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition, otherResources), outputDirectory, "differential.html"));
 			}
 		}
 		else {

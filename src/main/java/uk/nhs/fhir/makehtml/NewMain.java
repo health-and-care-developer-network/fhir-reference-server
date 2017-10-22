@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.util.SimpleFhirFileLocator;
 import uk.nhs.fhir.util.UrlValidator;
 
 /**
@@ -32,13 +33,6 @@ import uk.nhs.fhir.util.UrlValidator;
  */
 public class NewMain {
     private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
-
-	// Set on startup. Path to folder containing extension files.
-	private static String suppliedResourcesFolderPath = null;
-	
-	public static String getSuppliedResourcesFolderPath() {
-		return suppliedResourcesFolderPath;
-	}
     
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
@@ -58,21 +52,27 @@ public class NewMain {
 		FullFhirURL.TEST_LINK_URLS = TEST_LINK_URLS;
 	}
 	
-    private final Path inputDirectory;
-    private final String outPath;
+	private final SimpleFhirFileLocator renderingFileLocator;
     private final String newBaseURL;
     
-    public NewMain(Path inputDirectory, String outPath) {
+    public NewMain(Path inputDirectory, Path outPath) {
     	this(inputDirectory, outPath, null);
     }
     
-    public NewMain(Path inputDirectory, String outPath, String newBaseURL) {
-    	this.inputDirectory = inputDirectory;
-    	this.outPath = outPath;
-    	this.newBaseURL = newBaseURL;
+    public NewMain(Path inputDirectory, Path outPath, String newBaseURL) {
+    	this(new SimpleFhirFileLocator(inputDirectory, outPath), newBaseURL);
     }
 
-    /**
+    public NewMain(SimpleFhirFileLocator renderingFileLocator) {
+		this(renderingFileLocator, null);
+	}
+
+	public NewMain(SimpleFhirFileLocator renderingFileLocator, String newBaseURL) {
+		this.renderingFileLocator = renderingFileLocator;
+		this.newBaseURL = newBaseURL;
+	}
+
+	/**
      * Main entry point.
      *
      * @param args the command line arguments
@@ -87,22 +87,8 @@ public class NewMain {
             	LOG.log(Level.INFO, "Using new base URL: " + newBaseURL);
             	newBaseURL = args[2];
             }
-
-            String resourcesPath = args[0];
-            if (!resourcesPath.endsWith(File.separator)) {
-            	resourcesPath += File.separator;
-            }
-            suppliedResourcesFolderPath = resourcesPath;
             
-            if (!inputDir.endsWith(File.separator)) {
-            	inputDir += File.separator;
-            }
-            if (!outputDir.endsWith(File.separator)) {
-            	outputDir += File.separator;
-            }
-            
-            NewMain instance = new NewMain(Paths.get(inputDir), outputDir, newBaseURL);
-            
+            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL);
             instance.process();
         }
     }
@@ -113,14 +99,14 @@ public class NewMain {
      * @param directoryPath
      */
     public void process() {
-    	FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(inputDirectory).collect();
+    	FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(renderingFileLocator.getSourceRoot()).collect();
 
         FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
 	        	File sourceFile = e.getKey();
 				WrappedResource<?> parsedResource = e.getValue();
-				fileProcessor.processFile(outPath, newBaseURL, sourceFile, parsedResource);
+				fileProcessor.processFile(renderingFileLocator, newBaseURL, sourceFile, parsedResource);
 	        }
 	        
 	        if (TEST_LINK_URLS) {

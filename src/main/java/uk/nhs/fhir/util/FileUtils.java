@@ -56,22 +56,13 @@ public class FileUtils {
 		File f = new File(filename);
 		return f.exists();
 	}
-	
-	/**
-     * @param filename Filename to write data into
-     * @param data array of bytes to write to specified file
-     * @return true if successful, false otherwise
-     */
-    public static boolean writeFile(String filename, byte[] data) {
-        return writeFile(new File(filename), data);
-    }
     
     /**
      * @param file File to write data into
      * @param data array of bytes to write to specified file
      * @return true if successful, false otherwise
      */
-    private static boolean writeFile(File file, byte[] data) {
+    public static boolean writeFile(File file, byte[] data) {
         boolean success = false;
         try (
         	FileOutputStream fos = new FileOutputStream(file);
