@@ -58,10 +58,14 @@ public class NewMain {
 	private final RendererFileLocator rendererFileLocator;
     private final String newBaseURL;
     private final RendererErrorHandler errorHandler;
-    
-    public NewMain(Path inputDirectory, Path tempDirectory, Path outPath) {
-    	this(inputDirectory, tempDirectory, outPath, null);
-    }
+
+	public NewMain(Path inputDirectory, Path outputDirectory) {
+		this(inputDirectory, makeRenderedArtefactTempDirectory(), outputDirectory, null);
+	}
+
+	public NewMain(Path inputDirectory, Path outputDirectory, String newBaseURL) {
+		this(inputDirectory, makeRenderedArtefactTempDirectory(), outputDirectory, newBaseURL);
+	}
     
     public NewMain(Path inputDirectory, Path tempDirectory, Path outPath, String newBaseURL) {
     	this(new DefaultRendererFileLocator(inputDirectory, tempDirectory, outPath), newBaseURL);
@@ -101,17 +105,20 @@ public class NewMain {
             	newBaseURL = args[2];
             }
             
-            Path tempDirectory;
-			try {
-				tempDirectory = FhirFileUtils.makeTempDir("standalone-renderer-tmp", true);
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
-            
-            NewMain instance = new NewMain(Paths.get(inputDir), tempDirectory, Paths.get(outputDir), newBaseURL);
+            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL);
             instance.process();
         }
     }
+
+	static Path makeRenderedArtefactTempDirectory() {
+		Path tempDirectory;
+		try {
+			tempDirectory = FhirFileUtils.makeTempDir("fhir-renderer-tmp", true);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		return tempDirectory;
+	}
 
     /**
      * Process a directory of Profile files.
@@ -154,7 +161,7 @@ public class NewMain {
         	deleteTempFiles();
         	
         } catch (Exception e) {
-        	throw new IllegalStateException("Rendering failed", e);
+        	throw new IllegalStateException("Renderer failed", e);
         }
         
         if (TEST_LINK_URLS) {

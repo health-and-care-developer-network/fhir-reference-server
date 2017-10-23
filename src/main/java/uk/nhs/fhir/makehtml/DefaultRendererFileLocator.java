@@ -35,5 +35,4 @@ public class DefaultRendererFileLocator implements RendererFileLocator {
 	public Path getRenderingFinalOutputDirectory() {
 		return finalOutputDirectory;
 	}
-
 }
