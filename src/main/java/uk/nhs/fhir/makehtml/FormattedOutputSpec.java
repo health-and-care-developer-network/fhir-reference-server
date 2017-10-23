@@ -14,7 +14,7 @@ import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
-import uk.nhs.fhir.util.FileUtils;
+import uk.nhs.fhir.util.FhirFileUtils;
 
 public class FormattedOutputSpec<T extends WrappedResource<T>> {
 	
@@ -45,7 +45,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		outputDoc.addSection(sectionHTML);
 		String outputString = HTMLUtil.docToString(outputDoc.getHTML(), true, false);
 		
-		if (!FileUtils.writeFile(outputPath.toFile(), outputString.getBytes("UTF-8"))) {
+		if (!FhirFileUtils.writeFile(outputPath.toFile(), outputString.getBytes("UTF-8"))) {
 			throw new IllegalStateException("Failed to write file " + outputPath);
 		}
 	}

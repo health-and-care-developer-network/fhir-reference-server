@@ -13,6 +13,7 @@ import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.FormattedOutputSpec;
+import uk.nhs.fhir.makehtml.RendererFileLocator;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemConceptTableFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemFiltersTableFormatter;
 import uk.nhs.fhir.makehtml.render.codesys.CodeSystemFormatter;
@@ -28,7 +29,6 @@ import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.makehtml.render.structdef.StructureDefinitionSnapshotFormatter;
 import uk.nhs.fhir.makehtml.render.valueset.ValueSetFormatter;
-import uk.nhs.fhir.util.SimpleFhirFileLocator;
 
 public class ResourceFormatterFactory {
 	public ResourceFormatter<?> defaultFormatter(WrappedResource<?> wrappedResource, FhirFileRegistry otherResources) {
@@ -47,10 +47,10 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, SimpleFhirFileLocator renderingFileLocator, FhirFileRegistry otherResources) {
+	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator, FhirFileRegistry otherResources) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
-		Path outputDirectory = renderingFileLocator.getDestinationPathForResourceType(wrappedResource.getResourceType(), wrappedResource.getImplicitFhirVersion());
+		Path outputDirectory = rendererFileLocator.getRenderingTempOutputDirectory(wrappedResource);
 		
 		if (wrappedResource instanceof WrappedConceptMap) {
 			WrappedConceptMap wrappedConceptMap = (WrappedConceptMap)wrappedResource;

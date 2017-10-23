@@ -16,23 +16,26 @@
 package uk.nhs.fhir.makehtml;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.util.SimpleFhirFileLocator;
+import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.UrlValidator;
 
 /**
  * @author tim.coates@hscic.gov.uk
  */
 public class NewMain {
-    private static final Logger LOG = Logger.getLogger(NewMain.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NewMain.class.getName());
     
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
@@ -52,24 +55,34 @@ public class NewMain {
 		FullFhirURL.TEST_LINK_URLS = TEST_LINK_URLS;
 	}
 	
-	private final SimpleFhirFileLocator renderingFileLocator;
+	private final RendererFileLocator rendererFileLocator;
     private final String newBaseURL;
+    private final RendererErrorHandler errorHandler;
     
-    public NewMain(Path inputDirectory, Path outPath) {
-    	this(inputDirectory, outPath, null);
+    public NewMain(Path inputDirectory, Path tempDirectory, Path outPath) {
+    	this(inputDirectory, tempDirectory, outPath, null);
     }
     
-    public NewMain(Path inputDirectory, Path outPath, String newBaseURL) {
-    	this(new SimpleFhirFileLocator(inputDirectory, outPath), newBaseURL);
+    public NewMain(Path inputDirectory, Path tempDirectory, Path outPath, String newBaseURL) {
+    	this(new DefaultRendererFileLocator(inputDirectory, tempDirectory, outPath), newBaseURL);
     }
 
-    public NewMain(SimpleFhirFileLocator renderingFileLocator) {
-		this(renderingFileLocator, null);
+    public NewMain(RendererFileLocator renderingFileLocator) {
+		this(renderingFileLocator, null, null);
 	}
 
-	public NewMain(SimpleFhirFileLocator renderingFileLocator, String newBaseURL) {
-		this.renderingFileLocator = renderingFileLocator;
+	public NewMain(RendererFileLocator renderingFileLocator, String newBaseURL) {
+		this(renderingFileLocator, newBaseURL, null);
+	}
+	
+	public NewMain(RendererFileLocator renderingFileLocator, RendererErrorHandler errorHandler) {
+		this(renderingFileLocator, null, errorHandler);
+	}
+
+	public NewMain(RendererFileLocator renderingFileLocator, String newBaseURL, RendererErrorHandler errorHandler) {
+		this.rendererFileLocator = renderingFileLocator;
 		this.newBaseURL = newBaseURL;
+		this.errorHandler = errorHandler;
 	}
 
 	/**
@@ -84,11 +97,18 @@ public class NewMain {
             String outputDir = args[1];
             String newBaseURL = null;
             if (args.length == 3) {
-            	LOG.log(Level.INFO, "Using new base URL: " + newBaseURL);
+            	LOG.info("Using new base URL: " + newBaseURL);
             	newBaseURL = args[2];
             }
             
-            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL);
+            Path tempDirectory;
+			try {
+				tempDirectory = FhirFileUtils.makeTempDir("standalone-renderer-tmp", true);
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+            
+            NewMain instance = new NewMain(Paths.get(inputDir), tempDirectory, Paths.get(outputDir), newBaseURL);
             instance.process();
         }
     }
@@ -99,22 +119,64 @@ public class NewMain {
      * @param directoryPath
      */
     public void process() {
-    	FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(renderingFileLocator.getSourceRoot()).collect();
+    	Path rawArtefactDirectory = rendererFileLocator.getRawArtefactDirectory();
+    	LOG.info("Finding resources in " + rawArtefactDirectory.toString());
+		FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(rawArtefactDirectory).collect();
 
         FileProcessor fileProcessor = new FileProcessor(fhirFileRegistry);
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
-	        	File sourceFile = e.getKey();
-				WrappedResource<?> parsedResource = e.getValue();
-				fileProcessor.processFile(renderingFileLocator, newBaseURL, sourceFile, parsedResource);
+        		try {
+		        	File sourceFile = e.getKey();
+					WrappedResource<?> parsedResource = e.getValue();
+					fileProcessor.processFile(rendererFileLocator, newBaseURL, sourceFile, parsedResource);
+        		} catch (Exception error) {
+        			// If we have an error handler, we can carry on
+        			if (errorHandler == null) {
+        				throw error;
+        			} else {
+        				errorHandler.recordError(e.getKey(), e.getValue(), error);
+        			}
+        		}
 	        }
-	        
-	        if (TEST_LINK_URLS) {
-	        	new UrlValidator().testUrls(FhirURL.getLinkUrls());
-	            UrlValidator.logSuccessAndFailures();
-	        }
+        	
+        	if (errorHandler != null
+        	  && errorHandler.foundErrors()) {
+        		LOG.info("Rendering failed, displaying error messages");
+        		errorHandler.displayErrors();
+        	} else {
+        		LOG.info("Rendering succeeded, copying rendered artefacts");
+        		copyGeneratedArtefacts();
+        	}
+        	
+        	// if there is an error copying the files, this gets skipped so they can be recovered if necessary
+        	LOG.info("Deleting temporary files");
+        	deleteTempFiles();
+        	
         } catch (Exception e) {
-        	e.printStackTrace();
+        	throw new IllegalStateException("Rendering failed", e);
+        }
+        
+        if (TEST_LINK_URLS) {
+        	new UrlValidator().testUrls(FhirURL.getLinkUrls());
+            UrlValidator.logSuccessAndFailures();
         }
     }
+
+	private void copyGeneratedArtefacts() throws IOException {
+		Path generationTempDirectory = rendererFileLocator.getRenderingTempOutputDirectory();
+		Path outputDirectory = rendererFileLocator.getRenderingFinalOutputDirectory();
+		
+		FileUtils.copyDirectory(generationTempDirectory.toFile(), outputDirectory.toFile());
+	}
+
+	private void deleteTempFiles() {
+		File tempDir = rendererFileLocator.getRenderingTempOutputDirectory().toFile();
+		
+		try {
+			FileUtils.deleteDirectory(tempDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
