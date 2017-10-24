@@ -3,20 +3,20 @@ package uk.nhs.fhir.makehtml.render.conceptmap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class ConceptMapFormatter extends ResourceFormatter<WrappedConceptMap> {
 
-	public ConceptMapFormatter(WrappedConceptMap wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public ConceptMapFormatter(WrappedConceptMap wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
-		HTMLDocSection metadataPanel = new ConceptMapMetadataFormatter(wrappedResource, otherResources).makeSectionHTML();
-		HTMLDocSection conceptTable = new ConceptMapTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		HTMLDocSection metadataPanel = new ConceptMapMetadataFormatter(wrappedResource, context).makeSectionHTML();
+		HTMLDocSection conceptTable = new ConceptMapTableFormatter(wrappedResource, context).makeSectionHTML();
 		
 		HTMLDocSection valueSetSection = new HTMLDocSection();
 		

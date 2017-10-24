@@ -3,22 +3,22 @@ package uk.nhs.fhir.makehtml.render.codesys;
 import javax.xml.parsers.ParserConfigurationException;
 
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class CodeSystemFormatter extends ResourceFormatter<WrappedCodeSystem> {
 
-    public CodeSystemFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+    public CodeSystemFormatter(WrappedCodeSystem wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		
-		HTMLDocSection metadataPanel = new CodeSystemMetadataFormatter(wrappedResource, otherResources).makeSectionHTML();
-		HTMLDocSection conceptsPanel = new CodeSystemConceptTableFormatter(wrappedResource, otherResources).makeSectionHTML();
-		HTMLDocSection filterRowsPanel = new CodeSystemFiltersTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+		HTMLDocSection metadataPanel = new CodeSystemMetadataFormatter(wrappedResource, context).makeSectionHTML();
+		HTMLDocSection conceptsPanel = new CodeSystemConceptTableFormatter(wrappedResource, context).makeSectionHTML();
+		HTMLDocSection filterRowsPanel = new CodeSystemFiltersTableFormatter(wrappedResource, context).makeSectionHTML();
 		
 		HTMLDocSection codeSystemSection = new HTMLDocSection();
 		

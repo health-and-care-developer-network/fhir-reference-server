@@ -15,6 +15,7 @@ import uk.nhs.fhir.makehtml.render.HTMLDocSection;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FhirFileUtils;
+import uk.nhs.fhir.util.FileLoader;
 
 public class FormattedOutputSpec<T extends WrappedResource<T>> {
 	
@@ -30,7 +31,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		this.filename = filename;
 	}
 
-	public void formatAndSave(String inputPath, FhirFileRegistry otherResources) throws ParserConfigurationException, IOException {
+	public void formatAndSave(String inputPath) throws ParserConfigurationException, IOException {
 		ensureOutputDirectoryExists(inputPath);
 		Path outputPath = getOutputPath(inputPath);
 		
@@ -45,7 +46,7 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 		outputDoc.addSection(sectionHTML);
 		String outputString = HTMLUtil.docToString(outputDoc.getHTML(), true, false);
 		
-		if (!FhirFileUtils.writeFile(outputPath.toFile(), outputString.getBytes("UTF-8"))) {
+		if (!FhirFileUtils.writeFile(outputPath.toFile(), outputString.getBytes(FileLoader.DEFAULT_ENCODING))) {
 			throw new IllegalStateException("Failed to write file " + outputPath);
 		}
 	}

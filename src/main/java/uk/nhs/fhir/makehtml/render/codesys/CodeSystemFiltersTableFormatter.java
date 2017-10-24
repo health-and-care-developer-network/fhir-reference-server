@@ -8,17 +8,17 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemFilter;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class CodeSystemFiltersTableFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemFiltersTableFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public CodeSystemFiltersTableFormatter(WrappedCodeSystem wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override

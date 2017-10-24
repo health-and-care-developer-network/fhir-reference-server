@@ -17,7 +17,6 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -27,12 +26,13 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 
-	public ValueSetMetadataFormatter(WrappedValueSet valueSet, FhirFileRegistry otherResources) {
-		super(valueSet, otherResources);
+	public ValueSetMetadataFormatter(WrappedValueSet valueSet, RendererContext context) {
+		super(valueSet, context);
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package uk.nhs.fhir.makehtml;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import org.jdom2.Document;
@@ -13,52 +12,52 @@ import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.makehtml.prep.ResourcePreparer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.makehtml.render.ResourceFormatterFactory;
 import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
 import uk.nhs.fhir.util.FhirFileUtils;
+import uk.nhs.fhir.util.FileLoader;
 
 public class FileProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(FileProcessor.class.getName());
     
     // private final FhirFileParser parser = new FhirFileParser();
     
-    private final FhirFileRegistry fhirFileRegistry;
+    private final RendererContext context;
     private final ResourceFormatterFactory resourceFormatterFactory = new ResourceFormatterFactory(); 
     
-    public FileProcessor(FhirFileRegistry fhirFileRegistry) {
-    	this.fhirFileRegistry = fhirFileRegistry;
+    public FileProcessor(RendererContext context) {
+    	this.context = context;
     }
     
-	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String newBaseURL, File thisFile, WrappedResource<?> wrappedResource) throws Exception {
+	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
 		
-	    String inFilePath = thisFile.getPath();
-	    LOG.info("\n\n=========================================\nProcessing file: " + inFilePath + "\n=========================================");
+	    WrappedResource<?> resource = context.getCurrentParsedResource();
+		String inFilePath = context.getCurrentSource().getPath();
+	    
+		LOG.info("Processing file: " + inFilePath);
+	    
+	    saveAugmentedResource(context, rendererFileLocator, newBaseURL);
 		
-	    saveAugmentedResource(thisFile, wrappedResource, rendererFileLocator, newBaseURL, fhirFileRegistry);
-		
-		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(wrappedResource, rendererFileLocator, fhirFileRegistry)) {
-			LOG.info("Generating " + formatter.getOutputPath(inFilePath).toString());
-			formatter.formatAndSave(inFilePath, fhirFileRegistry);
+		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator, context)) {
+			LOG.debug("Generating " + formatter.getOutputPath(inFilePath).toString());
+			formatter.formatAndSave(inFilePath);
 		}
 	}
 	
-	public void saveAugmentedResource(File inFile, WrappedResource<?> parsedResource, RendererFileLocator rendererFileLocator, String newBaseURL, FhirFileRegistry registry) throws Exception {
+	public void saveAugmentedResource(RendererContext context, RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
+		WrappedResource<?> resource = context.getCurrentParsedResource();
+		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
-		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(parsedResource);
-		
+		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
 		outDirPath.toFile().mkdirs();
+		Path outFilePath = outDirPath.resolve(context.getCurrentSource().getName());
 		
-		Path outFilePath = outDirPath.resolve(inFile.getName());
-		LOG.info("Generating " + outFilePath.toString());
-	    
-	    augmentAndWriteResource(parsedResource, outFilePath, newBaseURL, registry);
-	}
-	
-	public void augmentAndWriteResource(WrappedResource<?> parsedResource, Path outFilePath, String newBaseURL, FhirFileRegistry registry) throws Exception {
-		ResourceFormatter<?> defaultViewFormatter = resourceFormatterFactory.defaultFormatter(parsedResource, registry);
-		
+		LOG.debug("Generating " + outFilePath.toString());	    
+		ResourceFormatter<?> defaultViewFormatter = resourceFormatterFactory.defaultFormatter(resource, context);		
 		HTMLDocSection defaultViewSection = defaultViewFormatter.makeSectionHTML();
+		
 		SectionedHTMLDoc defaultView = new SectionedHTMLDoc();
 		defaultView.addSection(defaultViewSection);
 		
@@ -68,7 +67,7 @@ public class FileProcessor {
 		    
 	    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
 	    
-        String augmentedResource = new ResourcePreparer(parsedResource).prepareAndSerialise(renderedTextSection, newBaseURL);
-        FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes("UTF-8"));
+        String augmentedResource = new ResourcePreparer(resource).prepareAndSerialise(renderedTextSection, newBaseURL);
+        FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes(FileLoader.DEFAULT_ENCODING));
 	}
 }

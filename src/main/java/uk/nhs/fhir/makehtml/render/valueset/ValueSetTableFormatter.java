@@ -3,14 +3,14 @@ package uk.nhs.fhir.makehtml.render.valueset;
 import javax.xml.parsers.ParserConfigurationException;
 
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 	
-	public ValueSetTableFormatter(WrappedValueSet wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public ValueSetTableFormatter(WrappedValueSet wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	//private static final String BLANK = "";
@@ -22,9 +22,9 @@ public class ValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 		
 		boolean filterPresent = wrappedResource.hasComposeIncludeFilter();
 		if (filterPresent) {
-			return new FilteredValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+			return new FilteredValueSetTableFormatter(wrappedResource, context).makeSectionHTML();
 		} else {
-			return new ConceptsValueSetTableFormatter(wrappedResource, otherResources).makeSectionHTML();
+			return new ConceptsValueSetTableFormatter(wrappedResource, context).makeSectionHTML();
 		}
 		
 		/*HTMLDocSection section = new HTMLDocSection();
