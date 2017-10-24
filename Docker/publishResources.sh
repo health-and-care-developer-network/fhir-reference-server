@@ -6,17 +6,18 @@
 # Note: If copy_only is passed as "true" then the renderer will not be called, the specified files will just be copied directly to
 # the output directory. This would typically be used to copy examples across.
 
-GITHUB_URL=$1
-BRANCH=$2
-IN_PATH=$3
-OLD_URL=$4
-NEW_URL=$5
-REGISTRY_HOST=$6
-TARGET_HOST=$7
-OUT_PATH=$8
-COPY_ONLY=$9
-TAG_NAME=${10}
- 
+GITHUB_URL=${GITHUB_URL:-${1}}
+BRANCH=${BRANCH:-${2}}
+IN_PATH=${IN_PATH:-${3}}
+OLD_URL=${OLD_URL:-${4}}
+NEW_URL=${NEW_URL:-${5}}
+REGISTRY_HOST=${REGISTRY_HOST:-${6}}
+TARGET_HOST=${TARGET_HOST:-${7}}
+OUT_PATH=${OUT_PATH:-${8}}
+COPY_ONLY=${COPY_ONLY:-${9}}
+TAG_NAME=${TAG_NAME:-${10}}
+ARGUMENTS=${ARGUMENTS:-${11}}
+
 IMAGE_NAME="nhsd/fhir-make-html"
 
 if [ ! -z $TAG_NAME ]
@@ -49,5 +50,6 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
+	-e "ARGUMENTS=$ARGUMENTS" \
 	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH $COPY_ONLY
 
