@@ -12,6 +12,7 @@ OLD_URL=$4
 NEW_URL=$5
 OUT_PATH=$6
 COPY_ONLY=$7
+ARGUMENTS=${ARGUMENTS}
 
 # First, clone the repository with our source files
 rm -Rf /source/files
@@ -29,6 +30,7 @@ then
   cp /source/files/$REPO_PATH/* /generated/$OUT_PATH
 else
   cd /usr/makehtml
-  java -cp ./target/MakeHTML-1.0-SNAPSHOT.jar uk.nhs.fhir.makehtml.NewMain /source/files/$REPO_PATH /generated/$OUT_PATH
+  echo "Running command: java $ARGUMENTS -cp ./target/MakeHTML-1.0-SNAPSHOT.jar uk.nhs.fhir.makehtml.NewMain /source/files/$REPO_PATH /generated/$OUT_PATH"
+  java $ARGUMENTS -cp ./target/MakeHTML-1.0-SNAPSHOT.jar uk.nhs.fhir.makehtml.NewMain /source/files/$REPO_PATH /generated/$OUT_PATH
 fi
 
