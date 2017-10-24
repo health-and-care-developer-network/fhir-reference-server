@@ -17,13 +17,15 @@ package uk.nhs.fhir;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.page.home.HomePageTemplate;
@@ -35,7 +37,7 @@ import uk.nhs.fhir.util.ServletUtils;
 public class IndexServlet extends javax.servlet.http.HttpServlet {
 	
 	private static final long serialVersionUID = -7060628622645267225L;
-	private static final Logger LOG = Logger.getLogger(IndexServlet.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(IndexServlet.class.getName());
 	
 	private static ResourceCountsProvider resourceCountsProvider = null;
 	

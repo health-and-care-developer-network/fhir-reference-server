@@ -17,11 +17,13 @@ package uk.nhs.fhir.page.extensions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
@@ -30,7 +32,7 @@ import uk.nhs.fhir.util.ServletUtils;
 
 public class ExtensionsListRenderer {
 	
-	private static final Logger LOG = Logger.getLogger(ExtensionsListRenderer.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ExtensionsListRenderer.class.getName());
 	
 	private static ExtensionsListProvider extensionsListProvider = null;
 	
@@ -40,7 +42,7 @@ public class ExtensionsListRenderer {
 	
 	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
 								FhirVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
-		LOG.fine("Requested URL: " + req.getRequestURL());
+		LOG.debug("Requested URL: " + req.getRequestURL());
 		
 		String baseUrl = req.getContextPath();
 		List<ResourceMetadata> extensions = extensionsListProvider.getExtensions();

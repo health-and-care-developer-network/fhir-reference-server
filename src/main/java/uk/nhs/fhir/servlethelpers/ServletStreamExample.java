@@ -5,10 +5,12 @@ import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -20,7 +22,7 @@ import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamExample {
-	private static final Logger LOG = Logger.getLogger(ServletStreamExample.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamExample.class.getName());
 	
 	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
 			FhirVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
@@ -44,7 +46,7 @@ public class ServletStreamExample {
 					String prettyPrinted = ServletUtils.prettyPrintXML(fileContent);
 					fileContent = prettyPrinted;
 				} catch (Exception e) {
-					LOG.warning("Unable to pretty-print XML example: " + srcFile.getName());
+					LOG.warn("Unable to pretty-print XML example: " + srcFile.getName());
 					e.printStackTrace();
 				}
 				// Pretty print XML
@@ -61,7 +63,7 @@ public class ServletStreamExample {
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {
-			LOG.severe("Unable to find example: " + exampleName + ", FhirVersion=" + fhirVersion);
+			LOG.error("Unable to find example: " + exampleName + ", FhirVersion=" + fhirVersion);
 			response.setStatus(404);
 		}
 	}

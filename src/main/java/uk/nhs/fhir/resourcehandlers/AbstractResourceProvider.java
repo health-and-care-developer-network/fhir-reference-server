@@ -1,9 +1,8 @@
 package uk.nhs.fhir.resourcehandlers;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
@@ -13,13 +12,11 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class AbstractResourceProvider implements IResourceProvider, IResourceHelper {
 
-	private static final Logger LOG = Logger.getLogger(AbstractResourceProvider.class.getName());
-    private static String logLevel = FhirServerProperties.getProperty("logLevel");
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractResourceProvider.class.getName());
 
     protected FilesystemIF myDatasource = null;
     protected ResourceType resourceType = null;
@@ -27,16 +24,8 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
     protected Class<? extends IBaseResource> fhirClass = null;
 
     public AbstractResourceProvider(FilesystemIF dataSource) {
-        LOG.setLevel(Level.INFO);
-
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
         myDatasource = dataSource;
-        LOG.fine("Created StrutureDefinitionProvider handler to respond to requests for StrutureDefinition resource types.");
+        LOG.debug("Created StrutureDefinitionProvider handler to respond to requests for StrutureDefinition resource types.");
     }
     
     /**
@@ -57,7 +46,7 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
      */
     @Search
 	public IBundleProvider searchByName(@RequiredParam(name = StructureDefinition.SP_NAME) StringParam theNamePart) {
-    	LOG.fine("Request for resources matching name: " + theNamePart);
+    	LOG.debug("Request for resources matching name: " + theNamePart);
     	return new PagedBundleProvider(PagedBundleProvider.SEARCH_BY_NAME, myDatasource,
 										fhirVersion, resourceType, theNamePart.getValue());
     }
@@ -71,7 +60,7 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
      */
     @Search
     public IBundleProvider searchByURL(@RequiredParam(name = StructureDefinition.SP_URL) StringParam theURL) {
-    	LOG.fine("Request for resources matching URL: " + theURL);
+    	LOG.debug("Request for resources matching URL: " + theURL);
     	return new PagedBundleProvider(PagedBundleProvider.SEARCH_BY_URL, myDatasource,
     									fhirVersion, resourceType, theURL.getValue());
     }
@@ -83,7 +72,7 @@ public abstract class AbstractResourceProvider implements IResourceProvider, IRe
      */
     @Search
     public IBundleProvider getAllResources() {
-        LOG.fine("Request for ALL resources");
+        LOG.debug("Request for ALL resources");
         return new PagedBundleProvider(PagedBundleProvider.SEARCH_BY_TYPE, myDatasource,
         								fhirVersion, resourceType);
     }

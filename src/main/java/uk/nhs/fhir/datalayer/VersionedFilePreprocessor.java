@@ -6,9 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -23,7 +24,7 @@ import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
 	
-	private static final Logger LOG = Logger.getLogger(VersionedFilePreprocessor.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(VersionedFilePreprocessor.class.getName());
 
 	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
 	private static final FhirFileParser parser = new FhirFileParser();
@@ -48,7 +49,7 @@ public class VersionedFilePreprocessor {
         
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
-                LOG.fine("Pre-processing " + resourceType + " resource from file: " + thisFile.getName());
+                LOG.debug("Pre-processing " + resourceType + " resource from file: " + thisFile.getName());
                 
                 String resourceID = null;
                 VersionNumber versionNo = null; 
@@ -59,24 +60,24 @@ public class VersionedFilePreprocessor {
                 	versionNo = newEntity.getVersionNo();
                 	
                 } catch (Exception ex) {
-                	LOG.severe("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
+                	LOG.error("Unable to load FHIR resource from file: "+thisFile.getAbsolutePath() + " error: " + ex.getMessage() + " - IGNORING");
                 	ex.printStackTrace();
                 }
                 
                 if (versionNo == null) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
-                	LOG.severe("Unable to process file as it is has an invalid version: " + thisFile.getName());
+                	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
                 } else if (!versionNo.isValid()) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
-                	LOG.severe("Unable to process file as it is has an invalid version: " + thisFile.getName());
+                	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
                 } else if (resourceID == null) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - No resource ID provided in the URL");
-                	LOG.severe("Unable to process file as it is has an invalid resource ID: " + thisFile.getName());
+                	LOG.error("Unable to process file as it is has an invalid resource ID: " + thisFile.getName());
                 } else {
 	                // Now, try to build a new versioned filename and copy the file to it
                 	String newFilename = resourceID + "-versioned-" + versionNo + ".xml";
                 	
-                	LOG.fine("Copying new profile into versioned directory with new filename: " + newFilename);
+                	LOG.debug("Copying new profile into versioned directory with new filename: " + newFilename);
                 	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
                 	File newFile = new File(outputDirectory + "/" + newFilename);
                 	FileUtils.copyFile(thisFile, newFile);
@@ -93,7 +94,7 @@ public class VersionedFilePreprocessor {
 
 	private void logStart(FhirVersion fhirVersion, ResourceType resourceType) {
 		//profileLoadMessages.clear();
-		LOG.fine("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
+		LOG.debug("Starting pre-processor to convert files into versioned files prior to loading into the server for " + fhirVersion);
 		addMessage("--------------------------------------------------------------------------------------");
 		addMessage("Loading " + resourceType + " files from disk: " + DateUtils.printCurrentDateTime());
 	}
@@ -136,7 +137,7 @@ public class VersionedFilePreprocessor {
 	    	        }
 	            }
 			} catch (IOException e) {
-				LOG.severe("Unable to copy supporting resources!");
+				LOG.error("Unable to copy supporting resources!");
 				e.printStackTrace();
 			}
 		}

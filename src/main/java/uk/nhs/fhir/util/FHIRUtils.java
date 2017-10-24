@@ -18,11 +18,11 @@ package uk.nhs.fhir.util;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
@@ -30,32 +30,19 @@ import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
+import uk.nhs.fhir.FhirURLConstants;
 
 public class FHIRUtils {
 
     /**
-     * Constructor, never explicitly called, just sets the logging level to
-     * that requested in config.properties
+     * Constructor, never explicitly called
      */
-    private FHIRUtils() {
-        LOG.setLevel(Level.INFO);
+    private FHIRUtils() {}
 
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
-    }
-
-    private static final Logger LOG = Logger.getLogger(FHIRUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FHIRUtils.class.getName());
 
     private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
     private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
-    
-    private static String logLevel = FhirServerProperties.getProperty("logLevel");
-    
-    private static String snomedCTcodeSystem = FhirServerProperties.getProperty("snomedCTcodeSystem");
 
 
     /**
@@ -76,7 +63,7 @@ public class FHIRUtils {
         	}
             String url = null;
             
-            LOG.fine("Parsed resource and identified it's class as: " + resource.getClass().getName());
+            LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
 
             // To get the URL we need to cast this to a concrete type
             if (resource instanceof StructureDefinition) {
@@ -111,7 +98,7 @@ public class FHIRUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.fine("Resource loaded from file: " + file.getName());
+        LOG.debug("Resource loaded from file: " + file.getName());
         return resource;
     }
     
@@ -121,7 +108,7 @@ public class FHIRUtils {
     			List<ComposeInclude> includeList = vs.getCompose().getInclude();
 				for (ComposeInclude includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
 							return true;
 						}
 					}
@@ -137,7 +124,7 @@ public class FHIRUtils {
     			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
 				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
 							return true;
 						}
 					}
@@ -153,7 +140,7 @@ public class FHIRUtils {
     			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
 				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
 							return true;
 						}
 					}

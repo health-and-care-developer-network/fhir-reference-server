@@ -1,7 +1,6 @@
 package uk.nhs.fhir;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,13 +8,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = {"*.css", "*.ico", "*.png", "*.gif", "*.js"}, displayName = "Static content Servlet", loadOnStartup = 1)
 public class StaticContentServlet extends HttpServlet {
-	private static Logger LOG = Logger.getLogger(StaticContentServlet.class.getName());
+	private static Logger LOG = LoggerFactory.getLogger(StaticContentServlet.class.getName());
 	
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

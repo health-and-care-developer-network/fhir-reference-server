@@ -22,11 +22,11 @@ import static uk.nhs.fhir.data.metadata.ResourceType.VALUESET;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -36,7 +36,6 @@ import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
@@ -45,35 +44,22 @@ import uk.nhs.fhir.util.FhirVersion;
  * @author Adam Hatherly
  */
 public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider, GroupedResourcesProvider {
-    private static final Logger LOG = Logger.getLogger(ResourceWebHandler.class.getName());
-    private static String logLevel = FhirServerProperties.getProperty("logLevel");
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceWebHandler.class.getName());
     private FhirVersion fhirVersion = null;
     
     FilesystemIF myDataSource = null;
 
     public ResourceWebHandler(FilesystemIF dataSource, FhirVersion fhirVersion) {
-    	
-        LOG.setLevel(Level.INFO);
-
-        if(logLevel.equals("INFO")) {
-           LOG.setLevel(Level.INFO);
-        }
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
         myDataSource = dataSource;
         this.fhirVersion = fhirVersion;
         
-        LOG.fine("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
+        LOG.debug("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
     
     
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
-        LOG.fine("Called: ResourceWebHandler.getAlGroupedNames()");
+        LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
         
         if (resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
           || resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
@@ -89,7 +75,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     }
 
     public List<ResourceMetadata> getAllNames(ResourceType resourceType, String namePart) {
-        LOG.fine("Called: ResourceWebHandler.getAllNames(String namePart)");
+        LOG.debug("Called: ResourceWebHandler.getAllNames(String namePart)");
         
         List<ResourceMetadata> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, namePart);
         
@@ -98,32 +84,32 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     
     @Override
     public List<ResourceMetadata> getExtensions() {
-        LOG.fine("Called: ResourceWebHandler.getExtensions()");
+        LOG.debug("Called: ResourceWebHandler.getExtensions()");
         
         return myDataSource.getExtensions();
     }
     
     public ResourceEntityWithMultipleVersions getVersionsForID(IIdType id) {
-        LOG.fine("Called: ResourceWebHandler.getVersionsForID(IIdType id)");
+        LOG.debug("Called: ResourceWebHandler.getVersionsForID(IIdType id)");
         
         return myDataSource.getVersionsByID(fhirVersion, id);
     }
     
     public ResourceMetadata getResourceEntityByID(IIdType theId) {
-        LOG.fine("Called: ResourceWebHandler.getResourceEntityByID(IIdType id)");
+        LOG.debug("Called: ResourceWebHandler.getResourceEntityByID(IIdType id)");
         
         return myDataSource.getResourceEntityByID(fhirVersion, theId);
     }
 
     public IBaseResource getResourceByID(IIdType id) {
-        LOG.fine("Called: ResourceWebHandler.getResourceByID(IIdType id)");
+        LOG.debug("Called: ResourceWebHandler.getResourceByID(IIdType id)");
         
         IBaseResource resource = myDataSource.getResourceByID(fhirVersion, id);
         return resource;
     }
 
     public ExampleResources getExamples(String resourceTypeAndID) {
-        LOG.fine("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
+        LOG.debug("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
         
         ExampleResources examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);
         return examples;

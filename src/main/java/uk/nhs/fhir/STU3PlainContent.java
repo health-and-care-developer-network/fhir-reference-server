@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.hl7.fhir.dstu3.model.IdType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -67,7 +68,7 @@ import uk.nhs.fhir.util.ServletUtils;
  * @author Tim Coates, Adam Hatherly
  */
 public class STU3PlainContent extends CORSInterceptor {
-    private static final Logger LOG = Logger.getLogger(STU3PlainContent.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(STU3PlainContent.class.getName());
     
     private static final String guidesPath = FhirServerProperties.getProperty("guidesPath");
 
@@ -94,7 +95,7 @@ public class STU3PlainContent extends CORSInterceptor {
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
         
         String typeInRequest = theRequestDetails.getResourceName();
-    	LOG.fine("Detecting type of resource: " + typeInRequest);
+    	LOG.debug("Detecting type of resource: " + typeInRequest);
     	ResourceType resourceType = ResourceType.getTypeFromHAPIName(typeInRequest);
         
         LOG.info("Request received - operation: " + operation.toString() + ", type: " + resourceType.toString());
@@ -114,7 +115,7 @@ public class STU3PlainContent extends CORSInterceptor {
             return true;
         }
 
-        LOG.fine("This appears to be a browser, generate some HTML to return.");
+        LOG.debug("This appears to be a browser, generate some HTML to return.");
         
         // If they have asked for the conformance profile then let this one through - it
         // will be caught and handled by the outgoingResponse handler instead
@@ -122,8 +123,8 @@ public class STU3PlainContent extends CORSInterceptor {
         	return true;
         }
 
-        LOG.fine("FHIR Operation: " + operation);
-        LOG.fine("Format to return to browser: " + mimeType.toString());
+        LOG.debug("FHIR Operation: " + operation);
+        LOG.debug("Format to return to browser: " + mimeType.toString());
         
         String baseURL = theRequestDetails.getServerBaseForRequest();
         
@@ -199,7 +200,7 @@ public class STU3PlainContent extends CORSInterceptor {
      * @param filename
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
-    	LOG.fine("Request for a file from the ImplementationGuide path: " + filename);
+    	LOG.debug("Request for a file from the ImplementationGuide path: " + filename);
 		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
     }
     
@@ -228,7 +229,7 @@ public class STU3PlainContent extends CORSInterceptor {
 	}
     
     private String renderConformance(IBaseResource conformance, MimeType mimeType, String baseURL) {
-    	LOG.fine("Attempting to render conformance statement");
+    	LOG.debug("Attempting to render conformance statement");
     	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
     	
     	return new RawResourceTemplate(Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
@@ -287,7 +288,7 @@ public class STU3PlainContent extends CORSInterceptor {
 				.stream()
 				.filter(artefact -> artefact.getArtefactType().isMetadata())
 				.findAny();
-    	LOG.fine("Has metadata from renderer: " + metadataArtefact.isPresent());
+    	LOG.debug("Has metadata from renderer: " + metadataArtefact.isPresent());
 
     	// Tree view
     	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);

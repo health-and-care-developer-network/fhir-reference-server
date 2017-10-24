@@ -2,10 +2,11 @@ package uk.nhs.fhir.resourcehandlers;
 
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -14,7 +15,7 @@ import uk.nhs.fhir.util.FhirVersion;
 
 public class PagedBundleProvider implements IBundleProvider {
 	
-	private static final Logger LOG = Logger.getLogger(PagedBundleProvider.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(PagedBundleProvider.class.getName());
 
 	public static final int SEARCH_BY_TYPE = 1;
 	public static final int SEARCH_BY_NAME = 2;
@@ -51,7 +52,7 @@ public class PagedBundleProvider implements IBundleProvider {
 	@Override
 	public List<IBaseResource> getResources(int theFromIndex, int theToIndex) {
 		
-		LOG.fine("Paging results provider - getResources method called for index " + theFromIndex + " to " + theToIndex);
+		LOG.debug("Paging results provider - getResources method called for index " + theFromIndex + " to " + theToIndex);
 		
 		switch(searchType) {
 		case SEARCH_BY_TYPE:
@@ -75,7 +76,7 @@ public class PagedBundleProvider implements IBundleProvider {
 	@Override
 	public Integer size() {
 		
-		LOG.fine("Paging results provider - size() method called");
+		LOG.debug("Paging results provider - size() method called");
 		
 		switch(searchType) {
 		case SEARCH_BY_TYPE:

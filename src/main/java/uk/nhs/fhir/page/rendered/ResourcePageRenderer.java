@@ -2,10 +2,11 @@ package uk.nhs.fhir.page.rendered;
 
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -19,7 +20,7 @@ import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourcePageRenderer {
     
-	private static final Logger LOG = Logger.getLogger(ResourcePageRenderer.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ResourcePageRenderer.class.getName());
 	
 	private final FhirVersion fhirVersion;
 	private final ResourceWebHandler resourceWebHandler;
@@ -49,7 +50,7 @@ public class ResourcePageRenderer {
 				.stream()
 				.filter(artefact -> artefact.getArtefactType().isMetadata())
 				.findAny();
-    	LOG.fine("Has metadata from renderer: " + metadataArtefact.isPresent());
+    	LOG.debug("Has metadata from renderer: " + metadataArtefact.isPresent());
 
     	// Tree view
     	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);

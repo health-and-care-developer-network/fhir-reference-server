@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.OutputKeys;
@@ -18,10 +17,12 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServletUtils {
 	
-	private static final Logger LOG = Logger.getLogger(ServletUtils.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ServletUtils.class.getName());
 	
     /**
      * Simple XML syntax highlight
@@ -59,7 +60,7 @@ public class ServletUtils {
 			response.setStatus(200);
 			response.setContentType(contentType);
     	} catch (IOException e) {
-    		LOG.severe(e.getMessage());
+    		LOG.error(e.getMessage());
 		}
     }
 
@@ -70,7 +71,7 @@ public class ServletUtils {
 			response.setStatus(200);
 			response.setContentType(contentType);
     	} catch (IOException e) {
-    		LOG.severe(e.getMessage());
+    		LOG.error(e.getMessage());
 		}
 	}
 

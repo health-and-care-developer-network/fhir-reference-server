@@ -3,10 +3,10 @@ package uk.nhs.fhir.metadata;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -18,7 +18,7 @@ import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFolderImportWriter implements ImportListener {
 
-	private static final Logger LOG = Logger.getLogger(VersionedFolderImportWriter.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(VersionedFolderImportWriter.class.getName());
 	
 	private final AbstractFhirFileLocator fhirFileLocator;
 	
@@ -40,10 +40,10 @@ public class VersionedFolderImportWriter implements ImportListener {
 	        	// Copy other resources (diffs, details, bindings, etc).
 	        	copyOtherResources(sourceFile, newFile);
 			} catch (IOException e) {
-				LOG.log(Level.SEVERE, "Failed to copy files to versioned folder", e);
+				LOG.error("Failed to copy files to versioned folder", e);
 			}
 		} else {
-			LOG.severe("Failed to import file " + sourceFile.getPath() + " due to invalid version " + versionNo);
+			LOG.error("Failed to import file " + sourceFile.getPath() + " due to invalid version " + versionNo);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 	    	        }
 	            }
 			} catch (IOException e) {
-				LOG.severe("Unable to copy supporting resources!");
+				LOG.error("Unable to copy supporting resources!");
 				e.printStackTrace();
 			}
 		}

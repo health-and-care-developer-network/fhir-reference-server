@@ -18,13 +18,14 @@ package uk.nhs.fhir;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
@@ -58,9 +59,8 @@ import uk.nhs.fhir.util.ServletUtils;
 @WebServlet(urlPatterns = {"/STU3/*", "/3.0.1/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
-    private static final Logger LOG = Logger.getLogger(STU3RestfulServlet.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(STU3RestfulServlet.class.getName());
     private static final FhirVersion fhirVersion = FhirVersion.STU3;
-    private static String logLevel = FhirServerProperties.getProperty("logLevel");
     private static final long serialVersionUID = 1L;
     private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
@@ -75,7 +75,7 @@ public class STU3RestfulServlet extends RestfulServer {
         LOG.info("STU3 Requested URI: " + request.getRequestURI());
 
         String requestedPath = request.getRequestURI().substring(5);
-        LOG.fine("Request path: " + requestedPath);
+        LOG.debug("Request path: " + requestedPath);
         
         if (requestedPath.startsWith("/artefact")) {
         	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
@@ -102,19 +102,6 @@ public class STU3RestfulServlet extends RestfulServer {
     	
     	// Explicitly set this as an STU3 FHIR server
     	super.setFhirContext(FhirContexts.forVersion(FhirVersion.STU3));
-
-        // We set our logging level based on the config file property.
-        LOG.setLevel(Level.INFO);
-
-        if(logLevel.equals("INFO")) {
-           LOG.setLevel(Level.INFO);
-        }
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
         
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
@@ -141,7 +128,7 @@ public class STU3RestfulServlet extends RestfulServer {
         setResourceProviders(resourceProviders);
         registerInterceptor(new STU3PlainContent(webber));
         registerInterceptor(new RedirectionInterceptor("3.0.1", "STU3"));
-        LOG.fine("resourceProviders added");
+        LOG.debug("resourceProviders added");
         
         //setServerConformanceProvider(new CustomServerConformanceProvider());
         //LOG.fine("Custom Conformance provider added");

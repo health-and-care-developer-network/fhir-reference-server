@@ -27,13 +27,14 @@ import static uk.nhs.fhir.enums.MimeType.XML;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -57,7 +58,7 @@ import uk.nhs.fhir.util.ServletUtils;
  */
 public class PlainContent extends CORSInterceptor {
 
-    private static final Logger LOG = Logger.getLogger(PlainContent.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PlainContent.class.getName());
     private static String guidesPath = FhirServerProperties.getProperty("guidesPath");
     private static final FhirVersion fhirVersion = FhirVersion.DSTU2;
     
@@ -89,7 +90,7 @@ public class PlainContent extends CORSInterceptor {
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
         
         String typeInRequest = theRequestDetails.getResourceName();
-    	LOG.fine("Detecting type of resource: " + typeInRequest);
+    	LOG.debug("Detecting type of resource: " + typeInRequest);
     	ResourceType resourceType = ResourceType.getTypeFromHAPIName(typeInRequest);
         
         LOG.info("Request received - operation: " + operation.toString() + ", type: " + resourceType.toString());
@@ -100,7 +101,7 @@ public class PlainContent extends CORSInterceptor {
         	
         	if (resourceName.endsWith(".md") 
         	  || resourceName.endsWith(".txt")) {
-            	LOG.fine("Request for a file from the ImplementationGuide path: " + resourceName);
+            	LOG.debug("Request for a file from the ImplementationGuide path: " + resourceName);
         		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + resourceName));
         		return false;
         	}
@@ -111,7 +112,7 @@ public class PlainContent extends CORSInterceptor {
             return true;
         }
 
-        LOG.fine("This appears to be a browser, generate some HTML to return.");
+        LOG.debug("This appears to be a browser, generate some HTML to return.");
         
         // If they have asked for the conformance profile then let this one through - it
         // will be caught and handled by the outgoingResponse handler instead
@@ -121,8 +122,8 @@ public class PlainContent extends CORSInterceptor {
             }
         }
         
-        LOG.fine("FHIR Operation: " + operation);
-        LOG.fine("Format to return to browser: " + mimeType.toString());
+        LOG.debug("FHIR Operation: " + operation);
+        LOG.debug("Format to return to browser: " + mimeType.toString());
 
         String baseURL = theRequestDetails.getServerBaseForRequest();
         
@@ -175,7 +176,7 @@ public class PlainContent extends CORSInterceptor {
         	if (operation == METADATA
         	  && clientType == BROWSER) {
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		LOG.fine("Attempting to render conformance statement");
+	    		LOG.debug("Attempting to render conformance statement");
 	    		Optional<String> resourceName = Optional.empty();
 	    		String renderedConformance = myRawResourceRenderer.renderSingleWrappedRAWResource(theResponseObject, fhirVersion, 
 	    				resourceName, ResourceType.CONFORMANCE, baseURL, mimeType);

@@ -1,14 +1,16 @@
 package uk.nhs.fhir.datalayer.collections;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 
 public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
 	
-	private static final Logger LOG = Logger.getLogger(ResourceEntityWithMultipleVersions.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
 	HashMap<VersionNumber,ResourceMetadata> metadataByVersion = new HashMap<VersionNumber,ResourceMetadata>();
 	VersionNumber latest = null;
@@ -39,12 +41,12 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	
 	public ResourceMetadata getSpecificVersion(VersionNumber version) {
 		if (metadataByVersion.containsKey(version)) {
-			LOG.fine("Found requested version - returning");
+			LOG.debug("Found requested version - returning");
 			return metadataByVersion.get(version);
 		} else {
-			LOG.warning("Could not find requested version - asked for version:"+version+" - versions we have are:");
+			LOG.warn("Could not find requested version - asked for version:"+version+" - versions we have are:");
 			for (VersionNumber v : metadataByVersion.keySet()) {
-				LOG.warning(" - version:"+v.toString());
+				LOG.warn(" - version:"+v.toString());
 			}
 			return null;
 		}
