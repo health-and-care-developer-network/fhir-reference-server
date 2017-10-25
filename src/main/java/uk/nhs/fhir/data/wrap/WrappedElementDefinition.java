@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
+import com.google.common.base.Strings;
+
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
@@ -18,9 +20,12 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
 import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.makehtml.RendererError;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class WrappedElementDefinition {
+
+	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 
 	public abstract String getName();
 	public abstract String getPath();
@@ -79,8 +84,22 @@ public abstract class WrappedElementDefinition {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
 		} else {
-			WrappedStructureDefinition extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(typeProfile);
-			return extensionDefinition.getExtensionType();
+			WrappedStructureDefinition extensionDefinition;
+			try {
+				extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(typeProfile);
+				return extensionDefinition.getExtensionType();
+			} catch (Exception e) {
+				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
+				
+				if (!Strings.isNullOrEmpty(permittedMissingExtensionRoot)
+				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
+					String message = "Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot;
+					RendererError.handle(RendererError.Key.DEFAULT_TO_SIMPLE_EXTENSION, message);
+					return ExtensionType.SIMPLE;
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 }

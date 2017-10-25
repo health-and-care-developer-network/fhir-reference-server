@@ -38,7 +38,8 @@ public class RendererError {
 		TYPELINK_STRING_WITH_PROFILE,
 		RESOURCE_WITHOUT_SNAPSHOT,
 		RESOURCE_URL_WITHOUT_FHIR_VERSION,
-		EMPTY_VALUE_SET;
+		EMPTY_VALUE_SET,
+		DEFAULT_TO_SIMPLE_EXTENSION;
 	}
 	
 	private static final Map<Key, ErrorResponse> responses = new HashMap<>();
@@ -67,7 +68,8 @@ public class RendererError {
 		responses.put(Key.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, ErrorResponse.IGNORE);
 		responses.put(Key.CONSTRAINT_WITHOUT_CONDITION, ErrorResponse.IGNORE);
 
-		
+
+		responses.put(Key.DEFAULT_TO_SIMPLE_EXTENSION, ErrorResponse.LOG_WARNING);
 		responses.put(Key.RESOURCE_URL_WITHOUT_FHIR_VERSION, ErrorResponse.LOG_WARNING);
 		
 		
