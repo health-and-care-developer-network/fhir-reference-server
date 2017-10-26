@@ -79,7 +79,7 @@ public class VersionedFilePreprocessor {
                 	
                 	LOG.debug("Copying new profile into versioned directory with new filename: " + newFilename);
                 	addMessage("  - Copying new " + resourceType + " into versioned directory with new filename: " + newFilename);
-                	File newFile = new File(outputDirectory + "/" + newFilename);
+                	File newFile = new File(outputDirectory + File.separator + newFilename);
                 	FileUtils.copyFile(thisFile, newFile);
                 	
                 	// And also copy other resources (diffs, details, bindings, etc).

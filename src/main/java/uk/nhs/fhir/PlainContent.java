@@ -102,7 +102,7 @@ public class PlainContent extends CORSInterceptor {
         	if (resourceName.endsWith(".md") 
         	  || resourceName.endsWith(".txt")) {
             	LOG.debug("Request for a file from the ImplementationGuide path: " + resourceName);
-        		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + resourceName));
+        		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + File.separator + resourceName));
         		return false;
         	}
         }

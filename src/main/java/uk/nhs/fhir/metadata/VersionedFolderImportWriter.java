@@ -67,11 +67,11 @@ public class VersionedFolderImportWriter implements ImportListener {
 		
 		String oldDir = oldFile.getParent();
 		String oldName = FileLoader.removeFileExtension(oldFile.getName());
-		File resourceDir = new File(oldDir + "/" + oldName);
+		File resourceDir = new File(oldDir + File.separator + oldName);
 		
 		String newDir = newFile.getParent();
 		String newName = FileLoader.removeFileExtension(newFile.getName());
-		File targetDir = new File(newDir + "/" + newName);
+		File targetDir = new File(newDir + File.separator + newName);
 		
 		if (resourceDir.exists()
 		  && resourceDir.isDirectory()) { 

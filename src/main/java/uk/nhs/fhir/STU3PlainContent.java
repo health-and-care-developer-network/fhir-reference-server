@@ -201,7 +201,7 @@ public class STU3PlainContent extends CORSInterceptor {
      */
     private void streamFileDirectly(HttpServletResponse theResponse, String filename) {
     	LOG.debug("Request for a file from the ImplementationGuide path: " + filename);
-		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + "/" + filename));
+		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + File.separator + filename));
     }
     
     @Override
