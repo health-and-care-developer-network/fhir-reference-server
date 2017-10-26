@@ -26,7 +26,7 @@ public class PropertiesFhirFileLocator extends AbstractFhirFileLocator {
 	private final Path rootDirFromProperties;
 	public PropertiesFhirFileLocator() {
 		String property = FhirServerProperties.getProperty(PROP_ROOT_PATH);
-		LOG.info("Root path: " + property);
+		LOG.debug("Root path: " + property);
 		rootDirFromProperties = Paths.get(property);
 	}
 	

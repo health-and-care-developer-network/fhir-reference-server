@@ -45,6 +45,7 @@ import uk.nhs.fhir.servlethelpers.RawResourceRender;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
+import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
@@ -59,6 +60,10 @@ import uk.nhs.fhir.util.ServletUtils;
 @WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
 
+	public RestfulServlet() {
+		super(FhirContexts.forVersion(FhirVersion.DSTU2));
+	}
+	
     private static final Logger LOG = LoggerFactory.getLogger(RestfulServlet.class.getName());
     private static final FhirVersion fhirVersion = FhirVersion.DSTU2;
     private static final long serialVersionUID = 1L;

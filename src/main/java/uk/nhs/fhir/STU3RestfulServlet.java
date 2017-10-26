@@ -59,6 +59,10 @@ import uk.nhs.fhir.util.ServletUtils;
 @WebServlet(urlPatterns = {"/STU3/*", "/3.0.1/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
+	public STU3RestfulServlet() {
+		super(FhirContexts.forVersion(FhirVersion.STU3));
+	}
+	
     private static final Logger LOG = LoggerFactory.getLogger(STU3RestfulServlet.class.getName());
     private static final FhirVersion fhirVersion = FhirVersion.STU3;
     private static final long serialVersionUID = 1L;
