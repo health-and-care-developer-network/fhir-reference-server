@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
@@ -19,9 +17,9 @@ import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.RendererErrorHandler;
 import uk.nhs.fhir.util.StringUtil;
 
-public class RendererEventAccumulator implements RendererErrorHandler {
+public abstract class RendererEventAccumulator implements RendererErrorHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RendererEventAccumulator.class);
+	protected abstract void displaySortedEvents(List<RendererEvents> events);
 	
 	private final Map<File, RendererEvents> events = Maps.newHashMap();
 	
@@ -79,9 +77,16 @@ public class RendererEventAccumulator implements RendererErrorHandler {
 				WrappedResource<?> resource1 = o1.getResource();
 				WrappedResource<?> resource2 = o2.getResource();
 				
-				String typeName1 = resource1.getResourceType().getDisplayName();
-				String typeName2 = resource2.getResourceType().getDisplayName();
-				int typeNameComparison = typeName1.compareTo(typeName2);
+				int typeNameComparison;
+				if (resource1 == null 
+				  || resource2 == null) {
+					typeNameComparison = 0;					
+				} else {
+					String typeName1 = resource1.getResourceType().getDisplayName();
+					String typeName2 = resource2.getResourceType().getDisplayName();
+					typeNameComparison = typeName1.compareTo(typeName2);
+				}
+				
 				if (typeNameComparison != 0) {
 					return typeNameComparison;
 				}
@@ -96,34 +101,20 @@ public class RendererEventAccumulator implements RendererErrorHandler {
 		// sort first by resourceType, then by filename
 		Collections.sort(events, BY_TYPE_THEN_NAME);
 		
-		for (RendererEvents fileEvents : events) {
-			
-			String absolutePath = fileEvents.getFile().getAbsolutePath();
-			String type = fileEvents.getResource().getResourceType().getDisplayName();
-			String name = fileEvents.getResource().getName();
-			Optional<String> url = fileEvents.getResource().getUrl();
-			
-			String startString = "==========================================================="
-			  + "\nFile: " + absolutePath
-			  + "\nType: " + type
-			  + "\nName: " + name
-			  + "\nURL: " + url;
-			
-			LOG.info(startString);
-			
-			for (RendererEvent event : fileEvents.getEvents()) {
-				EventType eventType = event.getEventType();
-				Optional<String> message = event.getMessage();
-				Optional<Exception> error = event.getError();
-				
-				String eventString = eventType.toString() + ": " + message.orElse("");
-				if (error.isPresent()) {
-					eventString += "\n" + StringUtil.getStackTrace(error.get());
-				}
-				
-				LOG.info(eventString);
-			}
-			
+		displaySortedEvents(events);
+	}
+	
+	protected String combineLoggableInfo(Optional<String> info, Optional<Exception> error) {
+		List<String> combinedInfo = Lists.newArrayList();
+		
+		if (info.isPresent()) {
+			combinedInfo.add(info.get());
 		}
+		
+		if (error.isPresent()) {
+			combinedInfo.add(StringUtil.getStackTrace(error.get()));
+		}
+		
+		return String.join("\n", combinedInfo);
 	}
 }

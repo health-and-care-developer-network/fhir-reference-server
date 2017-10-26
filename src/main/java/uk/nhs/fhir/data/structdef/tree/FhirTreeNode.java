@@ -569,7 +569,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 					
 					if (extensionUrlDiscriminators.size() == 0) {
 						RendererErrorConfig.handle(RendererError.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "
-							+ "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
+								+ "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
 						discriminators.add("<missing>");
 					} else if (extensionUrlDiscriminators.size() > 1) {
 						throw new IllegalStateException("Don't yet handle multiple extension url discriminators. Consider ordering so that keys are consistent?");

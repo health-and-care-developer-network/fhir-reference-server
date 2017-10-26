@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,9 +65,14 @@ public class NewMain {
     private final String newBaseURL;
     private final FhirErrorHandler errorHandler;
     private boolean continueOnFail = false;
+    private boolean allowCopyOnError = false;
     
     public void setContinueOnFail(boolean continueOnFail) {
     	this.continueOnFail = continueOnFail;
+    }
+    
+    public void setAllowCopyOnError(boolean allowCopyOnError) {
+    	this.allowCopyOnError = allowCopyOnError;
     }
 
 	public NewMain(Path inputDirectory, Path outputDirectory, FhirErrorHandler errorHandler) {
@@ -116,9 +122,37 @@ public class NewMain {
     public void process() {
     	Path rawArtefactDirectory = rendererFileLocator.getRawArtefactDirectory();
     	LOG.info("Finding resources in " + rawArtefactDirectory.toString());
-		FhirFileRegistry fhirFileRegistry = new FhirResourceCollector(rawArtefactDirectory).collect();
+
+    	FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
 		RendererContext context = new RendererContext(fhirFileRegistry, errorHandler);
+		List<File> potentialFhirFiles = new XmlFileFinder(rawArtefactDirectory).findFiles();
+    	
+		FhirFileParser parser = new FhirFileParser();
 		
+		for (File potentialFhirFile : potentialFhirFiles) {
+			try {
+				IBaseResource parsedFile;
+				try {
+					parsedFile = parser.parseFile(potentialFhirFile);
+				} catch (FhirParsingFailedException e) {
+					LOG.error("Skipping file: " + e.getMessage());
+					continue;
+				}
+				
+				context.setCurrentSource(potentialFhirFile);
+				try {
+					WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
+					context.setCurrentParsedResource(wrappedResource);
+				} catch (Exception e) {
+					context.setCurrentParsedResource(null);
+				}
+				
+				fhirFileRegistry.register(potentialFhirFile, parsedFile);
+			} catch (Exception e) {
+				errorHandler.error(Optional.of("Error adding file " + potentialFhirFile.getAbsolutePath() + " to registry"), Optional.of(e));
+			}
+		}
+    	
         FileProcessor fileProcessor = new FileProcessor(context);
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
@@ -133,8 +167,6 @@ public class NewMain {
         			errorHandler.error(Optional.empty(), Optional.of(error));
         			if (!continueOnFail) {
         				break;
-        			} else {
-        				throw error;
         			}
         		}
 
@@ -144,16 +176,21 @@ public class NewMain {
 
     		boolean succeeded = !errorHandler.foundErrors();
     		
-    		if (!succeeded) {
-        		LOG.info("Rendering failed, displaying event messages");
-        	} 
-    		
-    		errorHandler.displayOutstandingEvents();
-    		
-        	if (succeeded) {
-        		LOG.info("Rendering succeeded, copying rendered artefacts");
+        	if (succeeded || allowCopyOnError) {
+        		if (succeeded) {
+        			LOG.info("Rendering succeeded, copying rendered artefacts");
+        		} else if (allowCopyOnError) {
+        			LOG.info("Rendering failed for some files - copying rendered artefacts anyway since allowCopyOnError set");
+        		}
+        		
         		copyExamples(fhirFileRegistry);
         		copyGeneratedArtefacts();
+        	} 
+        	
+        	if (!succeeded) {
+        		LOG.info("Rendering failed, displaying event messages");
+        		
+        		errorHandler.displayOutstandingEvents();
         	}
         	
         	// if there is an error while copying the files, this gets skipped so they can be recovered if necessary

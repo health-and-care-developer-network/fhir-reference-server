@@ -123,6 +123,7 @@ public class StructureDefinitionTreeDataProvider {
 			}
 			
 			RendererErrorConfig.handle(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			
 			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}
 		
