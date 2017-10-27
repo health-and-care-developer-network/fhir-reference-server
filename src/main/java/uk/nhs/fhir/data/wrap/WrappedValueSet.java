@@ -27,7 +27,6 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public abstract List<FhirIdentifier> getIdentifiers();
 	public abstract Optional<String> getOid();
 	public abstract Optional<String> getReference();
-	public abstract Optional<String> getVersion();
 	public abstract Optional<String> getDescription();
 	public abstract Optional<String> getPublisher();
 	public abstract Optional<String> getRequirements();
@@ -81,7 +80,13 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
     		displayGroup = "Code List";
     	}
     	
-    	VersionNumber versionNo = new VersionNumber(getVersion().get());
+    	VersionNumber versionNo;
+    	try {
+    		versionNo = new VersionNumber(getVersion().get());
+    	} catch (Exception e) {
+    		throw new IllegalStateException("Failed to load ValueSet version number", e);
+    	}
+    	
     	String status = getStatus();
     	
     	return new ResourceMetadata(resourceName, source, ResourceType.VALUESET,

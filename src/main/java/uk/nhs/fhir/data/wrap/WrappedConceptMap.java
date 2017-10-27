@@ -16,7 +16,6 @@ public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMa
 	
 	public abstract String getName();
 	public abstract String getStatus();
-	public abstract Optional<String> getVersion();
 	public abstract Boolean getExperimental();
 	public abstract Optional<String> getDescription();
 	public abstract Optional<String> getPublisher();

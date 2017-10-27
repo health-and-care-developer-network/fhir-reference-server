@@ -1,0 +1,151 @@
+<ns0:resource xmlns:ns0="http://hl7.org/fhir">
+      <ns0:StructureDefinition>
+        <ns0:id value="referralrequest-reasonRefused" />
+        <ns0:url value="http://hl7.org/fhir/StructureDefinition/referralrequest-reasonRefused" />
+        <ns0:name value="Reason referral was refused" />
+        <ns0:display value="reasonRefused" />
+        <ns0:status value="draft" />
+        <ns0:publisher value="Health Level Seven, Inc. - FHIR WG" />
+        <ns0:contact>
+          <ns0:telecom>
+            <ns0:system value="other" />
+            <ns0:value value="HL7" />
+          </ns0:telecom>
+        </ns0:contact>
+        <ns0:date value="2015-02-21" />
+        <ns0:description value="The reason the referral request was refused. Only applicable when status = refused." />
+        <ns0:fhirVersion value="1.0.2" />
+        <ns0:kind value="datatype" />
+        <ns0:constrainedType value="Extension" />
+        <ns0:abstract value="false" />
+        <ns0:contextType value="resource" />
+        <ns0:context value="ReferralRequest" />
+        <ns0:base value="http://hl7.org/fhir/StructureDefinition/Extension" />
+        <ns0:snapshot>
+          <ns0:element>
+            <ns0:path value="Extension" />
+            <ns0:short value="Reason referral was refused" />
+            <ns0:definition value="The reason the referral request was refused. Only applicable when status = refused." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.id" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="xml:id (or equivalent in JSON)" />
+            <ns0:definition value="unique id for the element within a resource (for internal references)." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.id" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="id" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:short value="Extension" />
+            <ns0:definition value="An Extension" />
+            <ns0:min value="0" />
+            <ns0:max value="0" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.url" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="identifies the meaning of the extension" />
+            <ns0:definition value="Source of the definition for the extension code - a logical name or a URL." />
+            <ns0:comments value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.url" />
+              <ns0:min value="1" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/referralrequest-reasonRefused" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.valueCodeableConcept" />
+            <ns0:short value="Value of extension" />
+            <ns0:definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.value[x]" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="CodeableConcept" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+        </ns0:snapshot>
+        <ns0:differential>
+          <ns0:element>
+            <ns0:path value="Extension" />
+            <ns0:short value="Reason referral was refused" />
+            <ns0:definition value="The reason the referral request was refused. Only applicable when status = refused." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:max value="0" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.url" />
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/referralrequest-reasonRefused" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.value[x]" />
+            <ns0:min value="1" />
+            <ns0:type>
+              <ns0:code value="CodeableConcept" />
+            </ns0:type>
+          </ns0:element>
+        </ns0:differential>
+      </ns0:StructureDefinition>
+    </ns0:resource>
+  

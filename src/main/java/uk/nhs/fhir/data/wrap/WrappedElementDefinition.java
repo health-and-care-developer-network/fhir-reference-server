@@ -7,6 +7,7 @@ import java.util.Set;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
@@ -19,13 +20,16 @@ import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class WrappedElementDefinition {
 
 	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
+	
+	private static final Set<String> defaultedSimpleExtensions = Sets.newConcurrentHashSet();
 	
 	public abstract String getName();
 	public abstract String getPath();
@@ -56,17 +60,17 @@ public abstract class WrappedElementDefinition {
 	// Introduced with STU3
 	public abstract Optional<String> getSliceName();
 	
-	protected final FhirFileRegistry otherResources;
+	protected final RendererContext context;
 	
-	public WrappedElementDefinition(FhirFileRegistry otherResources) {
-		this.otherResources = otherResources;
+	public WrappedElementDefinition(RendererContext context) {
+		this.context = context;
 	}
 	
-	public static WrappedElementDefinition fromDefinition(Object definition, FhirFileRegistry otherResources) {
+	public static WrappedElementDefinition fromDefinition(Object definition, RendererContext context) {
 		if (definition instanceof ElementDefinitionDt) {
-			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition, otherResources);
+			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition, context);
 		} else if (definition instanceof ElementDefinition) {
-			return new WrappedStu3ElementDefinition((ElementDefinition)definition, otherResources);
+			return new WrappedStu3ElementDefinition((ElementDefinition)definition, context);
 		} else {
 			throw new IllegalStateException("Can't wrap element definition class " + definition.getClass().getCanonicalName());
 		}
@@ -83,23 +87,32 @@ public abstract class WrappedElementDefinition {
 	protected ExtensionType lookupExtensionType(String typeProfile) {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
+		} else if (defaultedSimpleExtensions.contains(typeProfile)) {
+			return ExtensionType.SIMPLE;
 		} else {
 			WrappedStructureDefinition extensionDefinition;
 			try {
-				extensionDefinition = otherResources.getStructureDefinitionIgnoreCase(typeProfile);
+				extensionDefinition = context.getFhirFileRegistry().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
 				return extensionDefinition.getExtensionType();
 			} catch (Exception e) {
 				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
 				
 				if (!Strings.isNullOrEmpty(permittedMissingExtensionRoot)
 				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
+					
 					String message = "Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot;
-					RendererError.handle(RendererError.Key.DEFAULT_TO_SIMPLE_EXTENSION, message);
+					RendererErrorConfig.handle(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, message);
+					
+					defaultedSimpleExtensions.add(typeProfile);
+					
 					return ExtensionType.SIMPLE;
 				} else {
 					throw e;
 				}
 			}
 		}
+	}
+	public RendererContext getContext() {
+		return context;
 	}
 }

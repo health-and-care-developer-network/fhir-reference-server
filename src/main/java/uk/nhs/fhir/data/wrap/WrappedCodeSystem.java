@@ -18,7 +18,6 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 	public abstract Optional<String> getTitle();
 	public abstract String getStatus();
 
-	public abstract Optional<String> getVersion();
 	public abstract Optional<String> getDisplay();
 	public abstract Optional<String> getPublisher();
 	public abstract Optional<Date> getLastUpdatedDate();

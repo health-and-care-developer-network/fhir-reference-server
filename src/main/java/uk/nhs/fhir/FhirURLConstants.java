@@ -50,4 +50,15 @@ public class FhirURLConstants {
 				throw new IllegalStateException("Base URL for version " + version.toString());
 		}
 	}
+	
+	public static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", "https://fhir.nhs.uk/", "https://fhir.hl7.org.uk"};
+	public static boolean isNhsResourceUrl(String url) {
+		for (String prefix : NHS_PROFILE_PREFIXES) {
+			if (url.startsWith(prefix)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }

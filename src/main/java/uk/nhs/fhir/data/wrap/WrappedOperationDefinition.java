@@ -25,7 +25,6 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
 	public abstract LinkData getInstanceTypeLink();
 	public abstract String getIsInstance();
 	public abstract String getStatus();
-	public abstract Optional<String> getVersion();
 
 	public abstract List<FhirOperationParameter> getInputParameters();
 	public abstract List<FhirOperationParameter> getOutputParameters();

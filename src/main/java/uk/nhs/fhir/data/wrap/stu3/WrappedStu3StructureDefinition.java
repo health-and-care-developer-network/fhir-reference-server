@@ -26,13 +26,7 @@ import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeDataBuilder;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNodeBuilder;
-import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -206,33 +200,6 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 	@Override
 	public IBaseMetaType getSourceMeta() {
 		return definition.getMeta();
-	}
-
-	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
-	
-	@Override
-	public FhirTreeData getSnapshotTree(FhirFileRegistry otherResources) {
-		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
-		
-		for (ElementDefinition element : definition.getSnapshot().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, otherResources));
-			fhirTreeDataBuilder.addFhirTreeNode(node);
-		}
-		
-		return fhirTreeDataBuilder.getTree();
-	}
-
-	@Override
-	public FhirTreeData getDifferentialTree(FhirFileRegistry otherResources) {
-		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
-		fhirTreeDataBuilder.permitDummyNodes();
-		
-		for (ElementDefinition element : definition.getDifferential().getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, otherResources));
-			fhirTreeDataBuilder.addFhirTreeNode(node);
-		}
-
-		return fhirTreeDataBuilder.getTree();
 	}
 
 	@Override

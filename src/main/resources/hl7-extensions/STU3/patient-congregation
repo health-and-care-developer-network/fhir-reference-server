@@ -1,0 +1,180 @@
+<ns0:resource xmlns:ns0="http://hl7.org/fhir">
+      <ns0:StructureDefinition>
+        <ns0:id value="patient-congregation" />
+        <ns0:extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-wg">
+          <ns0:valueCode value="pa" />
+        </ns0:extension>
+        <ns0:extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm">
+          <ns0:valueInteger value="1" />
+        </ns0:extension>
+        <ns0:url value="http://hl7.org/fhir/StructureDefinition/patient-congregation" />
+        <ns0:name value="congregation" />
+        <ns0:title value="congregation" />
+        <ns0:status value="draft" />
+        <ns0:date value="2017-04-19T07:44:43+10:00" />
+        <ns0:publisher value="HL7" />
+        <ns0:description value="A group or place of religious practice that may provide services to the patient." />
+        <ns0:fhirVersion value="3.0.1" />
+        <ns0:mapping>
+          <ns0:identity value="rim" />
+          <ns0:uri value="http://hl7.org/v3" />
+          <ns0:name value="RIM Mapping" />
+        </ns0:mapping>
+        <ns0:kind value="complex-type" />
+        <ns0:abstract value="false" />
+        <ns0:contextType value="resource" />
+        <ns0:context value="Patient" />
+        <ns0:type value="Extension" />
+        <ns0:baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+        <ns0:derivation value="constraint" />
+        <ns0:snapshot>
+          <ns0:element id="Extension">
+            <ns0:path value="Extension" />
+            <ns0:short value="A group of place of religious practice" />
+            <ns0:definition value="A group or place of religious practice that may provide services to the patient." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:condition value="ele-1" />
+            <ns0:constraint>
+              <ns0:key value="ele-1" />
+              <ns0:severity value="error" />
+              <ns0:human value="All FHIR elements must have a @value or children" />
+              <ns0:expression value="hasValue() | (children().count() &gt; id.count())" />
+              <ns0:xpath value="@value|f:*|h:div" />
+              <ns0:source value="Element" />
+            </ns0:constraint>
+            <ns0:constraint>
+              <ns0:key value="ext-1" />
+              <ns0:severity value="error" />
+              <ns0:human value="Must have either extensions or value[x], not both" />
+              <ns0:expression value="extension.exists() != value.exists()" />
+              <ns0:xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), 'value')])" />
+              <ns0:source value="Extension" />
+            </ns0:constraint>
+          </ns0:element>
+          <ns0:element id="Extension.id">
+            <ns0:path value="Extension.id" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="xml:id (or equivalent in JSON)" />
+            <ns0:definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Element.id" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="string" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element id="Extension.extension">
+            <ns0:path value="Extension.extension" />
+            <ns0:slicing>
+              <ns0:discriminator>
+                <ns0:type value="value" />
+                <ns0:path value="url" />
+              </ns0:discriminator>
+              <ns0:description value="Extensions are always sliced by (at least) url" />
+              <ns0:rules value="open" />
+            </ns0:slicing>
+            <ns0:short value="Additional Content defined by implementations" />
+            <ns0:definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension." />
+            <ns0:comment value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
+            <ns0:alias value="extensions" />
+            <ns0:alias value="user content" />
+            <ns0:min value="0" />
+            <ns0:max value="*" />
+            <ns0:base>
+              <ns0:path value="Element.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element id="Extension.url">
+            <ns0:path value="Extension.url" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="identifies the meaning of the extension" />
+            <ns0:definition value="Source of the definition for the extension code - a logical name or a URL." />
+            <ns0:comment value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition SHALL be a URI for the Structure Definition defining the extension." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.url" />
+              <ns0:min value="1" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/patient-congregation" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element id="Extension.valueString">
+            <ns0:path value="Extension.valueString" />
+            <ns0:short value="Value of extension" />
+            <ns0:definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.value[x]" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="string" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+        </ns0:snapshot>
+        <ns0:differential>
+          <ns0:element id="Extension">
+            <ns0:path value="Extension" />
+            <ns0:short value="A group of place of religious practice" />
+            <ns0:definition value="A group or place of religious practice that may provide services to the patient." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+          </ns0:element>
+          <ns0:element id="Extension.extension">
+            <ns0:path value="Extension.extension" />
+            <ns0:max value="0" />
+          </ns0:element>
+          <ns0:element id="Extension.url">
+            <ns0:path value="Extension.url" />
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/patient-congregation" />
+          </ns0:element>
+          <ns0:element id="Extension.valueString">
+            <ns0:path value="Extension.valueString" />
+            <ns0:type>
+              <ns0:code value="string" />
+            </ns0:type>
+          </ns0:element>
+        </ns0:differential>
+      </ns0:StructureDefinition>
+    </ns0:resource>
+  

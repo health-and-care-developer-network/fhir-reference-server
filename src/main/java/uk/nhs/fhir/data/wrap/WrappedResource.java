@@ -16,6 +16,7 @@ import uk.nhs.fhir.data.metadata.ArtefactType;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
+import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.metadata.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2OperationDefinition;
@@ -40,6 +41,12 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	public abstract FhirVersion getImplicitFhirVersion();
 	public abstract Optional<String> getUrl();
 	public abstract void setUrl(String url);
+	
+	public abstract Optional<String> getVersion();
+	
+	public Optional<VersionNumber> getVersionNo() {
+		return getVersion().map(version -> new VersionNumber(version));
+	}
 	
 	// Name as used in the resource's URL
 	public abstract String getName();
@@ -78,7 +85,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		
 		String resourceFilename = FileLoader.removeFileExtension(source.getName());
 		File dir = new File(source.getParent());
-		File artefactDir = new File(dir.getAbsolutePath() + "/" + resourceFilename);
+		File artefactDir = new File(dir.getAbsolutePath() + File.separator + resourceFilename);
 		
 		LOG.debug("Looking for artefacts in directory:" + artefactDir.getAbsolutePath());
 		

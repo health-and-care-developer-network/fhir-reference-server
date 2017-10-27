@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 
 public class BindingInfo {
 
@@ -46,7 +47,7 @@ public class BindingInfo {
 		
 		if (!resolvedDescription.isPresent() 
 		  && !resolvedUrl.isPresent()) {
-			RendererError.handle(RendererError.Key.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
+			RendererErrorConfig.handle(RendererError.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
 			resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
 		}
 		

@@ -1,5 +1,6 @@
 package uk.nhs.fhir.util;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -106,5 +107,46 @@ public class StringUtil {
 		e.printStackTrace(new PrintWriter(sw));
 		String stacktrace = sw.toString();
 		return stacktrace;
+	}
+
+	public static String commonStringStart(String commonFilepathStart, String filePath) {
+		char[] chars1 = commonFilepathStart.toCharArray();
+		char[] chars2 = filePath.toCharArray();
+		
+		int matchingCharsIndex = 0;
+		while (chars1.length > matchingCharsIndex
+		  && chars2.length > matchingCharsIndex
+		  && chars1[matchingCharsIndex] == chars2[matchingCharsIndex]) {
+			matchingCharsIndex++;
+		}
+		
+		char[] resultChars = Arrays.copyOf(chars1, matchingCharsIndex);
+		String result = new String(resultChars);
+		
+		return result;
+	}
+
+	public static String getTrimmedFileName(File xmlFile) {
+		String fullFileName = xmlFile.getName();
+		
+		String trimmedFileName = removeExtension(fullFileName);
+		
+		return trimmedFileName;
+	}
+	
+	public static String getLastPartOfUrlWithoutExtension(String url) {
+		String[] split = url.split("/");
+		String lastPart = split[split.length - 1];
+		String trimmedLastPart = removeExtension(lastPart);
+		return trimmedLastPart;
+	}
+	
+	// trims everything after first '.'
+	private static String removeExtension(String s) {
+		if (s.contains(".")) {
+			return s.substring(0, s.indexOf('.'));
+		} else {
+			return s;
+		}
 	}
 }

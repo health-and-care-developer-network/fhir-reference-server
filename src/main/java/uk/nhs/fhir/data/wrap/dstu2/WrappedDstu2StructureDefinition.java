@@ -27,13 +27,7 @@ import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirContact;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeDataBuilder;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNodeBuilder;
-import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
 

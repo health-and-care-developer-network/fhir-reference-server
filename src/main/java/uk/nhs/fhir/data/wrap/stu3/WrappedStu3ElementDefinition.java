@@ -32,8 +32,9 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -44,8 +45,8 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
 	private final ElementDefinition definition;
 
-	public WrappedStu3ElementDefinition(ElementDefinition definition, FhirFileRegistry otherResources) {
-		super(otherResources);
+	public WrappedStu3ElementDefinition(ElementDefinition definition, RendererContext context) {
+		super(context);
 		this.definition = definition;
 	}
 
@@ -84,7 +85,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 						LinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
 						typeLinks.addNestedUri(referenceLink, type.getTargetProfile(), FhirVersion.STU3);
 					} else if (type.getCode().equals("string")){
-						RendererError.handle(RendererError.Key.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
+						RendererErrorConfig.handle(RendererError.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
 						typeLinks.addSimpleLink(typeLinkFactory.forDataTypeName(type.getCode()));
 					} else {
 						String targetProfile = type.getTargetProfile();
@@ -186,6 +187,15 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			return Optional.empty();
 		} else {
 			ElementDefinitionSlicingComponent slicing = definition.getSlicing();
+
+			String description = slicing.getDescription();
+			String descriptionDesc = description == null ? "[no description]" : description;
+			if (slicing.getDiscriminator().isEmpty()
+			  && !getSliceName().isPresent()) {
+				RendererErrorConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
+					"Slicing " + descriptionDesc + " doesn't have a discriminator (" + getPath() + ")");
+			}
+			
 			SlicingInfo slicingInfo = new SlicingInfo(
 				slicing.getDescription(),
 				slicing.getDiscriminator().stream()

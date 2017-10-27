@@ -32,8 +32,9 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -44,8 +45,8 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	private final ElementDefinitionDt definition;
 
-	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition, FhirFileRegistry otherResources) {
-		super(otherResources);
+	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition, RendererContext context) {
+		super(context);
 		this.definition = definition;
 	}
 
@@ -175,6 +176,15 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			return Optional.empty();
 		} else {
 			Slicing slicing = definition.getSlicing();
+
+			String description = slicing.getDescription();
+			String descriptionDesc = description == null ? "[no description]" : description;
+			if (slicing.getDiscriminator().isEmpty()
+			  && !getSliceName().isPresent()) {
+				RendererErrorConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
+					"Slicing " + descriptionDesc + " doesn't have a discriminator (" + getPath() + ")");
+			}
+			
 			SlicingInfo slicingInfo = new SlicingInfo(
 				slicing.getDescription(),
 				slicing.getDiscriminator().stream()
@@ -196,7 +206,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 				
 				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
 					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
-					RendererError.handle(RendererError.Key.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
+					RendererErrorConfig.handle(RendererError.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
 					fixedValueAsString = correctedUrl;
 				}
 				

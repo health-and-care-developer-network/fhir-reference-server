@@ -9,7 +9,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.util.FhirContexts;
@@ -47,10 +48,8 @@ public class FhirFileParser {
 		
 		List<FhirVersion> successfullyParsedVersions = Lists.newArrayList();
 		
-		FhirVersion[] versionsToTry = new FhirVersion[]{FhirVersion.DSTU2, FhirVersion.STU3};
-		
 		IBaseResource resource;
-		for (FhirVersion version : versionsToTry) {
+		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			resource = tryParse(thisFile, version, successfullyParsedVersions);
 			if (resource != null) {
 				return resource;
@@ -82,8 +81,37 @@ public class FhirFileParser {
 		if (resource != null) {
 			successfullyParsedVersions.add(versionToTry);
 			
-			// If the version we found matches the intended version (i.e. the parser version we used) we are done
-			if (versionToTry.equals(getResourceVersion(resource))) {
+			if (!isSupported(resource)) {
+				
+				IBaseMetaType meta = null;
+				switch (versionToTry) {
+					case DSTU2:
+						ca.uhn.fhir.model.dstu2.resource.BaseResource dstu2Resource = (ca.uhn.fhir.model.dstu2.resource.BaseResource)resource;
+						meta = dstu2Resource.getMeta();
+						break;
+					case STU3:
+						org.hl7.fhir.dstu3.model.BaseResource stu3Resource = (org.hl7.fhir.dstu3.model.BaseResource)resource;
+						meta = stu3Resource.getMeta();
+						break;
+					default:
+						throw new IllegalStateException("Trying unexpected version " + versionToTry.toString());
+				}
+				
+				if (meta != null) {
+					for (IPrimitiveType<String> profile : meta.getProfile()) {
+						String url = profile.getValueAsString();
+						if (fromResourceUrl(url).equals(versionToTry)) {
+							return resource;
+						}
+					}
+				}
+
+				String className = resource.getClass().getName();
+				LOG.warn("Successfully parsed file " + thisFile.getAbsolutePath() + " for " + versionToTry.toString() 
+					+ " but meta wasn't present or didn't have a profile URL. Class=" + className);
+				
+			} else if (versionToTry.equals(getResourceVersion(resource))) {
+				// If the version we found matches the intended version (i.e. the parser version we used) we are done
 				return resource;
 			}
 		}
@@ -93,13 +121,8 @@ public class FhirFileParser {
 
 	private FhirVersion getResourceVersion(IBaseResource resource) {
 		
-		if (!isSupported(resource)) {
-			LOG.info("Skipping input xml file with class " + resource.getClass().getCanonicalName() + " (not supported)");
-			return null;
-		}
-		
 		if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
-			StructureDefinition dstu2StructureDefinition = (ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource;
+			ca.uhn.fhir.model.dstu2.resource.StructureDefinition dstu2StructureDefinition = (ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource;
 			
 			String url = dstu2StructureDefinition.getUrl();
 			if (!Strings.isNullOrEmpty(url)) {
@@ -239,11 +262,8 @@ public class FhirFileParser {
 			
 			if (path.startsWith("/STU3")) {
 				return FhirVersion.STU3;
-			} else if (path.startsWith("/DSTU2")) {
-				return FhirVersion.DSTU2;
 			} else {
-				RendererError.handle(RendererError.Key.RESOURCE_URL_WITHOUT_FHIR_VERSION, "URL " + urlString + " doesn't have a FHIR version prefix");
-				return null;
+				return FhirVersion.DSTU2;
 			}
 		} catch (MalformedURLException e) {
 			throw new IllegalStateException(e);

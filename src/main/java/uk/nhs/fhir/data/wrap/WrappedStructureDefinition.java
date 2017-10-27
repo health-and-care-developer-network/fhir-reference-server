@@ -25,7 +25,6 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 
 	public abstract Optional<String> getConstrainedType();
 	public abstract String getBase();
-	public abstract Optional<String> getVersion();
 	public abstract Optional<String> getDisplay();
 	public abstract Optional<String> getPublisher();
 	public abstract Optional<Date> getDate();

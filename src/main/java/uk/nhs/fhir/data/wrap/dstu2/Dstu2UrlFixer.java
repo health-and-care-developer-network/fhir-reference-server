@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.url.UrlFixer;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 
 public class Dstu2UrlFixer extends UrlFixer {
 
@@ -26,7 +27,7 @@ public class Dstu2UrlFixer extends UrlFixer {
 		// sanity check
 		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT + "/")
 		  && !hostAndPath.toLowerCase().contains("dstu2")) {
-			RendererError.handle(RendererError.Key.HL7_URL_WITHOUT_DSTU2, "Should " + hostAndPath + " have been modified to contain /dstu2/ ?");
+			RendererErrorConfig.handle(RendererError.HL7_URL_WITHOUT_DSTU2, "Should " + hostAndPath + " have been modified to contain /dstu2/ ?");
 			
 			if (hostAndPath.contains(FhirURLConstants.HL7_FHIR)) {
 				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_FHIR, FhirURLConstants.HL7_DSTU2);
