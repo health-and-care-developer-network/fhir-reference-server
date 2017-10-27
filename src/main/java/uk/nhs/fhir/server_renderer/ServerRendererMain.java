@@ -110,11 +110,10 @@ public class ServerRendererMain
 		AnnotationConfiguration annotationConfiguration = new AnnotationConfiguration();
 		CodeSource codeSource = RestfulServlet.class.getProtectionDomain().getCodeSource();
 		URL location = codeSource.getLocation();
-		LOG.info("Configuration resource name: " + location.toString());
+		LOG.debug("Configuration resource name: " + location.toString());
 		Resource fhirReferenceServerJar = Resource.newResource(location);
 		
 		try {
-			LOG.info("Configuration resource name: " + fhirReferenceServerJar.toString());
 			LOG.info("Configuring server based on Servlets found in " + fhirReferenceServerJar.getFile().getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
