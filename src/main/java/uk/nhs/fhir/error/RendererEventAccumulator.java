@@ -60,7 +60,12 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 	public void log(String info, Optional<Exception> throwable) {
 		File source = context.getCurrentSource();
 		WrappedResource<?> resource = context.getCurrentParsedResource();
-		addEvent(RendererEvent.warning(info, source, resource));
+		
+		if (throwable.isPresent()) {
+			addEvent(RendererEvent.warning(info, source, resource, throwable.get()));
+		} else {
+			addEvent(RendererEvent.warning(info, source, resource));
+		}
 	}
 
 	@Override

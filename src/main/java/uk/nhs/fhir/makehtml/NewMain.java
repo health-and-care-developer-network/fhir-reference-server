@@ -130,23 +130,25 @@ public class NewMain {
 		FhirFileParser parser = new FhirFileParser();
 		
 		for (File potentialFhirFile : potentialFhirFiles) {
+			context.setCurrentSource(potentialFhirFile);
+			context.setCurrentParsedResource(null);
+
+			IBaseResource parsedFile;
 			try {
-				IBaseResource parsedFile;
-				try {
-					parsedFile = parser.parseFile(potentialFhirFile);
-				} catch (FhirParsingFailedException e) {
-					LOG.error("Skipping file: " + e.getMessage());
-					continue;
-				}
-				
-				context.setCurrentSource(potentialFhirFile);
-				try {
-					WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
-					context.setCurrentParsedResource(wrappedResource);
-				} catch (Exception e) {
-					context.setCurrentParsedResource(null);
-				}
-				
+				parsedFile = parser.parseFile(potentialFhirFile);
+			} catch (Exception e) {
+				errorHandler.log("Skipping file " + potentialFhirFile.getAbsolutePath() + " - HAPI parsing failed - " + e.getMessage(), Optional.of(e));
+				continue;
+			}
+
+			try {
+				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
+				context.setCurrentParsedResource(wrappedResource);
+			} catch (Exception e) {
+				// leave 'current parsed resource' as null
+			}
+
+			try {
 				fhirFileRegistry.register(potentialFhirFile, parsedFile);
 			} catch (Exception e) {
 				errorHandler.error(Optional.of("Error adding file " + potentialFhirFile.getAbsolutePath() + " to registry"), Optional.of(e));
