@@ -13,7 +13,6 @@
 */
 package uk.nhs.fhir.util;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -148,32 +147,6 @@ public class FileLoader {
     			LOG.error("Unable to load file from classpath: " + fileName);
     			return null;
     		}
-    }
-    
-    private static final Character[] brokenQuoteChars = new Character[] {(char)25, (char)28, (char)29};
-    
-    private static String cleanString(String input) {
-    	for (Character c : brokenQuoteChars) {
-	    	int brokenquoteindex = input.indexOf((char)c);
-	    	if (brokenquoteindex > -1) {
-	    		LOG.info("Found broken quote " + input.charAt(brokenquoteindex) + " (0x" + Integer.toHexString(input.charAt(brokenquoteindex)) + ")");
-	    		LOG.info("Chars from " + (brokenquoteindex-1) + " (=0x" + Integer.toHexString(brokenquoteindex-1) + ": " 
-	    			+ input.charAt(brokenquoteindex-1) + " "
-	    			+ input.charAt(brokenquoteindex) + " "
-	    			+ input.charAt(brokenquoteindex+1) + " "
-	    			+ input.charAt(brokenquoteindex+2) + " "
-	    			+ input.charAt(brokenquoteindex+3) + " (0x"
-	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex-1)) + " 0x"
-	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex)) + " 0x"
-	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex+1)) + " 0x"
-	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex+2))
-	    			+ ")");
-	    	}
-    	}
-    	
-    	// Hack: The funny quote symbols are showing up as char codes 28 and 29.. replace them with '
-    	return input.replace((char)28, (char)39)
-    			    .replace((char)29, (char)39);
     }
     
     /**
