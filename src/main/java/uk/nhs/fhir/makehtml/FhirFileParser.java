@@ -2,8 +2,8 @@ package uk.nhs.fhir.makehtml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -24,6 +24,7 @@ import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.FileLoader;
 
 public class FhirFileParser {
 	private static Logger LOG = LoggerFactory.getLogger(FhirFileParser.class);
@@ -57,6 +58,12 @@ public class FhirFileParser {
 		}
 		
 		if (successfullyParsedVersions.isEmpty()) {
+			try {
+				parseFile(FhirContexts.xmlParser(FhirVersion.STU3), thisFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 			throw new FhirParsingFailedException("Parsing failed for file: " + thisFile.getAbsolutePath());
 		}
 		
@@ -279,8 +286,7 @@ public class FhirFileParser {
 	}
 	
 	private IBaseResource parseFile(IParser xmlParser, File thisFile) throws FileNotFoundException, IOException {
-		try (FileReader fr = new FileReader(thisFile)) {
-			return xmlParser.parseResource(fr);
-		}
+		String fileContents = FileLoader.loadFile(thisFile);
+		return xmlParser.parseResource(new StringReader(fileContents));
 	}
 }

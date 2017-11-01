@@ -13,6 +13,8 @@
 */
 package uk.nhs.fhir.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import org.apache.commons.io.ByteOrderMark;
@@ -54,42 +55,65 @@ public class FileLoader {
      */
     public static String loadFile(final File file) {
     	LOG.debug("Loading file: " + file.getAbsolutePath());
-        String defaultEncoding = DEFAULT_ENCODING;
-    	InputStream inputStream;
-    	Reader inputStreamReader;
-    	ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();
+        
+        String charsetName;
 		try {
-			inputStream = new FileInputStream(file);
-			String charsetName = defaultEncoding;
-			
-			// Use commons.io to deal with byte-order-marker if present
-			BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-			if (bOMInputStream.hasBOM()) {
-				ByteOrderMark bom = bOMInputStream.getBOM();
-			    charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
-			}
-			
-		    LOG.debug("Loading file using encoding: " + charsetName);
-		    
-	    	inputStreamReader = new InputStreamReader(bOMInputStream, charsetName);
-	    	int data = inputStreamReader.read();
-	    	while(data != -1){
+			charsetName = getCharset(file);
+		} catch (IOException e) {
+			throw new IllegalStateException("Unable to determine appropriate charset for file " + file.getName(), e);
+		}
+		
+	    LOG.debug("Loading file using encoding: " + charsetName);
+    	
+	    StringBuilder sb = new StringBuilder();
+	    
+		try (
+			ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();
+			InputStream fis = new FileInputStream(file);
+			InputStream bomInputStream = new BOMInputStream(fis);
+			Reader streamReader = new InputStreamReader(bomInputStream, charsetName);
+			BufferedReader in = new BufferedReader(streamReader);) {
+
+	    	/*int data = inputStreamReader.read();
+	    	while(data != -1) {
 	    	    bOutStream.write(data);
 	    	    data = inputStreamReader.read();
 	    	}
-	    	inputStreamReader.close();
-		} catch (FileNotFoundException e) {
-			LOG.error("Error reading file: " + file.getName() + " - message - " + e.getMessage());
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("Error reading file: " + file.getName() + " - message - " + e.getMessage());
+	    	
+	    	return bOutStream.toString(charsetName);*/
+			
+			String str;
+			while ((str = in.readLine()) != null) {
+			    sb.append(str);
+			}
+			
+			return sb.toString();
 		} catch (IOException e) {
-			LOG.error("Error reading file: " + file.getName() + " - message - " + e.getMessage());
+			throw new IllegalStateException("Error reading file: " + file.getName(), e);
 		}
-		
-		return cleanString(bOutStream.toString());
     }
     
     /**
+     * Return an appropriate charset which handles BOMs if necessary
+     * @throws IOException 
+     * @throws FileNotFoundException 
+     */
+    private static String getCharset(File file) throws IOException {
+    	try (InputStream fis = new FileInputStream(file);
+			BOMInputStream bOMInputStream = new BOMInputStream(fis);) {
+    		
+    		// Use commons.io to deal with byte-order-marker if present
+			ByteOrderMark bom = bOMInputStream.getBOM();
+			
+			if (bom != null) {
+				return bom.getCharsetName();
+			} else {
+				return DEFAULT_ENCODING;
+			}
+		}
+	}
+
+	/**
      * @param is InputStream to load content from
      * @return String containing content of specified file
      */
@@ -126,7 +150,27 @@ public class FileLoader {
     		}
     }
     
+    private static final Character[] brokenQuoteChars = new Character[] {(char)25, (char)28, (char)29};
+    
     private static String cleanString(String input) {
+    	for (Character c : brokenQuoteChars) {
+	    	int brokenquoteindex = input.indexOf((char)c);
+	    	if (brokenquoteindex > -1) {
+	    		LOG.info("Found broken quote " + input.charAt(brokenquoteindex) + " (0x" + Integer.toHexString(input.charAt(brokenquoteindex)) + ")");
+	    		LOG.info("Chars from " + (brokenquoteindex-1) + " (=0x" + Integer.toHexString(brokenquoteindex-1) + ": " 
+	    			+ input.charAt(brokenquoteindex-1) + " "
+	    			+ input.charAt(brokenquoteindex) + " "
+	    			+ input.charAt(brokenquoteindex+1) + " "
+	    			+ input.charAt(brokenquoteindex+2) + " "
+	    			+ input.charAt(brokenquoteindex+3) + " (0x"
+	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex-1)) + " 0x"
+	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex)) + " 0x"
+	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex+1)) + " 0x"
+	    			+ Integer.toHexString((int)input.charAt(brokenquoteindex+2))
+	    			+ ")");
+	    	}
+    	}
+    	
     	// Hack: The funny quote symbols are showing up as char codes 28 and 29.. replace them with '
     	return input.replace((char)28, (char)39)
     			    .replace((char)29, (char)39);
