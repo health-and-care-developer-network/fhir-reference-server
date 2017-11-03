@@ -56,8 +56,6 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	public FhirFileRegistry() {
 		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			externalFhirResources.put(version, Maps.newHashMap());
-		}
-		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			hl7Extensions.put(version, Maps.newHashMap());
 		}
 	}
