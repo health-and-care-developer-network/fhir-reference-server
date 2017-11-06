@@ -83,7 +83,7 @@ public class FhirTreeTable {
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
-		addTableRow(tableRows, root, rootVlines, rootIcons, false);
+		addTableRow(tableRows, root, rootVlines, rootIcons, true);
 		addChildrenRows(root, tableRows, rootVlines);
 		
 		return tableRows;
@@ -125,15 +125,16 @@ public class FhirTreeTable {
 	}
 
 	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
-		addTableRow(tableRows, nodeToAdd, rootVlines, treeIcons, true);
+		addTableRow(tableRows, nodeToAdd, rootVlines, treeIcons, false);
 	}
 	
-	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean showCardinality) {
+	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean isRoot) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		LinkDatas typeLinks = nodeToAdd.getTypeLinks();
 		
-		if (typeLinks.isEmpty()) {
+		if (typeLinks.isEmpty()
+		  && !isRoot) {
 			RendererErrorConfig.handle(RendererError.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
 		}
 		
@@ -143,9 +144,9 @@ public class FhirTreeTable {
 			new TableRow(
 				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
-				showCardinality ? 
-					new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile) : 
-					TableCell.empty(),
+				isRoot ? 
+					TableCell.empty() : 
+					new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile),
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false),
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}

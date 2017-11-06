@@ -4,13 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
-import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
@@ -25,10 +22,12 @@ public class FhirTreeNodeBuilder {
 
 		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
+			/*
 			typeLinks = new LinkDatas(
 				new LinkData(
 					FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_FHIR + "/profiling.html", elementDefinition.getVersion()), 
-					"Profile"));
+					"Profile"));*/
+			typeLinks = new LinkDatas();
 		} else {
 			typeLinks = elementDefinition.getTypeLinks();
 		}

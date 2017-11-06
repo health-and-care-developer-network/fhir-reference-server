@@ -89,6 +89,11 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
 			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
+			if (typeLinks.isEmpty()
+			  && !node.isRoot()) {
+				throw new IllegalStateException("No typeLinks or linked Node present for non root node " + pathName);
+			}
+			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
 				linkedNodeKey, fhirTreeNode.getMappings(), wrappedResource.getImplicitFhirVersion());

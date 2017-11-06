@@ -207,7 +207,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			typeLinks.addSimpleLink(new LinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
 		} 
 
-		if (typeLinks.isEmpty()) {
+		if (typeLinks.isEmpty()
+		  && !isRoot()) {
 			RendererErrorConfig.handle(RendererError.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
 		}
 		
@@ -674,5 +675,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 	public void setId(Optional<String> id) {
 		this.id = id;
+	}
+	
+	@Override
+	public boolean isRoot() {
+		return !path.contains(".");
 	}
 }

@@ -254,4 +254,9 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	public Optional<FhirTreeTableContent> getLinkedNode() {
 		return backup.getLinkedNode();
 	}
+	
+	@Override
+	public boolean isRoot() {
+		return !path.contains(".");
+	}
 }
