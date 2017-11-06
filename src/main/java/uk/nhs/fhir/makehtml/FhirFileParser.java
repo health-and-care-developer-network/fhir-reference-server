@@ -79,7 +79,8 @@ public class FhirFileParser {
 		} else {
 			// Multiple FHIR versions succeeded - default to DEFAULT_FHIR_VERSION
 			try {
-				LOG.info("Successfully parsed {} to multiple versions {}, defaulting to {}" + thisFile.getAbsolutePath(), successfullyParsedVersions, DEFAULT_FHIR_VERSION);
+				LOG.info("Successfully parsed {} to multiple versions {}, defaulting to {}", 
+					new Object[]{thisFile.getAbsolutePath(), successfullyParsedVersions, DEFAULT_FHIR_VERSION});
 				return parseFile(FhirContexts.xmlParser(DEFAULT_FHIR_VERSION), thisFile);
 			} catch (IOException e) {
 				throw new FhirParsingFailedException("Failed default parsing to " + DEFAULT_FHIR_VERSION.toString() + ": " + thisFile.getAbsolutePath(), e);
@@ -124,11 +125,11 @@ public class FhirFileParser {
 					meta.getProfile().forEach(profile -> profileUrlList.add(profile.getValueAsString()));
 					
 					LOG.debug("Parsed file {} to type {} (possibly an example resource) version from urls {} didn't match version tried {}", 
-							thisFile.toPath(), className, profileUrlList, versionToTry);
+							new Object[]{thisFile.toPath(), className, profileUrlList, versionToTry});
 					return null;
 				} else {
 					LOG.info("Successfully parsed file {} for {} but meta wasn't present or didn't have a profile URL. Class={}",
-							thisFile.getAbsolutePath(), versionToTry.toString(), className);
+							new Object[]{thisFile.getAbsolutePath(), versionToTry.toString(), className});
 					return null;
 				}
 				
@@ -141,7 +142,7 @@ public class FhirFileParser {
 					return resource;
 				} else if (selfIdentifiedVersion.isPresent()) {
 					LOG.debug("Parsed file {} to type {} but self identified version {} didn't match version tried {}", 
-						thisFile.toPath(), className, selfIdentifiedVersion.get(), versionToTry);
+						new Object[]{thisFile.toPath(), className, selfIdentifiedVersion.get(), versionToTry});
 					return null;
 				} else {
 					LOG.debug("Couldn't identify version for file {} when parsed into class {}", thisFile.toPath(), resource.getClass().getName());
