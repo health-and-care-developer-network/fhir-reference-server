@@ -15,7 +15,7 @@ public class RendererContext {
 	private final FhirErrorHandler errorDisplayer;
 	
 	private File currentSource = null;
-	private WrappedResource<?> currentParsedResource = null;
+	private Optional<WrappedResource<?>> currentParsedResource = null;
 	
 	public RendererContext(FhirFileRegistry knownFiles, FhirErrorHandler errorDisplayer) {
 		this.knownFiles = knownFiles;
@@ -43,11 +43,11 @@ public class RendererContext {
 		currentSource = newSource;
 	}
 
-	public WrappedResource<?> getCurrentParsedResource() {
+	public Optional<WrappedResource<?>> getCurrentParsedResource() {
 		return currentParsedResource;
 	}
 
-	public void setCurrentParsedResource(WrappedResource<?> newParsedResource) {
+	public void setCurrentParsedResource(Optional<WrappedResource<?>> newParsedResource) {
 		currentParsedResource = newParsedResource;
 	}
 
@@ -72,5 +72,10 @@ public class RendererContext {
 			default:
 				throw new IllegalStateException("Unexpected event type: " + responseType.toString());
 		}
+	}
+
+	public void clearCurrent() {
+		setCurrentParsedResource(Optional.empty());
+		setCurrentSource(null);
 	}
 }

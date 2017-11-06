@@ -2,6 +2,7 @@ package uk.nhs.fhir.error;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -14,9 +15,9 @@ public class RendererEvents {
 
 	private final List<RendererEvent> events = Lists.newArrayList();
 	private final File file;
-	private final WrappedResource<?> resource;
+	private final Optional<WrappedResource<?>> resource;
 	
-	public RendererEvents(File file, WrappedResource<?> resource) {
+	public RendererEvents(File file, Optional<WrappedResource<?>> resource) {
 		this.file = file;
 		this.resource = resource;
 	}
@@ -38,7 +39,7 @@ public class RendererEvents {
 		return Lists.newArrayList(events);
 	}
 	
-	public WrappedResource<?> getResource() {
+	public Optional<WrappedResource<?>> getResource() {
 		return resource;
 	}
 }
