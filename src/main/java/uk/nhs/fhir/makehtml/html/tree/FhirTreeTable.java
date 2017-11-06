@@ -27,6 +27,7 @@ import uk.nhs.fhir.makehtml.RendererErrorConfig;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.SimpleTextCell;
+import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.cell.TreeNodeCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
@@ -82,13 +83,13 @@ public class FhirTreeTable {
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
-		addTableRow(tableRows, root, rootVlines, rootIcons);
-		addNodeRows(root, tableRows, rootVlines);
+		addTableRow(tableRows, root, rootVlines, rootIcons, false);
+		addChildrenRows(root, tableRows, rootVlines);
 		
 		return tableRows;
 	}
 
-	private void addNodeRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
+	private void addChildrenRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
 		
 		List<? extends FhirTreeTableContent> children = node.getChildren();
 		for (int i=0; i<children.size(); i++) {
@@ -119,11 +120,15 @@ public class FhirTreeTable {
 			}
 
 			addTableRow(tableRows, childNode, childVlines, treeIcons);
-			addNodeRows(childNode, tableRows, childVlines);
+			addChildrenRows(childNode, tableRows, childVlines);
 		}
 	}
-	
+
 	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
+		addTableRow(tableRows, nodeToAdd, rootVlines, treeIcons, true);
+	}
+	
+	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean showCardinality) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		LinkDatas typeLinks = nodeToAdd.getTypeLinks();
@@ -138,8 +143,8 @@ public class FhirTreeTable {
 			new TableRow(
 				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
-				new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile), 
-				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false), 
+				(showCardinality ? new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile) : TableCell.empty()),
+				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false),
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
 	
