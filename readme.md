@@ -8,7 +8,7 @@ A simple utility to add a html representation of the described profile into the 
 Simply run:
 
 ```
-java -jar MakeHTML-1.0-SNAPSHOT.jar [source folder] [target folder]
+java -jar MakeHTML-1.0-SNAPSHOT.jar <source folder> <target folder>
 ```
 
 Any StructureDefinition files in `[source folder]` will have a tree view of itself inserted into the *text* element, and output into the `[target folder]`.

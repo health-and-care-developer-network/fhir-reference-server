@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.util.StringUtil;
 
 public class DeferredStdOutEventAccumulator extends RendererEventAccumulator {
@@ -17,9 +18,21 @@ public class DeferredStdOutEventAccumulator extends RendererEventAccumulator {
 		for (RendererEvents fileEvents : events) {
 			
 			String absolutePath = fileEvents.getFile().getAbsolutePath();
-			String type = fileEvents.getResource().getResourceType().getDisplayName();
-			String name = fileEvents.getResource().getName();
-			Optional<String> url = fileEvents.getResource().getUrl();
+			
+			String type;
+			String name;
+			Optional<String> url;
+			if (fileEvents.getResource().isPresent()) {
+				WrappedResource<?> wrappedResource = fileEvents.getResource().get();
+				
+				type = wrappedResource.getResourceType().getDisplayName();
+				name = wrappedResource.getName();
+				url = wrappedResource.getUrl();
+			} else {
+				type = "[resource not present]";
+				name = "[resource not present]";
+				url = Optional.empty();
+			}
 			
 			String startString = "Error rendering resource:"
 			  + "\nFile: " + absolutePath

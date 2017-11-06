@@ -131,7 +131,7 @@ public class NewMain {
 		
 		for (File potentialFhirFile : potentialFhirFiles) {
 			context.setCurrentSource(potentialFhirFile);
-			context.setCurrentParsedResource(null);
+			context.setCurrentParsedResource(Optional.empty());
 
 			IBaseResource parsedFile;
 			try {
@@ -143,9 +143,9 @@ public class NewMain {
 
 			try {
 				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
-				context.setCurrentParsedResource(wrappedResource);
+				context.setCurrentParsedResource(Optional.of(wrappedResource));
 			} catch (Exception e) {
-				// leave 'current parsed resource' as null
+				// if wrapping failed, leave 'current parsed resource' as null
 			}
 
 			try {
@@ -158,9 +158,8 @@ public class NewMain {
         FileProcessor fileProcessor = new FileProcessor(context);
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
-
 	        	context.setCurrentSource(e.getKey());
-				context.setCurrentParsedResource(e.getValue());
+				context.setCurrentParsedResource(Optional.of(e.getValue()));
 				
         		try {
 					fileProcessor.processFile(rendererFileLocator, newBaseURL);
@@ -172,8 +171,7 @@ public class NewMain {
         			}
         		}
 
-        		context.setCurrentSource(null);
-        		context.setCurrentParsedResource(null);
+	        	context.clearCurrent();
 	        }
 
     		boolean succeeded = !errorHandler.foundErrors();
@@ -189,8 +187,8 @@ public class NewMain {
         		copyGeneratedArtefacts();
         	} 
         	
-        	if (!succeeded) {
-        		LOG.info("Rendering failed, displaying event messages");
+        	if (!succeeded || errorHandler.foundWarnings()) {
+        		LOG.info("Displaying event messages");
         		
         		errorHandler.displayOutstandingEvents();
         	}

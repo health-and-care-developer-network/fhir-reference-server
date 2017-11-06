@@ -41,10 +41,18 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 	}
 
 	public boolean foundErrors() {
+		return foundAnyOfType(EventType.ERROR);
+	}
+
+	public boolean foundWarnings() {
+		return foundAnyOfType(EventType.WARNING);
+	}
+	
+	public boolean foundAnyOfType(EventType eventType) {
 		return events.values()
 				.stream()
 				.flatMap(events -> events.getEvents().stream())
-				.anyMatch(event -> event.getEventType().equals(EventType.ERROR));
+				.anyMatch(event -> event.getEventType().equals(eventType));
 	}
 	
 	public Map<File, RendererEvents> getEvents() {
@@ -59,7 +67,7 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 	@Override
 	public void log(String info, Optional<Exception> throwable) {
 		File source = context.getCurrentSource();
-		WrappedResource<?> resource = context.getCurrentParsedResource();
+		Optional<WrappedResource<?>> resource = context.getCurrentParsedResource();
 		
 		if (throwable.isPresent()) {
 			addEvent(RendererEvent.warning(info, source, resource, throwable.get()));
@@ -71,7 +79,7 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 	@Override
 	public void error(Optional<String> info, Optional<Exception> error) {
 		File source = context.getCurrentSource();
-		WrappedResource<?> resource = context.getCurrentParsedResource();
+		Optional<WrappedResource<?>> resource = context.getCurrentParsedResource();
 		addEvent(RendererEvent.error(info, source, resource, error));
 	}
 
@@ -79,16 +87,16 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 		new Comparator<RendererEvents>(){
 			@Override
 			public int compare(RendererEvents o1, RendererEvents o2) {
-				WrappedResource<?> resource1 = o1.getResource();
-				WrappedResource<?> resource2 = o2.getResource();
+				Optional<WrappedResource<?>> resource1 = o1.getResource();
+				Optional<WrappedResource<?>> resource2 = o2.getResource();
 				
 				int typeNameComparison;
-				if (resource1 == null 
-				  || resource2 == null) {
+				if (!resource1.isPresent() 
+				  || !resource2.isPresent()) {
 					typeNameComparison = 0;					
 				} else {
-					String typeName1 = resource1.getResourceType().getDisplayName();
-					String typeName2 = resource2.getResourceType().getDisplayName();
+					String typeName1 = resource1.get().getResourceType().getDisplayName();
+					String typeName2 = resource2.get().getResourceType().getDisplayName();
 					typeNameComparison = typeName1.compareTo(typeName2);
 				}
 				

@@ -33,7 +33,7 @@ public class FileProcessor {
     
 	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
 		
-	    WrappedResource<?> resource = context.getCurrentParsedResource();
+	    WrappedResource<?> resource = context.getCurrentParsedResource().get();
 		String inFilePath = context.getCurrentSource().getPath();
 	    
 		LOG.info("Processing file: " + inFilePath);
@@ -47,7 +47,7 @@ public class FileProcessor {
 	}
 	
 	public void saveAugmentedResource(RendererContext context, RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
-		WrappedResource<?> resource = context.getCurrentParsedResource();
+		WrappedResource<?> resource = context.getCurrentParsedResource().get();
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
