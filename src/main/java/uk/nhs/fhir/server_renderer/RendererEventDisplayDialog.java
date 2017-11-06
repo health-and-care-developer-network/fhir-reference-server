@@ -56,7 +56,7 @@ public class RendererEventDisplayDialog extends JDialog {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Errors");
 
 		Map<String, DefaultMutableTreeNode> nodesByFilePath = new HashMap<>();
-		Map<String, WrappedResource<?>> resourcesByFilePath = new HashMap<>();
+		Map<String, Optional<WrappedResource<?>>> resourcesByFilePath = new HashMap<>();
 		
 		String commonFilepathStart = null;
 		for (RendererEvents eventGroup : eventsList) {
@@ -74,8 +74,8 @@ public class RendererEventDisplayDialog extends JDialog {
 			resourcesByFilePath.put(filePath, eventGroup.getResource());
 			
 			String name;
-			if (eventGroup.getResource() != null) {
-				name = eventGroup.getResource().getName();
+			if (eventGroup.getResource().isPresent()) {
+				name = eventGroup.getResource().get().getName();
 			} else {
 				name = "[unknown resource name]";
 			}
@@ -124,15 +124,15 @@ public class RendererEventDisplayDialog extends JDialog {
 		sortedNodes.sort(new Comparator<Map.Entry<String, DefaultMutableTreeNode>>(){
 			@Override
 			public int compare(Entry<String, DefaultMutableTreeNode> o1, Entry<String, DefaultMutableTreeNode> o2) {
-				WrappedResource<?> wrappedResource1 = resourcesByFilePath.get(o1.getKey());
-				WrappedResource<?> wrappedResource2 = resourcesByFilePath.get(o2.getKey());
+				Optional<WrappedResource<?>> wrappedResource1 = resourcesByFilePath.get(o1.getKey());
+				Optional<WrappedResource<?>> wrappedResource2 = resourcesByFilePath.get(o2.getKey());
 				
-				if (wrappedResource1 == null 
-				  || wrappedResource2 == null) {
+				if (!wrappedResource1.isPresent() 
+				  || !wrappedResource2.isPresent()) {
 					return 0;
 				}
 				
-				return wrappedResource1.getName().compareTo(wrappedResource2.getName());
+				return wrappedResource1.get().getName().compareTo(wrappedResource2.get().getName());
 			}
 		});
 		
