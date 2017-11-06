@@ -119,7 +119,7 @@ public class STU3PlainContent extends CORSInterceptor {
         
         // If they have asked for the conformance profile then let this one through - it
         // will be caught and handled by the outgoingResponse handler instead
-        if (METADATA.equals(operation)) {
+        if (isHandledInOutgoingResponse(operation, clientType)) {
         	return true;
         }
 
@@ -204,6 +204,15 @@ public class STU3PlainContent extends CORSInterceptor {
 		ServletUtils.setResponseContentForSuccess(theResponse, "text/plain", new File(guidesPath + File.separator + filename));
     }
     
+    private boolean isHandledInOutgoingResponse(RestOperationTypeEnum operation, ClientType clientType) {
+    	return isBrowserConformanceRequest(operation, clientType);
+    }
+    
+    private boolean isBrowserConformanceRequest(RestOperationTypeEnum operation, ClientType clientType) {
+    	return operation != null && operation.equals(METADATA)
+    	  && clientType != null && clientType.equals(BROWSER);
+    }
+    
     @Override
     public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) {
     	
@@ -213,15 +222,13 @@ public class STU3PlainContent extends CORSInterceptor {
         RestOperationTypeEnum operation = theRequestDetails.getRestOperationType();
         
         // If this is a request from a browser for the conformance resource, render and wrap it in HTML
-        if (operation != null) {
-        	if (operation == METADATA && clientType == BROWSER) {
+        if (isBrowserConformanceRequest(operation, clientType)) {
 	    		String baseURL = theRequestDetails.getServerBaseForRequest();
 	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
 
 	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
 	    		return false;
-    		}
-        }
+		}
         
 		// Add the CORS header, and let HAPI handle the request
 		addCORSResponseHeaders(theServletResponse);

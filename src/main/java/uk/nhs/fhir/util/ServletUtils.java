@@ -53,20 +53,17 @@ public class ServletUtils {
     	return xmlString;
     }
     
-    public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, String wrappedContent) {
-    	try {
-    		response.getWriter().append(wrappedContent);
-
-			response.setStatus(200);
-			response.setContentType(contentType);
-    	} catch (IOException e) {
-    		LOG.error(e.getMessage());
-		}
+    public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, String contentString) {
+    	setResponseContentForSuccess(response, contentType, new StringResponseContentWriter(contentString));
     }
 
 	public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, File contentFile) {
+		setResponseContentForSuccess(response, contentType, new FileResponseContentWriter(contentFile));
+	}
+	
+	private static void setResponseContentForSuccess(HttpServletResponse response, String contentType, ResponseContentWriter<?> contentWriter) {
 		try {
-			FileUtils.copyFile(contentFile, response.getOutputStream());
+			contentWriter.write(response);
 
 			response.setStatus(200);
 			response.setContentType(contentType);
@@ -75,4 +72,38 @@ public class ServletUtils {
 		}
 	}
 
+}
+
+abstract class ResponseContentWriter<T> {
+	protected final T content;
+	
+	public ResponseContentWriter(T content) {
+		this.content = content;
+	}
+	
+	abstract void write(HttpServletResponse response) throws IOException;
+}
+
+class StringResponseContentWriter extends ResponseContentWriter<String> {
+	
+	public StringResponseContentWriter(String content) {
+		super(content);
+	}
+
+	@Override
+	void write(HttpServletResponse response) throws IOException {
+		response.getWriter().append(content);
+	}
+}
+
+class FileResponseContentWriter extends ResponseContentWriter<File> {
+	
+	public FileResponseContentWriter(File content) {
+		super(content);
+	}
+
+	@Override
+	void write(HttpServletResponse response) throws IOException {
+		FileUtils.copyFile(content, response.getOutputStream());
+	}
 }
