@@ -143,7 +143,9 @@ public class FhirTreeTable {
 			new TableRow(
 				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
-				(showCardinality ? new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile) : TableCell.empty()),
+				showCardinality ? 
+					new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile) : 
+					TableCell.empty(),
 				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false),
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
