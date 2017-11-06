@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -15,9 +19,8 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
@@ -28,17 +31,19 @@ import uk.nhs.fhir.util.FileLoader;
 
 public class FhirFileParser {
 	private static Logger LOG = LoggerFactory.getLogger(FhirFileParser.class);
+	
+	private static final FhirVersion DEFAULT_FHIR_VERSION = FhirVersion.DSTU2;
 
-	@SuppressWarnings("unchecked")
 	private final static Set<Class<? extends IBaseResource>> supportedClasses =
-		Sets.newHashSet(
+		ImmutableSet.of(
 			ca.uhn.fhir.model.dstu2.resource.StructureDefinition.class,
-			org.hl7.fhir.dstu3.model.StructureDefinition.class,
 			ca.uhn.fhir.model.dstu2.resource.ValueSet.class,
-			org.hl7.fhir.dstu3.model.ValueSet.class,
 			ca.uhn.fhir.model.dstu2.resource.OperationDefinition.class,
-			org.hl7.fhir.dstu3.model.CodeSystem.class,
 			ca.uhn.fhir.model.dstu2.resource.ConceptMap.class,
+			
+			org.hl7.fhir.dstu3.model.StructureDefinition.class,
+			org.hl7.fhir.dstu3.model.ValueSet.class,
+			org.hl7.fhir.dstu3.model.CodeSystem.class,
 			org.hl7.fhir.dstu3.model.ConceptMap.class);
 	
 	public static boolean isSupported(IBaseResource resource) {
@@ -58,26 +63,27 @@ public class FhirFileParser {
 		}
 		
 		if (successfullyParsedVersions.isEmpty()) {
+			// No versions succeeded, let's trigger an error if we can and get some idea what went wrong. 
+			// We don't know what FHIR version it should have been.
 			try {
 				parseFile(FhirContexts.xmlParser(FhirVersion.STU3), thisFile);
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new FhirParsingFailedException("Parsing failed for file: " + thisFile.getAbsolutePath(), e);
 			}
-			
+
 			throw new FhirParsingFailedException("Parsing failed for file: " + thisFile.getAbsolutePath());
-		}
-		
-		// Couldn't confirm that any was correct. If we only successfully parsed a single version, use that.
-		if (successfullyParsedVersions.size() == 1) {
+		} else if (successfullyParsedVersions.size() == 1) {
+			// Couldn't confirm that any was correct. If we only successfully parsed a single version, use that.
 			FhirVersion onlyParsableVersion = successfullyParsedVersions.get(0);
 			return parseFile(FhirContexts.xmlParser(onlyParsableVersion), thisFile, onlyParsableVersion);
-		}
-		
-		// otherwise default to DSTU2
-		try {
-			return parseFile(FhirContexts.xmlParser(FhirVersion.DSTU2), thisFile);
-		} catch (IOException e) {
-			throw new FhirParsingFailedException("Failed default parsing to DSTU2: " + thisFile.getAbsolutePath(), e);
+		} else {
+			// Multiple FHIR versions succeeded - default to DEFAULT_FHIR_VERSION
+			try {
+				LOG.info("Successfully parsed {} to multiple versions {}, defaulting to {}" + thisFile.getAbsolutePath(), successfullyParsedVersions, DEFAULT_FHIR_VERSION);
+				return parseFile(FhirContexts.xmlParser(DEFAULT_FHIR_VERSION), thisFile);
+			} catch (IOException e) {
+				throw new FhirParsingFailedException("Failed default parsing to " + DEFAULT_FHIR_VERSION.toString() + ": " + thisFile.getAbsolutePath(), e);
+			}
 		}
 	}
 	
@@ -87,6 +93,8 @@ public class FhirFileParser {
 		
 		if (resource != null) {
 			successfullyParsedVersions.add(versionToTry);
+
+			String className = resource.getClass().getName();
 			
 			if (!isSupported(resource)) {
 				
@@ -111,24 +119,63 @@ public class FhirFileParser {
 							return resource;
 						}
 					}
+					
+					StringJoiner profileUrlList = new StringJoiner(", ", "[", "]");
+					meta.getProfile().forEach(profile -> profileUrlList.add(profile.getValueAsString()));
+					
+					LOG.debug("Parsed file {} to type {} (possibly an example resource) version from urls {} didn't match version tried {}", 
+							thisFile.toPath(), className, profileUrlList, versionToTry);
+					return null;
+				} else {
+					LOG.info("Successfully parsed file {} for {} but meta wasn't present or didn't have a profile URL. Class={}",
+							thisFile.getAbsolutePath(), versionToTry.toString(), className);
+					return null;
 				}
-
-				String className = resource.getClass().getName();
-				LOG.warn("Successfully parsed file " + thisFile.getAbsolutePath() + " for " + versionToTry.toString() 
-					+ " but meta wasn't present or didn't have a profile URL. Class=" + className);
 				
-			} else if (versionToTry.equals(getResourceVersion(resource))) {
-				// If the version we found matches the intended version (i.e. the parser version we used) we are done
-				return resource;
+			} else {
+				Optional<FhirVersion> selfIdentifiedVersion = getResourceVersion(resource);
+				
+				if (selfIdentifiedVersion.isPresent()
+				  && versionToTry.equals(selfIdentifiedVersion.get())) {
+					// Successfully parsed, was a supported class type and matched the version we tried
+					return resource;
+				} else if (selfIdentifiedVersion.isPresent()) {
+					LOG.debug("Parsed file {} to type {} but self identified version {} didn't match version tried {}", 
+						thisFile.toPath(), className, selfIdentifiedVersion.get(), versionToTry);
+					return null;
+				} else {
+					LOG.debug("Couldn't identify version for file {} when parsed into class {}", thisFile.toPath(), resource.getClass().getName());
+					return null;
+				}
 			}
+		} else {
+			// failed to parse the source for this FHIR version
+			return null;
 		}
-		
-		return null;
 	}
 
-	private FhirVersion getResourceVersion(IBaseResource resource) {
+	/**
+	 * Note this may be used for external resources so we cannot rely on e.g. there being a URL
+	 * Assumes that there will be a getUrl() method on all resources (even if it returns null) and will throw if not.
+	 */
+	private Optional<FhirVersion> getResourceVersion(IBaseResource resource) {
 		
-		if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
+		Optional<String> urlByReflection = getUrlByReflection(resource);
+		if (urlByReflection.isPresent()) {
+			FhirVersion version = fromResourceUrl(urlByReflection.get());
+			return Optional.of(version);
+		}
+		
+		// Some external resources might store the version for e.g. StructureDefinitions this way
+		Optional<String> fhirReleaseByReflection = getFhirReleaseByReflection(resource);
+		if (fhirReleaseByReflection.isPresent()) {
+			FhirRelease release = FhirRelease.forString(fhirReleaseByReflection.get());
+			return Optional.ofNullable(release.getVersion());
+		}
+		
+		return Optional.empty();
+		
+		/*if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
 			ca.uhn.fhir.model.dstu2.resource.StructureDefinition dstu2StructureDefinition = (ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource;
 			
 			String url = dstu2StructureDefinition.getUrl();
@@ -257,9 +304,61 @@ public class FhirFileParser {
 			
 		} else {
 			throw new IllegalStateException("Class " + resource.getClass().getCanonicalName() + " is marked as supported, but wasn't handled");
+		}*/
+	}
+
+	Optional<String> getUrlByReflection(IBaseResource resource) {
+		Method getUrlMethod;
+		try {
+			getUrlMethod = resource.getClass().getMethod("getUrl");
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new IllegalStateException("No method getUrl() for successfully parsed class " + resource.getClass().getName());
+		}
+		
+		Object urlObj = null;
+		try {
+			urlObj = getUrlMethod.invoke(resource); 
+			String urlFromReflectionCall = (String)urlObj;
+			return Optional.ofNullable(urlFromReflectionCall);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException("Failed to invoke getUrl() for class " + resource.getClass().getName());
+		} catch (ClassCastException cce) {
+			String urlObjDesc = "[null]";
+			if (urlObj != null) {
+				urlObjDesc = urlObj.getClass().getName();
+			}
+			throw new IllegalStateException("Expected string from getUrl() for class " + resource.getClass().getName() + " but got " + urlObjDesc);
+		}
+	}
+
+	private Optional<String> getFhirReleaseByReflection(IBaseResource resource) {
+		Method getFhirReleaseMethod;
+		try {
+			getFhirReleaseMethod = resource.getClass().getMethod("getFhirVersion");
+		} catch (NoSuchMethodException | SecurityException e) {
+			// most resources don't have this - not unexpected
+			return null;
+		}
+		
+		Object releaseObj = null;
+		try {
+			releaseObj = getFhirReleaseMethod.invoke(resource);
+			String release = (String)releaseObj;
+			return Optional.ofNullable(release);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException("Failed to invoke getFhirVersion() for class " + resource.getClass().getName());
+		} catch (ClassCastException cce) {
+			String releaseObjDesc = "[null]";
+			if (releaseObj != null) {
+				releaseObjDesc = releaseObj.getClass().getName();
+			}
+			throw new IllegalStateException("Expected string from getFhirVersion() for class " + resource.getClass().getName() + " but got " + releaseObjDesc);
 		}
 	}
 	
+	/**
+	 * Nasty, but the requirement is a hard default of DSTU2 if there is no prefix
+	 */
 	private FhirVersion fromResourceUrl(String urlString) {
 		//e.g. https://fhir.nhs.uk/STU3/StructureDefinition/extension-optoutsource-1
 		

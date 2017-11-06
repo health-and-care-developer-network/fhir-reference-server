@@ -9,6 +9,8 @@ public interface FhirErrorHandler {
 	public void error(Optional<String> info, Optional<Exception> throwable);
 
 	public boolean foundErrors();
+	public boolean foundWarnings();
+	
 	void displayOutstandingEvents();
 
 }

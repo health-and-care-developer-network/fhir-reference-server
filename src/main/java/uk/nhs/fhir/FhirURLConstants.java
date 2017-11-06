@@ -51,7 +51,7 @@ public class FhirURLConstants {
 		}
 	}
 	
-	public static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", "https://fhir.nhs.uk/", "https://fhir.hl7.org.uk"};
+	public static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK};
 	public static boolean isNhsResourceUrl(String url) {
 		for (String prefix : NHS_PROFILE_PREFIXES) {
 			if (url.startsWith(prefix)) {

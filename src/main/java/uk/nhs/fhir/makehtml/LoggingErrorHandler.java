@@ -12,6 +12,7 @@ public class LoggingErrorHandler implements FhirErrorHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(LoggingErrorHandler.class);
 
 	private boolean foundErrors = false;
+	private boolean foundWarnings = false;
 	
 	@Override
 	public void ignore(String info, Optional<Exception> throwable) {
@@ -20,6 +21,8 @@ public class LoggingErrorHandler implements FhirErrorHandler {
 
 	@Override
 	public void log(String info, Optional<Exception> throwable) {
+		foundWarnings = true;
+		
 		LOG.error(info);
 		if (throwable.isPresent()) {
 			throwable.get().printStackTrace();
@@ -49,6 +52,11 @@ public class LoggingErrorHandler implements FhirErrorHandler {
 	@Override
 	public boolean foundErrors() {
 		return foundErrors;
+	}
+
+	@Override
+	public boolean foundWarnings() {
+		return foundWarnings;
 	}
 
 }
