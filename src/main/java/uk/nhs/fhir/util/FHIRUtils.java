@@ -28,7 +28,6 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import uk.nhs.fhir.FhirURLConstants;
 
@@ -68,13 +67,15 @@ public class FHIRUtils {
             // To get the URL we need to cast this to a concrete type
             if (resource instanceof StructureDefinition) {
             	url = ((StructureDefinition)resource).getUrl();
-            } else if (resource instanceof ValueSet) {
-            	url = ((ValueSet)resource).getUrl();
+            } else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
+            	url = ((ca.uhn.fhir.model.dstu2.resource.ValueSet)resource).getUrl();
             } else if (resource instanceof OperationDefinition) {
             	url = ((OperationDefinition)resource).getUrl();
             } else if (resource instanceof Conformance) {
             	url = ((Conformance)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
+            } 
+            
+            else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
             	url = ((org.hl7.fhir.dstu3.model.StructureDefinition)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
             	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
@@ -84,9 +85,13 @@ public class FHIRUtils {
             	url = ((org.hl7.fhir.dstu3.model.CodeSystem)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
             	url = ((org.hl7.fhir.dstu3.model.ConceptMap)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.instance.model.Conformance) {
-            	url = ((org.hl7.fhir.instance.model.Conformance)resource).getUrl();
             } 
+            
+            // Should never get this as it relies on parsing by the hapi-fhir-structures-hl7org-dstu2 package.
+            // There doesn't seem to be a notion of a Conformance object in org.hl7.fhir.dstu3.model 
+            //else if (resource instanceof org.hl7.fhir.instance.model.Conformance) {
+            //	url = ((org.hl7.fhir.instance.model.Conformance)resource).getUrl();
+            //} 
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());
@@ -102,19 +107,22 @@ public class FHIRUtils {
         return resource;
     }
     
-    public static boolean isValueSetSNOMED(ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ComposeInclude> includeList = vs.getCompose().getInclude();
-				for (ComposeInclude includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-							return true;
-						}
-					}
+    public static boolean isValueSetSNOMED(ca.uhn.fhir.model.dstu2.resource.ValueSet vs) {
+    	if (vs.getCompose() != null
+    	  && vs.getCompose().getInclude() != null) {
+    		
+			List<ComposeInclude> includeList = vs.getCompose().getInclude();
+			
+			for (ComposeInclude includeEntry : includeList) {
+				
+				if (includeEntry.getSystem() != null
+				  && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
+			
+					return true;
 				}
-    		}
+			}
     	}
+    	
     	return false;
     }
     

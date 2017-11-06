@@ -1,7 +1,5 @@
 package uk.nhs.fhir;
 
-import javax.servlet.ServletException;
-
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirContexts;
@@ -14,14 +12,10 @@ public class FhirRequestHandler extends RestfulServer {
 	private final FilesystemIF dataSource;
 
 	public FhirRequestHandler(FhirVersion fhirVersion, FilesystemIF dataSource) {
+		super(FhirContexts.forVersion(fhirVersion));
+		
 		this.fhirVersion = fhirVersion;
 		this.dataSource = dataSource;
-	}
-	
-	@Override
-    protected void initialize() throws ServletException {
-		super.setFhirContext(FhirContexts.forVersion(fhirVersion));
-		
 	}
 
 }

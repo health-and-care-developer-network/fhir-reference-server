@@ -56,17 +56,12 @@
             <version>3.0.0</version>
         </dependency>
         
-        
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-            <version>3.0.0</version>
-        </dependency>
         <dependency>
 	  		<groupId>ca.uhn.hapi.fhir</groupId>
 	  		<artifactId>hapi-fhir-structures-dstu3</artifactId>
 	  		<version>3.0.0</version>
 	  	</dependency>
+	  	<!-- Note that the version used for hapi-fhir-base will be reported in server responses -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-base</artifactId>
