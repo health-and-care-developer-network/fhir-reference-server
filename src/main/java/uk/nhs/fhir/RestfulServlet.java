@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,25 +29,17 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
-import uk.nhs.fhir.enums.ClientType;
-import uk.nhs.fhir.page.extensions.ExtensionsListRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.dstu2.ConformanceProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider;
-import uk.nhs.fhir.servlethelpers.RawResourceRender;
-import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
-import uk.nhs.fhir.servlethelpers.ServletStreamExample;
-import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.ServletUtils;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -57,7 +48,7 @@ import uk.nhs.fhir.util.ServletUtils;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
+//@WebServlet(urlPatterns = {"/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class RestfulServlet extends RestfulServer {
 
 	public RestfulServlet() {
@@ -65,52 +56,15 @@ public class RestfulServlet extends RestfulServer {
 	}
 	
     private static final Logger LOG = LoggerFactory.getLogger(RestfulServlet.class.getName());
-    private static final FhirVersion fhirVersion = FhirVersion.DSTU2;
     private static final long serialVersionUID = 1L;
     private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
-    private static RawResourceRender myRawResourceRenderer = null;
-
-    //private static String css = FileLoader.loadFileOnClasspath("/style.css");
-    //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	
-    	ClientType clientType = ClientType.getTypeFromHeaders(request);
-    	
-        LOG.info("DSTU2 Requested URI: " + request.getRequestURI());
-
-        if(request.getRequestURI().endsWith(".css")) {
-            // Stylesheets
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
-        } else if (request.getRequestURI().endsWith("favicon.ico")) {
-        	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
-        } else if (request.getRequestURI().startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
-        	// Image and JS files
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
-        } else if (request.getRequestURI().startsWith("/artefact")) {
-        	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
-        } else if (request.getRequestURI().startsWith("/Examples/")) {
-        	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
-        } else if (request.getRequestURI().startsWith("/Extensions")) {
-        	ExtensionsListRenderer.loadExtensions(request, response, fhirVersion, webber);
-        } else if ((clientType == ClientType.BROWSER) &&
-        			   (request.getRequestURI().equals("/CodeSystem") ||
-        				request.getRequestURI().equals("/ConceptMap"))
-        		  ) {
-        	// There are no CodeSystems for DSTU2, and if this is a browser we haven't decided what
-        	// to do with listing these yet anyway, so just redirect to the ValueSets page for now..
-        	response.sendRedirect("/ValueSet");
-        	return;
-        } else if (request.getRequestURI().equals("/dataLoadStatusReport")) {
-        	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
-			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);
-        } else {
-            super.doGet(request, response);
-        }
+        LOG.info("Delegated request to FHIR server DSTU2: " + request.getRequestURI());
+    	super.doGet(request, response);
     }
 
     /**
@@ -125,12 +79,7 @@ public class RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = SharedDataSource.get();
-        webber = new ResourceWebHandler(dataSource, fhirVersion);
-        myRawResourceRenderer = new RawResourceRender(webber);
-        
-        // Pass our resource handler to the other servlet
-        IndexServlet.setResourceHandler(webber);
-        ExtensionsListRenderer.setResourceHandler(webber);
+        webber = new ResourceWebHandler(dataSource);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StructureDefinitionProvider(dataSource));

@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.page.home.HomePageTemplate;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
@@ -38,12 +39,7 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 	
 	private static final long serialVersionUID = -7060628622645267225L;
 	private static final Logger LOG = LoggerFactory.getLogger(IndexServlet.class.getName());
-	
-	private static ResourceCountsProvider resourceCountsProvider = null;
-	
-	protected static void setResourceHandler(ResourceWebHandler webHandler) {
-		resourceCountsProvider = webHandler;
-	}
+	private static final ResourceCountsProvider resourceCountsProvider = new ResourceWebHandler(SharedDataSource.get());
 	
 	@Override
 	public void init() throws ServletException {

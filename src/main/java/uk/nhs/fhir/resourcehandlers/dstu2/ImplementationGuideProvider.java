@@ -10,11 +10,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -29,24 +25,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class ImplementationGuideProvider extends AbstractResourceProviderDSTU2 {
 
     public ImplementationGuideProvider(FilesystemIF dataSource) {
-    	super(dataSource);
-        resourceType = ResourceType.IMPLEMENTATIONGUIDE;
-        fhirVersion = FhirVersion.DSTU2;
-        fhirClass = ca.uhn.fhir.model.dstu2.resource.ImplementationGuide.class;
-    }
-        
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	ImplementationGuide output = (ImplementationGuide)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-
-    public String getTextSection(IBaseResource resource) {
-    	return ((ImplementationGuide)resource).getText().getDivAsString();
+    	super(dataSource, ResourceType.IMPLEMENTATIONGUIDE, ImplementationGuide.class);
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {

@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -24,11 +23,17 @@ import uk.nhs.fhir.util.ServletUtils;
 public class ServletStreamExample {
 	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamExample.class.getName());
 	
-	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
-			FhirVersion fhirVersion, FilesystemIF dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
+	private final FilesystemIF dataSource;
+	
+	public ServletStreamExample(FilesystemIF dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	public void streamExample(String uriAfterBase, HttpServletResponse response,
+			FhirVersion fhirVersion, RawResourceRenderer myRawResourceRenderer) throws IOException {
     	
 		// Parse the URL
-		String exampleName = request.getRequestURI().substring(10);
+		String exampleName = uriAfterBase.substring("/Examples/".length());
 		
 		ResourceMetadata exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
 		
@@ -58,8 +63,7 @@ public class ServletStreamExample {
 			}
 			
 			String resourceType = ResourceType.EXAMPLES.toString();
-			String baseURL = request.getContextPath();
-			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), baseURL, fileContent, mimeType).getHtml();
+			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), fileContent, mimeType).getHtml();
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {

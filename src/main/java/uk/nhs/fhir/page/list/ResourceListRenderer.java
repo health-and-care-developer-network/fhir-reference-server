@@ -22,11 +22,10 @@ public class ResourceListRenderer {
      * @return
      */
     public String renderResourceList(RequestDetails theRequestDetails, ResourceType resourceType) {
-        String baseURL = theRequestDetails.getServerBaseForRequest();
     	
     	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
     	HashMap<String, List<ResourceMetadata>> groupedResources = groupedResourcesProvider.getAGroupedListOfResources(resourceType);
     	
-    	return new ResourceListTemplate(resourceType, baseURL, groupedResources).getHtml();
+    	return new ResourceListTemplate(resourceType, groupedResources).getHtml();
 	}
 }

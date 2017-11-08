@@ -22,11 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.StringParam;
@@ -50,10 +46,7 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
      * @param dataSource
      */
     public ValueSetProvider(FilesystemIF dataSource) {
-    	super(dataSource);
-        resourceType = ResourceType.VALUESET;
-        fhirVersion = FhirVersion.DSTU2;
-        fhirClass = ca.uhn.fhir.model.dstu2.resource.ValueSet.class;
+    	super(dataSource, ResourceType.VALUESET, ca.uhn.fhir.model.dstu2.resource.ValueSet.class);
     }
 
     
@@ -74,24 +67,9 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
         
         List<String> ids = ValueSetCodesCache.findCode(theCode.getValue());
         for(String theID : ids) {
-            results.add((ValueSet)myDatasource.getResourceByID(FhirVersion.DSTU2, theID));
+            results.add((ValueSet)dataSource.getResourceByID(FhirVersion.DSTU2, theID));
         }
         return results;
-    }
-    
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	ValueSet output = (ValueSet)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

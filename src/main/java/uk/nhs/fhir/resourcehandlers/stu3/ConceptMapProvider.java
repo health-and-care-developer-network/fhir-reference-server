@@ -21,9 +21,6 @@ import java.io.File;
 import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.ConceptMap;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -40,24 +37,7 @@ public class ConceptMapProvider extends AbstractResourceProviderSTU3 {
 
 	
 	public ConceptMapProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.CONCEPTMAP;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.ConceptMap.class;
-    }
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-    	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-        ConceptMap output = (ConceptMap)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((ConceptMap)resource).getText().getDivAsString();
+		super(dataSource,ResourceType.CONCEPTMAP, ConceptMap.class);
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

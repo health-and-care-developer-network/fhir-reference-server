@@ -21,11 +21,12 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	private final Optional<SupportingArtefact> metadataArtefact;
 	private final String textSection;
 	private final Optional<ExampleResources> examples;
+	private final String baseURL;
 
 	public ResourceWithMetadataTemplate(String resourceType, String resourceName, String baseURL, IBaseResource resource,
 			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
 			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<ExampleResources> examples) {
-		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName), baseURL);
+		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName));
 		this.resource = resource;
 		this.firstTabName = firstTabName;
 		this.versionsList = versionsList;
@@ -33,6 +34,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 		this.metadataArtefact = metadataArtefact;
 		this.textSection = textSection;
 		this.examples = examples;
+		this.baseURL = baseURL;
 	}
 
 	@Override
@@ -42,6 +44,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
     	context.put( "versions", versionsList );
     	
     	context.put( "metadata", resourceMetadata );
+    	context.put( "baseURL", baseURL);
     	context.put( "generatedurl", resourceMetadata.getVersionedUrl(baseURL) );
     	
     	context.put( "hasGeneratedMetadataFromRenderer", metadataArtefact.isPresent() );

@@ -10,10 +10,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.Optional;
 
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.OperationDefinition;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -29,24 +26,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class OperationDefinitionProvider extends AbstractResourceProviderSTU3 {
 
 	public OperationDefinitionProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.OPERATIONDEFINITION;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.OperationDefinition.class;
-    }
-        
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-    	OperationDefinition output = (OperationDefinition)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((OperationDefinition)resource).getText().getDivAsString();
+		super(dataSource, ResourceType.OPERATIONDEFINITION, org.hl7.fhir.dstu3.model.OperationDefinition.class);
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

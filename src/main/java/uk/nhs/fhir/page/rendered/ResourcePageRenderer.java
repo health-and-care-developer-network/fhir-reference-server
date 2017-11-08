@@ -22,11 +22,9 @@ public class ResourcePageRenderer {
     
 	private static final Logger LOG = LoggerFactory.getLogger(ResourcePageRenderer.class.getName());
 	
-	private final FhirVersion fhirVersion;
 	private final ResourceWebHandler resourceWebHandler;
 	
-	public ResourcePageRenderer(FhirVersion fhirVersion, ResourceWebHandler resourceWebHandler) {
-		this.fhirVersion = fhirVersion;
+	public ResourcePageRenderer(ResourceWebHandler resourceWebHandler) {
 		this.resourceWebHandler = resourceWebHandler;
 	}
     
@@ -34,15 +32,15 @@ public class ResourcePageRenderer {
      * Code used to display a single resource as HTML when requested by a
      * browser.
      */
-    public String renderSingleResource(String baseURL, IIdType resourceID, String resourceName, ResourceType resourceType) {
-    	IBaseResource resource = resourceWebHandler.getResourceByID(resourceID);
+    public String renderSingleResource(FhirVersion fhirVersion, String baseURL, IIdType resourceID, String resourceName, ResourceType resourceType) {
+    	IBaseResource resource = resourceWebHandler.getResourceByID(fhirVersion, resourceID);
 
     	// List of versions
-    	ResourceEntityWithMultipleVersions entity = resourceWebHandler.getVersionsForID(resourceID);
+    	ResourceEntityWithMultipleVersions entity = resourceWebHandler.getVersionsForID(fhirVersion, resourceID);
     	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
 
     	// Resource metadata
-    	ResourceMetadata resourceMetadata = resourceWebHandler.getResourceEntityByID(resourceID);
+    	ResourceMetadata resourceMetadata = resourceWebHandler.getResourceEntityByID(fhirVersion, resourceID);
 
     	// Check if we have a nice metadata table from the renderer
     	Optional<SupportingArtefact> metadataArtefact = 
@@ -56,7 +54,7 @@ public class ResourcePageRenderer {
     	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
 
     	// Examples
-    	ExampleResources examplesList = resourceWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	ExampleResources examplesList = resourceWebHandler.getExamples(fhirVersion, resourceType + "/" + resourceID.getIdPart());
     	Optional<ExampleResources> examples = 
     		(examplesList == null 
     		  || examplesList.isEmpty()) ? 

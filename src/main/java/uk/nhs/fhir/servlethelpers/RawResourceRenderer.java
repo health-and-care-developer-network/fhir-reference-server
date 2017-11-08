@@ -17,11 +17,11 @@ import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class RawResourceRender {
+public class RawResourceRenderer {
 	
 	ResourceWebHandler myWebHandler = null;
 	
-	public RawResourceRender(ResourceWebHandler webHandler) {
+	public RawResourceRenderer(ResourceWebHandler webHandler) {
 		myWebHandler = webHandler;
 	}
 
@@ -35,7 +35,7 @@ public class RawResourceRender {
     
     public String renderSingleWrappedRAWResource(IBaseResource resource, FhirVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	String rawResource = getRawResource(resource, mimeType, fhirVersion);
-        return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, baseURL, rawResource, mimeType).getHtml();
+        return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, rawResource, mimeType).getHtml();
     }
     
     public String getRawResource(IBaseResource resource, MimeType mimeType, FhirVersion fhirVersion) {

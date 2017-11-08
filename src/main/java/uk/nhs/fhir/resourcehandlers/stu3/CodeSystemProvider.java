@@ -21,9 +21,6 @@ import java.io.File;
 import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.CodeSystem;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -40,24 +37,7 @@ public class CodeSystemProvider extends AbstractResourceProviderSTU3 {
 
 	
 	public CodeSystemProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.CODESYSTEM;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.CodeSystem.class;
-    }
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-    	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-        CodeSystem output = (CodeSystem)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((CodeSystem)resource).getText().getDivAsString();
+		super(dataSource, ResourceType.CODESYSTEM, org.hl7.fhir.dstu3.model.CodeSystem.class);
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

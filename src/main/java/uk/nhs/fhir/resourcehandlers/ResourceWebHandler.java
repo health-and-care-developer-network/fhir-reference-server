@@ -15,19 +15,16 @@
  */
 package uk.nhs.fhir.resourcehandlers;
 
-import static uk.nhs.fhir.data.metadata.ResourceType.IMPLEMENTATIONGUIDE;
-import static uk.nhs.fhir.data.metadata.ResourceType.OPERATIONDEFINITION;
-import static uk.nhs.fhir.data.metadata.ResourceType.STRUCTUREDEFINITION;
-import static uk.nhs.fhir.data.metadata.ResourceType.VALUESET;
-
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.nhs.fhir.FhirRequestServlet;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
@@ -45,26 +42,20 @@ import uk.nhs.fhir.util.FhirVersion;
  */
 public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider, GroupedResourcesProvider {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceWebHandler.class.getName());
-    private FhirVersion fhirVersion = null;
     
     FilesystemIF myDataSource = null;
 
-    public ResourceWebHandler(FilesystemIF dataSource, FhirVersion fhirVersion) {
+    public ResourceWebHandler(FilesystemIF dataSource) {
         myDataSource = dataSource;
-        this.fhirVersion = fhirVersion;
         
         LOG.debug("Created ResourceWebHandler handler to respond to requests for Profile resource types from a browser.");
     }
     
-    
-    
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
         
-        if (resourceType == STRUCTUREDEFINITION || resourceType == VALUESET
-          || resourceType == OPERATIONDEFINITION || resourceType == IMPLEMENTATIONGUIDE) {
-
-            if (resourceType == STRUCTUREDEFINITION) {
+        if (ArrayUtils.contains(FhirRequestServlet.getIndexedTypes(), resourceType)) {
+            if (resourceType == ResourceType.STRUCTUREDEFINITION) {
             	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
             	return myDataSource.getAllResourceNamesByCategory(resourceType);
@@ -74,7 +65,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return null;
     }
 
-    public List<ResourceMetadata> getAllNames(ResourceType resourceType, String namePart) {
+    public List<ResourceMetadata> getAllNames(FhirVersion fhirVersion, ResourceType resourceType, String namePart) {
         LOG.debug("Called: ResourceWebHandler.getAllNames(String namePart)");
         
         List<ResourceMetadata> myResourceList = myDataSource.getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, namePart);
@@ -89,26 +80,26 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return myDataSource.getExtensions();
     }
     
-    public ResourceEntityWithMultipleVersions getVersionsForID(IIdType id) {
+    public ResourceEntityWithMultipleVersions getVersionsForID(FhirVersion fhirVersion, IIdType id) {
         LOG.debug("Called: ResourceWebHandler.getVersionsForID(IIdType id)");
         
         return myDataSource.getVersionsByID(fhirVersion, id);
     }
     
-    public ResourceMetadata getResourceEntityByID(IIdType theId) {
+    public ResourceMetadata getResourceEntityByID(FhirVersion fhirVersion, IIdType theId) {
         LOG.debug("Called: ResourceWebHandler.getResourceEntityByID(IIdType id)");
         
         return myDataSource.getResourceEntityByID(fhirVersion, theId);
     }
 
-    public IBaseResource getResourceByID(IIdType id) {
+    public IBaseResource getResourceByID(FhirVersion fhirVersion, IIdType id) {
         LOG.debug("Called: ResourceWebHandler.getResourceByID(IIdType id)");
         
         IBaseResource resource = myDataSource.getResourceByID(fhirVersion, id);
         return resource;
     }
 
-    public ExampleResources getExamples(String resourceTypeAndID) {
+    public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
         LOG.debug("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
         
         ExampleResources examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);

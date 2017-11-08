@@ -20,10 +20,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.Optional;
 
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -39,25 +36,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 
 	public ValueSetProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.VALUESET;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.ValueSet.class;
-    }
-
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-    	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-    	ValueSet output = (ValueSet)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
+		super(dataSource, ResourceType.VALUESET, org.hl7.fhir.dstu3.model.ValueSet.class);
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

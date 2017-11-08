@@ -57,7 +57,7 @@ import uk.nhs.fhir.page.rendered.ResourceWithMetadataTemplate;
 import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.servlethelpers.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
@@ -76,11 +76,11 @@ public class STU3PlainContent extends CORSInterceptor {
     
     private final ResourceWebHandler myWebHandler;
     private final ResourceNameProvider resourceNameProvider;
-    private final RawResourceRender myRawResourceRenderer;
+    private final RawResourceRenderer myRawResourceRenderer;
 
     public STU3PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
-        myRawResourceRenderer = new RawResourceRender(webber);
+        myRawResourceRenderer = new RawResourceRenderer(webber);
 
 		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
     }
@@ -131,11 +131,11 @@ public class STU3PlainContent extends CORSInterceptor {
         String wrappedContent;
         if (READ.equals(operation) 
           || VREAD.equals(operation)) {
-            String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
+            String resourceName = resourceNameProvider.getNameForRequestedEntity(fhirVersion, theRequestDetails);
             
         	if (mimeType == XML || mimeType == JSON) {
                 IIdType resourceID = theRequestDetails.getId();
-            	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+            	IBaseResource resource = myWebHandler.getResourceByID(fhirVersion, resourceID);
                 wrappedContent = myRawResourceRenderer.renderSingleWrappedRAWResourceWithoutText(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
                 
         	} else {
@@ -166,16 +166,14 @@ public class STU3PlainContent extends CORSInterceptor {
 		// We are showing a list of matching resources for the specified name query
 		List<ResourceMetadata> list;
 		if (params.containsKey("name")) {
-        	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
+        	list = myWebHandler.getAllNames(fhirVersion, resourceType, params.get("name")[0]);
         } else if (params.containsKey("name:contains")) {
-        	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
+        	list = myWebHandler.getAllNames(fhirVersion, resourceType, params.get("name:contains")[0]);
         } else {
         	throw new IllegalStateException("Expected name or name:contains to be present in params");
         }
 
-        String baseURL = theRequestDetails.getServerBaseForRequest();
-
-		return new SearchResultsTemplate(resourceType, baseURL, list).getHtml();
+		return new SearchResultsTemplate(resourceType, list).getHtml();
 	}
 
 	/**
@@ -185,12 +183,11 @@ public class STU3PlainContent extends CORSInterceptor {
      * @return
      */
     private String renderResourceList(RequestDetails theRequestDetails, ResourceType resourceType) {
-        String baseURL = theRequestDetails.getServerBaseForRequest();
     	
     	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
     	HashMap<String, List<ResourceMetadata>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
     	
-    	return new ResourceListTemplate(resourceType, baseURL, groupedResources).getHtml();
+    	return new ResourceListTemplate(resourceType, groupedResources).getHtml();
 	}
     
     /**
@@ -239,7 +236,7 @@ public class STU3PlainContent extends CORSInterceptor {
     	LOG.debug("Attempting to render conformance statement");
     	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
     	
-    	return new RawResourceTemplate(Optional.of(CONFORMANCE.toString()), Optional.empty(), baseURL, resourceContent, mimeType).getHtml();
+    	return new RawResourceTemplate(Optional.of(CONFORMANCE.toString()), Optional.empty(), resourceContent, mimeType).getHtml();
     }
 
     /**
@@ -280,14 +277,14 @@ public class STU3PlainContent extends CORSInterceptor {
      * @return
      */
     private String describeResource(String resourceName, IIdType resourceID, String baseURL, String firstTabName, ResourceType resourceType) {
-    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+    	IBaseResource resource = myWebHandler.getResourceByID(fhirVersion, resourceID);
 
     	// List of versions
-    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
+    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(fhirVersion, resourceID);
     	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
 
     	// Resource metadata
-    	ResourceMetadata resourceMetadata = myWebHandler.getResourceEntityByID(resourceID);
+    	ResourceMetadata resourceMetadata = myWebHandler.getResourceEntityByID(fhirVersion, resourceID);
 
     	// Check if we have a nice metadata table from the renderer
     	Optional<SupportingArtefact> metadataArtefact = 
@@ -301,7 +298,7 @@ public class STU3PlainContent extends CORSInterceptor {
     	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
 
     	// Examples
-    	ExampleResources examplesList = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	ExampleResources examplesList = myWebHandler.getExamples(fhirVersion, resourceType + "/" + resourceID.getIdPart());
     	Optional<ExampleResources> examples = 
     		(examplesList == null 
     		  || examplesList.isEmpty()) ? 

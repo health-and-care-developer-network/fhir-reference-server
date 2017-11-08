@@ -19,8 +19,14 @@ import uk.nhs.fhir.util.ServletUtils;
 public class ServletStreamArtefact {
 	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamArtefact.class.getName());
 	
-	public static void streamArtefact(HttpServletRequest request, HttpServletResponse response,
-										FhirVersion fhirVersion, FilesystemIF dataSource) throws IOException {
+	private final FilesystemIF dataSource;
+	
+	public ServletStreamArtefact(FilesystemIF dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	public void streamArtefact(HttpServletRequest request, HttpServletResponse response,
+										FhirVersion fhirVersion) throws IOException {
     	
 		// Load a supporting artefact
     	String resourceID = request.getParameter("resourceID");

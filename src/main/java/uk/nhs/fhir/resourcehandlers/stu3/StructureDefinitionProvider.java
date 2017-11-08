@@ -24,11 +24,7 @@ import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.StringType;
-import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -44,27 +40,9 @@ import uk.nhs.fhir.util.FhirVersion;
 public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
 
 	public StructureDefinitionProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.STRUCTUREDEFINITION;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.StructureDefinition.class;
-    }
-
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-    	StructureDefinition output = (StructureDefinition)resource;
-    	output.setText(textElement);
-    	return output;
+		super(dataSource, ResourceType.STRUCTUREDEFINITION, org.hl7.fhir.dstu3.model.StructureDefinition.class);
     }
     
-    public String getTextSection(IBaseResource resource) {
-    	return ((StructureDefinition)resource).getText().getDivAsString();
-    }
-
     public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String resourceName = null;
     	String baseType = null;

@@ -85,13 +85,7 @@ public class FHIRUtils {
             	url = ((org.hl7.fhir.dstu3.model.CodeSystem)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
             	url = ((org.hl7.fhir.dstu3.model.ConceptMap)resource).getUrl();
-            } 
-            
-            // Should never get this as it relies on parsing by the hapi-fhir-structures-hl7org-dstu2 package.
-            // There doesn't seem to be a notion of a Conformance object in org.hl7.fhir.dstu3.model 
-            //else if (resource instanceof org.hl7.fhir.instance.model.Conformance) {
-            //	url = ((org.hl7.fhir.instance.model.Conformance)resource).getUrl();
-            //} 
+            }
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());

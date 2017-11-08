@@ -46,7 +46,7 @@ import uk.nhs.fhir.page.list.ResourceListRenderer;
 import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
 import uk.nhs.fhir.page.searchresults.SearchResultsRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.servlethelpers.RawResourceRender;
+import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
@@ -64,7 +64,7 @@ public class PlainContent extends CORSInterceptor {
     
     private final ResourceWebHandler myWebHandler;
     private final ResourceNameProvider resourceNameProvider;
-    private final RawResourceRender myRawResourceRenderer;
+    private final RawResourceRenderer myRawResourceRenderer;
 	private final ResourceListRenderer myResourceListRenderer;
 	private final ResourcePageRenderer myResourcePageRenderer;
 	private final SearchResultsRenderer mySearchResultsRenderer;
@@ -72,9 +72,9 @@ public class PlainContent extends CORSInterceptor {
 
     public PlainContent(ResourceWebHandler webber) {
         myWebHandler = webber;
-        myRawResourceRenderer = new RawResourceRender(webber);
+        myRawResourceRenderer = new RawResourceRenderer(webber);
         myResourceListRenderer = new ResourceListRenderer(myWebHandler);
-        myResourcePageRenderer = new ResourcePageRenderer(fhirVersion, myWebHandler);
+        myResourcePageRenderer = new ResourcePageRenderer(myWebHandler);
         mySearchResultsRenderer = new SearchResultsRenderer(myWebHandler);
         
 		this.resourceNameProvider = new ResourceNameProvider(myWebHandler); 
@@ -130,15 +130,15 @@ public class PlainContent extends CORSInterceptor {
         String content;
         if (READ.equals(operation) 
           || VREAD.equals(operation)) {
-            String resourceName = resourceNameProvider.getNameForRequestedEntity(theRequestDetails);
+            String resourceName = resourceNameProvider.getNameForRequestedEntity(fhirVersion, theRequestDetails);
             IIdType resourceID = theRequestDetails.getId();
             
         	if (mimeType == XML 
         	  || mimeType == JSON) {
-            	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+            	IBaseResource resource = myWebHandler.getResourceByID(fhirVersion, resourceID);
                 content = myRawResourceRenderer.renderSingleWrappedRAWResourceWithoutText(resource, fhirVersion, resourceName, resourceType, baseURL, mimeType);
         	} else {
-                content = myResourcePageRenderer.renderSingleResource(baseURL, resourceID, resourceName, resourceType);
+                content = myResourcePageRenderer.renderSingleResource(fhirVersion, baseURL, resourceID, resourceName, resourceType);
         	}
         } else {
             // We either don't have an operation, or we don't understand the operation, so
@@ -148,7 +148,7 @@ public class PlainContent extends CORSInterceptor {
 
         	if (params.containsKey("name")
         	  || params.containsKey("name:contains")) {
-                content = mySearchResultsRenderer.renderSearchResults(theRequestDetails, resourceType);
+                content = mySearchResultsRenderer.renderSearchResults(fhirVersion, theRequestDetails, resourceType);
         	} else {
                 content = myResourceListRenderer.renderResourceList(theRequestDetails, resourceType);
         	}

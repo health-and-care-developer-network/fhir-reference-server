@@ -26,22 +26,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ExtensionsListRenderer {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ExtensionsListRenderer.class.getName());
 	
-	private static ExtensionsListProvider extensionsListProvider = null;
+	private static ExtensionsListProvider extensionsListProvider = new ResourceWebHandler(SharedDataSource.get());
 	
-	public static void setResourceHandler(ExtensionsListProvider webHandler) {
-		extensionsListProvider = webHandler;
-	}
-	
-	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp,
-								FhirVersion fhirVersion, ResourceWebHandler webHandler) throws ServletException, IOException {
+	public static void loadExtensions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		LOG.debug("Requested URL: " + req.getRequestURL());
 		
 		String baseUrl = req.getContextPath();

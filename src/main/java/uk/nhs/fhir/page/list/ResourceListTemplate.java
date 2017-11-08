@@ -14,8 +14,8 @@ public class ResourceListTemplate extends VelocityTemplate {
 	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
 	private final HashMap<String, List<ResourceMetadata>> groupedResources;
 	
-	public ResourceListTemplate(ResourceType resourceType, String baseURL, HashMap<String, List<ResourceMetadata>> groupedResources) {
-		super("list.vm", Optional.of(resourceType.toString()), Optional.empty(), baseURL);
+	public ResourceListTemplate(ResourceType resourceType, HashMap<String, List<ResourceMetadata>> groupedResources) {
+		super("list.vm", Optional.of(resourceType.toString()), Optional.empty());
 		this.groupedResources = groupedResources;
 	}
 
@@ -23,7 +23,6 @@ public class ResourceListTemplate extends VelocityTemplate {
 	protected void updateContext(VelocityContext context) {
     	context.put( "groupedResources", groupedResources );
     	context.put( "resourceType", resourceType.get() );
-    	context.put( "baseURL", baseURL );
 	}
 
 }

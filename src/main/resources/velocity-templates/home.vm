@@ -65,6 +65,44 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
+						<h3>CodeSystem</h3>
+						<ul>
+							<li><a href="/CodeSystem">List all CodeSystems
+								#set( $countCS = $counts.get("CodeSystem") )
+								#if( $countCS )
+								  ($countCS)
+								#else
+								  (0)
+								#end
+								</a>
+							</li>
+						</ul>
+					</section>
+				</div>
+			</div>
+			<div class="one_third tree_wrap" style="min-height: 306px;">
+				<div class="box">
+					<div class="line aquaBlue_line"></div>
+					<section class="nav_box aquablue">
+						<h3>ConceptMap</h3>
+						<ul>
+							<li><a href="/ConceptMap">List all ConceptMaps
+								#set( $countCM = $counts.get("ConceptMap") )
+								#if( $countCM )
+								  ($countCM)
+								#else
+								  (0)
+								#end
+								</a>
+							</li>
+						</ul>
+					</section>
+				</div>
+			</div>
+			<div class="one_third tree_wrap" style="min-height: 306px;">
+				<div class="box">
+					<div class="line aquaBlue_line"></div>
+					<section class="nav_box aquablue">
 						<h3>Extensions</h3>
 						<ul>
 							<li><a href="/Extensions">Extension Registry

@@ -11,9 +11,6 @@ import java.io.File;
 import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.ImplementationGuide;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -29,25 +26,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class ImplementationGuideProvider extends AbstractResourceProviderSTU3 {
 
 	public ImplementationGuideProvider(FilesystemIF dataSource) {
-		super(dataSource);
-        resourceType = ResourceType.IMPLEMENTATIONGUIDE;
-        fhirVersion = FhirVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.ImplementationGuide.class;
-    }
-    
-    
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-    	ImplementationGuide output = (ImplementationGuide)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-
-    public String getTextSection(IBaseResource resource) {
-    	return ((ImplementationGuide)resource).getText().getDivAsString();
+		super(dataSource, ResourceType.IMPLEMENTATIONGUIDE, org.hl7.fhir.dstu3.model.ImplementationGuide.class);
     }
     
     public ResourceMetadata getMetadataFromResource(File thisFile) {

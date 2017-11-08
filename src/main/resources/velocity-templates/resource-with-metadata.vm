@@ -41,7 +41,7 @@
 					<p>
 						<ul id="exampleBullets">
 						#foreach( $example in $examples )
-							<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+							<li><a href="$baseURL/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
 						#end
 						</ul>
 					</p>

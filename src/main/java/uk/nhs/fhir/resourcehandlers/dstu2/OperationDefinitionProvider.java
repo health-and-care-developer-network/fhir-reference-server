@@ -10,11 +10,7 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -29,24 +25,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class OperationDefinitionProvider extends AbstractResourceProviderDSTU2 {
 
     public OperationDefinitionProvider(FilesystemIF dataSource) {
-    	super(dataSource);
-        resourceType = ResourceType.OPERATIONDEFINITION;
-        fhirVersion = FhirVersion.DSTU2;
-        fhirClass = ca.uhn.fhir.model.dstu2.resource.OperationDefinition.class;
-    }
-        
-    public IBaseResource removeTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	OperationDefinition output = (OperationDefinition)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((OperationDefinition)resource).getText().getDivAsString();
+    	super(dataSource, ResourceType.OPERATIONDEFINITION, ca.uhn.fhir.model.dstu2.resource.OperationDefinition.class);
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {

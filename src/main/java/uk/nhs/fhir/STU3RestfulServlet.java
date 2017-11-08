@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,10 +29,8 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import uk.nhs.fhir.datalayer.DataLoaderMessages;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
-import uk.nhs.fhir.page.extensions.ExtensionsListRenderer;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.resourcehandlers.stu3.CodeSystemProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ConceptMapProvider;
@@ -41,13 +38,9 @@ import uk.nhs.fhir.resourcehandlers.stu3.ImplementationGuideProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.OperationDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.StructureDefinitionProvider;
 import uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider;
-import uk.nhs.fhir.servlethelpers.RawResourceRender;
-import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
-import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.ServletUtils;
 
 /**
  * This is effectively the core of a HAPI RESTFul server.
@@ -56,7 +49,7 @@ import uk.nhs.fhir.util.ServletUtils;
  *
  * @author Tim Coates, Adam Hatherly
  */
-@WebServlet(urlPatterns = {"/STU3/*", "/3.0.1/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
+//@WebServlet(urlPatterns = {"/STU3/*", "/3.0.1/*"}, displayName = "FHIR Servlet", loadOnStartup = 1)
 public class STU3RestfulServlet extends RestfulServer {
 
 	public STU3RestfulServlet() {
@@ -64,35 +57,15 @@ public class STU3RestfulServlet extends RestfulServer {
 	}
 	
     private static final Logger LOG = LoggerFactory.getLogger(STU3RestfulServlet.class.getName());
-    private static final FhirVersion fhirVersion = FhirVersion.STU3;
     private static final long serialVersionUID = 1L;
     private static FilesystemIF dataSource = null;
     private static ResourceWebHandler webber = null;
-    private static RawResourceRender myRawResourceRenderer = null;
-    
-    //private static String css = FileLoader.loadFileOnClasspath("/style.css");
-    //private static String hl7css = FileLoader.loadFileOnClasspath("/hl7style.css");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOG.info("STU3 Requested URI: " + request.getRequestURI());
-
-        String requestedPath = request.getRequestURI().substring(5);
-        LOG.debug("Request path: " + requestedPath);
-        
-        if (requestedPath.startsWith("/artefact")) {
-        	ServletStreamArtefact.streamArtefact(request, response, fhirVersion, dataSource);
-        } else if (requestedPath.startsWith("/Examples/")) {
-        	ServletStreamExample.streamExample(request, response, fhirVersion, dataSource, myRawResourceRenderer);
-        } else if (requestedPath.startsWith("/Extensions")) {
-        	ExtensionsListRenderer.loadExtensions(request, response, fhirVersion, webber);
-        } else if (requestedPath.equals("/dataLoadStatusReport")) {
-        	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
-			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);
-        } else {
-            super.doGet(request, response);
-        }
+        LOG.info("Delegated request to FHIR server STU3: " + request.getRequestURI());
+        super.doGet(request, response);
     }
 
     /**
@@ -110,11 +83,7 @@ public class STU3RestfulServlet extends RestfulServer {
         // We create an instance of our persistent layer (either MongoDB or
         // Filesystem), which we'll pass to each resource type handler as we create them
         dataSource = SharedDataSource.get();
-        webber = new ResourceWebHandler(dataSource, fhirVersion);
-        myRawResourceRenderer = new RawResourceRender(webber);
-        
-        // Pass our resource handler to the other servlets
-        IndexServlet.setResourceHandler(webber);
+        webber = new ResourceWebHandler(dataSource);
 
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new StructureDefinitionProvider(dataSource));
@@ -133,9 +102,6 @@ public class STU3RestfulServlet extends RestfulServer {
         registerInterceptor(new STU3PlainContent(webber));
         registerInterceptor(new RedirectionInterceptor("3.0.1", "STU3"));
         LOG.debug("resourceProviders added");
-        
-        //setServerConformanceProvider(new CustomServerConformanceProvider());
-        //LOG.fine("Custom Conformance provider added");
         
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
         pp.setDefaultPageSize(Integer.parseInt(FhirServerProperties.getProperty("defaultPageSize")));
