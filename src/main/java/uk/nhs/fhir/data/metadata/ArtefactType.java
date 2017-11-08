@@ -27,7 +27,7 @@ public enum ArtefactType {
 	
 	// The code in the renderer for CM artefacts is: uk.nhs.fhir.data.wrap.WrappedConceptMap
 	CONCEPT_MAP_METADATA("metadata.html", ResourceType.CONCEPTMAP, "Metadata", -1, true),
-	CONCEPT_MAP_FULL("full.html", ResourceType.CONCEPTMAP, "Details", 0, false), // Taken from resource text section
+	//CONCEPT_MAP_FULL("full.html", ResourceType.CONCEPTMAP, "Details", 0, false), // Taken from resource text section
 	CONCEPT_MAP_MAPPINGS("mappings.html", ResourceType.CONCEPTMAP, "Mappings", 10, false),
 	
 	// The code in the renderer for CS artefacts is: uk.nhs.fhir.data.wrap.WrappedCodeSystem
@@ -47,11 +47,11 @@ public enum ArtefactType {
 		this.metadata = metadata;
 	}
 	
-	private String filename = null;
-	private ResourceType relatesToResourceType = null;
-	private String displayName = null;
-	private int weight = 0;
-	private boolean metadata = false;
+	private final String filename;
+	private final ResourceType relatesToResourceType;
+	private final String displayName;
+	private final int weight;
+	private final boolean metadata;
 	
 	/**
 	 * Takes a filename and resourceType and returns a matching ArtefactType (or null if not found)
@@ -108,32 +108,20 @@ public enum ArtefactType {
 	}
 	
 	public String getFilenameWithoutExtension() {
-		int idx = filename.indexOf('.');
-		if (idx == -1) {
-			return filename;
+		if (filename.contains(".")) {
+			int dotIndex = filename.indexOf('.');
+			return filename.substring(0, dotIndex);
 		} else {
-			return filename.substring(0, idx);
+			return filename;
 		}
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
 	}
 
 	public ResourceType getRelatesToResourceType() {
 		return relatesToResourceType;
 	}
 
-	public void setRelatesToResourceType(ResourceType relatesToResourceType) {
-		this.relatesToResourceType = relatesToResourceType;
-	}
-
 	public String getDisplayName() {
 		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
 	}
 
 	public int getWeight() {
@@ -142,9 +130,5 @@ public enum ArtefactType {
 
 	public boolean isMetadata() {
 		return metadata;
-	}
-
-	public void setMetadata(boolean metadata) {
-		this.metadata = metadata;
 	}
 }
