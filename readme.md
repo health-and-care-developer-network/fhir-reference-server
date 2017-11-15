@@ -1,27 +1,56 @@
-# MakeHTML
+# FHIR Artefact Renderer
+> Embed an HTML representation into FHIR API specification documents
 
-A simple utility to add a html representation of the described profile into the text div of one or more FHIR StructureDefinition XML files.
-
+A simple utility to add an HTML representation of the described profile into the text div of one or more FHIR Resource Specification XML files (such as StructureDefinitions, ValueSets and CodeSystems).
+- [Build](#Build)
+- [Usage](#Usage)
+- [Limitations](#Limitations)
+- [Contributing](#Contributing)
+- [Disclaimer](#Disclaimer)
 ---
-
-## Usage
-Simply run:
-
+### Build
+```
+# install dependency to local .m2
+git clone https://github.com/health-and-care-developer-network/fhir-model-utils.git \
+&& cd fhir-model-utils \
+&& mvn install
+```
+```
+# back to containing directory
+cd ..
+```
+```
+# checkout and package this project
+git clone https://github.com/health-and-care-developer-network/fhir-profile-renderer.git \
+&& cd fhir-profile-renderer
+&& mvn package
+# jar with dependencies is now present in ./target/
+```
+### Usage
 ```
 java -jar MakeHTML-1.0-SNAPSHOT.jar <source folder> <target folder>
 ```
 
-Any StructureDefinition files in `[source folder]` will have a tree view of itself inserted into the *text* element, and output into the `[target folder]`.
-The tree view uses inline styles and Base64 encoded images, and is therefore completely self standing.
-If or when the xml file is then opened using s browser, the majority of the XML is disregarded, but the `<text><div>...</div></text>` section will be properly rendered.
+Any supported files in `<source folder>` will have an HTML view of itself inserted into the *<text>* element, and output into the `<target folder>`. Supporting HTML artefacts are created in a subfolder of the same name as follows:
+| File type             | Supporting artefact views                             |
+| -                     | -                                                     |
+| CodeSystem            | metadata, concepts, filters                           |
+| ConceptMap            | metadata, mappings                                    |
+| OperationDefinition   | render (composite of metadata, inputs and outputs)    |
+| StructureDefinition   | metadata, snapshot, differential, details, bindings   |
+| ValueSet              | render (composite of metadata and table)              |
+
+N.B. StructureDefinitions specifying Extension structures do not get a differential view.
+
+The tree view uses inline styles and Base64 encoded background images. It currently relies on NHS Digital serving FHIR icons.
+If or when the XML file is then opened using a browser, the majority of the XML is disregarded, but the XHTML contained in the `<text><div>...</div></text>` section will be properly rendered.
 
 This repo' also contains all the necessary in order to *dockerise* the project.
 
 ## Limitations
-This code hasn't been tested with every possible combination of complexities that can be applied in a StructureDefinition.
-Slicing for example is pretty much ignored.
 XML is assumed as the input format.
 Any existing content in the text element is completely overwritten by this.
+Many features permitted by FHIR are not supported. Including these features will cause the process to fail. This is to ensure that we do not accidentally omit/ignore information in the rendered artefacts.
 
 ## Contributing
 Please feel free to fork and send pull requests if you feel able to contribute to this project.
