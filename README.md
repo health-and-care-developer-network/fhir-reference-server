@@ -14,15 +14,13 @@ A simple utility to add an HTML representation of the described profile into the
 git clone https://github.com/health-and-care-developer-network/fhir-model-utils.git \
 && cd fhir-model-utils \
 && mvn install
-```
-```
+
 # back to containing directory
 cd ..
-```
-```
+
 # checkout and package this project
 git clone https://github.com/health-and-care-developer-network/fhir-profile-renderer.git \
-&& cd fhir-profile-renderer
+&& cd fhir-profile-renderer \
 && mvn package
 # jar with dependencies is now present in ./target/
 ```
