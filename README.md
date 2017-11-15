@@ -23,4 +23,4 @@ A set of utilities to support rendering and serving FHIR specification resources
 
 [FHIR Local Server](https://github.com/health-and-care-developer-network/fhir-server-renderer)
 
-Built using [HAPI](http://hapifhir.io)
+### Built using [HAPI](http://hapifhir.io)
