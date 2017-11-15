@@ -22,6 +22,7 @@ cd ..
 git clone https://github.com/health-and-care-developer-network/fhir-profile-renderer.git \
 && cd fhir-profile-renderer \
 && mvn package
+
 # jar with dependencies is now present in ./target/
 ```
 ### Usage
