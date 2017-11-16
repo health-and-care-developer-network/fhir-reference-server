@@ -12,7 +12,7 @@
 	          <tr>
 	            <td class="fhir-metadata-cell">
 		            <span class="fhir-metadata-label">FHIR Version:</span>
-		            <span class="fhir-metadata-value">$!resource.getStructureFhirVersionEnum()</span>
+		            <span class="fhir-metadata-value">$!fhirVersion</span>
 				</td>
 	            <td class="fhir-metadata-cell" rowspan="2">
 	              <span class="fhir-metadata-label"><u>Version History</u></span>

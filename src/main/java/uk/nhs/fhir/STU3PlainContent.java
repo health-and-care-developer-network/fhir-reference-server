@@ -276,9 +276,30 @@ public class STU3PlainContent extends CORSInterceptor {
      * @param resourceID Name of the SD we need to describe.
      * @return
      */
+<<<<<<< HEAD
     private String describeResource(String resourceName, IIdType resourceID, String baseURL, String firstTabName, ResourceType resourceType) {
     	IBaseResource resource = myWebHandler.getResourceByID(fhirVersion, resourceID);
 
+=======
+    private String describeResource(IdType resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+    	
+    	Template template = null;
+    	try {
+    	  template = Velocity.getTemplate(templateDirectory + "resource-with-metadata.vm");
+    	} catch( Exception e ) {
+    		e.printStackTrace();
+    	}
+    	
+    	// Values to insert into template
+    	context.put( "resource", resource );
+    	context.put( "type", resourceType );
+    	context.put( "baseURL", baseURL );
+    	context.put( "firstTabName", firstTabName );
+    	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	context.put( "fhirVersion", fhirVersion);
+    	
+>>>>>>> develop
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(fhirVersion, resourceID);
     	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();

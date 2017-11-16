@@ -190,4 +190,188 @@ public class PlainContent extends CORSInterceptor {
 		addCORSResponseHeaders(theServletResponse);
 		return true;
 	}
+<<<<<<< HEAD
+=======
+    
+    private void renderConformance(StringBuffer content, IBaseResource conformance, MimeType mimeType) {
+    	LOG.fine("Attempting to render conformance statement");
+    	String resourceContent = null;
+    	if (mimeType == JSON) {
+    		resourceContent = myRawResourceRenderer.getResourceAsJSON(conformance, new IdDt(), fhirVersion);
+    	} else {
+    		resourceContent = myRawResourceRenderer.getResourceAsXML(conformance, new IdDt(), fhirVersion);
+    	}
+    	myRawResourceRenderer.renderSingleWrappedRAWResource(resourceContent, content, mimeType);
+    }
+
+    /**
+     * Code used to display a single resource as HTML when requested by a
+     * browser.
+     *
+     * @param theRequestDetails
+     * @param content
+     * @param resourceType
+     */
+    private String renderSingleResource(RequestDetails theRequestDetails, StringBuffer content, ResourceType resourceType) {
+
+    	VelocityContext context = new VelocityContext();
+    	
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
+
+        IdDt resourceID = (IdDt)theRequestDetails.getId();
+        
+        if (resourceType == STRUCTUREDEFINITION) {
+            content.append(describeResource(resourceID, baseURL, context, "Snapshot", resourceType));
+        }
+        if (resourceType == VALUESET) {
+        	content.append(describeResource(resourceID, baseURL, context, "Entries", resourceType));
+        }
+        if (resourceType == OPERATIONDEFINITION) {
+        	content.append(describeResource(resourceID, baseURL, context, "Operation Description", resourceType));
+        }
+        if (resourceType == IMPLEMENTATIONGUIDE) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
+        if (resourceType == CODESYSTEM) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
+        if (resourceType == CONCEPTMAP) {
+        	content.append(describeResource(resourceID, baseURL, context, "Description", resourceType));
+        }
+        
+        // Return resource name (for breadcrumb)
+        return myWebHandler.getResourceEntityByID(resourceID).getResourceName();
+    }
+    
+    
+    private String makeResourceURL(IdDt resourceID, String baseURL) {
+    	ResourceEntity entity = myWebHandler.getResourceEntityByID(resourceID);
+    	return entity.getVersionedUrl(baseURL);
+    }
+    
+    /**
+     * Code in here to create the HTML response to a request for a
+     * StructureDefinition we hold.
+     *
+     * @param resourceID Name of the SD we need to describe.
+     * @return
+     */
+    private String describeResource(IdDt resourceID, String baseURL, VelocityContext context, String firstTabName, ResourceType resourceType) {
+    	IBaseResource resource = myWebHandler.getResourceByID(resourceID);
+    	
+    	Template template = null;
+    	try {
+    	  template = Velocity.getTemplate(templateDirectory + "resource-with-metadata.vm");
+    	} catch( Exception e ) {
+    		e.printStackTrace();
+    	}
+    	
+    	// Values to insert into template
+    	context.put( "resource", resource );
+    	context.put( "type", resourceType );
+    	context.put( "baseURL", baseURL );
+    	context.put( "firstTabName", firstTabName );
+    	context.put( "generatedurl", makeResourceURL(resourceID, baseURL) );
+    	context.put( "fhirVersion", fhirVersion);
+    	
+    	// List of versions
+    	ResourceEntityWithMultipleVersions entity = myWebHandler.getVersionsForID(resourceID);
+    	HashMap<VersionNumber, ResourceEntity> list = entity.getVersionList();
+    	context.put( "versions", list );
+    	
+    	// Resource metadata
+    	ResourceEntity metadata = myWebHandler.getResourceEntityByID(resourceID);
+    	context.put( "metadata", metadata );
+    	
+    	// Check if we have a nice metadata table from the renderer
+    	boolean hasGeneratedMetadataFromRenderer = false;
+    	for (SupportingArtefact artefact : metadata.getArtefacts()) {
+    		if (artefact.getArtefactType().isMetadata()) {
+    			hasGeneratedMetadataFromRenderer = true;
+    			context.put( "metadataType", artefact.getArtefactType().name());
+    		}
+    	}
+    	LOG.fine("Has metadata from renderer: " + hasGeneratedMetadataFromRenderer);
+    	context.put( "hasGeneratedMetadataFromRenderer", hasGeneratedMetadataFromRenderer );
+    	
+    	// Tree view
+    	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
+    	context.put( "treeView", textSection );
+    	
+    	// Examples
+    	ExampleResources examples = myWebHandler.getExamples(resourceType + "/" + resourceID.getIdPart());
+    	if (examples != null) {
+    		if (examples.size() > 0) {
+    			context.put( "examples", examples );
+    		}
+    	}
+    	
+    	StringWriter sw = new StringWriter();
+    	template.merge( context, sw );
+    	return sw.toString();
+    }
+    
+    /**
+     * Code called to render a list of resources. for example in response to a
+     * url like http://host/fhir/StructureDefinition
+     *
+     * @param theRequestDetails
+     * @param content
+     * @param resourceType
+     */
+    private String renderListOfResources(RequestDetails theRequestDetails, ResourceType resourceType) {
+    	
+    	VelocityContext context = new VelocityContext();
+    	Template template = null;
+    	String baseURL = theRequestDetails.getServerBaseForRequest();
+    	
+    	Map<String, String[]> params = theRequestDetails.getParameters();
+    	
+    	if (params.containsKey("name") || params.containsKey("name:contains")) {
+            
+    		// We are showing a list of matching resources for the specified name query
+    		List<ResourceEntity> list = null;
+    		
+    		if (params.containsKey("name")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name")[0]);
+            } else if (params.containsKey("name:contains")) {
+            	list = myWebHandler.getAllNames(resourceType, params.get("name:contains")[0]);
+            }
+
+            try {
+          	  template = Velocity.getTemplate(templateDirectory + "search-results.vm");
+          	} catch( Exception e ) {
+          		e.printStackTrace();
+          	}
+          	
+          	// Put content into template
+          	context.put( "list", list );
+          	context.put( "resourceType", resourceType );
+          	context.put( "baseURL", baseURL );
+          	
+          	StringWriter sw = new StringWriter();
+          	template.merge( context, sw );
+          	return sw.toString();
+    		
+        } else {
+        	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
+        	HashMap<String, List<ResourceEntity>> groupedResources = myWebHandler.getAGroupedListOfResources(resourceType);
+        	
+        	try {
+        	  template = Velocity.getTemplate(templateDirectory + "list.vm");
+        	} catch( Exception e ) {
+        		e.printStackTrace();
+        	}
+        	
+        	// Put content into template
+        	context.put( "groupedResources", groupedResources );
+        	context.put( "resourceType", resourceType );
+        	context.put( "baseURL", baseURL );
+        	
+        	StringWriter sw = new StringWriter();
+        	template.merge( context, sw );
+        	return sw.toString();
+        }
+    }
+>>>>>>> develop
 }

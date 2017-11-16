@@ -99,6 +99,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
         String displayGroup = baseType;
         VersionNumber versionNo = new VersionNumber(profile.getVersion());
         String status = profile.getStatus().name();
+        System.out.println("******************** " + status);
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 				extension, Optional.of(baseType), displayGroup, false,
