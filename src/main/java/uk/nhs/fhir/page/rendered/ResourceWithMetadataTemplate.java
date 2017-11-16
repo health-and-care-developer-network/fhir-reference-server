@@ -11,6 +11,7 @@ import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.page.VelocityTemplate;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourceWithMetadataTemplate extends VelocityTemplate {
 
@@ -22,10 +23,12 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	private final String textSection;
 	private final Optional<ExampleResources> examples;
 	private final String baseURL;
+	private final FhirVersion fhirVersion;
 
 	public ResourceWithMetadataTemplate(String resourceType, String resourceName, String baseURL, IBaseResource resource,
 			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
-			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<ExampleResources> examples) {
+			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<ExampleResources> examples,
+			FhirVersion fhirVersion) {
 		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName));
 		this.resource = resource;
 		this.firstTabName = firstTabName;
@@ -35,6 +38,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 		this.textSection = textSection;
 		this.examples = examples;
 		this.baseURL = baseURL;
+		this.fhirVersion = fhirVersion;
 	}
 
 	@Override
@@ -46,6 +50,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
     	context.put( "metadata", resourceMetadata );
     	context.put( "baseURL", baseURL);
     	context.put( "generatedurl", resourceMetadata.getVersionedUrl(baseURL) );
+    	context.put( "fhirVersion", fhirVersion);
     	
     	context.put( "hasGeneratedMetadataFromRenderer", metadataArtefact.isPresent() );
     	if (metadataArtefact.isPresent()) {

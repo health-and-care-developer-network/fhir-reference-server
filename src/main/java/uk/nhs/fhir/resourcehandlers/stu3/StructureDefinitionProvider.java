@@ -25,6 +25,8 @@ import java.util.Optional;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
 import org.hl7.fhir.dstu3.model.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -39,6 +41,8 @@ import uk.nhs.fhir.util.FhirVersion;
  */
 public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StructureDefinitionProvider.class);
+	
 	public StructureDefinitionProvider(FilesystemIF dataSource) {
 		super(dataSource, ResourceType.STRUCTUREDEFINITION, org.hl7.fhir.dstu3.model.StructureDefinition.class);
     }
@@ -99,7 +103,7 @@ public class StructureDefinitionProvider extends AbstractResourceProviderSTU3 {
         String displayGroup = baseType;
         VersionNumber versionNo = new VersionNumber(profile.getVersion());
         String status = profile.getStatus().name();
-        System.out.println("******************** " + status);
+        LOG.debug("******************** " + status);
         
         return new ResourceMetadata(resourceName, thisFile, ResourceType.STRUCTUREDEFINITION,
 				extension, Optional.of(baseType), displayGroup, false,

@@ -291,7 +291,8 @@ public class FhirRequestServlet extends HttpServlet {
 		}
 	}
 	
-	// logic lifted from RestfulServer.populateRequestDetailsFromRequestPath()
+	// Logic lifted from HAPI v3.0.0 RestfulServer.populateRequestDetailsFromRequestPath()
+	// Explanatory comments added
 	public static RequestData extractData(FhirVersion version, String theRequestPath) {
 		StringTokenizer tok = new UrlPathTokenizer(theRequestPath);
 		

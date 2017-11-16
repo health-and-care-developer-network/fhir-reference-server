@@ -64,7 +64,7 @@ public class ResourcePageRenderer {
     	String firstTabName = getFirstTabName(resourceType);
     	
     	return new ResourceWithMetadataTemplate(resourceType.toString(), resourceName, baseURL, resource, firstTabName,
-    		versionsList, resourceMetadata, metadataArtefact, textSection, examples).getHtml();
+    		versionsList, resourceMetadata, metadataArtefact, textSection, examples, fhirVersion).getHtml();
     }
 
 	private String getFirstTabName(ResourceType resourceType) {
