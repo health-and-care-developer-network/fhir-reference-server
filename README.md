@@ -58,3 +58,11 @@ The first request sent to the server after rendering artefacts triggers the serv
 
 **Temp Directory**
 The server uses a temporary folder to hold imported artefacts. This should be deleted automatically on normal shutdown, but if the process is killed, or there is a HotSpot error etc, this folder should be deleted manually. This folder is named `FhirServerRenderer-[timestamp]` and is found within whatever is returned by `System.getProperty("java.io.tmpdir")` (usually `/tmp` on a Linux machine, but varies according to Windows versions).
+
+## Release Notes
+
+> ### v1.0.1 (09/11/2017)
+> - Minor code tidying only
+
+> ### v1.0.0 (01/11/2017)
+> - Initial Release
