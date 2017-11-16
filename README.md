@@ -23,4 +23,12 @@ A set of utilities to support rendering and serving FHIR specification resources
 
 [FHIR Local Server](https://github.com/health-and-care-developer-network/fhir-server-renderer)
 
+## Release Notes
+
+> ### v1.0.1 (09/11/2017)
+> - Updated maven artifactId to 'fhir-model-utils'
+
+> ### v1.0.0 (01/11/2017)
+> - Initial Release
+
 ### Built using [HAPI](http://hapifhir.io)
