@@ -1,11 +1,9 @@
 # FHIR Server/Renderer
 > Run a local FHIR artefact renderer and serve the rendered artefacts
 
-A combination of the NHS Developer Network [Renderer](https://github.com/health-and-care-developer-network/fhir-profile-renderer) and [Server](https://github.com/health-and-care-developer-network/fhir-reference-server) projects, designed for data modellers to run locally and test rendering of modified resources.
+A combination of the NHS Developer Network FHIR [Renderer](https://github.com/health-and-care-developer-network/fhir-profile-renderer) and [Server](https://github.com/health-and-care-developer-network/fhir-reference-server) projects, designed for data modellers to run locally and test rendering of resources as they are created/modified.
 
 ---
-
-### Features
 
 ### Build
 ```
@@ -36,12 +34,27 @@ git clone https://github.com/health-and-care-developer-network/fhir-server-rende
   && cd fhir-server-renderer \
   && mvn package
   
-# executable jar is now present in $
-
-
+# executable jar is now present in $builddir/fhir-server-renderer/target
 ```
+
 ### Usage
 ```
 java -jar fhir-server-renderer-1.0.1-SNAPSHOT-jar-with-dependencies.jar
 ```
 (Or simply double-click the jar file.)
+
+### Populating the server
+
+Upon startup, the server starts in the background and a **dialog** is displayed. Select a directory containing FHIR artefacts then click the `Run renderer` button. Once the buttons are no longer disabled, rendering is complete. If there are any errors or warnings, a dialog will be shown.
+
+Any artefacts that were successfully generated can then be accessed through the browser-friendly website served at `http://localhost:8080`.
+
+Repeat to add further FHIR artefacts. Use the `Clear server cache` button to clear cached artefacts down and start over.
+
+### Notes
+
+**Server population**
+The first request sent to the server after rendering artefacts triggers the server to cache metadata for available artefacts. This may take several seconds.
+
+**Temp Directory**
+The server uses a temporary folder to hold imported artefacts. This should be deleted automatically on normal shutdown, but if the process is killed, or there is a HotSpot error etc, this folder should be deleted manually. This folder is named `FhirServerRenderer-[timestamp]` and is found within whatever is returned by `System.getProperty("java.io.tmpdir")` (usually `/tmp` on a Linux machine, but varies according to Windows versions).
