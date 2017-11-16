@@ -56,3 +56,14 @@ Please feel free to fork and send pull requests if you feel able to contribute t
 
 ## Disclaimer
 No guarantee of correctness is provided. You may get benefit from the use of this, in which case, excellent, if not, sorry but we probably can't help further.
+
+## Release Notes
+
+> ### v1.0.1 (09/11/2017)
+> - Hide cardinality and type of StructureDefinition root node
+> - Perform empty links check earlier
+> - Display dialog after rendering even if only warnings (no errors) were encountered
+> - Add option to copy all successfully rendered resources even if some failed
+
+> ### v1.0.0 (01/11/2017)
+> - Initial Release
