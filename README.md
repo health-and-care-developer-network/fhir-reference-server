@@ -51,3 +51,16 @@ Then create and start the Docker image:
 
 By default, the server will look for files to serve in a bind-mounted directory at `/docker-data/fhir-profiles`, as specified in deploy.sh.
 DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from `./NHSDigital-STU3`, as specified in PropertiesFhirFileLocator.java.
+
+## Release Notes
+
+> ### v1.0.1 (09/11/2017)
+> - Include ConceptMaps and CodeSystems on the index page
+> - Handle most queries via a single servlet, delegating to HAPI FHIR for non-browser queries
+> - HAPI FHIR Servers no longer known to Jetty (main servlet acts as servlet container for them)
+> - Many metadata accessors now FHIR Version agnostic
+> - Simplify VelocityTemplate
+> - Abstract duplicated ResourceProvider code
+
+> ### v1.0.0 (01/11/2017)
+> - Initial Release
