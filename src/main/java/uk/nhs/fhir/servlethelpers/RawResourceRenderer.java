@@ -13,17 +13,10 @@ import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.resourcehandlers.IResourceHelper;
 import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
-import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class RawResourceRenderer {
-	
-	ResourceWebHandler myWebHandler = null;
-	
-	public RawResourceRenderer(ResourceWebHandler webHandler) {
-		myWebHandler = webHandler;
-	}
 
     public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FhirVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	// Clear out the generated text

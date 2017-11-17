@@ -40,7 +40,6 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
     }
 
     public ResourceMetadata getMetadataFromResource(File thisFile) {
-    	String displayGroup = "Code List";
     	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
@@ -48,9 +47,14 @@ public class ValueSetProvider extends AbstractResourceProviderSTU3 {
     	if (resourceName == null) {
     		resourceName = resourceID;
     	}
+    	
+    	String displayGroup;
     	if (FHIRUtils.isSTU3ValueSetSNOMED(profile)) {
     		displayGroup = "SNOMED CT Code List";
+    	} else {
+    		displayGroup = "Code List";
     	}
+    	
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	

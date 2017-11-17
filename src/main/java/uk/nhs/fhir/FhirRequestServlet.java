@@ -71,7 +71,7 @@ public class FhirRequestServlet extends HttpServlet {
 		FilesystemIF dataSource = SharedDataSource.get();
 		
 		data = new ResourceWebHandler(dataSource);
-		myRawResourceRenderer = new RawResourceRenderer(data);
+		myRawResourceRenderer = new RawResourceRenderer();
 		myResourcePageRenderer = new ResourcePageRenderer(data);
 		myArtefactStreamer = new ServletStreamArtefact(dataSource);
 		exampleStreamer = new ServletStreamExample(dataSource);
@@ -88,10 +88,17 @@ public class FhirRequestServlet extends HttpServlet {
 		}
 	}
 	
+	protected void addCORSResponseHeaders(HttpServletResponse response) {
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Expose-Headers", "Content-Location,Location");
+	}
+	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
     	LOG.debug("Received request for {}", request.getRequestURI());
+    	
+    	addCORSResponseHeaders(response);
     	
     	if(request.getRequestURI().endsWith(".css")) {
             // Stylesheets
@@ -150,16 +157,6 @@ public class FhirRequestServlet extends HttpServlet {
         	return;
         }
 		
-		if (fullUri.equals("/metadata")) {
-			// just supply DSTU2 info for now
-			try {
-				delegateHandlers.get(FhirVersion.DSTU2).service(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
-			}
-			return;
-		}
-		
 		serviceVersionedRequest(request, response, fullUri);
 	}
 
@@ -174,6 +171,16 @@ public class FhirRequestServlet extends HttpServlet {
 				uriAfterBase = fullUri.substring(serverBase.length());
 				break;
 			}
+		}
+		
+		if (uriAfterBase.equals("/metadata")) {
+			// just supply DSTU2 info for now
+			try {
+				delegateHandlers.get(requestVersion).service(request, response);
+			} catch (ServletException | IOException e) {
+				e.printStackTrace();
+			}
+			return;
 		}
 		
 		if (uriAfterBase.startsWith("/artefact")) {
