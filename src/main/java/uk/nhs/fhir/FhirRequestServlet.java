@@ -50,8 +50,8 @@ import uk.nhs.fhir.util.ServletUtils;
 @SuppressWarnings("serial")
 @WebServlet(
 	urlPatterns = {
-		"/CodeSystem/*", "/ConceptMap/*", "/StructureDefinition/*", "/OperationDefinition/*", "/Extensions/*", "/ValueSets/*",	// index pages
-		"/*", 						//DSTU2 delegated paths
+		//"/CodeSystem/*", "/ConceptMap/*", "/StructureDefinition/*", "/OperationDefinition/*", "/Extensions/*", "/ValueSets/*",	// index pages
+		"/*", 						//DSTU2 delegated paths + index pages
 		"/3.0.1/*", "/STU3/*"		//STU3 delegated paths
 		}, 
 	displayName = "FHIR Servlet", 
@@ -76,17 +76,21 @@ public class FhirRequestServlet extends HttpServlet {
 		myArtefactStreamer = new ServletStreamArtefact(dataSource);
 		exampleStreamer = new ServletStreamExample(dataSource);
 		
+	}
+	
+	public void init() throws ServletException {
 		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
 			FhirRequestHandler requestHandler = new FhirRequestHandler(version);
 			try {
 				// sharing config for now. Could use servlet holders at this level if necessary to give each its own context.
+				LOG.info("adding requestHandler for " + version.toString());
 				requestHandler.init(getServletConfig());
 				delegateHandlers.put(version, requestHandler);
 			} catch (ServletException se) {
 				LOG.error("Error initialising FHIR request handler for {} requests", version.toString(), se);
 			}
 		}
-	}
+    }
 	
 	protected void addCORSResponseHeaders(HttpServletResponse response) {
 		response.addHeader("Access-Control-Allow-Origin", "*");
@@ -174,9 +178,10 @@ public class FhirRequestServlet extends HttpServlet {
 		}
 		
 		if (uriAfterBase.equals("/metadata")) {
-			// just supply DSTU2 info for now
 			try {
-				delegateHandlers.get(requestVersion).service(request, response);
+				LOG.info("Delegating metadata request to delegate Handler for version " + requestVersion.toString());
+				FhirRequestHandler fhirRequestHandler = delegateHandlers.get(requestVersion);
+				fhirRequestHandler.service(request, response);
 			} catch (ServletException | IOException e) {
 				e.printStackTrace();
 			}
@@ -206,7 +211,22 @@ public class FhirRequestServlet extends HttpServlet {
 		// Pages that display a list of resources, whether as an index or the results of a search
 		for (ResourceType type : getIndexedTypes()) {
 			if (uriAfterBase.equals("/" + type.getHAPIName())) {
-				showListPage(requestVersion, request, response, type, params);
+				if (uriAfterBase.equals(fullUri)) {
+					showListPage(requestVersion, request, response, type, params);
+				} else {
+					// User is requesting an index page or search list, but included a FHIR version in the URL.
+					// We use relative links on those pages which will break, so redirect to the.
+					try {
+						String queryString = Optional.ofNullable(request.getQueryString()).orElse("");
+						if (queryString.length() > 0) {
+							queryString = "?" + queryString;
+						}
+						response.sendRedirect(uriAfterBase + queryString);
+					} catch (IOException e) {
+						throw new IllegalStateException(e);
+					}
+				}
+
 				return;
 			}
 		}
@@ -262,10 +282,10 @@ public class FhirRequestServlet extends HttpServlet {
 		String content;
 		// We are showing a list of matching resources for the specified name query
 		if (params.containsKey("name")) {
-			List<ResourceMetadata> list = data.getAllNames(FhirVersion.DSTU2, resourceType, params.get("name")[0]);
+			List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name")[0]);
 			content = new SearchResultsTemplate(resourceType, list).getHtml();
         } else if (params.containsKey("name:contains")) {
-        	List<ResourceMetadata> list = data.getAllNames(FhirVersion.DSTU2, resourceType, params.get("name:contains")[0]);
+        	List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name:contains")[0]);
         	content = new SearchResultsTemplate(resourceType, list).getHtml();
         } else {
         	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)

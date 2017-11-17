@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
+import uk.nhs.fhir.servlethelpers.ConformanceInterceptor;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
@@ -36,21 +37,25 @@ public class FhirRequestHandler extends RestfulServer {
         // Filesystem), which we'll pass to each resource type handler as we create them
         FilesystemIF dataSource = SharedDataSource.get();
         
-        setResourceProviders(fhirVersion, dataSource);
-        LOG.debug("resourceProviders added");
+        setResourceProviders(dataSource);
         
-        addPagingProvider();        
+        addInterceptor();
+        
+        addPagingProvider();
     }
 	
+	private void addInterceptor() {
+		registerInterceptor(new ConformanceInterceptor(fhirVersion));
+	}
+
 	private void addPagingProvider() {
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
         pp.setDefaultPageSize(Integer.parseInt(FhirServerProperties.getProperty("defaultPageSize")));
         pp.setMaximumPageSize(Integer.parseInt(FhirServerProperties.getProperty("maximumPageSize")));
         setPagingProvider(pp);
-
 	}
 
-	private void setResourceProviders(FhirVersion fhirVersion, FilesystemIF dataSource) {
+	private void setResourceProviders(FilesystemIF dataSource) {
 		List<IResourceProvider> providers;
 		switch (fhirVersion) {
 			case DSTU2:
@@ -63,7 +68,9 @@ public class FhirRequestHandler extends RestfulServer {
 				throw new IllegalStateException("No providers available for supported version " + fhirVersion);
 		}
 		
-		setProviders(providers);
+		setProviders((Object[])providers.toArray(new IResourceProvider[]{}));
+		
+		LOG.debug("resourceProviders added");
 	}
 
 	private List<IResourceProvider> getDstu2Providers(FilesystemIF dataSource) {

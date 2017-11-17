@@ -43,11 +43,11 @@ public class ConformanceInterceptor extends InterceptorAdapter {
         
         // If this is a request from a browser for the conformance resource, render and wrap it in HTML
         if (isBrowserConformanceRequest(operation, clientType)) {
-	    		String baseURL = theRequestDetails.getServerBaseForRequest();
-	    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
+    		String baseURL = theRequestDetails.getServerBaseForRequest();
+    		String wrappedContent = renderConformance(theResponseObject, mimeType, baseURL);
 
-	    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
-	    		return false;
+    		ServletUtils.setResponseContentForSuccess(theServletResponse, "text/html", wrappedContent);
+    		return false;
 		} else {
 			return true;
 		}
