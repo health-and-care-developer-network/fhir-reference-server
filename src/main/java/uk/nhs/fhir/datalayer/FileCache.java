@@ -83,7 +83,7 @@ public class FileCache {
     	resourceListByFhirVersion = null;
     	examplesListByFhirVersion = null;
     	examplesListByName = null;
-    	cacheNeedsUpdating = true;
+    	invalidateCache();
     }
     
     private static boolean updateRequired() {

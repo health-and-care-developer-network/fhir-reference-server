@@ -47,6 +47,14 @@ public class FilesystemIF {
         LOG.info("FilesystemIF instantiated, using filesystem datasource.");
     }
     
+    public static void invalidateCache() {
+    	FileCache.invalidateCache();
+    }
+    
+    public static void clearCache() {
+    	FileCache.clearCache();
+    }
+    
     /**
      * Gets a specific one, optionally also with a specific version (DSTU2 variant)
      * @param id

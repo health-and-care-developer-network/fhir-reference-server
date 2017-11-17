@@ -102,6 +102,18 @@ public class FhirRequestServlet extends HttpServlet {
 		
     	LOG.debug("Received request for {}", request.getRequestURI());
     	
+    	// TODO: turn into an interceptor
+    	if (request.getRequestURI().equals("/InvalidateCache")) {
+    		if (request.getRemoteHost().equals("127.0.0.1")
+    		  || request.getRemoteHost().equals("0:0:0:0:0:0:0:1")
+    		  || request.getRemoteHost().equals("localhost")) {
+    			FilesystemIF.invalidateCache();
+    		} else {
+    			response.sendError(403, "Only available on local machine");
+    		}
+    		return;
+    	}
+    	
     	addCORSResponseHeaders(response);
     	
     	if(request.getRequestURI().endsWith(".css")) {
