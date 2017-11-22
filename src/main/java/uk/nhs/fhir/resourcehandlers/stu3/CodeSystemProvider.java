@@ -18,18 +18,16 @@ package uk.nhs.fhir.resourcehandlers.stu3;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.CodeSystem;
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -38,40 +36,22 @@ import uk.nhs.fhir.util.FHIRUtils;
 public class CodeSystemProvider extends AbstractResourceProviderSTU3 {
 
 	
-	public CodeSystemProvider(Datasource dataSource) {
-		super(dataSource);
-        ctx = FHIRVersion.STU3.getContext();
-        resourceType = ResourceType.CODESYSTEM;
-        fhirVersion = FHIRVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.CodeSystem.class;
-    }
-    
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-    	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-        CodeSystem output = (CodeSystem)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((CodeSystem)resource).getText().getDivAsString();
+	public CodeSystemProvider(FilesystemIF dataSource) {
+		super(dataSource, ResourceType.CODESYSTEM, org.hl7.fhir.dstu3.model.CodeSystem.class);
     }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
-    	CodeSystem profile = (CodeSystem)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    	CodeSystem profile = (CodeSystem)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.CODESYSTEM,
-				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
+    	return new ResourceMetadata(resourceName, thisFile, ResourceType.CODESYSTEM,
+				false, Optional.empty(), displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.STU3, url);
     }
 
 }

@@ -3,20 +3,16 @@ package uk.nhs.fhir.servlethelpers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.RestfulServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServletStreamRawFile {
 	
-	private static final Logger LOG = Logger.getLogger(ServletStreamRawFile.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamRawFile.class.getName());
 	
 	public static void streamRawFileFromClasspath(HttpServletResponse response, String mimeType, String filename) throws IOException {
     	//LOG.info("Streaming raw file from classpath: " + filename);
@@ -27,11 +23,11 @@ public class ServletStreamRawFile {
 			if (mimeType == null) {
 				if (filename.endsWith(".js")) {
 					mimeType = "application/javascript";
-					LOG.fine("Using Javascript mimeType: " + mimeType);
+					LOG.debug("Using Javascript mimeType: " + mimeType);
 				} else {
 					// Now, try to guess from the file extension
 					mimeType = URLConnection.guessContentTypeFromName(filename);
-					LOG.fine("Detected mimeType using guessContentTypeFromName: " + mimeType);
+					LOG.debug("Detected mimeType using guessContentTypeFromName: " + mimeType);
 				}
 			}
 			
@@ -45,7 +41,7 @@ public class ServletStreamRawFile {
 	        	b = is.read();
 	        }
     	} catch (Exception e) {
-    		LOG.severe("Error streaming raw file to requestor: " + filename + " - error: " + e.getMessage());
+    		LOG.error("Error streaming raw file to requestor: " + filename + " - error: " + e.getMessage());
     		response.setStatus(404);
     	}
 	}

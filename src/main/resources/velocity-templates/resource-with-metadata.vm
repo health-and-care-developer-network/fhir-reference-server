@@ -3,7 +3,7 @@
 	#if( $hasGeneratedMetadataFromRenderer )
 		#parse( "/velocity-templates/resource-metadata-from-renderer.vm" )
 	#else
-		#if( $type == "ValueSet" || $type == "OperationDefinition" )
+		#if( $resourceType == "ValueSet" || $resourceType == "OperationDefinition" )
 			#parse( "/velocity-templates/minimal-metadata.vm" )
 		#else
 			#parse( "/velocity-templates/resource-metadata.vm" )
@@ -40,7 +40,7 @@
 					<p>
 						<ul id="exampleBullets">
 						#foreach( $example in $examples )
-							<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+							<li><a href="$baseURL/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
 						#end
 						</ul>
 					</p>
