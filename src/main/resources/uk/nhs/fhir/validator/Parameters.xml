@@ -4,8 +4,6 @@
 
 <!-- See: http://hapifhir.io/doc_rest_operations.html#Type_Level_-_Validate -->
 <!-- for how hapi implements validation -->
-
-</Parameters>
  
     <parameter>
         <name value="profile"/>

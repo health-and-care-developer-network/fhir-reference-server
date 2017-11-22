@@ -12,7 +12,6 @@
 				</a>
 		</li>
 	</ul>
-
 	<h3>ValueSet</h3>
 	<ul>
 		<li><a href="/ValueSet">List all ValueSets
@@ -31,6 +30,30 @@
 				#set( $countOD = $counts.get("OperationDefinition") )
 				#if( $countOD )
 				  ($countOD)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>CodeSystem</h3>
+	<ul>
+		<li><a href="/CodeSystem">List all CodeSystems
+				#set( $countCS = $counts.get("CodeSystem") )
+				#if( $countCS )
+				  ($countCS)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>ConceptMap</h3>
+	<ul>
+		<li><a href="/ConceptMap">List all ConceptMaps
+				#set( $countCM = $counts.get("ConceptMap") )
+				#if( $countCM )
+				  ($countCM)
 				#else
 				  (0)
 				#end

@@ -20,22 +20,19 @@ import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.param.StringParam;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.ValueSetCodesCache;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.enums.ResourceType;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -48,12 +45,8 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
      *
      * @param dataSource
      */
-    public ValueSetProvider(Datasource dataSource) {
-    	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
-        resourceType = ResourceType.VALUESET;
-        fhirVersion = FHIRVersion.DSTU2;
-        fhirClass = ca.uhn.fhir.model.dstu2.resource.ValueSet.class;
+    public ValueSetProvider(FilesystemIF dataSource) {
+    	super(dataSource, ResourceType.VALUESET, ca.uhn.fhir.model.dstu2.resource.ValueSet.class);
     }
 
     
@@ -71,33 +64,17 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     @Search()
     public List<ValueSet> getValueSetsByCode(@RequiredParam(name = ValueSet.SP_CODE) StringParam theCode) {
         List<ValueSet> results = new ArrayList<ValueSet>();
-        ValueSetCodesCache codeCache = ValueSetCodesCache.getInstance();
         
-        List<String> ids = codeCache.findCode(theCode.getValue());
+        List<String> ids = ValueSetCodesCache.findCode(theCode.getValue());
         for(String theID : ids) {
-            results.add((ValueSet)myDatasource.getResourceByID(FHIRVersion.DSTU2, theID));
+            results.add((ValueSet)dataSource.getResourceByID(FhirVersion.DSTU2, theID));
         }
         return results;
     }
-    
-    
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	ValueSet output = (ValueSet)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
-    }
 
-    public ResourceEntity getMetadataFromResource(File thisFile) {
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
     	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FhirVersion.DSTU2, thisFile);
     	String url = profile.getUrl();
     	String resourceName = profile.getName();
     	String resourceID = getResourceIDFromURL(url, resourceName);
@@ -110,9 +87,9 @@ public class ValueSetProvider extends AbstractResourceProviderDSTU2 {
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
-				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
+    	return new ResourceMetadata(resourceName, thisFile, ResourceType.VALUESET,
+				false, Optional.empty(), displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.DSTU2, url);
     }
 
 }

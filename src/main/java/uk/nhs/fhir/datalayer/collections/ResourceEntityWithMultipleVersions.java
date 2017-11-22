@@ -1,47 +1,52 @@
 package uk.nhs.fhir.datalayer.collections;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
 
-public class ResourceEntityWithMultipleVersions implements Comparable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.VersionNumber;
+
+public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
 	
-	private static final Logger LOG = Logger.getLogger(ResourceEntityWithMultipleVersions.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
-	HashMap<VersionNumber,ResourceEntity> versionList = new HashMap<VersionNumber,ResourceEntity>();
+	HashMap<VersionNumber,ResourceMetadata> metadataByVersion = new HashMap<VersionNumber,ResourceMetadata>();
 	VersionNumber latest = null;
 	VersionNumber latestActive = null;
 	VersionNumber latestDraft = null;
 	String resourceID = null;
 	String resourceName = null;
 	
-	public ResourceEntityWithMultipleVersions(ResourceEntity entity) {
+	public ResourceEntityWithMultipleVersions(ResourceMetadata entity) {
 		this.resourceID = entity.getResourceID();
 		this.resourceName = entity.getResourceName();
 		add(entity);
 	}
 	
-	public void add(ResourceEntity entity) {
+	public void add(ResourceMetadata entity) {
 		latest = largestVersion(latest, entity.getVersionNo());
 		if (entity.getStatus().equals("active")) {
 			latestActive = largestVersion(latestActive, entity.getVersionNo());
 		} else if (entity.getStatus().equals("draft")) {
 			latestDraft = largestVersion(latestDraft, entity.getVersionNo());
 		}
-		versionList.put(entity.getVersionNo(), entity);
+		metadataByVersion.put(entity.getVersionNo(), entity);
 	}
 	
-	public ResourceEntity getLatest() {
-		return versionList.get(latest);
+	public ResourceMetadata getLatest() {
+		return metadataByVersion.get(latest);
 	}
 	
-	public ResourceEntity getSpecificVersion(VersionNumber version) {
-		if (versionList.containsKey(version)) {
-			LOG.fine("Found requested version - returning");
-			return versionList.get(version);
+	public ResourceMetadata getSpecificVersion(VersionNumber version) {
+		if (metadataByVersion.containsKey(version)) {
+			LOG.debug("Found requested version - returning");
+			return metadataByVersion.get(version);
 		} else {
-			LOG.warning("Could not find requested version - asked for version:"+version+" - versions we have are:");
-			for (VersionNumber v : versionList.keySet()) {
-				LOG.warning(" - version:"+v.toString());
+			LOG.warn("Could not find requested version - asked for version:"+version+" - versions we have are:");
+			for (VersionNumber v : metadataByVersion.keySet()) {
+				LOG.warn(" - version:"+v.toString());
 			}
 			return null;
 		}
@@ -64,9 +69,9 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 	 * Allow resources to be sorted by name
 	 */
 	@Override
-	public int compareTo(Object arg0) {
+	public int compareTo(ResourceEntityWithMultipleVersions arg0) {
 		ResourceEntityWithMultipleVersions other = (ResourceEntityWithMultipleVersions)arg0;
-		return this.getLatest().compareTo(other.getLatest());
+		return ResourceMetadata.BY_RESOURCE_NAME.compare(this.getLatest(), other.getLatest());
 	}
 
 	public String getResourceID() {
@@ -80,13 +85,13 @@ public class ResourceEntityWithMultipleVersions implements Comparable {
 	@Override
 	public String toString() {
 		String result = "  - ResourceEntityWithMultipleVersions [ID=" + resourceID + ", latestVersion=" + latest + "] - Versions:";
-		for (VersionNumber version : versionList.keySet()) {
-			result = result + "\n" + versionList.get(version).toString();
+		for (VersionNumber version : metadataByVersion.keySet()) {
+			result = result + "\n" + metadataByVersion.get(version).toString();
 		}
 		return result;
 	}
 
-	public HashMap<VersionNumber, ResourceEntity> getVersionList() {
-		return versionList;
+	public HashMap<VersionNumber, ResourceMetadata> getVersionList() {
+		return metadataByVersion;
 	}
 }

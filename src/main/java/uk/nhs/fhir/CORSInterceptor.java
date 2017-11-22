@@ -15,15 +15,12 @@
  */
 package uk.nhs.fhir;
 
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.model.api.TagList;
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
@@ -37,8 +34,6 @@ import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
  * @author Adam Hatherly
  */
 public class CORSInterceptor extends InterceptorAdapter {
-
-    private static final Logger LOG = Logger.getLogger(CORSInterceptor.class.getName());
 
     @Override
     public boolean outgoingResponse(RequestDetails theRequestDetails, IBaseResource theResponseObject, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) {

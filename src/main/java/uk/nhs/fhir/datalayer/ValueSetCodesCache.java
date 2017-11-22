@@ -69,7 +69,7 @@ public class ValueSetCodesCache {
      * Constructor which is never directly called, instead, getInstance should be called.
      */
     private ValueSetCodesCache() {
-        _cache = new ArrayList();
+        _cache = new ArrayList<>();
     }   
     
     /**

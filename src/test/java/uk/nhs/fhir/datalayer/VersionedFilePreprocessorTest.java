@@ -1,14 +1,12 @@
 package uk.nhs.fhir.datalayer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-import uk.nhs.fhir.enums.ResourceType;
 
 public class VersionedFilePreprocessorTest {
 
@@ -22,7 +20,7 @@ public class VersionedFilePreprocessorTest {
 	
 	@Test
 	public void testCopyOtherResources() throws IOException {
-		VersionedFilePreprocessor.copyOtherResources(incomingFile, outgoingFile);
+		new VersionedFilePreprocessor(new PropertiesFhirFileLocator()).copyOtherResources(incomingFile.toPath(), outgoingFile.toPath());
 		
 		// Check the supporting resources have been copied properly
 		assertTrue(expectedFile1.exists());

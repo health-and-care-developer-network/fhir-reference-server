@@ -18,51 +18,30 @@ package uk.nhs.fhir.util;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Conformance;
 import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import org.hl7.fhir.dstu3.model.CodeSystem;
-import org.hl7.fhir.dstu3.model.CodeSystem.ConceptDefinitionComponent;
-
-import uk.nhs.fhir.enums.FHIRVersion;
+import uk.nhs.fhir.FhirURLConstants;
 
 public class FHIRUtils {
 
     /**
-     * Constructor, never explicitly called, just sets the logging level to
-     * that requested in config.properties
+     * Constructor, never explicitly called
      */
-    private FHIRUtils() {
-        LOG.setLevel(Level.INFO);
+    private FHIRUtils() {}
 
-        if(logLevel.equals("FINE")) {
-            LOG.setLevel(Level.FINE);
-        }
-        if(logLevel.equals("OFF")) {
-            LOG.setLevel(Level.OFF);
-        }
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(FHIRUtils.class.getName());
 
-    private static final Logger LOG = Logger.getLogger(FHIRUtils.class.getName());
-
-    private static FhirContext ctxDSTU2 = FHIRVersion.DSTU2.getContext();
-    private static FhirContext ctxSTU3 = FHIRVersion.STU3.getContext();
-    
-    private static String profilePath = PropertyReader.getProperty("profilePath");
-    private static String valueSetPath = PropertyReader.getProperty("valusetPath");
-    private static String logLevel = PropertyReader.getProperty("logLevel");
-    private static String examplesPath = PropertyReader.getProperty("examplesPath");
-    
-    private static String snomedCTcodeSystem = PropertyReader.getProperty("snomedCTcodeSystem");
+    private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
+    private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
 
 
     /**
@@ -71,30 +50,32 @@ public class FHIRUtils {
      * @param file File object pointing to the file we want to load
      * @return A resource object
      */
-    public static IBaseResource loadResourceFromFile(FHIRVersion fhirVersion, final File file) {
+    public static IBaseResource loadResourceFromFile(FhirVersion fhirVersion, final File file) {
         IBaseResource resource = null;
         try {
         	FileReader fr = new FileReader(file);
         	
-        	if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+        	if (fhirVersion.equals(FhirVersion.DSTU2)) {
         		resource = ctxDSTU2.newXmlParser().parseResource(fr);
-        	} else if (fhirVersion.equals(FHIRVersion.STU3)) {
+        	} else if (fhirVersion.equals(FhirVersion.STU3)) {
         		resource = ctxSTU3.newXmlParser().parseResource(fr);
         	}
             String url = null;
             
-            LOG.fine("Parsed resource and identified it's class as: " + resource.getClass().getName());
+            LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
 
             // To get the URL we need to cast this to a concrete type
             if (resource instanceof StructureDefinition) {
             	url = ((StructureDefinition)resource).getUrl();
-            } else if (resource instanceof ValueSet) {
-            	url = ((ValueSet)resource).getUrl();
+            } else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
+            	url = ((ca.uhn.fhir.model.dstu2.resource.ValueSet)resource).getUrl();
             } else if (resource instanceof OperationDefinition) {
             	url = ((OperationDefinition)resource).getUrl();
             } else if (resource instanceof Conformance) {
             	url = ((Conformance)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
+            } 
+            
+            else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
             	url = ((org.hl7.fhir.dstu3.model.StructureDefinition)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
             	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
@@ -104,9 +85,7 @@ public class FHIRUtils {
             	url = ((org.hl7.fhir.dstu3.model.CodeSystem)resource).getUrl();
             } else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
             	url = ((org.hl7.fhir.dstu3.model.ConceptMap)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.instance.model.Conformance) {
-            	url = ((org.hl7.fhir.instance.model.Conformance)resource).getUrl();
-            } 
+            }
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());
@@ -118,23 +97,26 @@ public class FHIRUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.fine("Resource loaded from file: " + file.getName());
+        LOG.debug("Resource loaded from file: " + file.getName());
         return resource;
     }
     
-    public static boolean isValueSetSNOMED(ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ComposeInclude> includeList = vs.getCompose().getInclude();
-				for (ComposeInclude includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
-							return true;
-						}
-					}
+    public static boolean isValueSetSNOMED(ca.uhn.fhir.model.dstu2.resource.ValueSet vs) {
+    	if (vs.getCompose() != null
+    	  && vs.getCompose().getInclude() != null) {
+    		
+			List<ComposeInclude> includeList = vs.getCompose().getInclude();
+			
+			for (ComposeInclude includeEntry : includeList) {
+				
+				if (includeEntry.getSystem() != null
+				  && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
+			
+					return true;
 				}
-    		}
+			}
     	}
+    	
     	return false;
     }
     
@@ -144,7 +126,7 @@ public class FHIRUtils {
     			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
 				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
 							return true;
 						}
 					}
@@ -160,7 +142,7 @@ public class FHIRUtils {
     			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
 				for (ConceptSetComponent includeEntry : includeList) {
 					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(snomedCTcodeSystem)) {
+						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
 							return true;
 						}
 					}
