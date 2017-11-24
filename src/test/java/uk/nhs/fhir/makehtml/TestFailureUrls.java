@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.url.UrlValidator;
+import uk.nhs.fhir.util.UrlValidator;
 
 public class TestFailureUrls {
 	private static final List<String> urls = Lists.newArrayList(

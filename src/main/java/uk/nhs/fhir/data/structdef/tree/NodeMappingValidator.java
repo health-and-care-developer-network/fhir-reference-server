@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 
 public class NodeMappingValidator {
 	
@@ -24,7 +25,7 @@ public class NodeMappingValidator {
 			addToMap(mappingsByIdentity, mapping);
 			
 			if (canIgnore(mapping)) {
-				RendererError.handle(RendererError.Key.IGNORABLE_MAPPING_ID, 
+				RendererErrorConfig.handle(RendererError.IGNORABLE_MAPPING_ID, 
 					"Found ignorable mapping (" + mapping.getMap() + ") for identity " + mapping.getIdentity());
 			} else {
 				addToMap(mappingsByIdentityStripNonApplicable, mapping);
@@ -38,10 +39,10 @@ public class NodeMappingValidator {
 			
 			if (nonIgnoredMappingsForKey != null
 			  && nonIgnoredMappingsForKey.size() > 1) {
-				RendererError.handle(RendererError.Key.MULTIPLE_MAPPINGS_SAME_KEY, 
+				RendererErrorConfig.handle(RendererError.MULTIPLE_MAPPINGS_SAME_KEY, 
 					"Multiple mapping entries (" + nonIgnoredMappingsForKey.size() + ") on " + node.getPath() + " for identity " + identity + " [" + String.join(", ", nonIgnoredMappingsForKey + "]"));
 			} else if (allMappingsForKey.size() > 1) {
-				RendererError.handle(RendererError.Key.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, 
+				RendererErrorConfig.handle(RendererError.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, 
 					"Multiple mapping entries (" + allMappingsForKey.size() + ") on " + node.getPath() + " for identity " + identity + " [" + String.join(", ", allMappingsForKey + "]"));
 			}
 		}

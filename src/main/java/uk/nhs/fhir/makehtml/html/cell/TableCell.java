@@ -11,9 +11,15 @@ import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 public abstract class TableCell {
 
 	public static final String ZERO_WIDTH_CHARACTER = "&#8203;";
-	private static final TableCell EMPTY_CELL = new SimpleTextCell(ZERO_WIDTH_CHARACTER, true);
+	
+	private static final TableCell EMPTY_PLAIN = new SimpleTextCell(ZERO_WIDTH_CHARACTER);
 	public static TableCell empty() {
-		return EMPTY_CELL;
+		return EMPTY_PLAIN;
+	}
+	
+	private static final TableCell EMPTY_BORDERED = new SimpleTextCell(ZERO_WIDTH_CHARACTER, true);
+	public static TableCell emptyBordered() {
+		return EMPTY_BORDERED;
 	}
 			
 	public abstract Element makeCell();

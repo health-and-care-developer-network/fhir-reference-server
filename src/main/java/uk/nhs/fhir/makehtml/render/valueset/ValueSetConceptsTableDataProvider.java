@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
@@ -14,19 +14,19 @@ import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererError.Key;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ValueSetConceptsTableDataProvider {
 	
 	private final WrappedValueSet valueSet;
-	private final FhirFileRegistry registry;
+	private final RendererContext context;
 	
-	public ValueSetConceptsTableDataProvider(WrappedValueSet valueSet, FhirFileRegistry registry) {
+	public ValueSetConceptsTableDataProvider(WrappedValueSet valueSet, RendererContext context) {
 		this.valueSet = valueSet;
-		this.registry = registry;
+		this.context = context;
 	}
 
 	public List<ValueSetConceptsTableDataCodeSystem> getCodeSystems() {
@@ -41,11 +41,11 @@ public class ValueSetConceptsTableDataProvider {
 		for (FhirValueSetComposeInclude include : valueSet.getCompose().getIncludes()) {
 			if (include.getConcepts().isEmpty()) {
 				// try to find the concept map from the registry
-				WrappedCodeSystem standaloneCodeSystem = registry.getCodeSystem(include.getSystem());
+				WrappedCodeSystem standaloneCodeSystem = context.getFhirFileRegistry().getCodeSystem(include.getSystem());
 				if (standaloneCodeSystem != null) {
 						addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
-					RendererError.handle(Key.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
+					RendererErrorConfig.handle(RendererError.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
 					// ensure that we still display the code system
 					addConcepts(rows, include.getSystem(), Lists.newArrayList());
 				}
@@ -65,7 +65,7 @@ public class ValueSetConceptsTableDataProvider {
 			
 			String mappedCode = null;
 			
-			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(registry)) {
+			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(context.getFhirFileRegistry())) {
 				for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
 	                if (code.equals(mapElement.getCode())) {
 	                	if (mapElement.getTargets().isEmpty()) {

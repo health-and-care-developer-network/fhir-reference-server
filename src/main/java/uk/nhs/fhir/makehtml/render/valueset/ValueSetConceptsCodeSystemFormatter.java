@@ -40,7 +40,7 @@ public class ValueSetConceptsCodeSystemFormatter {
 		Optional<String> mapping = concept.getMapping();
 		
 		TableRow row = new TableRow(
-			TableCell.empty(),
+			TableCell.emptyBordered(),
 			new SimpleTextCell(code, true));
 
 		if (needsDisplayColumn) {
@@ -66,16 +66,16 @@ public class ValueSetConceptsCodeSystemFormatter {
 			codeSystemCell = new LinkCell(new LinkDatas(new LinkData(codeSystem, codeSystem.toFullString())), true);
 		} 
 		
-		TableRow row = new TableRow(codeSystemCell,	TableCell.empty(), TableCell.empty());
+		TableRow row = new TableRow(codeSystemCell,	TableCell.emptyBordered(), TableCell.emptyBordered());
 		
 		if (needsDisplayColumn) {
-			row.addCell(TableCell.empty());
+			row.addCell(TableCell.emptyBordered());
 		}
 		if (needsDefinitionColumn) {
-			row.addCell(TableCell.empty());
+			row.addCell(TableCell.emptyBordered());
 		}
 		if (needsMappingColumn) {
-			row.addCell(TableCell.empty());
+			row.addCell(TableCell.emptyBordered());
 		}
 			
 		tableRows.add(row);

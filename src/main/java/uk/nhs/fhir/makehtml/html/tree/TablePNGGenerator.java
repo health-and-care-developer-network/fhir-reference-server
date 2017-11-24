@@ -82,7 +82,7 @@ public class TablePNGGenerator {
 
 		try {
 			byte[] pngBytes = getPngBytes(style, vlinesRequired);
-			String base64Png = Base64.encodeBase64String(pngBytes);
+			String base64Png = new String(Base64.encodeBase64(pngBytes));
 			cache.put(key, base64Png);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

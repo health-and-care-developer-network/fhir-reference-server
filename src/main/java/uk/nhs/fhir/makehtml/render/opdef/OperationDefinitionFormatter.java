@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.opdef.FhirOperationParameter;
 import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
@@ -19,12 +18,13 @@ import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
-	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override

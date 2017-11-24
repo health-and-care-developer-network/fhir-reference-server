@@ -13,10 +13,9 @@ import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
@@ -24,12 +23,13 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionMetadataFormatter extends TableFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override

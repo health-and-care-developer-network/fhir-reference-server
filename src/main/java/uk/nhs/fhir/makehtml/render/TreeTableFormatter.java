@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
@@ -26,8 +25,8 @@ import uk.nhs.fhir.makehtml.html.tree.TablePNGGenerator;
 
 public abstract class TreeTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 
-	public TreeTableFormatter(T wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public TreeTableFormatter(T wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	TablePNGGenerator backgrounds = new TablePNGGenerator();

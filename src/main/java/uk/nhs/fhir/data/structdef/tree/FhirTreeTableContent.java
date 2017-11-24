@@ -86,4 +86,6 @@ public interface FhirTreeTableContent {
 	public Optional<String> getId();
 
 	Optional<FhirTreeTableContent> getLinkedNode();
+	
+	public boolean isRoot();
 }

@@ -20,58 +20,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileUtils {
-	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-	
-	public static void deleteFilesInDir(String directory) {
-		ArrayList<String> exclusions = new ArrayList<String>();
-		exclusions.add("package-info.java");
-		deleteFilesInDir(directory, exclusions);
-	}
-	
-	public static void deleteFilesInDir(String directory, ArrayList<String> exclusions) {
-		File dir = new File(directory);
-		File files[] = dir.listFiles();
-		if (files != null) {
-			for(int index = 0; index < files.length; index++) {
-				if (exclusions.contains(files[index].getName())) {
-					logger.info("Retaining file: {}", files[index].getName());
-				} else {
-					files[index].delete();
-				}
-			}
-		}
-	}
-	
-	public static void createDirectory(String directory) {
-		new File(directory).mkdirs();
-	}
-	
-	public static boolean fileExists(String filename) {
-		File f = new File(filename);
-		return f.exists();
-	}
-	
-	/**
-     * @param filename Filename to write data into
-     * @param data array of bytes to write to specified file
-     * @return true if successful, false otherwise
-     */
-    public static boolean writeFile(String filename, byte[] data) {
-        return writeFile(new File(filename), data);
-    }
+import com.google.common.base.Strings;
+
+public class FhirFileUtils {
+	private static final Logger logger = LoggerFactory.getLogger(FhirFileUtils.class);
     
     /**
      * @param file File to write data into
      * @param data array of bytes to write to specified file
      * @return true if successful, false otherwise
      */
-    private static boolean writeFile(File file, byte[] data) {
+    public static boolean writeFile(File file, byte[] data) {
         boolean success = false;
         try (
         	FileOutputStream fos = new FileOutputStream(file);
@@ -101,25 +67,46 @@ public class FileUtils {
     public static boolean appendToFile(String filename, byte[] data) {
         boolean success = false;
         
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
-        try {
-            fos = new FileOutputStream(new File(filename), true);
-            bos = new BufferedOutputStream(fos);
-            for (int n=0; n<data.length; n++) {
-                bos.write(data[n]);
-            }
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(filename), true))) {
+        	for (byte b : data) {
+        		bos.write(b);
+        	}
             bos.flush();
             success = true;
         } catch (FileNotFoundException ex) {
         	logger.error("File not found {}", filename, ex);
         } catch (IOException ex) {
             logger.error("IOException writing to {}", filename, ex);
-        } finally {
-            try { if (bos != null) bos.close(); } catch (IOException ex) {}
-            try { if (fos != null) fos.close(); } catch (IOException ex) {}
         }
         
         return success;
+    }
+    
+    public static Path makeTempDir(String tmpDirName, boolean deleteExisting) throws IOException {
+    	if (deleteExisting) {
+    		Path tmpDir = getTempDir(tmpDirName);
+    		FileUtils.deleteDirectory(tmpDir.toFile());
+    	}
+    	
+    	return makeTempDir(tmpDirName);
+    }
+    
+    private static Path getTempDir(String tmpDirName) {
+    	String systemTempDir = System.getProperty("java.io.tmpdir");
+	    if (Strings.isNullOrEmpty(systemTempDir)) {
+	    	throw new IllegalStateException("No system temp dir available");
+	    }
+	    
+	    return Paths.get(systemTempDir).resolve(tmpDirName);
+    }
+    
+    private static Path makeTempDir(String tmpDirName) {
+		Path tmpDir = getTempDir(tmpDirName);
+    	
+		if (!tmpDir.toFile().mkdir()) {
+			throw new IllegalStateException("Failed to create temp directory at " + tmpDir.toString());
+		}
+		
+		return tmpDir;
     }
 }
