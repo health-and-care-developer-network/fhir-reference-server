@@ -4,16 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import uk.nhs.fhir.data.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
-import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeNodeBuilder {
@@ -24,10 +22,12 @@ public class FhirTreeNodeBuilder {
 
 		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
+			/*
 			typeLinks = new LinkDatas(
 				new LinkData(
 					FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_FHIR + "/profiling.html", elementDefinition.getVersion()), 
-					"Profile"));
+					"Profile"));*/
+			typeLinks = new LinkDatas();
 		} else {
 			typeLinks = elementDefinition.getTypeLinks();
 		}
@@ -62,7 +62,7 @@ public class FhirTreeNodeBuilder {
 		for (ConstraintInfo constraint : constraints) {
 			String key = constraint.getKey();
 			if (!conditionIds.contains(key)) {
-				RendererError.handle(RendererError.Key.CONSTRAINT_WITHOUT_CONDITION, "Constraint " + key + " doesn't have an associated condition pointing at it");
+				RendererErrorConfig.handle(RendererError.CONSTRAINT_WITHOUT_CONDITION, "Constraint " + key + " doesn't have an associated condition pointing at it");
 			}
 		}
 
@@ -72,7 +72,7 @@ public class FhirTreeNodeBuilder {
 			for (int j=i+1; j<constraints.size(); j++) {
 				ConstraintInfo constraint2 = constraints.get(j);
 				if (constraint1.getKey().equals(constraint2.getKey())) {
-					RendererError.handle(RendererError.Key.DUPLICATE_CONSTRAINT_KEYS, "Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
+					RendererErrorConfig.handle(RendererError.DUPLICATE_CONSTRAINT_KEYS, "Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
 				}
 			}
 		}

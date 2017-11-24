@@ -11,24 +11,24 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> {
 
-	public ConceptMapTableFormatter(WrappedConceptMap conceptMap, FhirFileRegistry otherResources) {
-		super(conceptMap, otherResources);
+	public ConceptMapTableFormatter(WrappedConceptMap conceptMap, RendererContext context) {
+		super(conceptMap, context);
 	}
 
 	@Override

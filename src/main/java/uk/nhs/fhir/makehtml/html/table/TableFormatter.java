@@ -12,20 +12,20 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
-	public TableFormatter(T wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public TableFormatter(T wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	protected static final String VERSION_DATE = "Version date";
@@ -48,7 +48,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	}
 	
 	protected Element labelledValueCell(String label, Optional<String> value, int colspan) {
-		String displayValue = value.isPresent() ? value.get() : BLANK;
+		String displayValue = value.orElse(BLANK);
 		return labelledValueCell(label, displayValue, colspan);
 	}
 	

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
@@ -29,6 +29,7 @@ import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -163,14 +164,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			return new FhirCardinality(min.get(), max.get());
 		} else {
 			try {
-				Integer resolvedMin = min.isPresent() ? min.get() : backupNode.getMin().get();
-				String resolvedMax = max.isPresent() ? max.get() : backupNode.getMax().get();
+				Integer resolvedMin = min.orElse(backupNode.getMin().get());
+				String resolvedMax = max.orElse(backupNode.getMax().get());
 				return new FhirCardinality(resolvedMin, resolvedMax);
 			} catch (NullPointerException | NoSuchElementException e) {
 				if (backupNode == null
 				  || !backupNode.getMin().isPresent()
 				  || !backupNode.getMax().isPresent()) {
-					RendererError.handle(RendererError.Key.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
+					RendererErrorConfig.handle(RendererError.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
 					return new FhirCardinality(0, "*");
 				} else {
 					throw e;
@@ -202,12 +203,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		
 		if (typeLinks.isEmpty()
 		  && fixableTypes.containsKey(getPathName())) {
-			RendererError.handle(RendererError.Key.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
+			RendererErrorConfig.handle(RendererError.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
 			typeLinks.addSimpleLink(new LinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
 		} 
 
-		if (typeLinks.isEmpty()) {
-			RendererError.handle(RendererError.Key.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
+		if (typeLinks.isEmpty()
+		  && !isRoot()) {
+			RendererErrorConfig.handle(RendererError.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
 		}
 		
 		if (getPathName().endsWith("[x]")
@@ -567,8 +569,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 							.collect(Collectors.toSet());
 					
 					if (extensionUrlDiscriminators.size() == 0) {
-						RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "
-							+ "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
+						RendererErrorConfig.handle(RendererError.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "
+								+ "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
 						discriminators.add("<missing>");
 					} else if (extensionUrlDiscriminators.size() > 1) {
 						throw new IllegalStateException("Don't yet handle multiple extension url discriminators. Consider ordering so that keys are consistent?");
@@ -622,8 +624,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 								discriminators.add(bindingInfo.getUrl().get().toFullString());
 							}
 						} else {
-							RendererError.handle(RendererError.Key.UNRESOLVED_DISCRIMINATOR, 
-								"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + getPath());
+							if (!getSliceName().isPresent()) {
+								RendererErrorConfig.handle(RendererError.UNRESOLVED_DISCRIMINATOR, 
+									"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + getPath());
+							}
 							discriminators.add("<missing>");
 						}
 					}
@@ -631,7 +635,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			}
 			
 			if (discriminators.size() == 0) {
-				RendererError.handle(RendererError.Key.NO_DISCRIMINATORS_FOUND, "Didn't find any discriminators to identify " + getPath() + " (likely caused by previous error)");
+				if (!getSliceName().isPresent()) {
+					RendererErrorConfig.handle(RendererError.NO_DISCRIMINATORS_FOUND, "Didn't find any discriminators to identify " + getPath() + " (likely caused by previous error)");
+				}
 				setDiscriminatorValue("<missing>");
 			} else if (discriminators.size() > 1) {
 				throw new IllegalStateException("Found multiple discriminators: [" + String.join(", ", discriminators) + " ] for node " + getPath());
@@ -669,5 +675,10 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 	public void setId(Optional<String> id) {
 		this.id = id;
+	}
+	
+	@Override
+	public boolean isRoot() {
+		return !path.contains(".");
 	}
 }

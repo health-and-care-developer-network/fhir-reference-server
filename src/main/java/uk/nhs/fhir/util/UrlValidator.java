@@ -1,4 +1,4 @@
-package uk.nhs.fhir.data.url;
+package uk.nhs.fhir.util;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +12,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,6 +23,8 @@ import uk.nhs.fhir.makehtml.NewMain;
 
 public class UrlValidator {
 
+	private static final Logger LOG = LoggerFactory.getLogger(UrlValidator.class);
+	
 	private static Map<String, Integer> success = Maps.newConcurrentMap();
 	private static Map<String, Integer> silentFailure = Maps.newConcurrentMap();
 	private static Map<String, Integer> failure = Maps.newConcurrentMap();
@@ -47,15 +51,15 @@ public class UrlValidator {
 	
 	public static void logSuccessAndFailures() {
 		if (!success.isEmpty()) {
-			System.out.println("Successfully tested the following link URLs:\n" + String.join("\n", success.keySet()));
+			LOG.info("Successfully tested the following link URLs:\n" + String.join("\n", success.keySet()));
 		}
 		
 		if (!silentFailure.isEmpty()) {
-			System.out.println("Displaying the following URLs as text rather than a link (received failure response):\n" + String.join("\n", silentFailure.keySet()));
+			LOG.warn("Displaying the following URLs as text rather than a link (received failure response):\n" + String.join("\n", silentFailure.keySet()));
 		}
 		
 		if (!failure.isEmpty()) {
-			System.out.println("WARNING - the following links are broken and included in output:\n" + String.join("\n", failure.keySet()));
+			LOG.error("WARNING - the following links are broken and included in output:\n" + String.join("\n", failure.keySet()));
 		}
 	}
 
@@ -70,11 +74,11 @@ public class UrlValidator {
 		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
 			testUrl(client, linkUrl, silentFailure);
 		} catch (SSLHandshakeException e1) {
-			System.out.println("SSL Handshake Exception for " + linkUrl);
+			LOG.warn("SSL Handshake Exception for " + linkUrl);
 			silentFailure.put(linkUrl, -1);
 			return false;
 		} catch (IOException e2) {
-			System.out.println("Exception for " + linkUrl);
+			LOG.warn("Exception for " + linkUrl);
 			e2.printStackTrace();
 			silentFailure.put(linkUrl, -1);
 			return false;
@@ -118,13 +122,13 @@ public class UrlValidator {
 		HttpGet request = new HttpGet(linkUrl);
 		request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 	
-		System.out.println("Sending GET request to " + linkUrl);
+		LOG.debug("Sending GET request to " + linkUrl);
 		
 		int statusCode;
 		try (CloseableHttpResponse response = client.execute(request)) {
 			statusCode = response.getStatusLine().getStatusCode();
 		}
-		System.out.println("" + statusCode);
+		LOG.debug("" + statusCode);
 		return statusCode;
 	}
 

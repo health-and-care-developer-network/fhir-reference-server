@@ -9,18 +9,18 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class FilteredValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
-	public FilteredValueSetTableFormatter(WrappedValueSet wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public FilteredValueSetTableFormatter(WrappedValueSet wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class FilteredValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 	
 	private Element buildFilteredCodeSystemPanel() {
-		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource, otherResources);
+		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource, context);
 		List<ValueSetFilteredCodeSystemTableData> rows = tableData.getRows();
 		ValueSetFilteredCodeSystemRowFormatter rowFormatter = new ValueSetFilteredCodeSystemRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();

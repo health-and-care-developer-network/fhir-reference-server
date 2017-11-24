@@ -21,7 +21,6 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
@@ -33,12 +32,13 @@ import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.makehtml.html.style.FhirFont;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	}
 
 	private Element getDetailsPanel() {
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, context);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
@@ -88,6 +88,11 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
 			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
+			
+			if (typeLinks.isEmpty()
+			  && !node.isRoot()) {
+				throw new IllegalStateException("No typeLinks or linked Node present for non root node " + pathName);
+			}
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,

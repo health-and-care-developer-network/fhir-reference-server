@@ -9,18 +9,18 @@ import org.jdom2.Element;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
-	public ConceptsValueSetTableFormatter(WrappedValueSet wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public ConceptsValueSetTableFormatter(WrappedValueSet wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 
 	private Element buildConceptsPanel() {
-		ValueSetConceptsTableDataProvider tableData = new ValueSetConceptsTableDataProvider(wrappedResource, otherResources);
+		ValueSetConceptsTableDataProvider tableData = new ValueSetConceptsTableDataProvider(wrappedResource, context);
 		List<ValueSetConceptsTableDataCodeSystem> codeSystems = tableData.getCodeSystems();
 
 		boolean needsDisplayColumn = false;

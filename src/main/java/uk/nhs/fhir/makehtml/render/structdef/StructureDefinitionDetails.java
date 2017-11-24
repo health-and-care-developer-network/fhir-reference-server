@@ -12,7 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
@@ -21,6 +21,7 @@ import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
+import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
 import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
@@ -203,7 +204,7 @@ public class StructureDefinitionDetails {
 		if (!typeLinks.isEmpty()) {
 			typeLinkCell = linkCell(typeLinks);
 		} else {
-			throw new IllegalStateException("No typeLinks or linked Node present for " + pathName);
+			typeLinkCell = TableCell.empty().makeCell();
 		}
 		
 		tableContent.add(

@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -19,8 +22,12 @@ import com.google.common.collect.Maps;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.util.StringUtil;
 
 public class FhirTreeData implements Iterable<FhirTreeTableContent> {
+	private static Logger LOG = LoggerFactory.getLogger(FhirTreeData.class);
+	
 	private final FhirTreeTableContent root;
 	
 	public FhirTreeData(FhirTreeTableContent root) {
@@ -40,10 +47,9 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	
 	public void dumpTreeStructure() {
 		for (FhirTreeTableContent node : this) {
-			for (int i=0; i < (node.getPath().split("\\.").length - 1); i++) {
-				System.out.write('\t');
-			}
-			System.out.println(node.getDisplayName());
+			int indentSize = node.getPath().split("\\.").length - 1;
+			String indent = StringUtil.nChars(indentSize, '\t');
+			LOG.debug(indent + node.getDisplayName());
 		}
 	}
 
@@ -174,12 +180,12 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			
 			if (hasId && hasIdLinkedNode) {
 				if (node.getId().get().equals(node.getLinkedNodeId().get())) {
-					RendererError.handle(RendererError.Key.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
+					RendererErrorConfig.handle(RendererError.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
 				}
 			}
 			
 			if (hasIdLinkedNode && node.getFixedValue().isPresent()) {
-				RendererError.handle(RendererError.Key.FIXEDVALUE_WITH_LINKED_NODE, 
+				RendererErrorConfig.handle(RendererError.FIXEDVALUE_WITH_LINKED_NODE, 
 				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
 				  + " (" + node.getLinkedNodeId().get() + ")");
 			}
@@ -209,7 +215,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 						.map(node -> node.getPath())
 						.collect(Collectors.toList()));
 				
-				RendererError.handle(RendererError.Key.MISSING_REFERENCED_NODE, 
+				RendererErrorConfig.handle(RendererError.MISSING_REFERENCED_NODE, 
 					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedId + ")");
 			}
 		}
@@ -240,12 +246,12 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			
 			if (hasName && hasLinkedNode) {
 				if (node.getName().get().equals(node.getLinkedNodeName().get())) {
-					RendererError.handle(RendererError.Key.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getName().get() + ")");
+					RendererErrorConfig.handle(RendererError.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getName().get() + ")");
 				}
 			}
 			
 			if (hasLinkedNode && node.getFixedValue().isPresent()) {
-				RendererError.handle(RendererError.Key.FIXEDVALUE_WITH_LINKED_NODE, 
+				RendererErrorConfig.handle(RendererError.FIXEDVALUE_WITH_LINKED_NODE, 
 				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
 				  + " (" + node.getLinkedNodeName().get() + ")");
 			}

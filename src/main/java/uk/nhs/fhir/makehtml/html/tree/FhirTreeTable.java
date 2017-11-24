@@ -6,6 +6,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.ResourceInfo;
@@ -19,11 +22,12 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.data.url.UrlValidator;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.SimpleTextCell;
+import uk.nhs.fhir.makehtml.html.cell.TableCell;
 import uk.nhs.fhir.makehtml.html.cell.TreeNodeCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.makehtml.html.style.CSSRule;
@@ -34,8 +38,11 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.UrlValidator;
 
 public class FhirTreeTable {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(FhirTreeTable.class);
 	
 	private final FhirTreeData data;
 	private final Style lineStyle = uk.nhs.fhir.makehtml.html.tree.Style.DOTTED;
@@ -76,13 +83,13 @@ public class FhirTreeTable {
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
 		
-		addTableRow(tableRows, root, rootVlines, rootIcons);
-		addNodeRows(root, tableRows, rootVlines);
+		addTableRow(tableRows, root, rootVlines, rootIcons, true);
+		addChildrenRows(root, tableRows, rootVlines);
 		
 		return tableRows;
 	}
 
-	private void addNodeRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
+	private void addChildrenRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
 		
 		List<? extends FhirTreeTableContent> children = node.getChildren();
 		for (int i=0; i<children.size(); i++) {
@@ -113,17 +120,22 @@ public class FhirTreeTable {
 			}
 
 			addTableRow(tableRows, childNode, childVlines, treeIcons);
-			addNodeRows(childNode, tableRows, childVlines);
+			addChildrenRows(childNode, tableRows, childVlines);
 		}
 	}
-	
+
 	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
+		addTableRow(tableRows, nodeToAdd, rootVlines, treeIcons, false);
+	}
+	
+	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean isRoot) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		LinkDatas typeLinks = nodeToAdd.getTypeLinks();
 		
-		if (typeLinks.isEmpty()) {
-			RendererError.handle(RendererError.Key.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
+		if (typeLinks.isEmpty()
+		  && !isRoot) {
+			RendererErrorConfig.handle(RendererError.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
 		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
@@ -132,8 +144,10 @@ public class FhirTreeTable {
 			new TableRow(
 				new TreeNodeCell(treeIcons, icons.getIcon(nodeToAdd), nodeToAdd.getDisplayName(), backgroundCSSClass, removedByProfile, nodeToAdd.getNodeKey(), nodeToAdd.getDefinition()),
 				new ResourceFlagsCell(nodeToAdd.getResourceFlags()),
-				new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile), 
-				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false), 
+				isRoot ? 
+					TableCell.empty() : 
+					new SimpleTextCell(nodeToAdd.getCardinality().toString(), false, nodeToAdd.useBackupCardinality(), removedByProfile),
+				new LinkCell(typeLinks, nodeToAdd.useBackupTypeLinks(), removedByProfile, false),
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
 	
@@ -220,7 +234,7 @@ public class FhirTreeTable {
 			}
 			
 			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
-				RendererError.handle(RendererError.Key.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
+				RendererErrorConfig.handle(RendererError.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
 					"Stand-in description being displayed - expected this to have been removed by cardinality in profile");
 			} else {
 				resourceInfos.add(new BindingResourceInfo(bindingToAdd));
@@ -259,7 +273,7 @@ public class FhirTreeTable {
 		boolean hasScheme = description.startsWith("http://") || description.startsWith("https://");
 		
 		if (!hasScheme && description.contains("/")) {
-			System.out.println("Should this be a link? " + description);
+			LOG.warn("Should this be a link? " + description);
 		}
 		
 		return hasScheme;

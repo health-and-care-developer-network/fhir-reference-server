@@ -15,13 +15,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.data.FhirURLConstants;
+import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.ValueWithInfoCell;
@@ -31,13 +30,14 @@ import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 	
-	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition, FhirFileRegistry otherResources) {
-		super(structureDefinition, otherResources);
+	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition, RendererContext context) {
+		super(structureDefinition, context);
 	}
 
     private static final String BLANK = "";
@@ -83,7 +83,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, otherResources);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, context);
 
         for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);

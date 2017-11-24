@@ -7,31 +7,33 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.FhirTreeDataFactory;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
+import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class StructureDefinitionTreeDataProvider {
 	
 	private final WrappedStructureDefinition source;
-	private final FhirFileRegistry registry;
+	private final RendererContext context;
 	
 	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
 			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
 			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
-	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source, FhirFileRegistry registry) {
+	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source, RendererContext context) {
 		this.source = source;
-		this.registry = registry;
+		this.context = context;
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-		FhirTreeData snapshotTree = source.getSnapshotTree(registry);
+		FhirTreeData snapshotTree = FhirTreeDataFactory.getSnapshotTree(source, context);
 		
 		snapshotTree.resolveLinkedNodes();
 		snapshotTree.cacheSlicingDiscriminators();
@@ -44,7 +46,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeData differentialTree = source.getDifferentialTree(registry);
+		FhirTreeData differentialTree = FhirTreeDataFactory.getDifferentialTree(source, context);
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		
@@ -120,7 +122,8 @@ public class StructureDefinitionTreeDataProvider {
 				}
 			}
 			
-			RendererError.handle(RendererError.Key.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			RendererErrorConfig.handle(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			
 			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}
 		
@@ -233,7 +236,6 @@ public class StructureDefinitionTreeDataProvider {
 		List<FhirTreeNode> matchingNodes = Lists.newArrayList();
 		
 		for (FhirTreeTableContent node : new FhirTreeData(searchRoot)) {
-			//System.out.println(node.getPath());
 			if (node.getPath().equals(differentialPath)) {
 				if (node instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)node;

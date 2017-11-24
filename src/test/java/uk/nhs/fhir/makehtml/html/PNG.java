@@ -41,7 +41,7 @@ public class PNG {
 	}
 
 	public static PNG parsePNGBase64(String base64Input) {
-		byte[] decodedBytes = Base64.decodeBase64(base64Input);
+		byte[] decodedBytes = Base64.decodeBase64(base64Input.getBytes());
 		return parsePNG(new ByteArrayInputStream(decodedBytes));
 	}
 	

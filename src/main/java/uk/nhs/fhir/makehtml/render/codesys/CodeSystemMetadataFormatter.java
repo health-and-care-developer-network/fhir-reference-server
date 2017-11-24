@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.jdom2.Elements;
 import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
@@ -24,12 +23,13 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
+import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemMetadataFormatter(WrappedCodeSystem wrappedResource, FhirFileRegistry otherResources) {
-		super(wrappedResource, otherResources);
+	public CodeSystemMetadataFormatter(WrappedCodeSystem wrappedResource, RendererContext context) {
+		super(wrappedResource, context);
 	}
 
 	@Override
@@ -57,15 +57,15 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		String valueSet = codeSystem.getValueSet().orElse(BLANK);
 		String status = codeSystem.getStatus();
 		Optional<Boolean> experimental = codeSystem.getExperimental();
-		String experimentalDesc = experimental.isPresent() ? experimental.get() ? "yes" : "no" : BLANK;
+		String experimentalDesc = experimental.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		String description = codeSystem.getDescription().orElse(BLANK);
 		String purpose = codeSystem.getPurpose().orElse(BLANK);
 		Optional<Boolean> caseSensitive = codeSystem.getCaseSensitive();
-		String caseSensitiveDesc = caseSensitive.isPresent() ? caseSensitive.get() ? "yes" : "no" : BLANK;
+		String caseSensitiveDesc = caseSensitive.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		Optional<Boolean> compositional = codeSystem.getCompositional();
-		String compositionalDesc = compositional.isPresent() ? compositional.get() ? "yes" : "no" : BLANK;
+		String compositionalDesc = compositional.map(bool -> boolDesc(bool)).orElse(BLANK);
 		
 		String content = codeSystem.getContent().orElse(BLANK);
 		
@@ -150,6 +150,10 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		FhirPanel panel = new FhirPanel(panelTitle, table);
 		
 		return panel.makePanel();
+	}
+	
+	private static String boolDesc(boolean bool) {
+		return bool ? "yes" : "no";
 	}
 	
 }
