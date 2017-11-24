@@ -63,10 +63,9 @@ public class ServletUtils {
 	
 	private static void setResponseContentForSuccess(HttpServletResponse response, String contentType, ResponseContentWriter<?> contentWriter) {
 		try {
-			contentWriter.write(response);
-
 			response.setStatus(200);
 			response.setContentType(contentType);
+			contentWriter.write(response);
     	} catch (IOException e) {
     		LOG.error(e.getMessage());
 		}
