@@ -2,11 +2,13 @@ package uk.nhs.fhir.resourcehandlers.dstu2;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
-import uk.nhs.fhir.datalayer.Datasource;
+import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
+import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  * This extends the AbstractResourceProvider for DSTU2 to use the old ID data
@@ -15,22 +17,25 @@ import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
  */
 public abstract class AbstractResourceProviderDSTU2 extends AbstractResourceProvider {
 
-	public AbstractResourceProviderDSTU2(Datasource dataSource) {
-		super(dataSource);
+	public AbstractResourceProviderDSTU2(FilesystemIF dataSource, ResourceType resourceType, Class<? extends IBaseResource> fhirClass) {
+		super(dataSource, resourceType, FhirVersion.DSTU2, fhirClass);
 	}
-
-    /**
-     * Instance level GET of a resource... This needs to get a Structure Definition resource by name, so will respond to for example:
-     *
-     * /StructureDefinition/nrls-documentreference-1-0
-     *
-     * @param theId ID value identifying the resource.
-     *
-     * @return A StructureDefinition resource
-     */
-    @Read(version=true)
-    public IBaseResource getResourceById(@IdParam IdDt theId) {
-        return myDatasource.getResourceByID(fhirVersion, theId);
+    
+    public String getTextSection(IBaseResource resource) {
+    	BaseResource baseResource = (BaseResource)resource;
+    	
+    	return baseResource.getText().getDivAsString();
+    }
+    
+    public IBaseResource removeTextSection(IBaseResource resource) {
+    	BaseResource baseResource = (BaseResource)resource;
+    	
+    	// Clear out the generated text
+        NarrativeDt textElement = new NarrativeDt();
+        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setDiv("");
+        baseResource.setText(textElement);
+    	return baseResource;
     }
 
 }

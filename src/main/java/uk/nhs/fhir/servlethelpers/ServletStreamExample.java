@@ -4,67 +4,70 @@ import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.enums.FHIRVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.MimeType;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.page.raw.RawResourceTemplate;
+import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.PageTemplateHelper;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamExample {
-	private static final Logger LOG = Logger.getLogger(ServletStreamExample.class.getName());
-	private static PageTemplateHelper templateHelper = new PageTemplateHelper();
+	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamExample.class.getName());
 	
-	public static void streamExample(HttpServletRequest request, HttpServletResponse response,
-			FHIRVersion fhirVersion, Datasource dataSource, RawResourceRender myRawResourceRenderer) throws IOException {
+	private final FilesystemIF dataSource;
+	
+	public ServletStreamExample(FilesystemIF dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	public void streamExample(String uriAfterBase, HttpServletResponse response,
+			FhirVersion fhirVersion, RawResourceRenderer myRawResourceRenderer) throws IOException {
     	
 		// Parse the URL
-		String exampleName = request.getRequestURI().substring(10);
+		String exampleName = uriAfterBase.substring("/Examples/".length());
 		
-		ResourceEntity exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
+		ResourceMetadata exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
 		
 		if (exampleEntity != null) {
 			// We've found a matching example - stream it back
-			response.setStatus(200);
-			//response.setContentType("text/html");
 			File srcFile = exampleEntity.getResourceFile();
-			
-		    //FileUtils.copyFile(srcFile, response.getOutputStream());
 			
 			String fileContent = FileLoader.loadFile(srcFile);
 			MimeType mimeType = null;
 			
 			// Indent XML
-			if (srcFile.getName().endsWith("xml") || srcFile.getName().endsWith("XML")) {
+			if (srcFile.getName().toLowerCase().endsWith("xml")) {
 				mimeType = MimeType.XML;
 				try {
 					String prettyPrinted = ServletUtils.prettyPrintXML(fileContent);
 					fileContent = prettyPrinted;
 				} catch (Exception e) {
-					LOG.warning("Unable to pretty-print XML example: " + srcFile.getName());
+					LOG.warn("Unable to pretty-print XML example: " + srcFile.getName());
 					e.printStackTrace();
 				}
 				// Pretty print XML
 				fileContent = syntaxHighlight(fileContent);
-			} else if (srcFile.getName().endsWith("json") || srcFile.getName().endsWith("json")) {
+			} else if (srcFile.getName().toLowerCase().endsWith("json")) {
 				mimeType = MimeType.JSON;
 			} else {
 				mimeType = MimeType.UNKNOWN_MIME;
 			}
 			
-			StringBuffer sb = new StringBuffer();
-			myRawResourceRenderer.renderSingleWrappedRAWResource(fileContent, sb, mimeType);
+			String resourceType = ResourceType.EXAMPLES.toString();
+			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), fileContent, mimeType).getHtml();
 			
-			templateHelper.streamTemplatedHTMLresponse(response, ResourceType.EXAMPLES.toString(), exampleName, sb, request.getContextPath());
+			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {
-			LOG.severe("Unable to find example: " + exampleName + ", FHIRVersion=" + fhirVersion);
+			LOG.error("Unable to find example: " + exampleName + ", FhirVersion=" + fhirVersion);
 			response.setStatus(404);
 		}
 	}

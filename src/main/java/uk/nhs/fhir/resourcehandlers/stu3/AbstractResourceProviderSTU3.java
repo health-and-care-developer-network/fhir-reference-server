@@ -1,13 +1,14 @@
 package uk.nhs.fhir.resourcehandlers.stu3;
 
-import org.hl7.fhir.dstu3.model.IdType;
+import org.hl7.fhir.dstu3.model.DomainResource;
+import org.hl7.fhir.dstu3.model.Narrative;
+import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
-import uk.nhs.fhir.datalayer.Datasource;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  * This extends the AbstractResourceProvider for STU3 (onwards?) to use the new ID data
@@ -16,22 +17,25 @@ import uk.nhs.fhir.resourcehandlers.AbstractResourceProvider;
  */
 public abstract class AbstractResourceProviderSTU3 extends AbstractResourceProvider {
 
-	public AbstractResourceProviderSTU3(Datasource dataSource) {
-		super(dataSource);
+	public AbstractResourceProviderSTU3(FilesystemIF dataSource, ResourceType resourceType, Class<? extends IBaseResource> fhirClass) {
+		super(dataSource, resourceType, FhirVersion.STU3, fhirClass);
 	}
-
-    /**
-     * Instance level GET of a resource... This needs to get a Structure Definition resource by name, so will respond to for example:
-     *
-     * /StructureDefinition/nrls-documentreference-1-0
-     *
-     * @param theId ID value identifying the resource.
-     *
-     * @return A StructureDefinition resource
-     */
-    @Read(version=true)
-    public IBaseResource getResourceById(@IdParam IdType theId) {
-        return myDatasource.getResourceByID(fhirVersion, theId);
+    
+    public String getTextSection(IBaseResource resource) {
+    	DomainResource domainResource = (DomainResource)resource;
+    	return domainResource.getText().getDivAsString();
+    }
+    
+    @Override
+    public IBaseResource removeTextSection(IBaseResource resource) {
+    	DomainResource domainResource = (DomainResource)resource;
+    	
+    	// Clear out the generated text
+    	Narrative textElement = new Narrative();
+        textElement.setStatus(NarrativeStatus.GENERATED);
+        textElement.setDivAsString("");
+        domainResource.setText(textElement);
+    	return domainResource;
     }
 
 }

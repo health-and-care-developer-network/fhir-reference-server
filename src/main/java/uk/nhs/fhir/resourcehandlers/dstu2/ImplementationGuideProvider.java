@@ -8,18 +8,15 @@ package uk.nhs.fhir.resourcehandlers.dstu2;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
+import java.util.Optional;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ImplementationGuide;
-import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -27,30 +24,12 @@ import uk.nhs.fhir.util.FHIRUtils;
  */
 public class ImplementationGuideProvider extends AbstractResourceProviderDSTU2 {
 
-    public ImplementationGuideProvider(Datasource dataSource) {
-    	super(dataSource);
-        ctx = FHIRVersion.DSTU2.getContext();
-        resourceType = ResourceType.IMPLEMENTATIONGUIDE;
-        fhirVersion = FHIRVersion.DSTU2;
-        fhirClass = ca.uhn.fhir.model.dstu2.resource.ImplementationGuide.class;
-    }
-        
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-        NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
-        textElement.setDiv("");
-    	ImplementationGuide output = (ImplementationGuide)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-
-    public String getTextSection(IBaseResource resource) {
-    	return ((ImplementationGuide)resource).getText().getDivAsString();
+    public ImplementationGuideProvider(FilesystemIF dataSource) {
+    	super(dataSource, ResourceType.IMPLEMENTATIONGUIDE, ImplementationGuide.class);
     }
     
-    public ResourceEntity getMetadataFromResource(File thisFile) {
-    	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(FHIRVersion.DSTU2, thisFile);
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
+    	ImplementationGuide guide = (ImplementationGuide)FHIRUtils.loadResourceFromFile(FhirVersion.DSTU2, thisFile);
     	String resourceName = guide.getName();
     	String url = guide.getUrl();
         String resourceID = getResourceIDFromURL(url, resourceName);
@@ -58,8 +37,8 @@ public class ImplementationGuideProvider extends AbstractResourceProviderDSTU2 {
         VersionNumber versionNo = new VersionNumber(guide.getVersion());
         String status = guide.getStatus();
         
-        return new ResourceEntity(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
-				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.DSTU2, url);
+        return new ResourceMetadata(resourceName, thisFile, ResourceType.IMPLEMENTATIONGUIDE,
+				false, Optional.empty(), displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.DSTU2, url);
     }
 }

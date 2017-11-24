@@ -18,18 +18,16 @@ package uk.nhs.fhir.resourcehandlers.stu3;
 import static uk.nhs.fhir.util.FHIRUtils.getResourceIDFromURL;
 
 import java.io.File;
+import java.util.Optional;
 
-import org.hl7.fhir.dstu3.model.Narrative;
-import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.dstu3.model.ValueSet;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import uk.nhs.fhir.datalayer.Datasource;
-import uk.nhs.fhir.datalayer.collections.ResourceEntity;
-import uk.nhs.fhir.datalayer.collections.VersionNumber;
-import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FHIRUtils;
+import uk.nhs.fhir.util.FhirVersion;
 
 /**
  *
@@ -37,47 +35,32 @@ import uk.nhs.fhir.util.FHIRUtils;
  */
 public class ValueSetProvider extends AbstractResourceProviderSTU3 {
 
-	public ValueSetProvider(Datasource dataSource) {
-		super(dataSource);
-        ctx = FHIRVersion.STU3.getContext();
-        resourceType = ResourceType.VALUESET;
-        fhirVersion = FHIRVersion.STU3;
-        fhirClass = org.hl7.fhir.dstu3.model.ValueSet.class;
+	public ValueSetProvider(FilesystemIF dataSource) {
+		super(dataSource, ResourceType.VALUESET, org.hl7.fhir.dstu3.model.ValueSet.class);
     }
 
-    
-    public IBaseResource getResourceWithoutTextSection(IBaseResource resource) {
-    	// Clear out the generated text
-    	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
-        textElement.setDivAsString("");
-    	ValueSet output = (ValueSet)resource;
-    	output.setText(textElement);
-    	return output;
-    }
-    
-    public String getTextSection(IBaseResource resource) {
-    	return ((ValueSet)resource).getText().getDivAsString();
-    }
-
-    public ResourceEntity getMetadataFromResource(File thisFile) {
-    	String displayGroup = "Code List";
-    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FHIRVersion.STU3, thisFile);
+    public ResourceMetadata getMetadataFromResource(File thisFile) {
+    	ValueSet profile = (ValueSet)FHIRUtils.loadResourceFromFile(FhirVersion.STU3, thisFile);
     	String resourceName = profile.getName();
     	String url = profile.getUrl();
     	String resourceID = getResourceIDFromURL(url, resourceName);
     	if (resourceName == null) {
     		resourceName = resourceID;
     	}
+    	
+    	String displayGroup;
     	if (FHIRUtils.isSTU3ValueSetSNOMED(profile)) {
     		displayGroup = "SNOMED CT Code List";
+    	} else {
+    		displayGroup = "Code List";
     	}
+    	
     	VersionNumber versionNo = new VersionNumber(profile.getVersion());
     	String status = profile.getStatus().name();
     	
-    	return new ResourceEntity(resourceName, thisFile, ResourceType.VALUESET,
-				false, null, displayGroup, false,
-				resourceID, versionNo, status, null, null, null, null, FHIRVersion.STU3, url);
+    	return new ResourceMetadata(resourceName, thisFile, ResourceType.VALUESET,
+				false, Optional.empty(), displayGroup, false,
+				resourceID, versionNo, status, null, null, null, null, FhirVersion.STU3, url);
     }
 
 }

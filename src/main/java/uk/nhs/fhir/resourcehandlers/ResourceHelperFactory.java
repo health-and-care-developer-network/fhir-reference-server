@@ -1,14 +1,14 @@
 package uk.nhs.fhir.resourcehandlers;
 
-import uk.nhs.fhir.enums.FHIRVersion;
-import uk.nhs.fhir.enums.ResourceType;
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourceHelperFactory {
 
-	public static IResourceHelper getResourceHelper(FHIRVersion fhirVersion, ResourceType resourceType) {
-		if (fhirVersion.equals(FHIRVersion.DSTU2)) {
+	public static IResourceHelper getResourceHelper(FhirVersion fhirVersion, ResourceType resourceType) {
+		if (fhirVersion.equals(FhirVersion.DSTU2)) {
 			if (resourceType.equals(ResourceType.STRUCTUREDEFINITION)) {
-				return new uk.nhs.fhir.resourcehandlers.dstu2.StrutureDefinitionProvider(null);
+				return new uk.nhs.fhir.resourcehandlers.dstu2.StructureDefinitionProvider(null);
 			} else if (resourceType.equals(ResourceType.VALUESET)) {
 				return new uk.nhs.fhir.resourcehandlers.dstu2.ValueSetProvider(null);
 			} else if (resourceType.equals(ResourceType.OPERATIONDEFINITION)) {
@@ -18,9 +18,9 @@ public class ResourceHelperFactory {
 			}
 		}
 		
-		if (fhirVersion.equals(FHIRVersion.STU3)) {
+		if (fhirVersion.equals(FhirVersion.STU3)) {
 			if (resourceType.equals(ResourceType.STRUCTUREDEFINITION)) {
-				return new uk.nhs.fhir.resourcehandlers.stu3.StrutureDefinitionProvider(null);
+				return new uk.nhs.fhir.resourcehandlers.stu3.StructureDefinitionProvider(null);
 			} else if (resourceType.equals(ResourceType.VALUESET)) {
 				return new uk.nhs.fhir.resourcehandlers.stu3.ValueSetProvider(null);
 			} else if (resourceType.equals(ResourceType.OPERATIONDEFINITION)) {
