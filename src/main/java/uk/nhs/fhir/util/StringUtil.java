@@ -149,4 +149,9 @@ public class StringUtil {
 			return s;
 		}
 	}
+	
+	public static boolean looksLikeUrl(String s) {
+		return s.startsWith("https://")
+		  || s.startsWith("http://");
+	}
 }
