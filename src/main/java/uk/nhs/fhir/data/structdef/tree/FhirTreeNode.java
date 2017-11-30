@@ -106,17 +106,17 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	}
 
 	public String getDisplayName() {
-		boolean hasName = name.isPresent() && !name.get().isEmpty();
+		boolean hasSliceName = sliceName.isPresent() && !sliceName.get().isEmpty();
 		String pathName = getPathName();
 		boolean hasPath = !pathName.isEmpty();
 
 		String displayName;
-		if (hasName && hasPath && !pathName.equals(name.get())) {
-			displayName = pathName + " (" + name.get() + ")";
+		if (hasSliceName && hasPath && !pathName.equals(sliceName.get())) {
+			displayName = pathName + " (" + sliceName.get() + ")";
 		} else if (hasPath) {
 			displayName = pathName;
-		} else if (hasName) {
-			displayName = name.get();
+		} else if (hasSliceName) {
+			displayName = sliceName.get();
 		} else {
 			throw new IllegalStateException("No name or path information");
 		}
