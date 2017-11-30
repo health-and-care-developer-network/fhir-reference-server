@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 
 import org.apache.commons.io.FileUtils;
 
-import uk.nhs.fhir.datalayer.FileCache;
+import uk.nhs.fhir.datalayer.FilesystemIF;
 
 @SuppressWarnings("serial")
 public class ServerRendererWindow extends JFrame implements RendererListener {
@@ -93,7 +93,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					FileCache.clearCache();
+					FilesystemIF.clearCache();
 					try {
 						FileUtils.cleanDirectory(renderedFileDir.toFile());
 						FileUtils.cleanDirectory(importedFileDir.toFile());
@@ -127,7 +127,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 
 	@Override
 	public void finishRender() {
-		FileCache.invalidateCache();
+		FilesystemIF.invalidateCache();
 		
 		runRendererButton.setEnabled(true);
 		runRendererButton.setText("Run renderer");
