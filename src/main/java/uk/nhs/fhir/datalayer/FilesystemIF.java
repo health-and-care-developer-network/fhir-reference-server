@@ -61,7 +61,7 @@ public class FilesystemIF {
      * @return 
      */
     public IBaseResource getResourceByID(FhirVersion fhirVersion, IIdType theId) {
-    	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId);
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
 	    	LOG.debug("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
@@ -75,20 +75,24 @@ public class FilesystemIF {
     
     public ResourceMetadata getResourceEntityByID(FhirVersion fhirVersion, IIdType theId) {
     	String idPart = theId.getIdPart();
-		String versionIdPart = theId.getVersionIdPart();
-		ResourceEntityWithMultipleVersions getversionsByID = FileCache.getversionsByID(fhirVersion, idPart, versionIdPart);
+		ResourceType resourceType = ResourceType.getTypeFromHAPIName(theId.getResourceType());
+		ResourceEntityWithMultipleVersions versionsByID = FileCache.getversionsByID(fhirVersion, idPart, resourceType);
+		
+		if (versionsByID == null) {
+			return null;
+		}
 		
 		if (theId.hasVersionIdPart()) {
-    		VersionNumber version = new VersionNumber(versionIdPart);
-    		return getversionsByID.getSpecificVersion(version);
+    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    		return versionsByID.getSpecificVersion(version);
     	} else {
-    		return getversionsByID.getLatest();
+    		return versionsByID.getLatest();
     	}
     	
     }
     
     public ResourceEntityWithMultipleVersions getVersionsByID(FhirVersion fhirVersion, IIdType theId) {
-    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), ResourceType.getTypeFromHAPIName(theId.getResourceType()));
     }
 
     /**

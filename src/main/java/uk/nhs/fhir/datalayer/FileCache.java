@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,7 +178,8 @@ public class FileCache {
     										ResourceMetadata entry) {
     	boolean found = false;
     	for (ResourceEntityWithMultipleVersions listItem : list) {
-    		if (listItem.getResourceID().equals(entry.getResourceID())) {
+    		if (listItem.getResourceID().equals(entry.getResourceID())
+    		  && listItem.getResourceType().equals(entry.getResourceType())) {
     			// This is a new version of an existing resource - add the version
     			listItem.add(entry);
     			found = true;
@@ -445,17 +447,18 @@ public class FileCache {
         return allFiles;
     }
     
-    public static ResourceMetadata getSingleResourceByID(FhirVersion fhirVersion, String idPart, String versionPart) {
+    public static ResourceMetadata getSingleResourceByID(FhirVersion fhirVersion, IIdType type) {
         if(updateRequired()) {
             updateCache();
         }
         
     	for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
-    		if (entry.getResourceID().equals(idPart)) {
-    			if (versionPart != null) {
+    		if (entry.getResourceID().equals(type.getIdPart())
+    		  && entry.getResourceType().equals(ResourceType.getTypeFromHAPIName(type.getResourceType()))) {
+    			if (type.getVersionIdPart() != null) {
     				// Get a specific version
-    				VersionNumber version = new VersionNumber(versionPart);
-    				LOG.debug("Getting versioned resource with ID="+idPart + " and version="+version);
+    				VersionNumber version = new VersionNumber(type.getVersionIdPart());
+    				LOG.debug("Getting versioned resource with ID=" + type.getIdPart() + ", type=" + type.getResourceType() + ", version=" + version);
     				return entry.getSpecificVersion(version);
     			} else {
     				// Get the latest
@@ -466,25 +469,27 @@ public class FileCache {
     	return null;
     }
     
-    public static ResourceEntityWithMultipleVersions getversionsByID(FhirVersion fhirVersion, String idPart, String versionPart) {
+    public static ResourceEntityWithMultipleVersions getversionsByID(FhirVersion fhirVersion, String idPart, ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
         
     	for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
-    		if (entry.getResourceID().equals(idPart)) {
+    		if (entry.getResourceID().equals(idPart)
+    		  && entry.getResourceType().equals(resourceType)) {
     			return entry;
     		}
     	}
     	return null;
     }
     
-    public static ResourceMetadata getSingleResourceByName(FhirVersion fhirVersion, String name) {
+    public static ResourceMetadata getSingleResourceByName(FhirVersion fhirVersion, String name, ResourceType resourceType) {
         if(updateRequired()) {
             updateCache();
         }
     	for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
-    		if (entry.getResourceName().equals(name)) {
+    		if (entry.getResourceName().equals(name)
+    		  && entry.getResourceType().equals(resourceType)) {
     			return entry.getLatest();
     		}
     	}

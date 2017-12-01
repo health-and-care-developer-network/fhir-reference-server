@@ -17,7 +17,7 @@
 			    #if( $artefact.getArtefactType().getWeight() >= 0 )
 					#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
 					<li><a $first href="#tabs-$tabname" onclick="loadTab('#tabs-$tabname', '$metadata.getResourceID()', '$metadata.getVersionNo()', 
-									'$artefact.getArtefactType().name()', '$baseURL');">$artefact.getArtefactType().getDisplayName()</a></li>
+									'$artefact.getArtefactType().name()', '$baseURL', '$metadata.getResourceType()');">$artefact.getArtefactType().getDisplayName()</a></li>
 					#set ($first = '')
 				#end
 			#end

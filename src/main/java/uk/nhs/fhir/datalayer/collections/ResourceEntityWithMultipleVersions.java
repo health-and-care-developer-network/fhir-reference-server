@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 
 public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
@@ -18,10 +19,13 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	VersionNumber latestDraft = null;
 	String resourceID = null;
 	String resourceName = null;
+	ResourceType resourceType = null;
 	
 	public ResourceEntityWithMultipleVersions(ResourceMetadata entity) {
 		this.resourceID = entity.getResourceID();
 		this.resourceName = entity.getResourceName();
+		this.resourceType = entity.getResourceType();
+		
 		add(entity);
 	}
 	
@@ -80,6 +84,10 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 
 	public String getResourceName() {
 		return resourceName;
+	}
+
+	public ResourceType getResourceType() {
+		return resourceType;
 	}
 	
 	@Override
