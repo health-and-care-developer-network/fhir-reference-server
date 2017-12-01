@@ -76,7 +76,13 @@ public class ResourceMetadata {
 		this.example = example;
 		this.resourceID = resourceID;
 		this.versionNo = versionNo;
-		this.status = ResourceStatus.getStatus(status);
+		
+		if (status == null) {
+			this.status = null;
+		} else {
+			this.status = ResourceStatus.getStatus(status);
+		}
+		
 		this.artefacts = artefacts;
 		this.extensionCardinality = cardinality;
 		this.extensionContexts = extensionContexts;
