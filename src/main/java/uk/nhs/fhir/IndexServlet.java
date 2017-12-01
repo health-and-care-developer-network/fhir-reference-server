@@ -52,8 +52,8 @@ public class IndexServlet extends javax.servlet.http.HttpServlet {
 		
 		/* Check if this is a ReST request (e.g. paging retrieval), and if so delegate back to the RestfulServlet */
 		ClientType clientType = ClientType.getTypeFromHeaders(req);
-		if (clientType == ClientType.NON_BROWSER) {
-			RequestDispatcher rd = getServletContext().getNamedDispatcher("uk.nhs.fhir.RestfulServlet");
+		if (clientType.equals(ClientType.NON_BROWSER)) {
+			RequestDispatcher rd = getServletContext().getNamedDispatcher(FhirRequestServlet.class.getName());
 			rd.forward(req, resp);
 			return;
 		}
