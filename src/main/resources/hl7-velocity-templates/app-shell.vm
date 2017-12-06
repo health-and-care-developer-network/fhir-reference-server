@@ -18,7 +18,7 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<link href="/js/jquery-ui/jquery-ui.css" rel="stylesheet">
 	
-		<link rel="stylesheet" href="/hl7style.css"/>
+		<link rel="stylesheet" href="/style/hl7style.css"/>
 		
 		<meta property="og:locale" content="en_GB" />
 		<meta property="og:title" content="HL7 UK FHIR Reference Server" />

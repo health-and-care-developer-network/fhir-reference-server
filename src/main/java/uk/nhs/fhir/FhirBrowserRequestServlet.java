@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -49,17 +49,22 @@ import uk.nhs.fhir.util.ServletUtils;
 
 @SuppressWarnings("serial")
 @WebServlet(
-	urlPatterns = {
-		//"/CodeSystem/*", "/ConceptMap/*", "/StructureDefinition/*", "/OperationDefinition/*", "/Extensions/*", "/ValueSets/*",	// index pages
-		"/*", 						//DSTU2 delegated paths + index pages
-		"/3.0.1/*", "/STU3/*"		//STU3 delegated paths
-		}, 
+	urlPatterns = {"/browser"},
+	name = "BROWSER",
 	displayName = "FHIR Servlet", 
-	loadOnStartup = 1)
-public class FhirRequestServlet extends HttpServlet {
-	private static final Logger LOG = LoggerFactory.getLogger(FhirRequestServlet.class);
+	loadOnStartup = 3)
+public class FhirBrowserRequestServlet extends HttpServlet {
+	private static final Logger LOG = LoggerFactory.getLogger(FhirBrowserRequestServlet.class);
+
+	public static final String BROWSER_SERVLET_NAME = "BROWSER";
+	public static final String DSTU2_SERVLET_NAME = "DSTU2";
+	public static final String STU3_SERVLET_NAME = "STU3";
 	
-	private final Map<FhirVersion, FhirRequestHandler> delegateHandlers = new ConcurrentHashMap<>();
+	private static final Map<FhirVersion, String> delegateServletNames = Maps.newConcurrentMap();
+	static {
+		delegateServletNames.put(FhirVersion.DSTU2, DSTU2_SERVLET_NAME);
+		delegateServletNames.put(FhirVersion.STU3, STU3_SERVLET_NAME);
+	}
 	
 	private final ResourceWebHandler data;
 	private final RawResourceRenderer myRawResourceRenderer;
@@ -67,7 +72,7 @@ public class FhirRequestServlet extends HttpServlet {
 	private final ServletStreamArtefact myArtefactStreamer;
 	private final ServletStreamExample exampleStreamer;
 	
-	public FhirRequestServlet() {
+	public FhirBrowserRequestServlet() {
 		FilesystemIF dataSource = SharedDataSource.get();
 		
 		data = new ResourceWebHandler(dataSource);
@@ -75,23 +80,14 @@ public class FhirRequestServlet extends HttpServlet {
 		myResourcePageRenderer = new ResourcePageRenderer(data);
 		myArtefactStreamer = new ServletStreamArtefact(dataSource);
 		exampleStreamer = new ServletStreamExample(dataSource);
-		
 	}
 	
-	public void init() throws ServletException {
-		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
-			FhirRequestHandler requestHandler = new FhirRequestHandler(version);
-			try {
-				// sharing config for now. Could use servlet holders at this level if necessary to give each its own context.
-				LOG.info("adding requestHandler for " + version.toString());
-				requestHandler.init(getServletConfig());
-				delegateHandlers.put(version, requestHandler);
-			} catch (ServletException se) {
-				LOG.error("Error initialising FHIR request handler for {} requests", version.toString(), se);
-			}
-		}
-    }
-	
+	private RequestDispatcher getDelegateDispatcher(FhirVersion fhirVersion) {
+		String delegateName = delegateServletNames.get(fhirVersion);
+		RequestDispatcher dispatcher = getServletContext().getNamedDispatcher(delegateName);
+		return dispatcher;
+	}
+
 	protected void addCORSResponseHeaders(HttpServletResponse response) {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Location,Location");
@@ -102,21 +98,9 @@ public class FhirRequestServlet extends HttpServlet {
 		
     	LOG.debug("Received request for {}", request.getRequestURI());
     	
-    	// TODO: turn into an interceptor
-    	if (request.getRequestURI().equals("/InvalidateCache")) {
-    		if (request.getRemoteHost().equals("127.0.0.1")
-    		  || request.getRemoteHost().equals("0:0:0:0:0:0:0:1")
-    		  || request.getRemoteHost().equals("localhost")) {
-    			FilesystemIF.invalidateCache();
-    		} else {
-    			response.sendError(403, "Only available on local machine");
-    		}
-    		return;
-    	}
-    	
     	addCORSResponseHeaders(response);
-    	
-    	if(request.getRequestURI().endsWith(".css")) {
+
+    	if (request.getRequestURI().endsWith(".css")) {
             // Stylesheets
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         	return;
@@ -187,17 +171,6 @@ public class FhirRequestServlet extends HttpServlet {
 				uriAfterBase = fullUri.substring(serverBase.length());
 				break;
 			}
-		}
-		
-		if (uriAfterBase.equals("/metadata")) {
-			try {
-				LOG.info("Delegating metadata request to delegate Handler for version " + requestVersion.toString());
-				FhirRequestHandler fhirRequestHandler = delegateHandlers.get(requestVersion);
-				fhirRequestHandler.service(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
-			}
-			return;
 		}
 		
 		if (uriAfterBase.startsWith("/artefact")) {
@@ -324,7 +297,7 @@ public class FhirRequestServlet extends HttpServlet {
 		}
 		
 		try {
-			delegateHandlers.get(requestVersion).service(request, response);
+			getDelegateDispatcher(requestVersion).forward(request, response);
 		} catch (ServletException | IOException e) {
 			e.printStackTrace();
 		}

@@ -15,7 +15,7 @@ import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = {"*.css", "*.ico", "*.png", "*.gif", "*.js"}, displayName = "Static content Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/favicon.ico", "/images/*", "/js/*", "/style/*"}, displayName = "Static content Servlet", loadOnStartup = 1)
 public class StaticContentServlet extends HttpServlet {
 	private static Logger LOG = LoggerFactory.getLogger(StaticContentServlet.class.getName());
 	

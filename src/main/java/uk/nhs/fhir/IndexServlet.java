@@ -18,9 +18,9 @@ package uk.nhs.fhir;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,41 +28,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.datalayer.SharedDataSource;
-import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.page.home.HomePageTemplate;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.ServletUtils;
 
-@WebServlet(urlPatterns = {"/index.html", ""}, displayName = "FHIR Server Home Page", loadOnStartup = 1)
-public class IndexServlet extends javax.servlet.http.HttpServlet {
+@WebServlet(urlPatterns = {"/index.html"}, displayName = "FHIR Server Home Page", loadOnStartup = 4)
+public class IndexServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = -7060628622645267225L;
 	private static final Logger LOG = LoggerFactory.getLogger(IndexServlet.class.getName());
 	private static final ResourceCountsProvider resourceCountsProvider = new ResourceWebHandler(SharedDataSource.get());
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		LOG.info("IndexServlet Requested URL: " + req.getRequestURL());
-		
-		/* Check if this is a ReST request (e.g. paging retrieval), and if so delegate back to the RestfulServlet */
-		ClientType clientType = ClientType.getTypeFromHeaders(req);
-		if (clientType.equals(ClientType.NON_BROWSER)) {
-			RequestDispatcher rd = getServletContext().getNamedDispatcher(FhirRequestServlet.class.getName());
-			rd.forward(req, resp);
-			return;
-		}
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		LOG.info("IndexServlet Requested URL: " + request.getRequestURL());
     	
 		// Render the home page
-		String baseUrl = req.getContextPath();
+		String baseUrl = request.getContextPath();
     	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
 		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml();
     	
-		ServletUtils.setResponseContentForSuccess(resp, "text/html", content);
+		ServletUtils.setResponseContentForSuccess(response, "text/html", content);
 	}
 }

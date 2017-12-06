@@ -24,7 +24,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.FhirRequestServlet;
+import uk.nhs.fhir.FhirBrowserRequestServlet;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
@@ -54,7 +54,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
         
-        if (ArrayUtils.contains(FhirRequestServlet.getIndexedTypes(), resourceType)) {
+        if (ArrayUtils.contains(FhirBrowserRequestServlet.getIndexedTypes(), resourceType)) {
             if (resourceType == ResourceType.STRUCTUREDEFINITION) {
             	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
