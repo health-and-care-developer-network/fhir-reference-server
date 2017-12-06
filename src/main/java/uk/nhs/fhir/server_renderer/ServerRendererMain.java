@@ -14,7 +14,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.FhirRequestServlet;
+import uk.nhs.fhir.FhirBrowserRequestServlet;
 import uk.nhs.fhir.datalayer.FileCache;
 import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.SimpleFhirFileLocator;
@@ -108,7 +108,7 @@ public class ServerRendererMain
 		WebAppContext handler = new WebAppContext();
 		handler.setContextPath("/");
 		AnnotationConfiguration annotationConfiguration = new AnnotationConfiguration();
-		CodeSource codeSource = FhirRequestServlet.class.getProtectionDomain().getCodeSource();
+		CodeSource codeSource = FhirBrowserRequestServlet.class.getProtectionDomain().getCodeSource();
 		URL location = codeSource.getLocation();
 		LOG.debug("Configuration resource name: " + location.toString());
 		Resource fhirReferenceServerJar = Resource.newResource(location);
