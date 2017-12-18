@@ -17,7 +17,6 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
-import uk.nhs.fhir.data.metadata.SupportingArtefact.OrderByWeight;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2OperationDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
@@ -73,7 +72,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
     	
     	ArrayList<SupportingArtefact> artefacts = getArtefacts(source);
 
-		Collections.sort(artefacts, new OrderByWeight());
+		Collections.sort(artefacts, SupportingArtefact.BY_WEIGHT);
 		
 		resourceMetadata.setArtefacts(artefacts);
 		

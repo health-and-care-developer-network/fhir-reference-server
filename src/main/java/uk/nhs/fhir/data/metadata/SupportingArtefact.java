@@ -3,6 +3,8 @@ package uk.nhs.fhir.data.metadata;
 import java.io.File;
 import java.util.Comparator;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This represents a supporting artefact that sits alongside a resource - for example a
  * html page showing a diff view, bindings, etc.
@@ -10,11 +12,18 @@ import java.util.Comparator;
  *
  */
 public class SupportingArtefact {
-	private File filename = null;
-	private ArtefactType artefactType = null;
+
+	public static final Comparator<SupportingArtefact> BY_WEIGHT = 
+		Comparator.comparing((SupportingArtefact supportingArtefact) 
+			-> supportingArtefact.artefactType.getWeight());
+	
+	private final File filename;
+	private final ArtefactType artefactType;
 	
 	public SupportingArtefact(File filename, ArtefactType artefactType) {
-		super();
+		Preconditions.checkNotNull(filename);
+		Preconditions.checkNotNull(artefactType);
+		
 		this.filename = filename;
 		this.artefactType = artefactType;
 	}
@@ -23,27 +32,7 @@ public class SupportingArtefact {
 		return filename;
 	}
 
-	public void setFilename(File filename) {
-		this.filename = filename;
-	}
-
 	public ArtefactType getArtefactType() {
 		return artefactType;
 	}
-
-	public void setArtefactType(ArtefactType artefactType) {
-		this.artefactType = artefactType;
-	}
-	
-	/**
-	 * Used for sorting artefacts by weight
-	 * @author adam
-	 */
-	public static class OrderByWeight implements Comparator<SupportingArtefact> {
-		@Override
-        public int compare(SupportingArtefact o1, SupportingArtefact o2) {
-            return o1.artefactType.getWeight() > o2.artefactType.getWeight() ? 1 : (o1.artefactType.getWeight() < o2.artefactType.getWeight() ? -1 : 0);
-        }
-	}
-
 }

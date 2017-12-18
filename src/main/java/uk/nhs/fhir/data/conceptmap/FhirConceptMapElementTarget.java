@@ -2,6 +2,8 @@ package uk.nhs.fhir.data.conceptmap;
 
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
+
 public class FhirConceptMapElementTarget {
 
 	private final String code;
@@ -9,6 +11,9 @@ public class FhirConceptMapElementTarget {
 	private final Optional<String> comments;
 	
 	public FhirConceptMapElementTarget(String code, String equivalence, Optional<String> comments) {
+		Preconditions.checkNotNull(code);
+		Preconditions.checkNotNull(equivalence);
+		
 		this.code = code;
 		this.equivalence = equivalence;
 		this.comments = comments;

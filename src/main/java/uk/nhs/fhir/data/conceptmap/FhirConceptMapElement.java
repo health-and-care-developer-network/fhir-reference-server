@@ -2,6 +2,7 @@ package uk.nhs.fhir.data.conceptmap;
 
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 public class FhirConceptMapElement {
@@ -10,6 +11,8 @@ public class FhirConceptMapElement {
 	private final List<FhirConceptMapElementTarget> targets = Lists.newArrayList();
 	
 	public FhirConceptMapElement(String code) {
+		Preconditions.checkNotNull(code);
+		
 		this.code = code;
 	}
 
