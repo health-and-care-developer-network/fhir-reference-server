@@ -1,5 +1,6 @@
 package uk.nhs.fhir.data.metadata;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,52 +10,39 @@ import org.slf4j.LoggerFactory;
 public class VersionNumber implements Comparable<VersionNumber> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(VersionNumber.class.getName());
-	private static final Pattern versionMask1 = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})$");
-	private static final Pattern versionMask2 = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})$");
-	private static final Pattern versionMask3 = Pattern.compile("^([0-9]{1,3})$");
 	
-	private int major = 0;
-	private int minor = 0;
-	private int patch = 0;
-	private boolean valid = false;
-	private boolean versionless = false;
+	private static final Pattern REGEX = Pattern.compile("^([0-9]{1,3})(?:\\.([0-9]{1,3})(?:\\.([0-9]{1,3}))?)?$");
 	
-	public VersionNumber() {
-		this.versionless = true;
-		this.valid = true;
-	}
+	private final int major;
+	private final int minor;
+	private final int patch;
+	private final boolean valid;
 	
 	public VersionNumber(String versionStr) {
-		if (versionStr != null) {
-			// First, check this is a valid version number, then extract the components
-			Matcher matcher1 = versionMask1.matcher(versionStr);
-			if (matcher1.find()) {
-				// We have major.minor.patch
-				this.major = Integer.parseInt(matcher1.group(1));
-				this.minor = Integer.parseInt(matcher1.group(2));
-				this.patch = Integer.parseInt(matcher1.group(3));
-				this.valid = true;
-			} else {
-				Matcher matcher2 = versionMask2.matcher(versionStr);
-				if (matcher2.find()) {
-					// We have major.minor
-					this.major = Integer.parseInt(matcher2.group(1));
-					this.minor = Integer.parseInt(matcher2.group(2));
-					this.patch = 0;
-					this.valid = true;
-				} else {
-					Matcher matcher3 = versionMask3.matcher(versionStr);
-					if (matcher3.find()) {
-						// We have major only
-						this.major = Integer.parseInt(matcher3.group(1));
-						this.minor = 0;
-						this.patch = 0;
-						this.valid = true;
-					} else {
-						LOG.warn("Unable to parse version number: " + versionStr);
-					}
-				}
-			}
+		
+		Matcher matcher = REGEX.matcher(versionStr);
+		if (matcher.find()) {
+			this.major = Integer.parseInt(matcher.group(1));
+			
+			this.minor = 
+				Optional.ofNullable(matcher.group(2))
+					.map(Integer::parseInt)
+					.orElse(0);
+			
+			this.patch = 
+				Optional.ofNullable(matcher.group(3))
+					.map(Integer::parseInt)
+					.orElse(0);
+			
+			this.valid = true;
+		} else {
+			LOG.warn("Unable to parse version number: " + versionStr);
+			
+			this.major = 0;
+			this.minor = 0;
+			this.patch = 0;
+			
+			this.valid = false;
 		}
 	}
 
@@ -62,24 +50,12 @@ public class VersionNumber implements Comparable<VersionNumber> {
 		return major;
 	}
 
-	public void setMajor(int major) {
-		this.major = major;
-	}
-
 	public int getMinor() {
 		return minor;
 	}
 
-	public void setMinor(int minor) {
-		this.minor = minor;
-	}
-
 	public int getPatch() {
 		return patch;
-	}
-
-	public void setPatch(int patch) {
-		this.patch = patch;
 	}
 	
 	public boolean isValid() {
@@ -108,7 +84,7 @@ public class VersionNumber implements Comparable<VersionNumber> {
 	public String toString() {
 		String versionString = major + "." + minor;
 		if (patch > 0)
-			versionString = versionString + '.' + patch;
+			versionString += '.' + patch;
 		return versionString;
 	}
 
@@ -141,9 +117,5 @@ public class VersionNumber implements Comparable<VersionNumber> {
 		if (valid != other.valid)
 			return false;
 		return true;
-	}
-
-	public boolean isVersionless() {
-		return versionless;
 	}
 }
