@@ -338,7 +338,7 @@ public class FhirFileParser {
 			getFhirReleaseMethod = resource.getClass().getMethod("getFhirVersion");
 		} catch (NoSuchMethodException | SecurityException e) {
 			// most resources don't have this - not unexpected
-			return null;
+			return Optional.empty();
 		}
 		
 		Object releaseObj = null;
