@@ -19,10 +19,10 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirStu3DataTypes;
 import uk.nhs.fhir.data.ResourceInfo;
 import uk.nhs.fhir.data.ResourceInfoType;
 import uk.nhs.fhir.data.opdef.FhirOperationParameter;
+import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
 import uk.nhs.fhir.data.structdef.tree.BindingResourceInfo;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
@@ -51,7 +51,7 @@ private final OperationDefinition definition;
 	}
 	
 	private ResourceInfo buildBindingResourceInfo(OperationDefinitionParameterBindingComponent binding) {
-		String choice = FhirStu3DataTypes.resolveValue(binding.getValueSet());
+		String choice = FhirElementDataTypeStu3.resolveValue(binding.getValueSet());
 		String strength = binding.getStrength().getDisplay();
 		
 		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, getImplicitFhirVersion())), strength);

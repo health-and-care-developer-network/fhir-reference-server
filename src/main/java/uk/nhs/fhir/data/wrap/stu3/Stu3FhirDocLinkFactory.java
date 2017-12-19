@@ -3,9 +3,9 @@ package uk.nhs.fhir.data.wrap.stu3;
 import org.hl7.fhir.dstu3.model.CodeType;
 import org.hl7.fhir.dstu3.model.PrimitiveType;
 
-import ca.uhn.fhir.context.FhirStu3DataTypes;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import uk.nhs.fhir.FhirURLConstants;
+import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
 import uk.nhs.fhir.data.url.FhirDocLinkFactory;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
@@ -39,7 +39,7 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 	}
 
 	private String urlForDataTypeName(String dataTypeName) {
-		switch (FhirStu3DataTypes.forType(dataTypeName)) {
+		switch (FhirElementDataTypeStu3.forType(dataTypeName)) {
 			case EXTENSION:
 				return urlForExtension();
 			case RESOURCE:

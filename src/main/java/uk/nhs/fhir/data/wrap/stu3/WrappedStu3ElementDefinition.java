@@ -19,11 +19,11 @@ import org.hl7.fhir.dstu3.model.Type;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import ca.uhn.fhir.context.FhirStu3DataTypes;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
@@ -41,7 +41,6 @@ import uk.nhs.fhir.util.StringUtil;
 public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Stu3FhirDocLinkFactory typeLinkFactory = new Stu3FhirDocLinkFactory();
-	private static final FhirStu3DataTypes fhirDataTypes = new FhirStu3DataTypes(); 
 	
 	private final ElementDefinition definition;
 
@@ -64,7 +63,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	public LinkDatas getTypeLinks() {
 		LinkDatas typeLinks = new LinkDatas();
 		
-		List<TypeRefComponent> knownTypes = fhirDataTypes.knownTypes(definition.getType());
+		List<TypeRefComponent> knownTypes = FhirElementDataTypeStu3.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
 			for (TypeRefComponent type : knownTypes) {
 
@@ -105,7 +104,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Set<FhirElementDataType> getDataTypes() {
-		return FhirStu3DataTypes.getTypes(definition.getType());
+		return FhirElementDataTypeStu3.getTypes(definition.getType());
 	}
 
 	@Override
@@ -268,7 +267,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			Type valueSet = binding.getValueSet();
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
-				String urlString = FhirStu3DataTypes.resolveValue(valueSet);
+				String urlString = FhirElementDataTypeStu3.resolveValue(valueSet);
 				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixStu3(urlString), FhirVersion.STU3));
 			}
 			

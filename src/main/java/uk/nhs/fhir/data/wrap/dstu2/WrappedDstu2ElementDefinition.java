@@ -10,7 +10,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -24,6 +23,7 @@ import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
+import uk.nhs.fhir.data.structdef.FhirElementDataTypeDstu2;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
@@ -41,7 +41,6 @@ import uk.nhs.fhir.util.StringUtil;
 public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	
 	private static final Dstu2FhirDocLinkFactory typeLinkFactory = new Dstu2FhirDocLinkFactory();
-	private static final FhirDstu2DataTypes fhirDataTypes = new FhirDstu2DataTypes();
 
 	private final ElementDefinitionDt definition;
 
@@ -64,7 +63,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public LinkDatas getTypeLinks() {
 		LinkDatas typeLinks = new LinkDatas();
 		
-		List<Type> knownTypes = fhirDataTypes.knownTypes(definition.getType());
+		List<Type> knownTypes = FhirElementDataTypeDstu2.knownTypes(definition.getType());
 		if (!knownTypes.isEmpty()) {
 			for (Type type : knownTypes) {
 				String code = type.getCode();
@@ -89,7 +88,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	@Override
 	public Set<FhirElementDataType> getDataTypes() {
-		return FhirDstu2DataTypes.getTypes(definition.getType());
+		return FhirElementDataTypeDstu2.getTypes(definition.getType());
 	}
 
 	@Override
@@ -268,7 +267,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			IDatatype valueSet = binding.getValueSet();
 			Optional<FhirURL> url = Optional.empty();
 			if (valueSet != null) {
-				String urlString = FhirDstu2DataTypes.resolveDstu2DatatypeValue(valueSet);
+				String urlString = FhirElementDataTypeDstu2.resolveDstu2DatatypeValue(valueSet);
 				url = Optional.of(FhirURL.buildOrThrow(ValuesetLinkFix.fixDstu2(urlString), FhirVersion.DSTU2));
 			}
 			
