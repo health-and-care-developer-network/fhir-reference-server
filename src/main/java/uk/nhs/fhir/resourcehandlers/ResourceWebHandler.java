@@ -24,7 +24,6 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.FhirBrowserRequestServlet;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
@@ -33,6 +32,7 @@ import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
+import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**

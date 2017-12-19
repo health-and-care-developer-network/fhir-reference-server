@@ -25,9 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Conformance;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import uk.nhs.fhir.FhirURLConstants;
 
@@ -42,7 +39,6 @@ public class FHIRUtils {
 
     private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
     private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
-
 
     /**
      * Method to load a fhir resource from a file.
@@ -60,32 +56,12 @@ public class FHIRUtils {
         	} else if (fhirVersion.equals(FhirVersion.STU3)) {
         		resource = ctxSTU3.newXmlParser().parseResource(fr);
         	}
-            String url = null;
             
             LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
-
-            // To get the URL we need to cast this to a concrete type
-            if (resource instanceof StructureDefinition) {
-            	url = ((StructureDefinition)resource).getUrl();
-            } else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
-            	url = ((ca.uhn.fhir.model.dstu2.resource.ValueSet)resource).getUrl();
-            } else if (resource instanceof OperationDefinition) {
-            	url = ((OperationDefinition)resource).getUrl();
-            } else if (resource instanceof Conformance) {
-            	url = ((Conformance)resource).getUrl();
-            } 
             
-            else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
-            	url = ((org.hl7.fhir.dstu3.model.StructureDefinition)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
-            	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.OperationDefinition) {
-            	url = ((org.hl7.fhir.dstu3.model.OperationDefinition)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
-            	url = ((org.hl7.fhir.dstu3.model.CodeSystem)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
-            	url = ((org.hl7.fhir.dstu3.model.ConceptMap)resource).getUrl();
-            }
+            // getUrl() is declared on each class individually.
+            // Avoids a big if/else block
+            String url = FhirReflectionUtils.expectUrlByReflection(resource);
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());
@@ -121,34 +97,21 @@ public class FHIRUtils {
     }
     
     public static boolean isSTU3ValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
-				for (ConceptSetComponent includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-							return true;
-						}
-					}
+    	if (vs.getCompose() != null
+    	  && vs.getCompose().getInclude() != null) {
+    		
+			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
+			
+			for (ConceptSetComponent includeEntry : includeList) {
+				
+				if (includeEntry.getSystem() != null
+				 && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
+					
+					return true;
 				}
-    		}
+			}
     	}
-    	return false;
-    }
-    
-    public static boolean isValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
-				for (ConceptSetComponent includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-							return true;
-						}
-					}
-				}
-    		}
-    	}
+    	
     	return false;
     }
     

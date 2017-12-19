@@ -14,8 +14,8 @@ import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.util.FhirTextSectionHelpers;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourcePageRenderer {
@@ -51,7 +51,7 @@ public class ResourcePageRenderer {
     	LOG.debug("Has metadata from renderer: " + metadataArtefact.isPresent());
 
     	// Tree view
-    	String textSection = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType).getTextSection(resource);
+    	String textSection = FhirTextSectionHelpers.forVersion(fhirVersion).getTextSection(resource);
 
     	// Examples
     	ExampleResources examplesList = resourceWebHandler.getExamples(fhirVersion, resourceType + "/" + resourceID.getIdPart());

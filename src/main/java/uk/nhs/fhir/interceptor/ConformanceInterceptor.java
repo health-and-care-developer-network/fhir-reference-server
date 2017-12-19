@@ -1,4 +1,4 @@
-package uk.nhs.fhir.servlethelpers;
+package uk.nhs.fhir.interceptor;
 
 import static ca.uhn.fhir.rest.api.RestOperationTypeEnum.METADATA;
 import static uk.nhs.fhir.data.metadata.ResourceType.CONFORMANCE;
@@ -19,6 +19,7 @@ import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
+import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 

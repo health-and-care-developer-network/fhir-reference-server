@@ -15,7 +15,6 @@ public class VersionNumberTest {
 		assertEquals(1, vn.getMajor());
 		assertEquals(2, vn.getMinor());
 		assertEquals(3, vn.getPatch());
-		assertTrue(vn.isValid());
 	}
 	
 	@Test
@@ -25,7 +24,6 @@ public class VersionNumberTest {
 		assertEquals(123, vn.getMajor());
 		assertEquals(234, vn.getMinor());
 		assertEquals(345, vn.getPatch());
-		assertTrue(vn.isValid());
 	}
 
 	@Test
@@ -35,7 +33,6 @@ public class VersionNumberTest {
 		assertEquals(1, vn.getMajor());
 		assertEquals(2, vn.getMinor());
 		assertEquals(0, vn.getPatch());
-		assertTrue(vn.isValid());
 	}
 
 	@Test
@@ -45,47 +42,26 @@ public class VersionNumberTest {
 		assertEquals(1, vn.getMajor());
 		assertEquals(0, vn.getMinor());
 		assertEquals(0, vn.getPatch());
-		assertTrue(vn.isValid());
 	}
 	
-	@Test
+	@Test(expected=IllegalStateException.class)
 	public void testBadVersionNumberAlpha() {
-		VersionNumber vn;
-		vn = new VersionNumber("1.2.3a");
-		assertEquals(0, vn.getMajor());
-		assertEquals(0, vn.getMinor());
-		assertEquals(0, vn.getPatch());
-		assertFalse(vn.isValid());
+		new VersionNumber("1.2.3a");
 	}
-	
-	@Test
+
+	@Test(expected=IllegalStateException.class)
 	public void testBadVersionNumberAlphaOnly() {
-		VersionNumber vn;
-		vn = new VersionNumber("draft");
-		assertEquals(0, vn.getMajor());
-		assertEquals(0, vn.getMinor());
-		assertEquals(0, vn.getPatch());
-		assertFalse(vn.isValid());
+		new VersionNumber("draft");
 	}
-	
-	@Test
+
+	@Test(expected=IllegalStateException.class)
 	public void testBadVersionNumberTooManyDots() {
-		VersionNumber vn;
-		vn = new VersionNumber("1.2.3.4");
-		assertEquals(0, vn.getMajor());
-		assertEquals(0, vn.getMinor());
-		assertEquals(0, vn.getPatch());
-		assertFalse(vn.isValid());
+		new VersionNumber("1.2.3.4");
 	}
-	
-	@Test
+
+	@Test(expected=IllegalStateException.class)
 	public void testBadVersionNumberTooManyDigits() {
-		VersionNumber vn;
-		vn = new VersionNumber("1.2.3012");
-		assertEquals(0, vn.getMajor());
-		assertEquals(0, vn.getMinor());
-		assertEquals(0, vn.getPatch());
-		assertFalse(vn.isValid());
+		new VersionNumber("1.2.3012");
 	}
 	
 	@Test

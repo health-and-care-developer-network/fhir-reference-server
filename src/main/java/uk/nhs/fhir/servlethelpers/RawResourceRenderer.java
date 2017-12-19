@@ -11,17 +11,14 @@ import ca.uhn.fhir.context.FhirContext;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
-import uk.nhs.fhir.resourcehandlers.IResourceHelper;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirTextSectionHelpers;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class RawResourceRenderer {
 
     public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FhirVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
-    	// Clear out the generated text
-    	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
-        resource = helper.removeTextSection(resource);
+        resource = FhirTextSectionHelpers.forVersion(fhirVersion).removeTextSection(resource);
         
         return renderSingleWrappedRAWResource(resource, fhirVersion, Optional.of(resourceName), resourceType, baseURL, mimeType);
     }

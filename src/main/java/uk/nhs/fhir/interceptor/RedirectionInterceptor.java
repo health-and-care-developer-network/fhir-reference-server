@@ -1,4 +1,4 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.interceptor;
 
 import java.io.IOException;
 

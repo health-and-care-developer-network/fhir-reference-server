@@ -1,4 +1,4 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.servlet.browser;
 
 import java.io.IOException;
 import java.util.HashMap;

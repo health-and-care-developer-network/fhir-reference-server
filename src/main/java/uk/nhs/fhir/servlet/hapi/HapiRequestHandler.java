@@ -1,4 +1,4 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.servlet.hapi;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +19,14 @@ import com.google.common.collect.ImmutableSet;
 import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
-import uk.nhs.fhir.servlethelpers.ConformanceInterceptor;
+import uk.nhs.fhir.interceptor.ConformanceInterceptor;
+import uk.nhs.fhir.resourcehandlers.ResourceProvider;
+import uk.nhs.fhir.servlet.IndexServlet;
+import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
@@ -33,7 +38,7 @@ public abstract class HapiRequestHandler extends RestfulServer {
 	protected abstract List<IResourceProvider> getResourceProvidersList();
 	
 	private final FhirVersion fhirVersion;
-	protected final FilesystemIF dataSource;
+	private final FilesystemIF dataSource;
 	
 	public HapiRequestHandler(FhirVersion fhirVersion) {
 		this(fhirVersion, SharedDataSource.get());
@@ -73,9 +78,7 @@ public abstract class HapiRequestHandler extends RestfulServer {
 	@Override
     protected void initialize() throws ServletException {
         setResourceProviders();
-        
         addInterceptor();
-        
         addPagingProvider();
     }
 	
@@ -95,5 +98,9 @@ public abstract class HapiRequestHandler extends RestfulServer {
 		setProviders((Object[])providers.toArray(new IResourceProvider[]{}));
 		
 		LOG.debug("resourceProviders added");
+	}
+	
+	protected IResourceProvider createResourceProvider(ResourceType resourceType, Class<? extends IBaseResource> clazz) {
+		return new ResourceProvider(dataSource, resourceType, fhirVersion, clazz);
 	}
 }

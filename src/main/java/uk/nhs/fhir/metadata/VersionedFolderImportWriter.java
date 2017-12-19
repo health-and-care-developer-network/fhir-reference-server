@@ -31,8 +31,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 		Path outputDirectory = ensureVersionedFolderExists(resource);
 		ResourceMetadata metadata = resource.getMetadata(sourceFile);
 		VersionNumber versionNo = metadata.getVersionNo();
-		if (versionNo != null 
-		  && versionNo.isValid()) {
+		if (versionNo != null) {
 			File newFile = outputDirectory.resolve(metadata.getVersionedFileName()).toFile();
         	
 			try {

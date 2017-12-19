@@ -31,11 +31,13 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	
 	public void add(ResourceMetadata entity) {
 		latest = largestVersion(latest, entity.getVersionNo());
+		
 		if (entity.getStatus().equals("active")) {
 			latestActive = largestVersion(latestActive, entity.getVersionNo());
 		} else if (entity.getStatus().equals("draft")) {
 			latestDraft = largestVersion(latestDraft, entity.getVersionNo());
 		}
+		
 		metadataByVersion.put(entity.getVersionNo(), entity);
 	}
 	
@@ -48,9 +50,9 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 			LOG.debug("Found requested version - returning");
 			return metadataByVersion.get(version);
 		} else {
-			LOG.warn("Could not find requested version - asked for version:"+version+" - versions we have are:");
+			LOG.warn("Could not find requested version - asked for version:" + version + " - versions we have are:");
 			for (VersionNumber v : metadataByVersion.keySet()) {
-				LOG.warn(" - version:"+v.toString());
+				LOG.warn(" - version:" + v.toString());
 			}
 			return null;
 		}
@@ -60,13 +62,14 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 		if (previousLatest == null) {
 			return newVersion;
 		}
-		if (newVersion.isValid()) {
-			if (newVersion.compareTo(previousLatest) > 0) {
-				// New version is bigger
-				return newVersion;
-			}
+		
+		boolean newVersionIsBigger = newVersion.compareTo(previousLatest) > 0; 
+		
+		if (newVersionIsBigger) {
+			return newVersion;
+		} else {
+			return previousLatest;
 		}
-		return previousLatest;
 	}
 	
 	/**

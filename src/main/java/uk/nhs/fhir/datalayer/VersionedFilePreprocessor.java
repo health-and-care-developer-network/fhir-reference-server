@@ -67,9 +67,6 @@ public class VersionedFilePreprocessor {
                 if (versionNo == null) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
                 	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
-                } else if (!versionNo.isValid()) {
-                	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
-                	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
                 } else if (resourceID == null) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - No resource ID provided in the URL");
                 	LOG.error("Unable to process file as it is has an invalid resource ID: " + thisFile.getName());
