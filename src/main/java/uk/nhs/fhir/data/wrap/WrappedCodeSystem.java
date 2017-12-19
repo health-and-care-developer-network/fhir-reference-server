@@ -53,7 +53,7 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
     	String name = getName();
     	String url = getUrl().get();
         String resourceID = getIdFromUrl().orElse(name);
-    	VersionNumber versionNo = new VersionNumber(getVersion().get());
+    	VersionNumber versionNo = parseVersionNumber();
     	String status = getStatus();
     	
     	return new ResourceMetadata(name, source, ResourceType.CODESYSTEM,

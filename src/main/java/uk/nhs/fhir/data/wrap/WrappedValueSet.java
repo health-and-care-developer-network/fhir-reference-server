@@ -80,12 +80,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
     		displayGroup = "Code List";
     	}
     	
-    	VersionNumber versionNo;
-    	try {
-    		versionNo = new VersionNumber(getVersion().get());
-    	} catch (Exception e) {
-    		throw new IllegalStateException("Failed to load ValueSet version number", e);
-    	}
+    	VersionNumber versionNo = parseVersionNumber();
     	
     	String status = getStatus();
     	
@@ -93,7 +88,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 				false, Optional.empty(), displayGroup, false,
 				resourceID, versionNo, status, null, null, null, null, getImplicitFhirVersion(), url);
 	}
-
+	
 	@Override
 	public ResourceType getResourceType() {
 		return ResourceType.VALUESET;

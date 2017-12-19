@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -25,6 +23,7 @@ import com.google.common.collect.Lists;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.util.FhirContexts;
+import uk.nhs.fhir.util.FhirReflectionUtils;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
@@ -43,8 +42,9 @@ public class FhirFileParser {
 			
 			org.hl7.fhir.dstu3.model.StructureDefinition.class,
 			org.hl7.fhir.dstu3.model.ValueSet.class,
-			org.hl7.fhir.dstu3.model.CodeSystem.class,
-			org.hl7.fhir.dstu3.model.ConceptMap.class);
+			org.hl7.fhir.dstu3.model.OperationDefinition.class,
+			org.hl7.fhir.dstu3.model.ConceptMap.class,
+			org.hl7.fhir.dstu3.model.CodeSystem.class);
 	
 	public static boolean isSupported(IBaseResource resource) {
 		return supportedClasses.contains(resource.getClass());
@@ -161,200 +161,20 @@ public class FhirFileParser {
 	 */
 	private Optional<FhirVersion> getResourceVersion(IBaseResource resource) {
 		
-		Optional<String> urlByReflection = getUrlByReflection(resource);
+		Optional<String> urlByReflection = FhirReflectionUtils.getUrlByReflection(resource);
 		if (urlByReflection.isPresent()) {
 			FhirVersion version = fromResourceUrl(urlByReflection.get());
 			return Optional.of(version);
 		}
 		
 		// Some external resources might store the version for e.g. StructureDefinitions this way
-		Optional<String> fhirReleaseByReflection = getFhirReleaseByReflection(resource);
+		Optional<String> fhirReleaseByReflection = FhirReflectionUtils.getFhirReleaseByReflection(resource);
 		if (fhirReleaseByReflection.isPresent()) {
 			FhirRelease release = FhirRelease.forString(fhirReleaseByReflection.get());
 			return Optional.ofNullable(release.getVersion());
 		}
 		
 		return Optional.empty();
-		
-		/*if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
-			ca.uhn.fhir.model.dstu2.resource.StructureDefinition dstu2StructureDefinition = (ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource;
-			
-			String url = dstu2StructureDefinition.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			String fhirVersion = dstu2StructureDefinition.getFhirVersion();
-			if (!Strings.isNullOrEmpty(fhirVersion)) {
-				return FhirRelease.forString(fhirVersion).getVersion();
-			}
-			
-			return null;
-			
-		} else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
-			
-			org.hl7.fhir.dstu3.model.StructureDefinition stu3StructureDefinition = (org.hl7.fhir.dstu3.model.StructureDefinition)resource;
-			
-			String url = stu3StructureDefinition.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			String fhirVersion = stu3StructureDefinition.getFhirVersion();
-			if (!Strings.isNullOrEmpty(fhirVersion)) {
-				return FhirRelease.forString(fhirVersion).getVersion(); 
-			}
-			
-			return null;
-			
-		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
-			
-			ca.uhn.fhir.model.dstu2.resource.ValueSet dstu2ValueSet = (ca.uhn.fhir.model.dstu2.resource.ValueSet)resource;
-			
-			String url = dstu2ValueSet.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			return null;
-			
-		} else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
-			
-			org.hl7.fhir.dstu3.model.ValueSet stu3ValueSet = (org.hl7.fhir.dstu3.model.ValueSet)resource;
-			
-			String url = stu3ValueSet.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			return null;
-			
-		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.OperationDefinition) {
-			
-			ca.uhn.fhir.model.dstu2.resource.OperationDefinition dstu2OperationDefinition = (ca.uhn.fhir.model.dstu2.resource.OperationDefinition)resource;
-			
-			String url = dstu2OperationDefinition.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			return null;
-			
-		} else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
-			
-			org.hl7.fhir.dstu3.model.CodeSystem stu3CodeSystem = (org.hl7.fhir.dstu3.model.CodeSystem)resource;
-			
-			String url = stu3CodeSystem.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			return null;
-			
-		} else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ConceptMap) {
-			ca.uhn.fhir.model.dstu2.resource.ConceptMap dstu2CodeSystem = (ca.uhn.fhir.model.dstu2.resource.ConceptMap)resource;
-			
-			String url = dstu2CodeSystem.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-			
-			return null;
-			
-		} else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
-			org.hl7.fhir.dstu3.model.ConceptMap stu3CodeSystem = (org.hl7.fhir.dstu3.model.ConceptMap)resource;
-			
-			String url = stu3CodeSystem.getUrl();
-			if (!Strings.isNullOrEmpty(url)) {
-				FhirVersion version = fromResourceUrl(url);
-				
-				if (version != null) {
-					return version;
-				}
-			}
-
-			return null;
-			
-		} else {
-			throw new IllegalStateException("Class " + resource.getClass().getCanonicalName() + " is marked as supported, but wasn't handled");
-		}*/
-	}
-
-	Optional<String> getUrlByReflection(IBaseResource resource) {
-		Method getUrlMethod;
-		try {
-			getUrlMethod = resource.getClass().getMethod("getUrl");
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new IllegalStateException("No method getUrl() for successfully parsed class " + resource.getClass().getName());
-		}
-		
-		Object urlObj = null;
-		try {
-			urlObj = getUrlMethod.invoke(resource); 
-			String urlFromReflectionCall = (String)urlObj;
-			return Optional.ofNullable(urlFromReflectionCall);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalStateException("Failed to invoke getUrl() for class " + resource.getClass().getName());
-		} catch (ClassCastException cce) {
-			String urlObjDesc = "[null]";
-			if (urlObj != null) {
-				urlObjDesc = urlObj.getClass().getName();
-			}
-			throw new IllegalStateException("Expected string from getUrl() for class " + resource.getClass().getName() + " but got " + urlObjDesc);
-		}
-	}
-
-	private Optional<String> getFhirReleaseByReflection(IBaseResource resource) {
-		Method getFhirReleaseMethod;
-		try {
-			getFhirReleaseMethod = resource.getClass().getMethod("getFhirVersion");
-		} catch (NoSuchMethodException | SecurityException e) {
-			// most resources don't have this - not unexpected
-			return Optional.empty();
-		}
-		
-		Object releaseObj = null;
-		try {
-			releaseObj = getFhirReleaseMethod.invoke(resource);
-			String release = (String)releaseObj;
-			return Optional.ofNullable(release);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalStateException("Failed to invoke getFhirVersion() for class " + resource.getClass().getName());
-		} catch (ClassCastException cce) {
-			String releaseObjDesc = "[null]";
-			if (releaseObj != null) {
-				releaseObjDesc = releaseObj.getClass().getName();
-			}
-			throw new IllegalStateException("Expected string from getFhirVersion() for class " + resource.getClass().getName() + " but got " + releaseObjDesc);
-		}
 	}
 	
 	/**

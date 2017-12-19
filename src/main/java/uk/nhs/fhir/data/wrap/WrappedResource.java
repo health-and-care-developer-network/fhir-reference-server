@@ -195,4 +195,12 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	public IParser newXmlParser() {
 		return FhirContexts.xmlParser(getImplicitFhirVersion());
 	}
+
+	protected VersionNumber parseVersionNumber() {
+    	try {
+    		return new VersionNumber(getVersion().get());
+    	} catch (Exception e) {
+    		throw new IllegalStateException("Failed to load " + getResourceType().getDisplayName() + " version number", e);
+    	}
+	}
 }

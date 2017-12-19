@@ -35,7 +35,7 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
     	String url = getUrl().get();
     	String resourceID = getIdFromUrl().orElse(resourceName);
     	String displayGroup = "Operations";
-        VersionNumber versionNo = new VersionNumber(getVersion().get());
+        VersionNumber versionNo = parseVersionNumber();
         String status = getStatus();
     	
         return new ResourceMetadata(resourceName, source, ResourceType.OPERATIONDEFINITION,

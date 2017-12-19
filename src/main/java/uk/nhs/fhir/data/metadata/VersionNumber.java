@@ -1,15 +1,11 @@
 package uk.nhs.fhir.data.metadata;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class VersionNumber implements Comparable<VersionNumber> {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(VersionNumber.class.getName());
 	
 	private static final Pattern REGEX = Pattern.compile("^([0-9]{1,3})(?:\\.([0-9]{1,3})(?:\\.([0-9]{1,3}))?)?$");
 	
@@ -18,31 +14,41 @@ public class VersionNumber implements Comparable<VersionNumber> {
 	private final int patch;
 	private final boolean valid;
 	
+	public VersionNumber(int major, int minor) {
+		this(major, minor, 0);
+	}
+	
+	public VersionNumber(int major, int minor, int patch) {
+		this.major = major;
+		this.minor = minor;
+		this.patch = patch;
+		
+		this.valid = true;
+	}
+	
 	public VersionNumber(String versionStr) {
 		
 		Matcher matcher = REGEX.matcher(versionStr);
 		if (matcher.find()) {
-			this.major = Integer.parseInt(matcher.group(1));
+			
+			String majorGroup = matcher.group(1);
+			Optional<String> minorGroup = Optional.ofNullable(matcher.group(2));
+			Optional<String> patchGroup = Optional.ofNullable(matcher.group(3));
+			
+			this.major = Integer.parseInt(majorGroup);
 			
 			this.minor = 
-				Optional.ofNullable(matcher.group(2))
+				minorGroup
 					.map(Integer::parseInt)
 					.orElse(0);
-			
 			this.patch = 
-				Optional.ofNullable(matcher.group(3))
+				patchGroup
 					.map(Integer::parseInt)
 					.orElse(0);
 			
 			this.valid = true;
 		} else {
-			LOG.warn("Unable to parse version number: " + versionStr);
-			
-			this.major = 0;
-			this.minor = 0;
-			this.patch = 0;
-			
-			this.valid = false;
+			throw new IllegalStateException("Unable to parse version number: " + versionStr);
 		}
 	}
 
@@ -62,22 +68,13 @@ public class VersionNumber implements Comparable<VersionNumber> {
 		return valid;
 	}
 
+	public static final Comparator<VersionNumber> BY_MAJOR_MINOR = 
+		Comparator.comparing((VersionNumber version) -> version.major)
+			.thenComparing((VersionNumber version) -> version.minor);
+	
 	@Override
 	public int compareTo(VersionNumber other) {
-		if (this.major < other.getMajor()) {
-			return -1;
-		} else if (this.major > other.getMajor()) {
-			return 1;
-		} else {
-			if (this.minor < other.getMinor()) {
-				return -1;
-			} else if (this.minor > other.getMinor()) {
-				return 1;
-			} else {
-				// Ignore patch versions and assume the are the same as any other resource with the same major.minor version
-				return 0;
-			}
-		}
+		return BY_MAJOR_MINOR.compare(this, other);
 	}
 
 	@Override
