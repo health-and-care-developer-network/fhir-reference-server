@@ -95,4 +95,22 @@ public class VersionNumberTest {
 		vn2 = new VersionNumber("1.1.3");
 		assertTrue(vn2.compareTo(vn1) == 0);
 	}
+	
+	@Test
+	public void testMajorVersionToString() {
+		VersionNumber vn = new VersionNumber("6");
+		assertEquals("6.0", vn.toString());
+	}
+	
+	@Test
+	public void testMajorMinorVersionToString() {
+		VersionNumber vn = new VersionNumber("6.1");
+		assertEquals("6.1", vn.toString());
+	}
+	
+	@Test
+	public void testMajorMinorPatchVersionToString() {
+		VersionNumber vn = new VersionNumber("6.1.2");
+		assertEquals("6.1.2", vn.toString());
+	}
 }
