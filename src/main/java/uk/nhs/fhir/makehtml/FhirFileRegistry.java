@@ -25,13 +25,13 @@ import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.error.FhirErrorHandler;
+import uk.nhs.fhir.error.EventHandler;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.StringUtil;
 
-public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResource<?>>> {
+public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResource<?>>>, StructureDefinitionRepository {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(FhirFileRegistry.class);
 
@@ -60,7 +60,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		}
 	}
 	
-	public void registerMany(List<File> potentialFhirFiles, FhirErrorHandler errorHandler) {
+	public void registerMany(List<File> potentialFhirFiles, EventHandler errorHandler) {
 		for (File potentialFhirFile : potentialFhirFiles) {
 			try {
 				register(potentialFhirFile);
@@ -171,17 +171,17 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 				try {
 					version = wrappedResource.getVersion();
 				} catch (Exception e) {
-					RendererErrorConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Error loading version for " + xmlFile.getAbsolutePath(), Optional.of(e));
+					RendererEventConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Error loading version for " + xmlFile.getAbsolutePath(), Optional.of(e));
 				}
 				if (!version.isPresent()) {
-					RendererErrorConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Version not present for " + xmlFile.getAbsolutePath());
+					RendererEventConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Version not present for " + xmlFile.getAbsolutePath());
 				}
 					
 				try {
 					// trigger error if we can't get the metadata. This will otherwise prevent it being imported into the server later.
 					wrappedResource.getMetadata(xmlFile);
 				} catch (Exception e) {
-					RendererErrorConfig.handle(RendererError.METADATA_NOT_AVAILABLE, "Couldn't load metadata for " + xmlFile.getAbsolutePath(), Optional.of(e));
+					RendererEventConfig.handle(RendererError.METADATA_NOT_AVAILABLE, "Couldn't load metadata for " + xmlFile.getAbsolutePath(), Optional.of(e));
 				}
 				
 				resourcesByFile.put(xmlFile, wrappedResource);

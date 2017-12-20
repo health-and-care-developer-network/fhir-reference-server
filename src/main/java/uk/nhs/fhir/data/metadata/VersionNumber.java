@@ -81,7 +81,7 @@ public class VersionNumber implements Comparable<VersionNumber> {
 	public String toString() {
 		String versionString = major + "." + minor;
 		if (patch > 0)
-			versionString += '.' + patch;
+			versionString += "." + patch;
 		return versionString;
 	}
 

@@ -33,8 +33,8 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
-import uk.nhs.fhir.makehtml.render.RendererContext;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -44,8 +44,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	
 	private final ElementDefinition definition;
 
-	public WrappedStu3ElementDefinition(ElementDefinition definition, RendererContext context) {
-		super(context);
+	public WrappedStu3ElementDefinition(ElementDefinition definition) {
 		this.definition = definition;
 	}
 
@@ -84,7 +83,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 						LinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());
 						typeLinks.addNestedUri(referenceLink, type.getTargetProfile(), FhirVersion.STU3);
 					} else if (type.getCode().equals("string")){
-						RendererErrorConfig.handle(RendererError.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
+						RendererEventConfig.handle(RendererError.TYPELINK_STRING_WITH_PROFILE, "Type link with type " + type.getCode() + " and a target profile " + type.getTargetProfile() + " - dropping targetProfile (" + getPath() + ")");
 						typeLinks.addSimpleLink(typeLinkFactory.forDataTypeName(type.getCode()));
 					} else {
 						String targetProfile = type.getTargetProfile();
@@ -191,7 +190,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			String descriptionDesc = description == null ? "[no description]" : description;
 			if (slicing.getDiscriminator().isEmpty()
 			  && !getSliceName().isPresent()) {
-				RendererErrorConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
+				RendererEventConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
 					"Slicing " + descriptionDesc + " doesn't have a discriminator (" + getPath() + ")");
 			}
 			
@@ -300,7 +299,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public Optional<ExtensionType> getExtensionType() {
+	public Optional<ExtensionType> getExtensionType(StructureDefinitionRepository structureDefinitions) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		}
@@ -308,7 +307,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 		for (TypeRefComponent type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
-				return Optional.of(lookupExtensionType(type.getProfile()));
+				return Optional.of(lookupExtensionType(type.getProfile(), structureDefinitions));
 			}
 		}
 		

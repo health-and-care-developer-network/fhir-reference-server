@@ -21,15 +21,15 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
-import uk.nhs.fhir.makehtml.render.RendererContext;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class WrappedElementDefinition {
 
 	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 	
-	private static final Set<String> defaultedSimpleExtensions = Sets.newConcurrentHashSet();
+	private static final Set<String> cachedPermittedMissingExtensions = Sets.newConcurrentHashSet();
 	
 	public abstract String getName();
 	public abstract String getPath();
@@ -50,7 +50,7 @@ public abstract class WrappedElementDefinition {
 	public abstract Optional<String> getRequirements();
 	public abstract Optional<String> getComments();
 	public abstract List<String> getAliases();
-	public abstract Optional<ExtensionType> getExtensionType();
+	public abstract Optional<ExtensionType> getExtensionType(StructureDefinitionRepository structureDefinitions);
 	public abstract Optional<String> getLinkedNodeName();
 	public abstract Optional<String> getLinkedNodePath();
 	public abstract List<FhirElementMapping> getMappings();
@@ -60,17 +60,11 @@ public abstract class WrappedElementDefinition {
 	// Introduced with STU3
 	public abstract Optional<String> getSliceName();
 	
-	protected final RendererContext context;
-	
-	public WrappedElementDefinition(RendererContext context) {
-		this.context = context;
-	}
-	
-	public static WrappedElementDefinition fromDefinition(Object definition, RendererContext context) {
+	public static WrappedElementDefinition fromDefinition(Object definition) {
 		if (definition instanceof ElementDefinitionDt) {
-			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition, context);
+			return new WrappedDstu2ElementDefinition((ElementDefinitionDt)definition);
 		} else if (definition instanceof ElementDefinition) {
-			return new WrappedStu3ElementDefinition((ElementDefinition)definition, context);
+			return new WrappedStu3ElementDefinition((ElementDefinition)definition);
 		} else {
 			throw new IllegalStateException("Can't wrap element definition class " + definition.getClass().getCanonicalName());
 		}
@@ -84,15 +78,15 @@ public abstract class WrappedElementDefinition {
 		return getPathParts().length == 1;
 	}
 
-	protected ExtensionType lookupExtensionType(String typeProfile) {
+	protected ExtensionType lookupExtensionType(String typeProfile, StructureDefinitionRepository structureDefinitions) {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
-		} else if (defaultedSimpleExtensions.contains(typeProfile)) {
+		} else if (cachedPermittedMissingExtensions.contains(typeProfile)) {
 			return ExtensionType.SIMPLE;
 		} else {
 			WrappedStructureDefinition extensionDefinition;
 			try {
-				extensionDefinition = context.getFhirFileRegistry().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
+				extensionDefinition = structureDefinitions.getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
 				return extensionDefinition.getExtensionType();
 			} catch (Exception e) {
 				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
@@ -101,9 +95,9 @@ public abstract class WrappedElementDefinition {
 				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
 					
 					String message = "Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot;
-					RendererErrorConfig.handle(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, message);
+					RendererEventConfig.handle(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, message);
 					
-					defaultedSimpleExtensions.add(typeProfile);
+					cachedPermittedMissingExtensions.add(typeProfile);
 					
 					return ExtensionType.SIMPLE;
 				} else {
@@ -111,8 +105,5 @@ public abstract class WrappedElementDefinition {
 				}
 			}
 		}
-	}
-	public RendererContext getContext() {
-		return context;
 	}
 }

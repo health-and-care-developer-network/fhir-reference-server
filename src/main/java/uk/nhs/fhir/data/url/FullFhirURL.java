@@ -7,7 +7,7 @@ import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.wrap.dstu2.Dstu2UrlFixer;
 import uk.nhs.fhir.data.wrap.stu3.Stu3UrlFixer;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
@@ -70,7 +70,7 @@ public class FullFhirURL extends FhirURL {
 		String linkUrl = scheme + hostAndPath;
 		
 		if (isLogicalUrl(linkUrl)) {
-			RendererErrorConfig.handle(RendererError.LINK_WITH_LOGICAL_URL, "Using logical url " + linkUrl + " as a link href");
+			RendererEventConfig.handle(RendererError.LINK_WITH_LOGICAL_URL, "Using logical url " + linkUrl + " as a link href");
 		} else if (TEST_LINK_URLS) {
 			FhirURL.addLinkUrl(linkUrl);
 		}

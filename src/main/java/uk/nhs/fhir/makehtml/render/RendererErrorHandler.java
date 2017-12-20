@@ -1,9 +1,7 @@
 package uk.nhs.fhir.makehtml.render;
 
-import uk.nhs.fhir.error.FhirErrorHandler;
+import uk.nhs.fhir.error.EventHandler;
 
-public interface RendererErrorHandler extends FhirErrorHandler {
-
-	void setContext(RendererContext rendererContext);
+public interface RendererErrorHandler extends EventHandler {
 
 }

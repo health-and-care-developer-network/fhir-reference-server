@@ -4,18 +4,18 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import uk.nhs.fhir.error.FhirErrorHandler;
+import uk.nhs.fhir.error.EventHandler;
 
 public class FhirResourceCollector {
 
 	private final XmlFileFinder fileFinder;
-	private final FhirErrorHandler errorHandler;
+	private final EventHandler errorHandler;
 
 	public FhirResourceCollector(Path root) {
-		this(root, new LoggingErrorHandler());
+		this(root, new LoggingEventHandler());
 	}
 	
-	public FhirResourceCollector(Path root, FhirErrorHandler errorHandler) {
+	public FhirResourceCollector(Path root, EventHandler errorHandler) {
 		this.fileFinder = new XmlFileFinder(root);
 		this.errorHandler = errorHandler;
 	}

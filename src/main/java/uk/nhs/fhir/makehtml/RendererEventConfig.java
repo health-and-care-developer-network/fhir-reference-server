@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
  * This config is overridden by newMain.STRICT
  */
 
-public class RendererErrorConfig {
-	private static final Logger LOG = LoggerFactory.getLogger(RendererErrorConfig.class);
+public class RendererEventConfig {
+	private static final Logger LOG = LoggerFactory.getLogger(RendererEventConfig.class);
 	
 	public static boolean STRICT = false;
 	
@@ -42,7 +42,8 @@ public class RendererErrorConfig {
 		responses.put(RendererError.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, RendererErrorResponse.IGNORE);
 		responses.put(RendererError.CONSTRAINT_WITHOUT_CONDITION, RendererErrorResponse.IGNORE);
 
-		// Uses a temporary name - if it is going to be displayed, we hit STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED
+		// Uses placeholder with the expectation that the node is going to be removed before display
+		// If the placeholder is going to be displayed, we hit STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED
 		responses.put(RendererError.BINDING_WITHOUT_DESC_OR_URL, RendererErrorResponse.IGNORE);
 		
 		responses.put(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, RendererErrorResponse.LOG_WARNING);

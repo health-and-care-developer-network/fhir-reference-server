@@ -33,8 +33,8 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
-import uk.nhs.fhir.makehtml.render.RendererContext;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -44,8 +44,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 
 	private final ElementDefinitionDt definition;
 
-	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition, RendererContext context) {
-		super(context);
+	public WrappedDstu2ElementDefinition(ElementDefinitionDt definition) {
 		this.definition = definition;
 	}
 
@@ -180,7 +179,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			String descriptionDesc = description == null ? "[no description]" : description;
 			if (slicing.getDiscriminator().isEmpty()
 			  && !getSliceName().isPresent()) {
-				RendererErrorConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
+				RendererEventConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
 					"Slicing " + descriptionDesc + " doesn't have a discriminator (" + getPath() + ")");
 			}
 			
@@ -205,7 +204,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 				
 				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
 					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
-					RendererErrorConfig.handle(RendererError.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
+					RendererEventConfig.handle(RendererError.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
 					fixedValueAsString = correctedUrl;
 				}
 				
@@ -300,7 +299,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public Optional<ExtensionType> getExtensionType() {
+	public Optional<ExtensionType> getExtensionType(StructureDefinitionRepository structureDefinitions) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		}
@@ -311,7 +310,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
 				for (UriDt profile : type.getProfile()) {
-					ExtensionType extensionType = lookupExtensionType(profile.getValueAsString());
+					ExtensionType extensionType = lookupExtensionType(profile.getValueAsString(), structureDefinitions);
 					if (extensionType != null) {
 						extensionTypes.add(extensionType);
 					}
