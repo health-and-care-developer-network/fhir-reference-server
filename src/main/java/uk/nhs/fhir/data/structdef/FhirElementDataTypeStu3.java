@@ -28,7 +28,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirStu3DataTypes;
+import ca.uhn.fhir.context.HAPIDataTypes;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirElementDataTypeStu3 {
 
@@ -75,7 +76,7 @@ public class FhirElementDataTypeStu3 {
 			return FhirElementDataType.ELEMENT;
 		}
 
-		Optional<Class<?>> implementingType = FhirStu3DataTypes.getImplementingType(typeName);
+		Optional<Class<?>> implementingType = HAPIDataTypes.getImplementingType(FhirVersion.STU3, typeName);
 		
 		if (implementingType.isPresent()) {
 			Class<?> implementingClass = implementingType.get();

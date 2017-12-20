@@ -7,14 +7,15 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import ca.uhn.fhir.context.FhirDstu2DataTypes;
+import ca.uhn.fhir.context.HAPIDataTypes;
 import ca.uhn.fhir.model.api.BaseElement;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirElementDataTypeDstu2 {
 
@@ -32,7 +33,7 @@ public class FhirElementDataTypeDstu2 {
 			return FhirElementDataType.ELEMENT;
 		}
 		
-		Optional<Class<?>> implementingType = FhirDstu2DataTypes.getImplementingType(typeName);
+		Optional<Class<?>> implementingType = HAPIDataTypes.getImplementingType(FhirVersion.DSTU2, typeName);
 		
 		if (implementingType.isPresent()) {
 			Class<?> implementingClass = implementingType.get();

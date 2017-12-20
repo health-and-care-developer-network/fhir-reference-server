@@ -15,19 +15,29 @@ public class FhirReflectionUtils {
 	
 	private static Method getOrCacheMethod(Object o, String methodName) {
 		Class<?> clazz = o.getClass();
-		Map<String, Method> methodsMap = cachedMethods.putIfAbsent(clazz, Maps.newConcurrentMap());
+		cachedMethods.putIfAbsent(clazz, Maps.newConcurrentMap());
+		Map<String, Method> methodsMap = cachedMethods.get(clazz);
 		try {
-			return methodsMap.putIfAbsent(methodName, o.getClass().getMethod(methodName));
+			methodsMap.putIfAbsent(methodName, o.getClass().getMethod(methodName));
+			return methodsMap.get(methodName);
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new IllegalStateException("No method " + methodName + "() for resource class " + o.getClass().getName());
 		}
 	}
 	
-	public static Optional<String> callResourceMethodByReflection(String methodName, IBaseResource resource) {
+	public static Optional<String> callResourceMethodByReflection(String methodName, IBaseResource resource, boolean throwOnError) {
+		try {
 		Method method = getOrCacheMethod(resource, methodName);
 		Object result = invokeMethod(method, resource, methodName);
 		String resultString = castToString(result, methodName, resource);
 		return Optional.ofNullable(resultString);
+		} catch (Exception e) {
+			if (throwOnError) {
+				throw e;
+			} else {
+				return Optional.empty();
+			}
+		}
 	}
 
 	public static Object invokeMethod(Method method, IBaseResource resource, String methodName) {
@@ -50,12 +60,14 @@ public class FhirReflectionUtils {
 		} 
 	}
 
-	public static Optional<String> getUrlByReflection(IBaseResource resource) {
-		return callResourceMethodByReflection("getUrl", resource);
+	public static Optional<String> getUrlByReflection(IBaseResource resource, boolean throwOnError) {
+		return callResourceMethodByReflection("getUrl", resource, throwOnError);
 	}
 
 	public static String expectUrlByReflection(IBaseResource resource) {
-		Optional<String> url = getUrlByReflection(resource);
+		Optional<String> url = getUrlByReflection(resource, true);
+		
+		// method might still have returned null, so check
 		if (url.isPresent()) {
 			return url.get();
 		} else {
@@ -64,8 +76,7 @@ public class FhirReflectionUtils {
 	}
 
 	public static Optional<String> getFhirReleaseByReflection(IBaseResource resource) {
-		return callResourceMethodByReflection("getFhirVersion", resource);
+		return callResourceMethodByReflection("getFhirVersion", resource, false);
 	}
 
-	
 }

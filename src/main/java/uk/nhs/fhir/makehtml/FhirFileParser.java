@@ -161,7 +161,7 @@ public class FhirFileParser {
 	 */
 	private Optional<FhirVersion> getResourceVersion(IBaseResource resource) {
 		
-		Optional<String> urlByReflection = FhirReflectionUtils.getUrlByReflection(resource);
+		Optional<String> urlByReflection = FhirReflectionUtils.getUrlByReflection(resource, false);
 		if (urlByReflection.isPresent()) {
 			FhirVersion version = fromResourceUrl(urlByReflection.get());
 			return Optional.of(version);
