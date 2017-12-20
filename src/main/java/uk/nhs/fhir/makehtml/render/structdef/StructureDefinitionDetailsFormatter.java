@@ -32,13 +32,12 @@ import uk.nhs.fhir.makehtml.html.style.FhirColour;
 import uk.nhs.fhir.makehtml.html.style.FhirFont;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public StructureDefinitionDetailsFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	}
 
 	private Element getDetailsPanel() {
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, context);
+		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		

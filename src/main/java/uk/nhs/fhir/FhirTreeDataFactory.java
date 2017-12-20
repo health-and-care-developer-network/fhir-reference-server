@@ -13,72 +13,69 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeNodeBuilder;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeDataFactory {
 
 	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
 	
-	public static FhirTreeData getSnapshotTree(WrappedStructureDefinition structureDefinition, RendererContext context) {
+	public static FhirTreeData getSnapshotTree(WrappedStructureDefinition structureDefinition) {
 		FhirVersion fhirVersion = structureDefinition.getImplicitFhirVersion();
 		switch (fhirVersion) {
 			case DSTU2:
-				return dstu2Snapshot(structureDefinition, context);
+				return dstu2Snapshot(structureDefinition);
 			case STU3:
-				return stu3Snapshot(structureDefinition, context);
+				return stu3Snapshot(structureDefinition);
 			default:
 				throw new IllegalStateException("Unexpected FHIR verison " + fhirVersion.toString());
 		}
 	}
 
-	private static FhirTreeData dstu2Snapshot(WrappedStructureDefinition structureDefinition,
-			RendererContext context) {
+	private static FhirTreeData dstu2Snapshot(WrappedStructureDefinition structureDefinition) {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		
 		Snapshot snapshot = ((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		for (ElementDefinitionDt element : snapshot.getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, context));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 		
 		return fhirTreeDataBuilder.getTree();
 	}
 	
-	private static FhirTreeData stu3Snapshot(WrappedStructureDefinition structureDefinition,
-			RendererContext context) {
+	private static FhirTreeData stu3Snapshot(WrappedStructureDefinition structureDefinition) {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		
 		StructureDefinitionSnapshotComponent snapshot = ((org.hl7.fhir.dstu3.model.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		
 		for (ElementDefinition element : snapshot.getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, context));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 		
 		return fhirTreeDataBuilder.getTree();
 	}
 	
-	public static FhirTreeData getDifferentialTree(WrappedStructureDefinition structureDefinition, RendererContext context) {
+	public static FhirTreeData getDifferentialTree(WrappedStructureDefinition structureDefinition) {
 
 		FhirVersion fhirVersion = structureDefinition.getImplicitFhirVersion();
 		switch (fhirVersion) {
 			case DSTU2:
-				return dstu2Differential(structureDefinition, context);
+				return dstu2Differential(structureDefinition);
 			case STU3:
-				return stu3Differential(structureDefinition, context);
+				return stu3Differential(structureDefinition);
 			default:
 				throw new IllegalStateException("Unexpected FHIR verison " + fhirVersion.toString());
 		}
 	}
 
-	private static FhirTreeData dstu2Differential(WrappedStructureDefinition structureDefinition, RendererContext context) {
+	private static FhirTreeData dstu2Differential(WrappedStructureDefinition structureDefinition) {
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		fhirTreeDataBuilder.permitDummyNodes();
 		
 		Differential differential = ((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)structureDefinition.getWrappedResource()).getDifferential();
 		for (ElementDefinitionDt element : differential.getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, context));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 
@@ -86,8 +83,7 @@ public class FhirTreeDataFactory {
 		
 	}
 
-	private static FhirTreeData stu3Differential(WrappedStructureDefinition structureDefinition,
-			RendererContext context) {
+	private static FhirTreeData stu3Differential(WrappedStructureDefinition structureDefinition) {
 
 		FhirTreeDataBuilder fhirTreeDataBuilder = new FhirTreeDataBuilder();
 		fhirTreeDataBuilder.permitDummyNodes();
@@ -95,7 +91,7 @@ public class FhirTreeDataFactory {
 		StructureDefinitionDifferentialComponent differential = ((org.hl7.fhir.dstu3.model.StructureDefinition)structureDefinition.getWrappedResource()).getDifferential();
 		
 		for (ElementDefinition element : differential.getElement()) {
-			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element, context));
+			FhirTreeNode node = treeNodeBuilder.fromElementDefinition(WrappedElementDefinition.fromDefinition(element));
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
 

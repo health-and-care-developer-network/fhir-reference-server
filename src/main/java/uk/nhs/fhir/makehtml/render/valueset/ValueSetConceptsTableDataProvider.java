@@ -15,18 +15,16 @@ import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.RendererFhirContext;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ValueSetConceptsTableDataProvider {
 	
 	private final WrappedValueSet valueSet;
-	private final RendererContext context;
 	
-	public ValueSetConceptsTableDataProvider(WrappedValueSet valueSet, RendererContext context) {
+	public ValueSetConceptsTableDataProvider(WrappedValueSet valueSet) {
 		this.valueSet = valueSet;
-		this.context = context;
 	}
 
 	public List<ValueSetConceptsTableDataCodeSystem> getCodeSystems() {
@@ -41,11 +39,11 @@ public class ValueSetConceptsTableDataProvider {
 		for (FhirValueSetComposeInclude include : valueSet.getCompose().getIncludes()) {
 			if (include.getConcepts().isEmpty()) {
 				// try to find the concept map from the registry
-				WrappedCodeSystem standaloneCodeSystem = context.getFhirFileRegistry().getCodeSystem(include.getSystem());
+				WrappedCodeSystem standaloneCodeSystem = RendererFhirContext.forThread().getFhirFileRegistry().getCodeSystem(include.getSystem());
 				if (standaloneCodeSystem != null) {
 						addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
-					RendererErrorConfig.handle(RendererError.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
+					RendererEventConfig.handle(RendererError.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
 					// ensure that we still display the code system
 					addConcepts(rows, include.getSystem(), Lists.newArrayList());
 				}
@@ -65,7 +63,7 @@ public class ValueSetConceptsTableDataProvider {
 			
 			String mappedCode = null;
 			
-			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(context.getFhirFileRegistry())) {
+			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(RendererFhirContext.forThread().getFhirFileRegistry())) {
 				for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
 	                if (code.equals(mapElement.getCode())) {
 	                	if (mapElement.getTargets().isEmpty()) {

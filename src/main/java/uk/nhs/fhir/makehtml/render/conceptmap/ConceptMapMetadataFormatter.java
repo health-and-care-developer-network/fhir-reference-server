@@ -17,12 +17,11 @@ import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ConceptMapMetadataFormatter extends TableFormatter<WrappedConceptMap>{
 
-	public ConceptMapMetadataFormatter(WrappedConceptMap conceptMap, RendererContext context) {
-		super(conceptMap, context);
+	public ConceptMapMetadataFormatter(WrappedConceptMap conceptMap) {
+		super(conceptMap);
 	}
 
 	@Override

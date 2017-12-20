@@ -18,13 +18,12 @@ import uk.nhs.fhir.makehtml.html.panel.FhirPanel;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class OperationDefinitionFormatter extends ResourceFormatter<WrappedOperationDefinition> {
 
-	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public OperationDefinitionFormatter(WrappedOperationDefinition wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override

@@ -15,12 +15,11 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
-	public ConceptsValueSetTableFormatter(WrappedValueSet wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public ConceptsValueSetTableFormatter(WrappedValueSet wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override
@@ -35,7 +34,7 @@ public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 
 	private Element buildConceptsPanel() {
-		ValueSetConceptsTableDataProvider tableData = new ValueSetConceptsTableDataProvider(wrappedResource, context);
+		ValueSetConceptsTableDataProvider tableData = new ValueSetConceptsTableDataProvider(wrappedResource);
 		List<ValueSetConceptsTableDataCodeSystem> codeSystems = tableData.getCodeSystems();
 
 		boolean needsDisplayColumn = false;

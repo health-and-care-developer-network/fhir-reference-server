@@ -30,14 +30,13 @@ import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.tree.FhirIcon;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionBindingFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 	
-	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition, RendererContext context) {
-		super(structureDefinition, context);
+	public StructureDefinitionBindingFormatter(WrappedStructureDefinition structureDefinition) {
+		super(structureDefinition);
 	}
 
     private static final String BLANK = "";
@@ -83,7 +82,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource, context);
+        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 
         for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);

@@ -8,14 +8,14 @@ import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
+import uk.nhs.fhir.makehtml.RendererFhirContext;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class ValueSetFilteredCodeSystemTableDataProvider {
 	
 	private final WrappedValueSet valueSet;
 	
-	public ValueSetFilteredCodeSystemTableDataProvider(WrappedValueSet valueSet, RendererContext context) {
+	public ValueSetFilteredCodeSystemTableDataProvider(WrappedValueSet valueSet) {
 		
 		if (valueSet.getCodeSystem().isPresent()) {
 			throw new IllegalStateException("Didn't expect inline code system with a filter");
@@ -23,7 +23,7 @@ public class ValueSetFilteredCodeSystemTableDataProvider {
 		if (!valueSet.getConceptsToDisplay().isEmpty()) {
 			throw new IllegalStateException("Didn't expect concepts to display with a filter");
 		}
-		if (!valueSet.getConceptMaps(context.getFhirFileRegistry()).isEmpty()) {
+		if (!valueSet.getConceptMaps(RendererFhirContext.forThread().getFhirFileRegistry()).isEmpty()) {
 			throw new IllegalStateException("Didn't expect concepts map with a filter");
 		}
 		

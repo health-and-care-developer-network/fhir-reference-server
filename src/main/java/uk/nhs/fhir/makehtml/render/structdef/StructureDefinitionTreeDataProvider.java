@@ -15,25 +15,22 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
-import uk.nhs.fhir.makehtml.render.RendererContext;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
 
 public class StructureDefinitionTreeDataProvider {
 	
 	private final WrappedStructureDefinition source;
-	private final RendererContext context;
 	
 	private Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
 			"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
 			"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
-	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source, RendererContext context) {
+	public StructureDefinitionTreeDataProvider(WrappedStructureDefinition source) {
 		this.source = source;
-		this.context = context;
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-		FhirTreeData snapshotTree = FhirTreeDataFactory.getSnapshotTree(source, context);
+		FhirTreeData snapshotTree = FhirTreeDataFactory.getSnapshotTree(source);
 		
 		snapshotTree.resolveLinkedNodes();
 		snapshotTree.cacheSlicingDiscriminators();
@@ -46,7 +43,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeData differentialTree = FhirTreeDataFactory.getDifferentialTree(source, context);
+		FhirTreeData differentialTree = FhirTreeDataFactory.getDifferentialTree(source);
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		
@@ -122,7 +119,7 @@ public class StructureDefinitionTreeDataProvider {
 				}
 			}
 			
-			RendererErrorConfig.handle(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			RendererEventConfig.handle(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
 			
 			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}

@@ -18,14 +18,13 @@ import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
 import uk.nhs.fhir.makehtml.html.style.CSSTag;
 import uk.nhs.fhir.makehtml.html.style.FhirCSS;
 import uk.nhs.fhir.makehtml.html.style.FhirColour;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 	
-	public TableFormatter(T wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public TableFormatter(T wrappedResource) {
+		super(wrappedResource);
 	}
 
 	protected static final String VERSION_DATE = "Version date";

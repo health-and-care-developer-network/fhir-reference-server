@@ -15,12 +15,11 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class FilteredValueSetTableFormatter extends TableFormatter<WrappedValueSet> {
 
-	public FilteredValueSetTableFormatter(WrappedValueSet wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public FilteredValueSetTableFormatter(WrappedValueSet wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override
@@ -35,7 +34,7 @@ public class FilteredValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 	
 	private Element buildFilteredCodeSystemPanel() {
-		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource, context);
+		ValueSetFilteredCodeSystemTableDataProvider tableData = new ValueSetFilteredCodeSystemTableDataProvider(wrappedResource);
 		List<ValueSetFilteredCodeSystemTableData> rows = tableData.getRows();
 		ValueSetFilteredCodeSystemRowFormatter rowFormatter = new ValueSetFilteredCodeSystemRowFormatter();
 		List<TableRow> tableRows = Lists.newArrayList();

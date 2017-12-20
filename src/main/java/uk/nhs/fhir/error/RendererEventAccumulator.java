@@ -13,22 +13,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.render.RendererContext;
-import uk.nhs.fhir.makehtml.render.RendererErrorHandler;
+import uk.nhs.fhir.makehtml.RendererFhirContext;
 import uk.nhs.fhir.util.StringUtil;
 
-public abstract class RendererEventAccumulator implements RendererErrorHandler {
+public abstract class RendererEventAccumulator implements RendererEventHandler {
 
 	protected abstract void displaySortedEvents(List<RendererEvents> events);
 	
 	private final Map<File, RendererEvents> events = Maps.newHashMap();
-	
-	private RendererContext context = null;
-	
-	@Override
-	public void setContext(RendererContext context) {
-		this.context = context;
-	}
 	
 	public void addEvent(RendererEvent event) {
 		File sourceFile = event.getSourceFile();
@@ -66,8 +58,8 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 
 	@Override
 	public void log(String info, Optional<Exception> throwable) {
-		File source = context.getCurrentSource();
-		Optional<WrappedResource<?>> resource = context.getCurrentParsedResource();
+		File source = RendererFhirContext.forThread().getCurrentSource();
+		Optional<WrappedResource<?>> resource = RendererFhirContext.forThread().getCurrentParsedResource();
 		
 		if (throwable.isPresent()) {
 			addEvent(RendererEvent.warning(info, source, resource, throwable.get()));
@@ -78,8 +70,8 @@ public abstract class RendererEventAccumulator implements RendererErrorHandler {
 
 	@Override
 	public void error(Optional<String> info, Optional<Exception> error) {
-		File source = context.getCurrentSource();
-		Optional<WrappedResource<?>> resource = context.getCurrentParsedResource();
+		File source = RendererFhirContext.forThread().getCurrentSource();
+		Optional<WrappedResource<?>> resource = RendererFhirContext.forThread().getCurrentParsedResource();
 		addEvent(RendererEvent.error(info, source, resource, error));
 	}
 

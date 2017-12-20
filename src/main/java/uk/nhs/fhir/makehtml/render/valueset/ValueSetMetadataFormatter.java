@@ -26,13 +26,12 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 
-	public ValueSetMetadataFormatter(WrappedValueSet valueSet, RendererContext context) {
-		super(valueSet, context);
+	public ValueSetMetadataFormatter(WrappedValueSet valueSet) {
+		super(valueSet);
 	}
 	
 	@Override

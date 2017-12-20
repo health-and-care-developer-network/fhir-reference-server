@@ -10,8 +10,10 @@ import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
+import uk.nhs.fhir.makehtml.FhirFileRegistry;
 import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererErrorConfig;
+import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.RendererFhirContext;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeNodeBuilder {
@@ -62,7 +64,7 @@ public class FhirTreeNodeBuilder {
 		for (ConstraintInfo constraint : constraints) {
 			String key = constraint.getKey();
 			if (!conditionIds.contains(key)) {
-				RendererErrorConfig.handle(RendererError.CONSTRAINT_WITHOUT_CONDITION, "Constraint " + key + " doesn't have an associated condition pointing at it");
+				RendererEventConfig.handle(RendererError.CONSTRAINT_WITHOUT_CONDITION, "Constraint " + key + " doesn't have an associated condition pointing at it");
 			}
 		}
 
@@ -72,7 +74,7 @@ public class FhirTreeNodeBuilder {
 			for (int j=i+1; j<constraints.size(); j++) {
 				ConstraintInfo constraint2 = constraints.get(j);
 				if (constraint1.getKey().equals(constraint2.getKey())) {
-					RendererErrorConfig.handle(RendererError.DUPLICATE_CONSTRAINT_KEYS, "Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
+					RendererEventConfig.handle(RendererError.DUPLICATE_CONSTRAINT_KEYS, "Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
 				}
 			}
 		}
@@ -118,8 +120,8 @@ public class FhirTreeNodeBuilder {
 		}
 
 		node.setAliases(elementDefinition.getAliases());
-		node.setExtensionType(elementDefinition.getExtensionType());
-
+		FhirFileRegistry fhirFileRegistry = RendererFhirContext.forThread().getFhirFileRegistry();
+		node.setExtensionType(elementDefinition.getExtensionType(fhirFileRegistry));
 		
 		Optional<String> nameReference = elementDefinition.getLinkedNodeName();
 		if (nameReference.isPresent() && !nameReference.get().isEmpty()) {

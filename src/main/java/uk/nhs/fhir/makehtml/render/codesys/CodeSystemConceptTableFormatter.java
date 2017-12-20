@@ -14,12 +14,11 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.html.table.TableRow;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 
 public class CodeSystemConceptTableFormatter extends TableFormatter<WrappedCodeSystem> {
 
-	public CodeSystemConceptTableFormatter(WrappedCodeSystem wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public CodeSystemConceptTableFormatter(WrappedCodeSystem wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override

@@ -4,22 +4,21 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.makehtml.render.ResourceFormatter;
 
 public class StructureDefinitionFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionFormatter(WrappedStructureDefinition wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public StructureDefinitionFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
-		HTMLDocSection metadataPanel = new StructureDefinitionMetadataFormatter(wrappedResource, context).makeSectionHTML();
-		HTMLDocSection snapshotTree = new StructureDefinitionSnapshotFormatter(wrappedResource, context).makeSectionHTML();
-		HTMLDocSection differentialTree = new StructureDefinitionDifferentialFormatter(wrappedResource, context).makeSectionHTML();
-		HTMLDocSection detailsTable = new StructureDefinitionDetailsFormatter(wrappedResource, context).makeSectionHTML();
-		HTMLDocSection bindingTable = new StructureDefinitionBindingFormatter(wrappedResource, context).makeSectionHTML();
+		HTMLDocSection metadataPanel = new StructureDefinitionMetadataFormatter(wrappedResource).makeSectionHTML();
+		HTMLDocSection snapshotTree = new StructureDefinitionSnapshotFormatter(wrappedResource).makeSectionHTML();
+		HTMLDocSection differentialTree = new StructureDefinitionDifferentialFormatter(wrappedResource).makeSectionHTML();
+		HTMLDocSection detailsTable = new StructureDefinitionDetailsFormatter(wrappedResource).makeSectionHTML();
+		HTMLDocSection bindingTable = new StructureDefinitionBindingFormatter(wrappedResource).makeSectionHTML();
 		
 		HTMLDocSection structureDefinitionSection = new HTMLDocSection();
 		

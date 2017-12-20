@@ -23,13 +23,12 @@ import uk.nhs.fhir.makehtml.html.table.Table;
 import uk.nhs.fhir.makehtml.html.table.TableFormatter;
 import uk.nhs.fhir.makehtml.render.FhirContactRenderer;
 import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionMetadataFormatter extends TableFormatter<WrappedStructureDefinition> {
 
-	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public StructureDefinitionMetadataFormatter(WrappedStructureDefinition wrappedResource) {
+		super(wrappedResource);
 	}
 
 	@Override

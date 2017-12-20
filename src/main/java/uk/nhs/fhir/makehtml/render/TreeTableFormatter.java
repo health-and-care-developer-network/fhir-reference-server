@@ -25,8 +25,8 @@ import uk.nhs.fhir.makehtml.html.tree.TablePNGGenerator;
 
 public abstract class TreeTableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
 
-	public TreeTableFormatter(T wrappedResource, RendererContext context) {
-		super(wrappedResource, context);
+	public TreeTableFormatter(T wrappedResource) {
+		super(wrappedResource);
 	}
 
 	TablePNGGenerator backgrounds = new TablePNGGenerator();

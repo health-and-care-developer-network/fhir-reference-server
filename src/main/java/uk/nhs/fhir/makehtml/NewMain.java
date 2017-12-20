@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.error.FhirErrorHandler;
-import uk.nhs.fhir.makehtml.render.RendererContext;
+import uk.nhs.fhir.error.RendererEventHandler;
+import uk.nhs.fhir.error.RendererLoggingEventHandler;
 import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
@@ -46,7 +46,7 @@ public class NewMain {
     // force any RendererError errors to throw an exception and stop rendering
 	public static final boolean STRICT = false;
 	static {
-		RendererErrorConfig.STRICT = STRICT;
+		RendererEventConfig.STRICT = STRICT;
 	}
 	
 	// convert any links with host fhir.hl7.org.uk into relative links
@@ -63,7 +63,7 @@ public class NewMain {
 	
 	private final RendererFileLocator rendererFileLocator;
     private final String newBaseURL;
-    private final FhirErrorHandler errorHandler;
+    private final RendererEventHandler errorHandler;
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
     
@@ -75,11 +75,11 @@ public class NewMain {
     	this.allowCopyOnError = allowCopyOnError;
     }
 
-	public NewMain(Path inputDirectory, Path outputDirectory, FhirErrorHandler errorHandler) {
+	public NewMain(Path inputDirectory, Path outputDirectory, RendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, null, errorHandler);
 	}
     
-	public NewMain(Path inputDirectory, Path outPath, String newBaseURL, FhirErrorHandler errorHandler) {
+	public NewMain(Path inputDirectory, Path outPath, String newBaseURL, RendererEventHandler errorHandler) {
 		this.rendererFileLocator = new DefaultRendererFileLocator(inputDirectory, makeRenderedArtefactTempDirectory(), outPath);
 		this.newBaseURL = newBaseURL;
 		this.errorHandler = errorHandler;
@@ -101,7 +101,7 @@ public class NewMain {
             	newBaseURL = args[2];
             }
             
-            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL, new LoggingErrorHandler());
+            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL, new RendererLoggingEventHandler());
             instance.process();
         }
     }
@@ -124,7 +124,8 @@ public class NewMain {
     	LOG.info("Finding resources in " + rawArtefactDirectory.toString());
 
     	FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
-		RendererContext context = new RendererContext(fhirFileRegistry, errorHandler);
+		RendererFhirContext context = new RendererFhirContext(fhirFileRegistry, errorHandler);
+    	NhsFhirContext.setForThread(context);
 		List<File> potentialFhirFiles = new XmlFileFinder(rawArtefactDirectory).findFiles();
     	
 		FhirFileParser parser = new FhirFileParser();
@@ -155,7 +156,7 @@ public class NewMain {
 			}
 		}
     	
-        FileProcessor fileProcessor = new FileProcessor(context);
+        FileProcessor fileProcessor = new FileProcessor();
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
 	        	context.setCurrentSource(e.getKey());
