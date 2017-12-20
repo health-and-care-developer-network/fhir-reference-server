@@ -202,16 +202,29 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		  && parsedFile.getMeta().getProfile().stream().anyMatch(profile -> FhirURLConstants.isNhsResourceUrl(profile.getValueAsString()))) {
 			exampleFhirResources.put(xmlFile, parsedFile);
 		} else if (FhirFileParser.isSupported(parsedFile)) {
+			String errorNotes = "";
+			Optional<Exception> error = Optional.empty(); 
+			
 			try {
 				Optional<String> url = WrappedResource.fromBaseResource(parsedFile).getUrl();
 				if (url.isPresent()) {
 					LOG.info("Resource appears to be external: " + url.get() + " - " + xmlFile.getAbsolutePath());
 					localCopiesOfExternalFhirResources.put(url.get(), xmlFile);
 					return;
+				} else {
+					errorNotes = " - No url found";
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				error = Optional.of(e);
+				errorNotes = " - caught Exception while trying to get URL";
+			}
 			
-			throw new IllegalStateException("Don't know what to do with file " + xmlFile.getAbsolutePath());
+			String errorMessage = "Don't know what to do with file " + xmlFile.getAbsolutePath() + errorNotes;
+			if (error.isPresent()) {
+				throw new IllegalStateException(errorMessage, error.get());
+			} else {
+				throw new IllegalStateException(errorMessage);
+			}
 		} else {
 			LOG.warn("SKIPPING " + xmlFile.getAbsolutePath() + " - not an example and not a supported type");
 		}
