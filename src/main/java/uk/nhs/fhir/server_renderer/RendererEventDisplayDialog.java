@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.error.EventType;
@@ -28,16 +29,23 @@ import uk.nhs.fhir.util.StringUtil;
 
 @SuppressWarnings("serial")
 public class RendererEventDisplayDialog extends JDialog {
-	private final JTree tree;
+	
+	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Events");
+	private final DefaultMutableTreeNode justWarnings = new DefaultMutableTreeNode("Warnings");
+	private final DefaultMutableTreeNode withErrors = new DefaultMutableTreeNode("Errors");
+	private final JTree tree = new JTree(root);
+    private final JScrollPane treeView = new JScrollPane(tree);
 	
 	public RendererEventDisplayDialog(List<RendererEvents> events, JFrame parentWindow) {
 		super(parentWindow, "Renderer Events Log", ModalityType.TOOLKIT_MODAL);
 
 		setSize(1000, 500);
 		setLayout(new BorderLayout());
-	    
-	    tree = new JTree(createNodes(events));
-	    JScrollPane treeView = new JScrollPane(tree);
+
+		root.add(justWarnings);
+		root.add(withErrors);
+		
+		createNodes(events);
 	    
 	    add(treeView, BorderLayout.CENTER);
 	}
@@ -51,7 +59,21 @@ public class RendererEventDisplayDialog extends JDialog {
 			    JOptionPane.ERROR_MESSAGE);
 		}
 		
+		int levelsToExpand = 2;
+		expandTreeRecursive(root, levelsToExpand);
+		
 		super.setVisible(visible);
+	}
+	
+	private void expandTreeRecursive(DefaultMutableTreeNode node, int levelsToExpand) {
+		tree.expandPath(new TreePath(node.getPath()));
+		
+		if (--levelsToExpand > 0) {
+			for (int childIndex=0; childIndex < node.getChildCount(); childIndex++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode)node.getChildAt(childIndex);
+				expandTreeRecursive(child, levelsToExpand);
+			}
+		}
 	}
 
 	private TreeNode createNodes(List<RendererEvents> eventsList) {
@@ -116,13 +138,6 @@ public class RendererEventDisplayDialog extends JDialog {
 				return wrappedResource1.get().getName().compareTo(wrappedResource2.get().getName());
 			}
 		});
-		
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Events");
-		DefaultMutableTreeNode justWarnings = new DefaultMutableTreeNode("Warnings");
-		DefaultMutableTreeNode withErrors = new DefaultMutableTreeNode("Errors");
-		
-		root.add(justWarnings);
-		root.add(withErrors);
 		
 		for (Map.Entry<String, DefaultMutableTreeNode> entry : sortedNodes) {
 			if (filesWithErrors.contains(entry.getKey())) {
