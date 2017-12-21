@@ -10,7 +10,6 @@ import com.google.common.collect.Streams;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.datalayer.PropertiesFhirFileLocator;
-import uk.nhs.fhir.makehtml.FhirResourceCollector;
 import uk.nhs.fhir.metadata.index.SimpleFhirResourceList;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirVersion;
