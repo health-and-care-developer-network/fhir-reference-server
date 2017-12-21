@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -53,63 +55,42 @@ public class RendererEventDisplayDialog extends JDialog {
 	}
 
 	private TreeNode createNodes(List<RendererEvents> eventsList) {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Errors");
-
 		Map<String, DefaultMutableTreeNode> nodesByFilePath = new HashMap<>();
 		Map<String, Optional<WrappedResource<?>>> resourcesByFilePath = new HashMap<>();
 		
-		String commonFilepathStart = null;
-		for (RendererEvents eventGroup : eventsList) {
-			String filePath = eventGroup.getFile().getAbsolutePath();
-			
-			if (commonFilepathStart == null) {
-				commonFilepathStart = filePath;
-			} else if (!filePath.startsWith(commonFilepathStart)) {
-				commonFilepathStart = StringUtil.commonStringStart(commonFilepathStart, filePath);
-			}
-		}
+		String commonFilepathStart = calculateCommonFilepathStart(eventsList);
+		
+		Set<String> filesWithErrors = 
+			eventsList.stream()
+				.filter(
+					rendererEvents -> 
+						rendererEvents.getEvents()
+							.stream()
+							.anyMatch(rendererEvent -> 
+								rendererEvent.getEventType()
+												.equals(EventType.ERROR)))
+				.map(rendererEvents -> rendererEvents.getFile().getAbsolutePath())
+				.collect(Collectors.toSet());
 		
 		for (RendererEvents eventGroup : eventsList) {
 			String filePath = eventGroup.getFile().getAbsolutePath();
 			resourcesByFilePath.put(filePath, eventGroup.getResource());
 			
-			String name;
-			if (eventGroup.getResource().isPresent()) {
-				name = eventGroup.getResource().get().getName();
-			} else {
-				name = "[unknown resource name]";
+			if (!nodesByFilePath.containsKey(filePath)) {
+				nodesByFilePath.put(filePath, newFileNode(filePath, commonFilepathStart, eventGroup.getResource()));
 			}
 			
-			// combine event lists by file path if necessary
-			DefaultMutableTreeNode fileNode;
-			if (nodesByFilePath.containsKey(filePath)) {
-				fileNode = nodesByFilePath.get(filePath);
-			} else {
-				String trimmedFilePath = filePath.substring(commonFilepathStart.length());
-				fileNode = new DefaultMutableTreeNode(name + " (" + File.separator + trimmedFilePath + ")");
-				nodesByFilePath.put(filePath, fileNode);
-			}
+			DefaultMutableTreeNode fileNode = nodesByFilePath.get(filePath);
 			
 			for (RendererEvent event : eventGroup.getEvents()) {
-				EventType eventType = event.getEventType();
-				Optional<String> message = event.getMessage();
-				Optional<Exception> error = event.getError();
-				
-				String eventString = eventType.toString();
-				if (message.isPresent()) {
-					eventString += " - " + message.get();
-				}
-				
-				if (error.isPresent()
-				  && error.get().getMessage() != null) {
-					eventString += " - " + error.get().getMessage();
-				}
+
+				String eventString = getEventString(event);
 				
 				DefaultMutableTreeNode eventNode = new DefaultMutableTreeNode(eventString);
 				
-				if (error.isPresent()) {
+				if (event.getError().isPresent()) {
 					// tree data is displayed in a label. Use HTML to make it multi-line.
-					String htmlStacktrace = "<html>" + StringUtil.getStackTrace(error.get()).replace("\n", "<br>") + "</html>";
+					String htmlStacktrace = "<html>" + StringUtil.getStackTrace(event.getError().get()).replace("\n", "<br>") + "</html>";
 					DefaultMutableTreeNode stacktraceNode = new DefaultMutableTreeNode(htmlStacktrace);
 					eventNode.add(stacktraceNode);
 				}
@@ -136,10 +117,77 @@ public class RendererEventDisplayDialog extends JDialog {
 			}
 		});
 		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Events");
+		DefaultMutableTreeNode justWarnings = new DefaultMutableTreeNode("Warnings");
+		DefaultMutableTreeNode withErrors = new DefaultMutableTreeNode("Errors");
+		
+		root.add(justWarnings);
+		root.add(withErrors);
+		
 		for (Map.Entry<String, DefaultMutableTreeNode> entry : sortedNodes) {
-			root.add(entry.getValue());
+			if (filesWithErrors.contains(entry.getKey())) {
+				withErrors.add(entry.getValue());
+			} else {
+				justWarnings.add(entry.getValue());
+			}
 		}
 		
 		return root;
+	}
+
+	private String getEventString(RendererEvent event) {
+		EventType eventType = event.getEventType();
+		Optional<String> message = event.getMessage();
+		Optional<Exception> error = event.getError();
+		String eventString = eventType.toString();
+		if (message.isPresent()) {
+			eventString += " - " + message.get();
+		}
+		
+		if (error.isPresent()
+		  && error.get().getMessage() != null) {
+			eventString += " - " + error.get().getMessage();
+		}
+		return eventString;
+	}
+
+	private DefaultMutableTreeNode newFileNode(String filePath, String commonFilepathStart, Optional<WrappedResource<?>> resource) {
+		String trimmedFilePath = filePath.substring(commonFilepathStart.length());
+		
+		String truncatedFilePath = "";
+		if (trimmedFilePath.length() > 0) {
+			truncatedFilePath = " (" + File.separator + trimmedFilePath + ")";
+		}
+
+		String name;
+		if (resource.isPresent()) {
+			name = resource.get().getName();
+		} else {
+			name = "[unknown resource name]";
+		}
+		
+		return new DefaultMutableTreeNode(name + truncatedFilePath);
+	}
+
+	private String calculateCommonFilepathStart(List<RendererEvents> eventsList) {
+		String commonFilepathStart = "";
+		
+		for (RendererEvents eventGroup : eventsList) {
+			String filePath = eventGroup.getFile().getAbsolutePath();
+			String grandparentPath = getGrandparentDirectoryPath(filePath);
+			
+			if (commonFilepathStart.equals("")) {
+				commonFilepathStart = grandparentPath;
+			} else if (!grandparentPath.startsWith(commonFilepathStart)) {
+				commonFilepathStart = StringUtil.commonStringStart(commonFilepathStart, grandparentPath);
+			}
+		}
+		
+		return commonFilepathStart;
+	}
+	
+	private String getGrandparentDirectoryPath(String filePath) {
+		String parentDirectoryPath = filePath.substring(0, filePath.lastIndexOf(File.separatorChar));
+		return parentDirectoryPath.substring(0, parentDirectoryPath.lastIndexOf(File.separatorChar));
 	}
 }

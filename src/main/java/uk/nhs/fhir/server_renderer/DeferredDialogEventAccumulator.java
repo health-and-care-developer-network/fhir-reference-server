@@ -9,8 +9,8 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.error.RendererEventAccumulator;
 import uk.nhs.fhir.error.RendererEvents;
+import uk.nhs.fhir.event.RendererEventAccumulator;
 
 /**
  * Logs to standard out as the events are triggered, but accumulates events too, and displays them in a dialog upon rendering completion
@@ -25,16 +25,16 @@ public class DeferredDialogEventAccumulator extends RendererEventAccumulator {
 		this.parentWindow = parentWindow;
 	}
 	
-	@Override public void log(String info, Optional<Exception> throwable) {
+	@Override public void logImpl(String info, Optional<Exception> throwable) {
 		// store for display in dialog later
-		super.log(info, throwable);
+		super.logImpl(info, throwable);
 		
 		LOG.info(combineLoggableInfo(Optional.of(info), throwable));
 	};
 	
-	@Override public void error(Optional<String> info, Optional<Exception> error) {
+	@Override public void errorImpl(Optional<String> info, Optional<Exception> error) {
 		// store for display in dialog later
-		super.error(info, error);
+		super.errorImpl(info, error);
 		
 		LOG.error(combineLoggableInfo(info, error));
 	};
