@@ -8,7 +8,7 @@ import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.RendererFhirContext;
+import uk.nhs.fhir.makehtml.RendererContext;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
 
 public class ValueSetFilteredCodeSystemTableDataProvider {
@@ -23,7 +23,7 @@ public class ValueSetFilteredCodeSystemTableDataProvider {
 		if (!valueSet.getConceptsToDisplay().isEmpty()) {
 			throw new IllegalStateException("Didn't expect concepts to display with a filter");
 		}
-		if (!valueSet.getConceptMaps(RendererFhirContext.forThread().getFhirFileRegistry()).isEmpty()) {
+		if (!valueSet.getConceptMaps(RendererContext.forThread().getFhirFileRegistry()).isEmpty()) {
 			throw new IllegalStateException("Didn't expect concepts map with a filter");
 		}
 		

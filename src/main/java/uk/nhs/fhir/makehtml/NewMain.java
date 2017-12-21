@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.error.RendererEventHandler;
-import uk.nhs.fhir.error.RendererLoggingEventHandler;
+import uk.nhs.fhir.event.AbstractRendererEventHandler;
+import uk.nhs.fhir.event.RendererLoggingEventHandler;
 import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
@@ -42,28 +42,10 @@ import uk.nhs.fhir.util.UrlValidator;
  */
 public class NewMain {
     private static final Logger LOG = LoggerFactory.getLogger(NewMain.class.getName());
-    
-    // force any RendererError errors to throw an exception and stop rendering
-	public static final boolean STRICT = false;
-	static {
-		RendererEventConfig.STRICT = STRICT;
-	}
-	
-	// convert any links with host fhir.hl7.org.uk into relative links
-	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
-	static {
-		FullFhirURL.FHIR_HL7_ORG_LINKS_LOCAL = FHIR_HL7_ORG_LINKS_LOCAL;
-	}
-	
-	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
-	public static final boolean TEST_LINK_URLS = false;
-	static {
-		FullFhirURL.TEST_LINK_URLS = TEST_LINK_URLS;
-	}
 	
 	private final RendererFileLocator rendererFileLocator;
     private final String newBaseURL;
-    private final RendererEventHandler errorHandler;
+    private final AbstractRendererEventHandler eventHandler;
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
     
@@ -75,14 +57,14 @@ public class NewMain {
     	this.allowCopyOnError = allowCopyOnError;
     }
 
-	public NewMain(Path inputDirectory, Path outputDirectory, RendererEventHandler errorHandler) {
+	public NewMain(Path inputDirectory, Path outputDirectory, AbstractRendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, null, errorHandler);
 	}
     
-	public NewMain(Path inputDirectory, Path outPath, String newBaseURL, RendererEventHandler errorHandler) {
+	public NewMain(Path inputDirectory, Path outPath, String newBaseURL, AbstractRendererEventHandler errorHandler) {
 		this.rendererFileLocator = new DefaultRendererFileLocator(inputDirectory, makeRenderedArtefactTempDirectory(), outPath);
 		this.newBaseURL = newBaseURL;
-		this.errorHandler = errorHandler;
+		this.eventHandler = errorHandler;
 	}
 
 	/**
@@ -124,27 +106,28 @@ public class NewMain {
     	LOG.info("Finding resources in " + rawArtefactDirectory.toString());
 
     	FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
-		RendererFhirContext context = new RendererFhirContext(fhirFileRegistry, errorHandler);
-    	NhsFhirContext.setForThread(context);
+		RendererContext rendererContext = RendererContext.forThread();
+		rendererContext.setFhirFileRegistry(fhirFileRegistry);
+    	EventHandlerContext.setForThread(eventHandler);
 		List<File> potentialFhirFiles = new XmlFileFinder(rawArtefactDirectory).findFiles();
     	
 		FhirFileParser parser = new FhirFileParser();
 		
 		for (File potentialFhirFile : potentialFhirFiles) {
-			context.setCurrentSource(potentialFhirFile);
-			context.setCurrentParsedResource(Optional.empty());
+			rendererContext.setCurrentSource(potentialFhirFile);
+			rendererContext.setCurrentParsedResource(Optional.empty());
 
 			IBaseResource parsedFile;
 			try {
 				parsedFile = parser.parseFile(potentialFhirFile);
 			} catch (Exception e) {
-				errorHandler.log("Skipping file " + potentialFhirFile.getAbsolutePath() + " - HAPI parsing failed - " + e.getMessage(), Optional.of(e));
+				eventHandler.log("Skipping file " + potentialFhirFile.getAbsolutePath() + " - HAPI parsing failed - " + e.getMessage(), Optional.of(e));
 				continue;
 			}
 
 			try {
 				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
-				context.setCurrentParsedResource(Optional.of(wrappedResource));
+				rendererContext.setCurrentParsedResource(Optional.of(wrappedResource));
 			} catch (Exception e) {
 				// if wrapping failed, leave 'current parsed resource' as null
 			}
@@ -152,30 +135,44 @@ public class NewMain {
 			try {
 				fhirFileRegistry.register(potentialFhirFile, parsedFile);
 			} catch (Exception e) {
-				errorHandler.error(Optional.of("Error adding file " + potentialFhirFile.getAbsolutePath() + " to registry"), Optional.of(e));
+				try {
+					eventHandler.error(Optional.of("Error adding file " + potentialFhirFile.getAbsolutePath() + " to registry"), Optional.of(e));
+				} catch (LoggedRenderingException lre) {}
 			}
 		}
     	
         FileProcessor fileProcessor = new FileProcessor();
         try {
         	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
-	        	context.setCurrentSource(e.getKey());
-				context.setCurrentParsedResource(Optional.of(e.getValue()));
+        		rendererContext.setCurrentSource(e.getKey());
+        		rendererContext.setCurrentParsedResource(Optional.of(e.getValue()));
 				
+        		boolean causedException = false;
+        		
         		try {
-					fileProcessor.processFile(rendererFileLocator, newBaseURL);
-        		} catch (Exception error) {
-        			// If we have an event handler, we can carry on
-        			errorHandler.error(Optional.empty(), Optional.of(error));
-        			if (!continueOnFail) {
-        				break;
-        			}
-        		}
+        			try {
+						fileProcessor.processFile(rendererFileLocator, newBaseURL);
+	        		} catch (LoggedRenderingException loggedError) {
+	        			// Already passed to the event handler - just rethrow
+	        			throw loggedError;
+	        		} catch (Exception error) {
+	        			// Needs to be passed to the event handler so that it can be logged.
+	        			eventHandler.error(Optional.empty(), Optional.of(error));
+	        		}
+        		} catch (LoggedRenderingException loggedError) {
+        			causedException = true;
+        		} 
+        			
+        		
+    			if (causedException 
+    			  && !continueOnFail) {
+    				break;
+    			}
 
-	        	context.clearCurrent();
+        		rendererContext.clearCurrent();
 	        }
 
-    		boolean succeeded = !errorHandler.foundErrors();
+    		boolean succeeded = !eventHandler.foundErrors();
     		
         	if (succeeded || allowCopyOnError) {
         		if (succeeded) {
@@ -188,10 +185,10 @@ public class NewMain {
         		copyGeneratedArtefacts();
         	} 
         	
-        	if (!succeeded || errorHandler.foundWarnings()) {
+        	if (!succeeded || eventHandler.foundWarnings()) {
         		LOG.info("Displaying event messages");
         		
-        		errorHandler.displayOutstandingEvents();
+        		eventHandler.displayOutstandingEvents();
         	}
         	
         	// if there is an error while copying the files, this gets skipped so they can be recovered if necessary
@@ -202,7 +199,7 @@ public class NewMain {
         	throw new IllegalStateException("Renderer failed", e);
         }
         
-        if (TEST_LINK_URLS) {
+        if (FullFhirURL.TEST_LINK_URLS) {
         	new UrlValidator().testUrls(FhirURL.getLinkUrls());
             UrlValidator.logSuccessAndFailures();
         }

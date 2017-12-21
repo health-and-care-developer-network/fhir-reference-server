@@ -1,4 +1,4 @@
-package uk.nhs.fhir.error;
+package uk.nhs.fhir.event;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.error.EventType;
+import uk.nhs.fhir.error.RendererEvent;
+import uk.nhs.fhir.error.RendererEvents;
 import uk.nhs.fhir.util.StringUtil;
 
 public class DeferredStdOutEventAccumulator extends RendererEventAccumulator {
@@ -61,8 +64,6 @@ public class DeferredStdOutEventAccumulator extends RendererEventAccumulator {
 					break;
 				}
 			}
-			
 		}
-	}
-	
+	}	
 }

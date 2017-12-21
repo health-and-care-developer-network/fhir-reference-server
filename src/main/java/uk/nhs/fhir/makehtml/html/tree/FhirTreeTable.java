@@ -22,8 +22,8 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.makehtml.html.cell.LinkCell;
 import uk.nhs.fhir.makehtml.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.makehtml.html.cell.SimpleTextCell;
@@ -135,7 +135,7 @@ public class FhirTreeTable {
 		
 		if (typeLinks.isEmpty()
 		  && !isRoot) {
-			RendererEventConfig.handle(RendererError.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
+			EventHandlerContext.forThread().event(RendererEventType.EMPTY_TYPE_LINKS, "No type links available for " + nodeToAdd.getPath());
 		}
 		
 		boolean removedByProfile = nodeToAdd.isRemovedByProfile();
@@ -234,7 +234,7 @@ public class FhirTreeTable {
 			}
 			
 			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
-				RendererEventConfig.handle(RendererError.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
+				EventHandlerContext.forThread().event(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
 					"Stand-in description being displayed - expected this to have been removed by cardinality in profile");
 			} else {
 				resourceInfos.add(new BindingResourceInfo(bindingToAdd));

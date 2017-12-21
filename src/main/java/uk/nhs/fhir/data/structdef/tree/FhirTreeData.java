@@ -21,8 +21,8 @@ import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.util.StringUtil;
 
 public class FhirTreeData implements Iterable<FhirTreeTableContent> {
@@ -180,12 +180,12 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			
 			if (hasId && hasIdLinkedNode) {
 				if (node.getId().get().equals(node.getLinkedNodeId().get())) {
-					RendererEventConfig.handle(RendererError.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
+					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
 				}
 			}
 			
 			if (hasIdLinkedNode && node.getFixedValue().isPresent()) {
-				RendererEventConfig.handle(RendererError.FIXEDVALUE_WITH_LINKED_NODE, 
+				EventHandlerContext.forThread().event(RendererEventType.FIXEDVALUE_WITH_LINKED_NODE, 
 				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
 				  + " (" + node.getLinkedNodeId().get() + ")");
 			}
@@ -215,7 +215,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 						.map(node -> node.getPath())
 						.collect(Collectors.toList()));
 				
-				RendererEventConfig.handle(RendererError.MISSING_REFERENCED_NODE, 
+				EventHandlerContext.forThread().event(RendererEventType.MISSING_REFERENCED_NODE, 
 					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedId + ")");
 			}
 		}
@@ -246,12 +246,13 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			
 			if (hasName && hasLinkedNode) {
 				if (node.getName().get().equals(node.getLinkedNodeName().get())) {
-					RendererEventConfig.handle(RendererError.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getName().get() + ")");
+					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, 
+						"Link " + node.getPath() + " references itself (" + node.getName().get() + ")");
 				}
 			}
 			
 			if (hasLinkedNode && node.getFixedValue().isPresent()) {
-				RendererEventConfig.handle(RendererError.FIXEDVALUE_WITH_LINKED_NODE, 
+				EventHandlerContext.forThread().event(RendererEventType.FIXEDVALUE_WITH_LINKED_NODE, 
 				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
 				  + " (" + node.getLinkedNodeName().get() + ")");
 			}

@@ -14,9 +14,9 @@ import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
-import uk.nhs.fhir.makehtml.RendererFhirContext;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.makehtml.html.table.TableTitle;
 
 public class ValueSetConceptsTableDataProvider {
@@ -39,11 +39,12 @@ public class ValueSetConceptsTableDataProvider {
 		for (FhirValueSetComposeInclude include : valueSet.getCompose().getIncludes()) {
 			if (include.getConcepts().isEmpty()) {
 				// try to find the concept map from the registry
-				WrappedCodeSystem standaloneCodeSystem = RendererFhirContext.forThread().getFhirFileRegistry().getCodeSystem(include.getSystem());
+				WrappedCodeSystem standaloneCodeSystem = RendererContext.forThread().getFhirFileRegistry().getCodeSystem(include.getSystem());
 				if (standaloneCodeSystem != null) {
 						addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
-					RendererEventConfig.handle(RendererError.EMPTY_VALUE_SET, "Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
+					EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
+						"Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
 					// ensure that we still display the code system
 					addConcepts(rows, include.getSystem(), Lists.newArrayList());
 				}
@@ -63,7 +64,7 @@ public class ValueSetConceptsTableDataProvider {
 			
 			String mappedCode = null;
 			
-			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(RendererFhirContext.forThread().getFhirFileRegistry())) {
+			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(RendererContext.forThread().getFhirFileRegistry())) {
 				for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
 	                if (code.equals(mapElement.getCode())) {
 	                	if (mapElement.getTargets().isEmpty()) {

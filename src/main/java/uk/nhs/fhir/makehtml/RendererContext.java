@@ -4,20 +4,24 @@ import java.io.File;
 import java.util.Optional;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.error.EventHandler;
 
-public class RendererFhirContext extends NhsFhirContext {
+public class RendererContext {
 	
-	public static RendererFhirContext forThread() {
-		return (RendererFhirContext)NhsFhirContext.forThread();
+	private static final ThreadLocal<RendererContext> theRendererContext = ThreadLocal.withInitial(RendererContext::new);
+	
+	public static RendererContext forThread() {
+		return theRendererContext.get();
 	}
 	
 	private FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
 	private File currentSource = null;
 	private Optional<WrappedResource<?>> currentParsedResource = null;
 	
-	public RendererFhirContext(FhirFileRegistry fhirFileRegistry, EventHandler errorDisplayer) {
-		super(errorDisplayer);
+	public RendererContext() {
+		this(new FhirFileRegistry());
+	}
+	
+	public RendererContext(FhirFileRegistry fhirFileRegistry) {
 		this.fhirFileRegistry = fhirFileRegistry;
 	}
 	

@@ -1,4 +1,4 @@
-package uk.nhs.fhir.error;
+package uk.nhs.fhir.event;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,10 +13,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.RendererFhirContext;
+import uk.nhs.fhir.error.RendererEvent;
+import uk.nhs.fhir.error.RendererEvents;
+import uk.nhs.fhir.makehtml.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
-public abstract class RendererEventAccumulator implements RendererEventHandler {
+public abstract class RendererEventAccumulator extends AbstractRendererEventHandler {
 
 	protected abstract void displaySortedEvents(List<RendererEvents> events);
 	
@@ -31,47 +33,27 @@ public abstract class RendererEventAccumulator implements RendererEventHandler {
 			events.put(sourceFile, new RendererEvents(event));
 		}
 	}
-
-	public boolean foundErrors() {
-		return foundAnyOfType(EventType.ERROR);
-	}
-
-	public boolean foundWarnings() {
-		return foundAnyOfType(EventType.WARNING);
-	}
-	
-	public boolean foundAnyOfType(EventType eventType) {
-		return events.values()
-				.stream()
-				.flatMap(events -> events.getEvents().stream())
-				.anyMatch(event -> event.getEventType().equals(eventType));
-	}
 	
 	public Map<File, RendererEvents> getEvents() {
 		return ImmutableMap.copyOf(events);
 	}
 
 	@Override
-	public void ignore(String info, Optional<Exception> throwable) {
-		// nothing
-	}
-
-	@Override
-	public void log(String info, Optional<Exception> throwable) {
-		File source = RendererFhirContext.forThread().getCurrentSource();
-		Optional<WrappedResource<?>> resource = RendererFhirContext.forThread().getCurrentParsedResource();
+	public void logImpl(String info, Optional<Exception> throwable) {
+		File source = RendererContext.forThread().getCurrentSource();
+		Optional<WrappedResource<?>> resource = RendererContext.forThread().getCurrentParsedResource();
 		
 		if (throwable.isPresent()) {
-			addEvent(RendererEvent.warning(info, source, resource, throwable.get()));
+			addEvent(RendererEvent.warning(info, source, resource, throwable));
 		} else {
 			addEvent(RendererEvent.warning(info, source, resource));
 		}
 	}
 
 	@Override
-	public void error(Optional<String> info, Optional<Exception> error) {
-		File source = RendererFhirContext.forThread().getCurrentSource();
-		Optional<WrappedResource<?>> resource = RendererFhirContext.forThread().getCurrentParsedResource();
+	public void errorImpl(Optional<String> info, Optional<Exception> error) {
+		File source = RendererContext.forThread().getCurrentSource();
+		Optional<WrappedResource<?>> resource = RendererContext.forThread().getCurrentParsedResource();
 		addEvent(RendererEvent.error(info, source, resource, error));
 	}
 

@@ -14,8 +14,8 @@ import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeTableContent;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 
 public class StructureDefinitionTreeDataProvider {
 	
@@ -119,7 +119,8 @@ public class StructureDefinitionTreeDataProvider {
 				}
 			}
 			
-			RendererEventConfig.handle(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, "Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
+			EventHandlerContext.forThread().event(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, 
+				"Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
 			
 			matchingNodes = Lists.newArrayList(localSearchRoot);
 		}

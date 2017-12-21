@@ -28,8 +28,8 @@ import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeNode implements FhirTreeTableContent {
@@ -171,7 +171,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 				if (backupNode == null
 				  || !backupNode.getMin().isPresent()
 				  || !backupNode.getMax().isPresent()) {
-					RendererEventConfig.handle(RendererError.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
+					EventHandlerContext.forThread().event(RendererEventType.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
 					return new FhirCardinality(0, "*");
 				} else {
 					throw e;
@@ -203,13 +203,13 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		
 		if (typeLinks.isEmpty()
 		  && fixableTypes.containsKey(getPathName())) {
-			RendererEventConfig.handle(RendererError.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
+			EventHandlerContext.forThread().event(RendererEventType.FIX_MISSING_TYPE_LINK, "Filling in type link for " + getPath());
 			typeLinks.addSimpleLink(new LinkData(FullFhirURL.buildOrThrow(fixableTypes.get(getPathName()), version), "Extension"));
 		} 
 
 		if (typeLinks.isEmpty()
 		  && !isRoot()) {
-			RendererEventConfig.handle(RendererError.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
+			EventHandlerContext.forThread().event(RendererEventType.MISSING_TYPE_LINK, "Couldn't find any typelinks for " + path);
 		}
 		
 		if (getPathName().endsWith("[x]")
@@ -569,8 +569,9 @@ public class FhirTreeNode implements FhirTreeTableContent {
 							.collect(Collectors.toSet());
 					
 					if (extensionUrlDiscriminators.size() == 0) {
-						RendererEventConfig.handle(RendererError.UNRESOLVED_DISCRIMINATOR, "Missing extension URL discriminator node (" + getPath() + "). "
-								+ "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
+						EventHandlerContext.forThread().event(RendererEventType.UNRESOLVED_DISCRIMINATOR, 
+							"Missing extension URL discriminator node (" + getPath() + "). "
+							  + "If slicing node is removed, we may not know to include a disambiguator in fhirTreeNode.getKeySegment()");
 						discriminators.add("<missing>");
 					} else if (extensionUrlDiscriminators.size() > 1) {
 						throw new IllegalStateException("Don't yet handle multiple extension url discriminators. Consider ordering so that keys are consistent?");
@@ -625,7 +626,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 							}
 						} else {
 							if (!getSliceName().isPresent()) {
-								RendererEventConfig.handle(RendererError.UNRESOLVED_DISCRIMINATOR, 
+								EventHandlerContext.forThread().event(RendererEventType.UNRESOLVED_DISCRIMINATOR, 
 									"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + getPath());
 							}
 							discriminators.add("<missing>");
@@ -636,7 +637,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			
 			if (discriminators.size() == 0) {
 				if (!getSliceName().isPresent()) {
-					RendererEventConfig.handle(RendererError.NO_DISCRIMINATORS_FOUND, "Didn't find any discriminators to identify " + getPath() + " (likely caused by previous error)");
+					EventHandlerContext.forThread().event(RendererEventType.NO_DISCRIMINATORS_FOUND,
+						"Didn't find any discriminators to identify " + getPath() + " (likely caused by previous error)");
 				}
 				setDiscriminatorValue("<missing>");
 			} else if (discriminators.size() > 1) {

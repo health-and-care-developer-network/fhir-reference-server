@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.data.url.FullFhirURL;
 
 public class UrlValidator {
 
@@ -101,7 +101,7 @@ public class UrlValidator {
 		}
 		
 		int statusCode;
-		if (!NewMain.TEST_LINK_URLS) {
+		if (!FullFhirURL.TEST_LINK_URLS) {
 			statusCode = getRecordedResponseCode(linkUrl);
 		} else {
 			statusCode = sendTestRequest(client, linkUrl);

@@ -27,8 +27,8 @@ public class FileProcessor {
     
 	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
 		
-	    WrappedResource<?> resource = RendererFhirContext.forThread().getCurrentParsedResource().get();
-		String inFilePath = RendererFhirContext.forThread().getCurrentSource().getPath();
+	    WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
+		String inFilePath = RendererContext.forThread().getCurrentSource().getPath();
 	    
 		LOG.info("Processing file: " + inFilePath);
 	    
@@ -41,12 +41,12 @@ public class FileProcessor {
 	}
 	
 	public void saveAugmentedResource(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
-		WrappedResource<?> resource = RendererFhirContext.forThread().getCurrentParsedResource().get();
+		WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
 		outDirPath.toFile().mkdirs();
-		Path outFilePath = outDirPath.resolve(RendererFhirContext.forThread().getCurrentSource().getName());
+		Path outFilePath = outDirPath.resolve(RendererContext.forThread().getCurrentSource().getName());
 		
 		LOG.debug("Generating " + outFilePath.toString());	    
 		ResourceFormatter<?> defaultViewFormatter = resourceFormatterFactory.defaultFormatter(resource);		
