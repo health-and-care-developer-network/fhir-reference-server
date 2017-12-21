@@ -7,7 +7,6 @@ import java.util.Set;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
@@ -28,8 +27,6 @@ import uk.nhs.fhir.util.FhirVersion;
 public abstract class WrappedElementDefinition {
 
 	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
-	
-	private static final Set<String> cachedPermittedMissingExtensions = Sets.newConcurrentHashSet();
 	
 	public abstract String getName();
 	public abstract String getPath();
@@ -81,7 +78,7 @@ public abstract class WrappedElementDefinition {
 	protected ExtensionType lookupExtensionType(String typeProfile, StructureDefinitionRepository structureDefinitions) {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
-		} else if (cachedPermittedMissingExtensions.contains(typeProfile)) {
+		} else if (structureDefinitions.isCachedPermittedMissingExtension(typeProfile)) {
 			return ExtensionType.SIMPLE;
 		} else {
 			WrappedStructureDefinition extensionDefinition;
@@ -97,7 +94,7 @@ public abstract class WrappedElementDefinition {
 					EventHandlerContext.forThread().event(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, 
 						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot);
 					
-					cachedPermittedMissingExtensions.add(typeProfile);
+					structureDefinitions.addCachedPermittedMissingExtension(typeProfile);
 					
 					return ExtensionType.SIMPLE;
 				} else {

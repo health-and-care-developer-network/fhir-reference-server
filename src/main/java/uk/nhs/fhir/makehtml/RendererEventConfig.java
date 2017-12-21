@@ -1,11 +1,7 @@
 package uk.nhs.fhir.makehtml;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class to allow fine-grained configuration of how the app responds to errors.
@@ -13,8 +9,6 @@ import org.slf4j.LoggerFactory;
  */
 
 public class RendererEventConfig {
-	private static final Logger LOG = LoggerFactory.getLogger(RendererEventConfig.class);
-	
 	public static boolean STRICT = false;
 	
 	private static final Map<RendererEventType, RendererEventResponse> responses = new ConcurrentHashMap<>();
@@ -63,48 +57,6 @@ public class RendererEventConfig {
 	
 	public static RendererEventResponse getResponse(RendererEventType error) {
 		return responses.get(error);
-	}
-	
-	public static void handle(RendererEventType errorType, String logInfo) {
-		handle(errorType, logInfo, Optional.empty());
-	}
-	
-	public static void handle(RendererEventType errorType, String logInfo, Optional<Throwable> throwable) {
-		if (STRICT) {
-			handleThrow(logInfo, throwable);
-		}
-		
-		if (!responses.containsKey(errorType)) {
-			throw new IllegalStateException("Missing RendererError key: " + errorType);
-		}
-		
-		switch (responses.get(errorType)) {
-			case IGNORE:
-				return;
-			case LOG_WARNING:
-				handleLog(logInfo, throwable);
-				return;
-			case THROW:
-				handleThrow(logInfo, throwable);
-				return;
-			default:
-				throw new IllegalStateException("Unexpected default for " + errorType);
-		}
-	}
-	
-	private static void handleLog(String info, Optional<Throwable> throwable) {
-		LOG.error(info);
-		if (throwable.isPresent()) {
-			throwable.get().printStackTrace();
-		}
-	}
-	
-	private static void handleThrow(String info, Optional<Throwable> throwable) {
-		if (throwable.isPresent()) {
-			throw new IllegalStateException(info, throwable.get());
-		} else {
-			throw new IllegalStateException(info);
-		}
 	}
 
 }

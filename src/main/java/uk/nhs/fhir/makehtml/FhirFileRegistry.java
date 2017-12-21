@@ -49,6 +49,16 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		return exampleFhirResources;
 	}
 	
+	private final Set<String> cachedPermittedMissingExtensions = Sets.newConcurrentHashSet();
+
+	public boolean isCachedPermittedMissingExtension(String url) {
+		return cachedPermittedMissingExtensions.contains(url);
+	}
+	
+	public void addCachedPermittedMissingExtension(String url) {
+		cachedPermittedMissingExtensions.add(url);
+	}
+	
 	private final Map<FhirVersion, Map<String, File>> hl7Extensions = Maps.newHashMap();
 	private final Map<String, File> localCopiesOfExternalFhirResources = Maps.newHashMap();
 	private final Map<FhirVersion, Map<String, IBaseResource>> externalFhirResources = Maps.newHashMap();
