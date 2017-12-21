@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.event;
 
 @SuppressWarnings("serial")
 public class LoggedRenderingException extends IllegalStateException {

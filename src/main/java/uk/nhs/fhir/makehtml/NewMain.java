@@ -32,6 +32,7 @@ import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.event.AbstractRendererEventHandler;
+import uk.nhs.fhir.event.LoggedRenderingException;
 import uk.nhs.fhir.event.RendererLoggingEventHandler;
 import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.FhirVersion;

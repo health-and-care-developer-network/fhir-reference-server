@@ -3,7 +3,6 @@ package uk.nhs.fhir.event;
 import java.util.Optional;
 
 import uk.nhs.fhir.error.AbstractEventHandler;
-import uk.nhs.fhir.makehtml.LoggedRenderingException;
 
 public abstract class AbstractRendererEventHandler extends AbstractEventHandler {
 	
