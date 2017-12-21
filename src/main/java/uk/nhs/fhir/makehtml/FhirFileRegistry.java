@@ -171,17 +171,20 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 				try {
 					version = wrappedResource.getVersion();
 				} catch (Exception e) {
-					RendererEventConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Error loading version for " + xmlFile.getAbsolutePath(), Optional.of(e));
+					EventHandlerContext.forThread().event(RendererEventType.VERSION_NOT_AVAILABLE,
+						"Error loading version for " + xmlFile.getAbsolutePath(), Optional.of(e));
 				}
 				if (!version.isPresent()) {
-					RendererEventConfig.handle(RendererError.VERSION_NOT_AVAILABLE, "Version not present for " + xmlFile.getAbsolutePath());
+					EventHandlerContext.forThread().event(RendererEventType.VERSION_NOT_AVAILABLE,
+						"Version not present for " + xmlFile.getAbsolutePath());
 				}
 					
 				try {
 					// trigger error if we can't get the metadata. This will otherwise prevent it being imported into the server later.
 					wrappedResource.getMetadata(xmlFile);
 				} catch (Exception e) {
-					RendererEventConfig.handle(RendererError.METADATA_NOT_AVAILABLE, "Couldn't load metadata for " + xmlFile.getAbsolutePath(), Optional.of(e));
+					EventHandlerContext.forThread().event(RendererEventType.METADATA_NOT_AVAILABLE, 
+						"Couldn't load metadata for " + xmlFile.getAbsolutePath(), Optional.of(e));
 				}
 				
 				resourcesByFile.put(xmlFile, wrappedResource);

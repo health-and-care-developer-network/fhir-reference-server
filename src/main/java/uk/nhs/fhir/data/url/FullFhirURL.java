@@ -6,16 +6,18 @@ import java.net.URL;
 import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.wrap.dstu2.Dstu2UrlFixer;
 import uk.nhs.fhir.data.wrap.stu3.Stu3UrlFixer;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
  * Class to wrap a URL allow corrections to URLs used as links, to make them relative.
  */
 public class FullFhirURL extends FhirURL {
-	
-	public static boolean FHIR_HL7_ORG_LINKS_LOCAL = false;
+
+	// convert any links with host fhir.hl7.org.uk into relative links
+	public static boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
+	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static boolean TEST_LINK_URLS = false;
 	
 	private static final String SCHEME_END = "://";
@@ -70,7 +72,7 @@ public class FullFhirURL extends FhirURL {
 		String linkUrl = scheme + hostAndPath;
 		
 		if (isLogicalUrl(linkUrl)) {
-			RendererEventConfig.handle(RendererError.LINK_WITH_LOGICAL_URL, "Using logical url " + linkUrl + " as a link href");
+			EventHandlerContext.forThread().event(RendererEventType.LINK_WITH_LOGICAL_URL, "Using logical url " + linkUrl + " as a link href");
 		} else if (TEST_LINK_URLS) {
 			FhirURL.addLinkUrl(linkUrl);
 		}

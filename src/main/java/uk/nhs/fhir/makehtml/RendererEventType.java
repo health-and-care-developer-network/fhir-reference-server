@@ -1,6 +1,6 @@
 package uk.nhs.fhir.makehtml;
 
-public enum RendererError {
+public enum RendererEventType {
 	EMPTY_TYPE_LINKS,
 	MISNAMED_SNAPSHOT_CHOICE_NODE,
 	DUPLICATE_CONSTRAINT_KEYS,

@@ -14,22 +14,22 @@ public class RendererEvent {
 	private final EventType eventType;
 	
 	public static RendererEvent warning(String message, File sourceFile, Optional<WrappedResource<?>> resource) {
-		return warning(message, sourceFile, resource, null);
+		return warning(message, sourceFile, resource, Optional.empty());
 	}
 	
-	public static RendererEvent warning(String message, File sourceFile, Optional<WrappedResource<?>> resource, Exception exception) {
+	public static RendererEvent warning(String message, File sourceFile, Optional<WrappedResource<?>> resource, Optional<Exception> exception) {
 		return new RendererEvent(Optional.of(message), sourceFile, resource, exception, EventType.WARNING);
 	}
 	
 	public static RendererEvent error(Optional<String> message, File sourceFile, Optional<WrappedResource<?>> resource, Optional<Exception> error) {
-		return new RendererEvent(message, sourceFile, resource, error.orElse(null), EventType.ERROR);
+		return new RendererEvent(message, sourceFile, resource, error, EventType.ERROR);
 	}
 	
-	RendererEvent(Optional<String> message, File sourceFile, Optional<WrappedResource<?>> resource, Exception error, EventType eventType) {
+	private RendererEvent(Optional<String> message, File sourceFile, Optional<WrappedResource<?>> resource, Optional<Exception> error, EventType eventType) {
 		this.message = message;
 		this.sourceFile = sourceFile;
 		this.resource = resource;
-		this.error = Optional.ofNullable(error);
+		this.error = error;
 		this.eventType = eventType;
 	}
 	

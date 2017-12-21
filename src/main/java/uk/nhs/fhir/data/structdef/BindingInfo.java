@@ -3,8 +3,8 @@ package uk.nhs.fhir.data.structdef;
 import java.util.Optional;
 
 import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 
 public class BindingInfo {
 
@@ -47,7 +47,7 @@ public class BindingInfo {
 		
 		if (!resolvedDescription.isPresent() 
 		  && !resolvedUrl.isPresent()) {
-			RendererEventConfig.handle(RendererError.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
+			EventHandlerContext.forThread().event(RendererEventType.BINDING_WITHOUT_DESC_OR_URL, "Description or URL must be present");
 			resolvedDescription = Optional.of(STAND_IN_DESCRIPTION);
 		}
 		

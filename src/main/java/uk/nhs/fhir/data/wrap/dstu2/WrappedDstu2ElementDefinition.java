@@ -32,8 +32,8 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
@@ -179,7 +179,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			String descriptionDesc = description == null ? "[no description]" : description;
 			if (slicing.getDiscriminator().isEmpty()
 			  && !getSliceName().isPresent()) {
-				RendererEventConfig.handle(RendererError.SLICING_WITHOUT_DISCRIMINATOR, 
+				EventHandlerContext.forThread().event(RendererEventType.SLICING_WITHOUT_DISCRIMINATOR, 
 					"Slicing " + descriptionDesc + " doesn't have a discriminator (" + getPath() + ")");
 			}
 			
@@ -204,7 +204,8 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 				
 				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
 					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
-					RendererEventConfig.handle(RendererError.HL7_ORG_UK_HOST, "Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
+					EventHandlerContext.forThread().event(RendererEventType.HL7_ORG_UK_HOST, 
+						"Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
 					fixedValueAsString = correctedUrl;
 				}
 				

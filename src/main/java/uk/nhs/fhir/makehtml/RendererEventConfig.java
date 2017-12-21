@@ -17,59 +17,59 @@ public class RendererEventConfig {
 	
 	public static boolean STRICT = false;
 	
-	private static final Map<RendererError, RendererErrorResponse> responses = new ConcurrentHashMap<>();
+	private static final Map<RendererEventType, RendererEventResponse> responses = new ConcurrentHashMap<>();
 
 	static {
 		// Forge bug
-		responses.put(RendererError.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererErrorResponse.IGNORE);
+		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.IGNORE);
 		
 		// Error in profile
-		responses.put(RendererError.HL7_ORG_UK_HOST, RendererErrorResponse.IGNORE);
-		responses.put(RendererError.SLICING_WITHOUT_DISCRIMINATOR, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.UNRESOLVED_DISCRIMINATOR, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.NO_DISCRIMINATORS_FOUND, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.MISSING_CARDINALITY, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.FIX_MISSING_TYPE_LINK, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.RESOURCE_WITHOUT_SNAPSHOT, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.DUPLICATE_CONSTRAINT_KEYS, RendererErrorResponse.IGNORE);
-		responses.put(RendererError.IGNORABLE_MAPPING_ID, RendererErrorResponse.IGNORE);
+		responses.put(RendererEventType.HL7_ORG_UK_HOST, RendererEventResponse.IGNORE);
+		responses.put(RendererEventType.SLICING_WITHOUT_DISCRIMINATOR, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.UNRESOLVED_DISCRIMINATOR, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.NO_DISCRIMINATORS_FOUND, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.MISSING_CARDINALITY, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.FIX_MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.RESOURCE_WITHOUT_SNAPSHOT, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.IGNORE);
+		responses.put(RendererEventType.IGNORABLE_MAPPING_ID, RendererEventResponse.IGNORE);
 		
 		// Perhaps valid?
-		responses.put(RendererError.EMPTY_VALUE_SET, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.MISSING_TYPE_LINK, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.TYPELINK_STRING_WITH_PROFILE, RendererErrorResponse.LOG_WARNING);
-		responses.put(RendererError.MULTIPLE_MAPPINGS_SAME_KEY, RendererErrorResponse.IGNORE);
-		responses.put(RendererError.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, RendererErrorResponse.IGNORE);
-		responses.put(RendererError.CONSTRAINT_WITHOUT_CONDITION, RendererErrorResponse.IGNORE);
+		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.TYPELINK_STRING_WITH_PROFILE, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY, RendererEventResponse.IGNORE);
+		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, RendererEventResponse.IGNORE);
+		responses.put(RendererEventType.CONSTRAINT_WITHOUT_CONDITION, RendererEventResponse.IGNORE);
 
 		// Uses placeholder with the expectation that the node is going to be removed before display
 		// If the placeholder is going to be displayed, we hit STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED
-		responses.put(RendererError.BINDING_WITHOUT_DESC_OR_URL, RendererErrorResponse.IGNORE);
+		responses.put(RendererEventType.BINDING_WITHOUT_DESC_OR_URL, RendererEventResponse.IGNORE);
 		
-		responses.put(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, RendererErrorResponse.LOG_WARNING);
+		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.LOG_WARNING);
 
-		responses.put(RendererError.METADATA_NOT_AVAILABLE, RendererErrorResponse.THROW);
-		responses.put(RendererError.VERSION_NOT_AVAILABLE, RendererErrorResponse.THROW);
+		responses.put(RendererEventType.METADATA_NOT_AVAILABLE, RendererEventResponse.THROW);
+		responses.put(RendererEventType.VERSION_NOT_AVAILABLE, RendererEventResponse.THROW);
 		
 		// Currently not hit
-		responses.put(RendererError.HL7_URL_WITHOUT_DSTU2, RendererErrorResponse.THROW);
-		responses.put(RendererError.EMPTY_TYPE_LINKS, RendererErrorResponse.THROW);
-		responses.put(RendererError.LINK_WITH_LOGICAL_URL, RendererErrorResponse.THROW);
-		responses.put(RendererError.EXTENSION_FILE_NOT_FOUND, RendererErrorResponse.THROW);
-		responses.put(RendererError.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, RendererErrorResponse.THROW);
-		responses.put(RendererError.LINK_REFERENCES_ITSELF, RendererErrorResponse.THROW);
-		responses.put(RendererError.MISSING_REFERENCED_NODE, RendererErrorResponse.THROW);
+		responses.put(RendererEventType.HL7_URL_WITHOUT_DSTU2, RendererEventResponse.THROW);
+		responses.put(RendererEventType.EMPTY_TYPE_LINKS, RendererEventResponse.THROW);
+		responses.put(RendererEventType.LINK_WITH_LOGICAL_URL, RendererEventResponse.THROW);
+		responses.put(RendererEventType.EXTENSION_FILE_NOT_FOUND, RendererEventResponse.THROW);
+		responses.put(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, RendererEventResponse.THROW);
+		responses.put(RendererEventType.LINK_REFERENCES_ITSELF, RendererEventResponse.THROW);
+		responses.put(RendererEventType.MISSING_REFERENCED_NODE, RendererEventResponse.THROW);
 	}
 	
-	public static RendererErrorResponse getResponse(RendererError error) {
+	public static RendererEventResponse getResponse(RendererEventType error) {
 		return responses.get(error);
 	}
 	
-	public static void handle(RendererError errorType, String logInfo) {
+	public static void handle(RendererEventType errorType, String logInfo) {
 		handle(errorType, logInfo, Optional.empty());
 	}
 	
-	public static void handle(RendererError errorType, String logInfo, Optional<Throwable> throwable) {
+	public static void handle(RendererEventType errorType, String logInfo, Optional<Throwable> throwable) {
 		if (STRICT) {
 			handleThrow(logInfo, throwable);
 		}

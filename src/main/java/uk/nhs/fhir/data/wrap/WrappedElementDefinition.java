@@ -20,8 +20,8 @@ import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
-import uk.nhs.fhir.makehtml.RendererError;
-import uk.nhs.fhir.makehtml.RendererEventConfig;
+import uk.nhs.fhir.makehtml.EventHandlerContext;
+import uk.nhs.fhir.makehtml.RendererEventType;
 import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -94,8 +94,8 @@ public abstract class WrappedElementDefinition {
 				if (!Strings.isNullOrEmpty(permittedMissingExtensionRoot)
 				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
 					
-					String message = "Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot;
-					RendererEventConfig.handle(RendererError.DEFAULT_TO_SIMPLE_EXTENSION, message);
+					EventHandlerContext.forThread().event(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, 
+						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot);
 					
 					cachedPermittedMissingExtensions.add(typeProfile);
 					

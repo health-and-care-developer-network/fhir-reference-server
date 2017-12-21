@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.error.EventHandler;
+import uk.nhs.fhir.error.AbstractEventHandler;
 
-public class LoggingEventHandler implements EventHandler {
+public class LoggingEventHandler extends AbstractEventHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoggingEventHandler.class);
 	
