@@ -24,7 +24,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
@@ -34,7 +33,8 @@ import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class WrappedStu3ValueSet extends WrappedValueSet {

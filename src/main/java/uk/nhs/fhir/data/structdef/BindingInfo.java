@@ -3,8 +3,8 @@ package uk.nhs.fhir.data.structdef;
 import java.util.Optional;
 
 import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.makehtml.EventHandlerContext;
-import uk.nhs.fhir.makehtml.RendererEventType;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 
 public class BindingInfo {
 

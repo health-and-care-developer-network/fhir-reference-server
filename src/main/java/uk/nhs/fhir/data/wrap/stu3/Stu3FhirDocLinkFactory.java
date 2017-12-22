@@ -4,11 +4,11 @@ import org.hl7.fhir.dstu3.model.CodeType;
 import org.hl7.fhir.dstu3.model.PrimitiveType;
 
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
 import uk.nhs.fhir.data.url.FhirDocLinkFactory;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 

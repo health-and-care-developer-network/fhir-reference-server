@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.event;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

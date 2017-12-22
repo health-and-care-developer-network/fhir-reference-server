@@ -1,8 +1,6 @@
-package uk.nhs.fhir.error;
+package uk.nhs.fhir.event;
 
 import java.util.Optional;
-
-import uk.nhs.fhir.makehtml.RendererEventType;
 
 public interface EventHandler {
 	

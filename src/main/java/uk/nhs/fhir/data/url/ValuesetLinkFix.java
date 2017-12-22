@@ -1,6 +1,6 @@
 package uk.nhs.fhir.data.url;
 
-import uk.nhs.fhir.FhirURLConstants;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**

@@ -1,7 +1,7 @@
 package uk.nhs.fhir.data.wrap.stu3;
 
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.url.UrlFixer;
+import uk.nhs.fhir.util.FhirURLConstants;
 
 public class Stu3UrlFixer extends UrlFixer {
 	

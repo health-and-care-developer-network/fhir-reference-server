@@ -1,7 +1,6 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.util;
 
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.util.FhirVersion;
 
 public interface StructureDefinitionRepository {
 	public WrappedStructureDefinition getStructureDefinitionIgnoreCase(FhirVersion version, String url);

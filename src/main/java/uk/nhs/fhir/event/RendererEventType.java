@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.event;
 
 public enum RendererEventType {
 	EMPTY_TYPE_LINKS,

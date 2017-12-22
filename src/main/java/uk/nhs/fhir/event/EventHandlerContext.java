@@ -1,6 +1,4 @@
-package uk.nhs.fhir.makehtml;
-
-import uk.nhs.fhir.error.EventHandler;
+package uk.nhs.fhir.event;
 
 public class EventHandlerContext {
 	private static final ThreadLocal<EventHandler> theEventHandler = ThreadLocal.withInitial(LoggingEventHandler::new);

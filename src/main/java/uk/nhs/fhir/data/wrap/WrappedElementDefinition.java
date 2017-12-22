@@ -19,10 +19,10 @@ import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
-import uk.nhs.fhir.makehtml.EventHandlerContext;
-import uk.nhs.fhir.makehtml.RendererEventType;
-import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedElementDefinition {
 
@@ -92,7 +92,7 @@ public abstract class WrappedElementDefinition {
 				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
 					
 					EventHandlerContext.forThread().event(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, 
-						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot);
+						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot + "\"");
 					
 					structureDefinitions.addCachedPermittedMissingExtension(typeProfile);
 					

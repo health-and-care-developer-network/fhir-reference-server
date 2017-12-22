@@ -16,7 +16,7 @@ import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirFileRegistry;
 
 public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 

@@ -3,11 +3,11 @@ package uk.nhs.fhir.data.url;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.wrap.dstu2.Dstu2UrlFixer;
 import uk.nhs.fhir.data.wrap.stu3.Stu3UrlFixer;
-import uk.nhs.fhir.makehtml.EventHandlerContext;
-import uk.nhs.fhir.makehtml.RendererEventType;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**

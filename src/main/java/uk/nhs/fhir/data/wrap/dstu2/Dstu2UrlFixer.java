@@ -4,10 +4,10 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.url.UrlFixer;
-import uk.nhs.fhir.makehtml.EventHandlerContext;
-import uk.nhs.fhir.makehtml.RendererEventType;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
+import uk.nhs.fhir.util.FhirURLConstants;
 
 public class Dstu2UrlFixer extends UrlFixer {
 

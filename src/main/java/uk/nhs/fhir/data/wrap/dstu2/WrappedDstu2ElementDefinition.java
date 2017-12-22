@@ -32,11 +32,11 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.makehtml.EventHandlerContext;
-import uk.nhs.fhir.makehtml.RendererEventType;
-import uk.nhs.fhir.makehtml.StructureDefinitionRepository;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
+import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	

@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.load;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,7 +26,6 @@ import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirReflectionUtils;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 
 public class FhirFileParser {
 	private static Logger LOG = LoggerFactory.getLogger(FhirFileParser.class);

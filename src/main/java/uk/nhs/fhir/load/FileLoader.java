@@ -11,7 +11,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.load;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -39,14 +39,6 @@ public class FileLoader {
 	private static final Logger LOG = LoggerFactory.getLogger(FileLoader.class.getName());
 	
 	public static final String DEFAULT_ENCODING = "UTF-8";
-	
-	/**
-     * @param filename Filename to load content from
-     * @return String containing content of specified file
-     */
-    public static String loadFile(final String filename) {
-        return loadFile(new File(filename));
-    }
     
 	/**
      * @param file File to load content from
@@ -72,14 +64,6 @@ public class FileLoader {
 			InputStream bomInputStream = new BOMInputStream(fis);
 			Reader streamReader = new InputStreamReader(bomInputStream, charsetName);
 			BufferedReader in = new BufferedReader(streamReader);) {
-
-	    	/*int data = inputStreamReader.read();
-	    	while(data != -1) {
-	    	    bOutStream.write(data);
-	    	    data = inputStreamReader.read();
-	    	}
-	    	
-	    	return bOutStream.toString(charsetName);*/
 			
 			String str;
 			while ((str = in.readLine()) != null) {

@@ -1,6 +1,4 @@
-package uk.nhs.fhir;
-
-import uk.nhs.fhir.util.FhirVersion;
+package uk.nhs.fhir.util;
 
 public class FhirURLConstants {
 	public static final String HL7_ROOT = "hl7.org";

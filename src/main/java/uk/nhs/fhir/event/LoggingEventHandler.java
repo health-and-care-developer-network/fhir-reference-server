@@ -1,11 +1,9 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.event;
 
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.nhs.fhir.error.AbstractEventHandler;
 
 public class LoggingEventHandler extends AbstractEventHandler {
 

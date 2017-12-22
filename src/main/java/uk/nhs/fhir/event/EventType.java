@@ -1,4 +1,4 @@
-package uk.nhs.fhir.error;
+package uk.nhs.fhir.event;
 
 public enum EventType {
 	WARNING,

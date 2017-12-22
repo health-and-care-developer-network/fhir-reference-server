@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.load;
 
 import java.io.IOException;
 

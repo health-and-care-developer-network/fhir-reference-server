@@ -1,4 +1,4 @@
-package uk.nhs.fhir.util;
+package uk.nhs.fhir.util.text;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 

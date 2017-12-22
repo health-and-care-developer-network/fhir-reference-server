@@ -1,4 +1,4 @@
-package uk.nhs.fhir.makehtml;
+package uk.nhs.fhir.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,16 +20,16 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.parser.IParser;
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.error.EventHandler;
-import uk.nhs.fhir.util.FhirContexts;
-import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
-import uk.nhs.fhir.util.StringUtil;
+import uk.nhs.fhir.event.EventHandler;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
+import uk.nhs.fhir.load.FhirFileParser;
+import uk.nhs.fhir.load.FhirParsingFailedException;
+import uk.nhs.fhir.load.FileLoader;
 
 public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResource<?>>>, StructureDefinitionRepository {
 	

@@ -3,11 +3,11 @@ package uk.nhs.fhir.data.wrap.dstu2;
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.structdef.FhirElementDataTypeDstu2;
 import uk.nhs.fhir.data.url.FhirDocLinkFactory;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 

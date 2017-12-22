@@ -26,9 +26,9 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
+import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {

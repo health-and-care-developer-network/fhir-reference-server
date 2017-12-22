@@ -21,7 +21,6 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeConcept;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeFilter;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.FhirURLConstants;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
@@ -31,7 +30,8 @@ import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeIncludeFilter;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
-import uk.nhs.fhir.makehtml.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirFileRegistry;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class WrappedDstu2ValueSet extends WrappedValueSet {

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.FhirURLConstants;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class FhirURL {
