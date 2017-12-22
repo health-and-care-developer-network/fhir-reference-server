@@ -12,8 +12,8 @@ import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.util.FhirContexts;
-import uk.nhs.fhir.util.FhirTextSectionHelpers;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.text.FhirTextSectionHelpers;
 
 public class RawResourceRenderer {
 

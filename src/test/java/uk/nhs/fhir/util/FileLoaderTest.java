@@ -19,6 +19,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import uk.nhs.fhir.load.FileLoader;
+
 public class FileLoaderTest {
 
     @Test

@@ -1,6 +1,7 @@
 package uk.nhs.fhir.page.rendered;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
@@ -9,7 +10,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.page.VelocityTemplate;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -21,13 +21,13 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	private final ResourceMetadata resourceMetadata;
 	private final Optional<SupportingArtefact> metadataArtefact;
 	private final String textSection;
-	private final Optional<ExampleResources> examples;
+	private final Optional<List<ResourceMetadata>> examples;
 	private final String baseURL;
 	private final FhirVersion fhirVersion;
 
 	public ResourceWithMetadataTemplate(String resourceType, String resourceName, String baseURL, IBaseResource resource,
 			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
-			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<ExampleResources> examples,
+			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<List<ResourceMetadata>> examples,
 			FhirVersion fhirVersion) {
 		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName));
 		this.resource = resource;

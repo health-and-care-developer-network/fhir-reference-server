@@ -51,6 +51,7 @@ public class ServletStreamArtefact {
 			
 			if (entity == null) {
 				LOG.error("Unable to find matching artefact - type=" + artefactType + ", resourceID=" + resourceID + ", version=" + resourceVersion + ", fhirVersion=" + fhirVersion + ", resourceType=" + resourceType);
+				response.setStatus(404);
 				return;
 			}
 			

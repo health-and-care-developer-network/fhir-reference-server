@@ -31,7 +31,6 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FhirVersion;
@@ -239,7 +238,7 @@ public class FilesystemIF {
         List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
         
         // Now filter the list to those matching our criteria
-        ArrayList<ResourceMetadata> matches = new ArrayList<ResourceMetadata>();
+        List<ResourceMetadata> matches = new ArrayList<ResourceMetadata>();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
         
@@ -259,7 +258,7 @@ public class FilesystemIF {
         return matches;
     }
     
-	public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
+	public List<ResourceMetadata> getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
 		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	

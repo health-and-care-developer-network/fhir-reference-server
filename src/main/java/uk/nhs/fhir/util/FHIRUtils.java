@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import uk.nhs.fhir.FhirURLConstants;
+import uk.nhs.fhir.load.FileLoader;
 
 public class FHIRUtils {
 

@@ -15,18 +15,18 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.makehtml.FhirFileParser;
+import uk.nhs.fhir.load.FhirFileParser;
+import uk.nhs.fhir.load.FileLoader;
+import uk.nhs.fhir.load.XmlFileFinder;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(VersionedFilePreprocessor.class.getName());
 
-	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
+	private static final XmlFileFinder resourceFileFinder = new XmlFileFinder();
 	private static final FhirFileParser parser = new FhirFileParser();
 
 	private AbstractFhirFileLocator fhirFileLocator;  

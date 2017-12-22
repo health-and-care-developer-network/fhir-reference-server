@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
@@ -99,10 +98,10 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return resource;
     }
 
-    public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
+    public List<ResourceMetadata> getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
         LOG.debug("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
         
-        ExampleResources examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);
+        List<ResourceMetadata> examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);
         return examples;
     }
     

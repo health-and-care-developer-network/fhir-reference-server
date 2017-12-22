@@ -1,6 +1,7 @@
 package uk.nhs.fhir.page.rendered;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -12,11 +13,10 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
-import uk.nhs.fhir.util.FhirTextSectionHelpers;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.text.FhirTextSectionHelpers;
 
 public class ResourcePageRenderer {
     
@@ -54,8 +54,8 @@ public class ResourcePageRenderer {
     	String textSection = FhirTextSectionHelpers.forVersion(fhirVersion).getTextSection(resource);
 
     	// Examples
-    	ExampleResources examplesList = resourceWebHandler.getExamples(fhirVersion, resourceType + "/" + resourceID.getIdPart());
-    	Optional<ExampleResources> examples = 
+    	List<ResourceMetadata> examplesList = resourceWebHandler.getExamples(fhirVersion, resourceType + "/" + resourceID.getIdPart());
+    	Optional<List<ResourceMetadata>> examples = 
     		(examplesList == null 
     		  || examplesList.isEmpty()) ? 
     			Optional.empty() : 
