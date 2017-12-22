@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFrame;
 
-import uk.nhs.fhir.makehtml.NewMain;
+import uk.nhs.fhir.render.NewMain;
 
 public class RendererSupervisor {
 

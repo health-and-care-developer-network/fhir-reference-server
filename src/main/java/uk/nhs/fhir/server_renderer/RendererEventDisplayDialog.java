@@ -22,9 +22,9 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.error.EventType;
-import uk.nhs.fhir.error.RendererEvent;
-import uk.nhs.fhir.error.RendererEvents;
+import uk.nhs.fhir.event.EventType;
+import uk.nhs.fhir.event.RendererEvent;
+import uk.nhs.fhir.event.RendererEvents;
 import uk.nhs.fhir.util.StringUtil;
 
 @SuppressWarnings("serial")
