@@ -7,12 +7,12 @@ import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionSnapshotC
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Differential;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeDataBuilder;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNodeBuilder;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.FhirTreeDataBuilder;
+import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.FhirTreeNodeBuilder;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class FhirTreeDataFactory {

@@ -10,14 +10,14 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.html.table.Table;
-import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
+import uk.nhs.fhir.render.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.render.html.table.Table;
+import uk.nhs.fhir.render.html.tree.FhirTreeTable;
+import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.FhirTreeNode;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {

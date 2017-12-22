@@ -2,7 +2,7 @@ package uk.nhs.fhir.event;
 
 import java.util.Optional;
 
-import uk.nhs.fhir.error.AbstractEventHandler;
+import uk.nhs.fhir.event.AbstractEventHandler;
 
 public abstract class AbstractRendererEventHandler extends AbstractEventHandler {
 	

@@ -13,9 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.error.RendererEvent;
-import uk.nhs.fhir.error.RendererEvents;
-import uk.nhs.fhir.makehtml.RendererContext;
+import uk.nhs.fhir.event.RendererEvent;
+import uk.nhs.fhir.event.RendererEvents;
+import uk.nhs.fhir.render.RendererContext;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class RendererEventAccumulator extends AbstractRendererEventHandler {

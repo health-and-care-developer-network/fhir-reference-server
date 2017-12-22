@@ -14,12 +14,12 @@ import junit.framework.Assert;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.html.cell.LinkCell;
-import uk.nhs.fhir.makehtml.html.cell.SimpleTextCell;
-import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.html.table.Table;
-import uk.nhs.fhir.makehtml.html.table.TableRow;
-import uk.nhs.fhir.makehtml.html.table.TableTitle;
+import uk.nhs.fhir.render.html.cell.LinkCell;
+import uk.nhs.fhir.render.html.cell.SimpleTextCell;
+import uk.nhs.fhir.render.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.render.html.table.Table;
+import uk.nhs.fhir.render.html.table.TableRow;
+import uk.nhs.fhir.render.html.table.TableTitle;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFormatTable {
