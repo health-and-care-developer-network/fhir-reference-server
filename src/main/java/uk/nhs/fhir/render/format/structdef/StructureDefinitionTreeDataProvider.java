@@ -1,13 +1,16 @@
 package uk.nhs.fhir.render.format.structdef;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.FhirTreeDataFactory;
+import uk.nhs.fhir.FhirTreeDatas;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
@@ -30,9 +33,9 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getSnapshotTreeData() {
-		FhirTreeData snapshotTree = FhirTreeDataFactory.getSnapshotTree(source);
+		FhirTreeData snapshotTree = FhirTreeDatas.getSnapshotTree(source);
 		
-		snapshotTree.resolveLinkedNodes();
+		resolveLinkedNodes(snapshotTree);
 		snapshotTree.cacheSlicingDiscriminators();
 		
 		return snapshotTree;
@@ -43,14 +46,128 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeData differentialTree = FhirTreeDataFactory.getDifferentialTree(source);
+		FhirTreeData differentialTree = FhirTreeDatas.getDifferentialTree(source);
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		
-		differentialTree.resolveLinkedNodes();
+		resolveLinkedNodes(differentialTree);
 		differentialTree.cacheSlicingDiscriminators();
 		
 		return differentialTree;
+	}
+	
+	private void resolveLinkedNodes(FhirTreeData treeData) {
+		resolveNameLinkedNodes(treeData);
+		resolveIdLinkedNodes(treeData);
+	}
+	
+	private void resolveIdLinkedNodes(FhirTreeData treeData) {
+		Map<String, List<AbstractFhirTreeTableContent>> expectedIds = Maps.newHashMap();
+		Map<String, AbstractFhirTreeTableContent> nodesWithId = Maps.newHashMap();
+		
+		for (AbstractFhirTreeTableContent node : treeData) {
+			
+			Optional<String> id = node.getId();
+			boolean hasId = id.isPresent();
+			if (hasId) {
+				nodesWithId.put(id.get(), node);
+			}
+			
+			Optional<String> linkedNodeId = node.getLinkedNodeId();
+			boolean hasIdLinkedNode = linkedNodeId.isPresent();
+			if (hasIdLinkedNode) {
+				List<AbstractFhirTreeTableContent> nodesLinkingToThisId;
+				if (expectedIds.containsKey(linkedNodeId.get())) {
+					nodesLinkingToThisId = expectedIds.get(linkedNodeId.get());
+				} else {
+					nodesLinkingToThisId = Lists.newArrayList();
+					expectedIds.put(linkedNodeId.get(), nodesLinkingToThisId);
+				}
+				
+				nodesLinkingToThisId.add(node);
+			}
+			
+			if (hasId && hasIdLinkedNode) {
+				if (node.getId().get().equals(node.getLinkedNodeId().get())) {
+					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
+				}
+			}
+			
+			if (hasIdLinkedNode && node.getFixedValue().isPresent()) {
+				EventHandlerContext.forThread().event(RendererEventType.FIXEDVALUE_WITH_LINKED_NODE, 
+				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
+				  + " (" + node.getLinkedNodeId().get() + ")");
+			}
+		}
+		
+		setLinkedNodes(expectedIds, nodesWithId);
+	}
+
+	void setLinkedNodes(Map<String, List<AbstractFhirTreeTableContent>> expectedIds,
+			Map<String, AbstractFhirTreeTableContent> nodesWithId) {
+		for (Map.Entry<String, List<AbstractFhirTreeTableContent>> expectedIdEntry : expectedIds.entrySet()) {
+			String expectedId = expectedIdEntry.getKey();
+			List<AbstractFhirTreeTableContent> nodesWithLink = expectedIdEntry.getValue();
+			
+			if (nodesWithId.containsKey(expectedId)) {
+				for (AbstractFhirTreeTableContent nodeWithLink : nodesWithLink) {
+					if (nodeWithLink instanceof FhirTreeNode) {
+						((FhirTreeNode)nodeWithLink).setLinkedNode(nodesWithId.get(expectedId));
+					}
+					// If we are in a dummy node, we don't need to do anything since the backup node
+					// should contain this information
+				}
+			} else {
+				String nodesWithMissingLinkTarget = String.join(", ", 
+					nodesWithLink
+						.stream()
+						.map(node -> node.getPath())
+						.collect(Collectors.toList()));
+				
+				EventHandlerContext.forThread().event(RendererEventType.MISSING_REFERENCED_NODE, 
+					"Linked node(s) at " + nodesWithMissingLinkTarget + " missing target (" + expectedId + ")");
+			}
+		}
+	}
+
+	public void resolveNameLinkedNodes(FhirTreeData treeData) {
+		Map<String, List<AbstractFhirTreeTableContent>> expectedNames = Maps.newHashMap();
+		Map<String, AbstractFhirTreeTableContent> namedNodes = Maps.newHashMap();
+		
+		for (AbstractFhirTreeTableContent node : treeData) {
+			boolean hasName = node.getName().isPresent();
+			if (hasName) {
+				namedNodes.put(node.getName().get(), node);
+			}
+			
+			boolean hasLinkedNode = node.getLinkedNodeName().isPresent();
+			if (hasLinkedNode) {
+				List<AbstractFhirTreeTableContent> nodesLinkingToThisName;
+				if (expectedNames.containsKey(node.getLinkedNodeName().get())) {
+					nodesLinkingToThisName = expectedNames.get(node.getLinkedNodeName().get());
+				} else {
+					nodesLinkingToThisName = Lists.newArrayList();
+					expectedNames.put(node.getLinkedNodeName().get(), nodesLinkingToThisName);
+				}
+				
+				nodesLinkingToThisName.add(node);
+			}
+			
+			if (hasName && hasLinkedNode) {
+				if (node.getName().get().equals(node.getLinkedNodeName().get())) {
+					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, 
+						"Link " + node.getPath() + " references itself (" + node.getName().get() + ")");
+				}
+			}
+			
+			if (hasLinkedNode && node.getFixedValue().isPresent()) {
+				EventHandlerContext.forThread().event(RendererEventType.FIXEDVALUE_WITH_LINKED_NODE, 
+				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
+				  + " (" + node.getLinkedNodeName().get() + ")");
+			}
+		}
+		
+		setLinkedNodes(expectedNames, namedNodes);
 	}
 
 	private void addBackupNodes(FhirTreeData differentialTree, FhirTreeData snapshotTreeData) {

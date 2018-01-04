@@ -9,16 +9,20 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Differential;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition.Snapshot;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.DifferentialTreeDataBuilder;
+import uk.nhs.fhir.render.tree.FhirDummyNodeFactory;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.FhirTreeDataFactory;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeNodeBuilder;
 import uk.nhs.fhir.render.tree.SnapshotTreeDataBuilder;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class FhirTreeDataFactory {
+public class FhirTreeDatas {
 
 	private static final FhirTreeNodeBuilder treeNodeBuilder = new FhirTreeNodeBuilder();
+	private static final FhirTreeDataFactory treeDataFactory = new FhirTreeDataFactory();
 	
 	public static FhirTreeData getSnapshotTree(WrappedStructureDefinition structureDefinition) {
 		FhirVersion fhirVersion = structureDefinition.getImplicitFhirVersion();
@@ -33,7 +37,7 @@ public class FhirTreeDataFactory {
 	}
 
 	private static FhirTreeData dstu2Snapshot(WrappedStructureDefinition structureDefinition) {
-		SnapshotTreeDataBuilder fhirTreeDataBuilder = new SnapshotTreeDataBuilder();
+		SnapshotTreeDataBuilder<AbstractFhirTreeTableContent> fhirTreeDataBuilder = new SnapshotTreeDataBuilder<>(treeDataFactory);
 		
 		Snapshot snapshot = ((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		for (ElementDefinitionDt element : snapshot.getElement()) {
@@ -45,7 +49,7 @@ public class FhirTreeDataFactory {
 	}
 	
 	private static FhirTreeData stu3Snapshot(WrappedStructureDefinition structureDefinition) {
-		SnapshotTreeDataBuilder fhirTreeDataBuilder = new SnapshotTreeDataBuilder();
+		SnapshotTreeDataBuilder<AbstractFhirTreeTableContent> fhirTreeDataBuilder = new SnapshotTreeDataBuilder<>(treeDataFactory);
 		
 		StructureDefinitionSnapshotComponent snapshot = ((org.hl7.fhir.dstu3.model.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		
@@ -71,7 +75,7 @@ public class FhirTreeDataFactory {
 	}
 
 	private static FhirTreeData dstu2Differential(ca.uhn.fhir.model.dstu2.resource.StructureDefinition structureDefinition) {
-		DifferentialTreeDataBuilder fhirTreeDataBuilder = new DifferentialTreeDataBuilder();
+		DifferentialTreeDataBuilder<AbstractFhirTreeTableContent> fhirTreeDataBuilder = new DifferentialTreeDataBuilder<>(new FhirDummyNodeFactory(), treeDataFactory);
 		
 		Differential differential = structureDefinition.getDifferential();
 		for (ElementDefinitionDt element : differential.getElement()) {
@@ -84,7 +88,7 @@ public class FhirTreeDataFactory {
 
 	private static FhirTreeData stu3Differential(org.hl7.fhir.dstu3.model.StructureDefinition structureDefinition) {
 
-		DifferentialTreeDataBuilder fhirTreeDataBuilder = new DifferentialTreeDataBuilder();
+		DifferentialTreeDataBuilder<AbstractFhirTreeTableContent> fhirTreeDataBuilder = new DifferentialTreeDataBuilder<>(new FhirDummyNodeFactory(), treeDataFactory);
 
 		StructureDefinitionDifferentialComponent differential = structureDefinition.getDifferential();
 		

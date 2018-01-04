@@ -60,7 +60,7 @@ public abstract class AbstractFhirTreeTableContent extends TreeContent<AbstractF
 	
 	abstract public String getNodeKey();
 
-	abstract Optional<String> getName();
+	public abstract Optional<String> getName();
 
 	abstract public Optional<String> getDefinition();
 	

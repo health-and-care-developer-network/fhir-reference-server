@@ -1,7 +1,15 @@
 package uk.nhs.fhir.render.tree;
 
-public class DifferentialTreeDataBuilder extends FhirTreeDataBuilder<AbstractFhirTreeTableContent> {
+public class DifferentialTreeDataBuilder<T extends TreeContent<T>> extends FhirTreeDataBuilder<T> {
 
+	private final DummyNodeFactory<T> dummyNodeFactory;
+	private final TreeDataFactory<T> fhirTreeDataFactory;
+	
+	public DifferentialTreeDataBuilder(DummyNodeFactory<T> dummyNodeFactory, TreeDataFactory<T> fhirTreeDataFactory) {
+		this.dummyNodeFactory = dummyNodeFactory;
+		this.fhirTreeDataFactory = fhirTreeDataFactory;
+	}
+	
 	@Override
 	protected void stepToNonAncestorPath(NodePath targetPath) {
 		// trim path back until it only has nodes in common with the target path
@@ -13,11 +21,11 @@ public class DifferentialTreeDataBuilder extends FhirTreeDataBuilder<AbstractFhi
 		for (int i=path.size(); i<targetPath.size(); i++) {
 			path.stepInto(targetPath.getPart(i));
 
-			appendNode(new DummyFhirTreeNode(currentNode, path.toPathString()));
+			appendNode(dummyNodeFactory.create(currentNode, path));
 		}
 	}
 	
 	public FhirTreeData getTree() {
-		return new FhirTreeData(rootNode);
+		return fhirTreeDataFactory.create(rootNode);
 	}
 }

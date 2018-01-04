@@ -18,6 +18,11 @@ import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
+import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {
@@ -37,7 +42,13 @@ public class TestFhirTreeTable {
 		FhirTreeData data = new FhirTreeData(node);
 		
 		FhirTreeTable fhirTreeTable = new FhirTreeTable(data, FhirVersion.DSTU2);
-		fhirTreeTable.stripRemovedElements();
+
+		new RemovedElementStripper(data).process();
+		new ExtensionsSlicingNodesRemover(data).process();
+		new ChildlessDummyNodeRemover(data).process();
+		new UnwantedConstraintRemover(data).process();
+		new ComplexExtensionChildrenStripper(data).process();
+		
 		Table table = fhirTreeTable.asTable();
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);

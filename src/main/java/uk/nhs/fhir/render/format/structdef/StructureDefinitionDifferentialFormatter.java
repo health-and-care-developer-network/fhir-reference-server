@@ -11,6 +11,10 @@ import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
+import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 
 public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
 
@@ -25,9 +29,14 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 		
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData();
-		differentialTreeData.tidyData();
-		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData, getResourceVersion());
 		
+		new ExtensionsSlicingNodesRemover(differentialTreeData).process();
+		new ChildlessDummyNodeRemover(differentialTreeData).process();
+		new UnwantedConstraintRemover(differentialTreeData).process();
+		new ComplexExtensionChildrenStripper(differentialTreeData).process();
+		
+		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData, getResourceVersion());
+
 		Table differentialTable = differentialTreeTable.asTable();
 		
 		Element differentialHtmlTable = differentialTable.makeTable();

@@ -33,6 +33,11 @@ import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
+import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
@@ -61,9 +66,12 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
 		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
-		snapshotTreeData.stripRemovedElements();
+		new RemovedElementStripper(differentialTreeData).process();
 		new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
-		snapshotTreeData.tidyData();
+		new ExtensionsSlicingNodesRemover(snapshotTreeData).process();
+		new ChildlessDummyNodeRemover(snapshotTreeData).process();
+		new UnwantedConstraintRemover(snapshotTreeData).process();
+		new ComplexExtensionChildrenStripper(snapshotTreeData).process();
 		
 		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();
 		

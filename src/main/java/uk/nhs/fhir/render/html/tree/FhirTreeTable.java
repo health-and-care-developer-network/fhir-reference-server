@@ -37,6 +37,10 @@ import uk.nhs.fhir.render.html.table.TableTitle;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
+import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
 
@@ -75,8 +79,6 @@ public class FhirTreeTable {
 	
 	private List<TableRow> getRows() {
 		List<TableRow> tableRows = Lists.newArrayList();
-		
-		data.tidyData();
 		
 		AbstractFhirTreeTableContent root = data.getRoot();
 		
@@ -346,9 +348,5 @@ public class FhirTreeTable {
 					new CSSRule(CSSTag.BORDER, "0"),
 					new CSSRule(CSSTag.WIDTH, "20"),
 					new CSSRule(CSSTag.HEIGHT, "16")));
-	}
-
-	public void stripRemovedElements() {
-		data.stripRemovedElements();
 	}
 }
