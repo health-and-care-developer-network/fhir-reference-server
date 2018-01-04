@@ -18,6 +18,7 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
 import uk.nhs.fhir.render.tree.cache.IdLinkedNodeResolver;
 import uk.nhs.fhir.render.tree.cache.NameLinkedNodeResolver;
+import uk.nhs.fhir.render.tree.cache.SlicingDiscriminatorCacher;
 
 public class StructureDefinitionTreeDataProvider {
 	
@@ -34,8 +35,7 @@ public class StructureDefinitionTreeDataProvider {
 	public FhirTreeData getSnapshotTreeData() {
 		FhirTreeData snapshotTree = FhirTreeDatas.getSnapshotTree(source);
 		
-		resolveLinkedNodes(snapshotTree);
-		snapshotTree.cacheSlicingDiscriminators();
+		cacheTreeLinks(snapshotTree);
 		
 		return snapshotTree;
 	}
@@ -49,15 +49,15 @@ public class StructureDefinitionTreeDataProvider {
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		
-		resolveLinkedNodes(differentialTree);
-		differentialTree.cacheSlicingDiscriminators();
+		cacheTreeLinks(differentialTree);
 		
 		return differentialTree;
 	}
 	
-	private void resolveLinkedNodes(FhirTreeData treeData) {
+	private void cacheTreeLinks(FhirTreeData treeData) {
 		new NameLinkedNodeResolver(treeData).resolve();
 		new IdLinkedNodeResolver(treeData).resolve();
+		new SlicingDiscriminatorCacher(treeData).resolve();
 	}
 	
 	private void addBackupNodes(FhirTreeData differentialTree, FhirTreeData snapshotTreeData) {

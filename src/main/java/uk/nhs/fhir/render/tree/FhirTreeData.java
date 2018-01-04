@@ -25,15 +25,6 @@ public class FhirTreeData implements Iterable<AbstractFhirTreeTableContent> {
 	public Iterator<AbstractFhirTreeTableContent> iterator() {
 		return new FhirTreeIterator (this);
 	}
-
-	public void cacheSlicingDiscriminators() {
-		for (AbstractFhirTreeTableContent content : this) {
-			if (content instanceof FhirTreeNode) {
-				FhirTreeNode node = (FhirTreeNode)content;
-				node.cacheSlicingDiscriminator();
-			}
-		}
-	}
 }
 
 class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
