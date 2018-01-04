@@ -13,7 +13,7 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
 
 public class NameLinkedNodeResolver extends LinkedNodeResolver {
 	
-	public NameLinkedNodeResolver(FhirTreeData treeData) {
+	public NameLinkedNodeResolver(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		super(treeData);
 	}
 	

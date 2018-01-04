@@ -16,6 +16,7 @@ import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.render.html.jdom2.HTMLUtil;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
 import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
@@ -39,7 +40,8 @@ public class TestFhirTreeTable {
 			"path.to.resource",
 			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
-		FhirTreeData data = new FhirTreeData(node);
+		
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(node);
 		
 		FhirTreeTable fhirTreeTable = new FhirTreeTable(data, FhirVersion.DSTU2);
 

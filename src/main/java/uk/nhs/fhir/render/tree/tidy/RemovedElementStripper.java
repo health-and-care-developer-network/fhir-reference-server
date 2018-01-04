@@ -10,9 +10,9 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
  * no longer appear in the resource.
  */
 public class RemovedElementStripper {
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 
-	public RemovedElementStripper(FhirTreeData treeData) {
+	public RemovedElementStripper(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 

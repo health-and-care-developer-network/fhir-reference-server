@@ -7,34 +7,34 @@ import java.util.NoSuchElementException;
 
 import com.google.common.base.Preconditions;
 
-public class FhirTreeData implements Iterable<AbstractFhirTreeTableContent> {
+public class FhirTreeData<T extends TreeContent<T>> implements Iterable<T> {
 	
-	private final AbstractFhirTreeTableContent root;
+	private final T root;
 	
-	public FhirTreeData(AbstractFhirTreeTableContent root) {
+	public FhirTreeData(T root) {
 		Preconditions.checkNotNull(root);
 		
 		this.root = root;
 	}
 
-	public AbstractFhirTreeTableContent getRoot() {
+	public T getRoot() {
 		return root;
 	}
 
 	@Override
-	public Iterator<AbstractFhirTreeTableContent> iterator() {
-		return new FhirTreeIterator (this);
+	public Iterator<T> iterator() {
+		return new TreeIterator<T> (this);
 	}
 }
 
-class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
+class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 
 	// Each node down the tree to the current node
-	Deque<FhirNodeAndChildIndex> chain = new ArrayDeque<>();
+	Deque<NodeAndChildIndex> chain = new ArrayDeque<>();
 	
-	private final FhirTreeData data;
+	private final FhirTreeData<T> data;
 	
-	public FhirTreeIterator(FhirTreeData data) {
+	public TreeIterator(FhirTreeData<T> data) {
 		Preconditions.checkNotNull(data);
 		this.data = data;
 	}
@@ -46,7 +46,7 @@ class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
 		}
 
 		// true if any node in the chain to the current node has further children to offer
-		for (FhirNodeAndChildIndex node : chain) {
+		for (NodeAndChildIndex node : chain) {
 			if (node.hasMoreChildren()) {
 				return true;
 			}
@@ -60,7 +60,7 @@ class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
 	}
 
 	@Override
-	public AbstractFhirTreeTableContent next() {
+	public T next() {
 		if (!returnedRoot()) {
 			return supplyRoot();
 		}
@@ -76,23 +76,23 @@ class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
 		}
 	}
 
-	private AbstractFhirTreeTableContent supplyRoot() {
-		AbstractFhirTreeTableContent root = data.getRoot();
-		chain.add(new FhirNodeAndChildIndex(root));
+	private T supplyRoot() {
+		T root = data.getRoot();
+		chain.add(new NodeAndChildIndex(root));
 		return root;
 	}
 	
-	private AbstractFhirTreeTableContent nextChildOfCurrent() {
-		AbstractFhirTreeTableContent child = chain.getLast().nextChild();
-		chain.add(new FhirNodeAndChildIndex(child));
+	private T nextChildOfCurrent() {
+		T child = chain.getLast().nextChild();
+		chain.add(new NodeAndChildIndex(child));
 		return child;
 	}
 	
-	private class FhirNodeAndChildIndex {
-		private final AbstractFhirTreeTableContent node;
+	private class NodeAndChildIndex {
+		private final T node;
 		private Integer currentChildIndex;
 		
-		FhirNodeAndChildIndex(AbstractFhirTreeTableContent node) {
+		NodeAndChildIndex(T node) {
 			this.node = node;
 			this.currentChildIndex = null;
 		}
@@ -108,7 +108,7 @@ class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
 			}
 		}
 		
-		public AbstractFhirTreeTableContent nextChild() {
+		public T nextChild() {
 			if (currentChildIndex == null) {
 				currentChildIndex = 0;
 			} else {

@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
 	
 	protected abstract void stepToNonAncestorPath(NodePath targetPath);
-	public abstract FhirTreeData getTree();
 	
 	protected final NodePath path = new NodePath();
 	protected T rootNode = null;
@@ -65,6 +64,10 @@ public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
 		  && currentNode.getPath().split("\\.").length != path.size()) {
 			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + path.toPathString());
 		}
+	}
+	
+	public FhirTreeData<T> getTree() {
+		return new FhirTreeData<>(rootNode);
 	}
 }
 

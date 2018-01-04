@@ -17,9 +17,9 @@ public class UnwantedConstraintRemover {
 
 	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
 	
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 
-	public UnwantedConstraintRemover(FhirTreeData treeData) {
+	public UnwantedConstraintRemover(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 

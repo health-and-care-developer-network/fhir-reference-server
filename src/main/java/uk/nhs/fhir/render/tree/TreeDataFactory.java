@@ -1,7 +1,7 @@
 package uk.nhs.fhir.render.tree;
 
-public interface TreeDataFactory<T> {
+public interface TreeDataFactory<T extends TreeContent<T>> {
 
-	public FhirTreeData create(T rootNode);
+	public FhirTreeData<T> create(T rootNode);
 
 }

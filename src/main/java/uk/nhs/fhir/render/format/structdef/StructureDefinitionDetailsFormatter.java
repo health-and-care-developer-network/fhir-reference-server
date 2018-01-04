@@ -63,8 +63,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 
 	private Element getDetailsPanel() {
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
-		FhirTreeData snapshotTreeData = dataProvider.getSnapshotTreeData();
-		FhirTreeData differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
+		FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData = dataProvider.getSnapshotTreeData();
+		FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
 		new RemovedElementStripper(differentialTreeData).process();
 		new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
@@ -128,7 +128,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		return panel.makePanel();
 	}
 
-	private void splitConstraints(FhirTreeNode node, FhirTreeData differentialTreeData,
+	private void splitConstraints(FhirTreeNode node, FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData,
 			List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
 		
 		Optional<AbstractFhirTreeTableContent> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)

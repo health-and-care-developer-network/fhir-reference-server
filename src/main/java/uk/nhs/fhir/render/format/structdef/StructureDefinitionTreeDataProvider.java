@@ -32,20 +32,20 @@ public class StructureDefinitionTreeDataProvider {
 		this.source = source;
 	}
 	
-	public FhirTreeData getSnapshotTreeData() {
-		FhirTreeData snapshotTree = FhirTreeDatas.getSnapshotTree(source);
+	public FhirTreeData<AbstractFhirTreeTableContent> getSnapshotTreeData() {
+		FhirTreeData<AbstractFhirTreeTableContent> snapshotTree = FhirTreeDatas.getSnapshotTree(source);
 		
 		cacheTreeLinks(snapshotTree);
 		
 		return snapshotTree;
 	}
 	
-	public FhirTreeData getDifferentialTreeData() {
+	public FhirTreeData<AbstractFhirTreeTableContent> getDifferentialTreeData() {
 		return getDifferentialTreeData(getSnapshotTreeData());
 	}
 	
-	public FhirTreeData getDifferentialTreeData(FhirTreeData backupTreeData) {
-		FhirTreeData differentialTree = FhirTreeDatas.getDifferentialTree(source);
+	public FhirTreeData<AbstractFhirTreeTableContent> getDifferentialTreeData(FhirTreeData<AbstractFhirTreeTableContent> backupTreeData) {
+		FhirTreeData<AbstractFhirTreeTableContent> differentialTree = FhirTreeDatas.getDifferentialTree(source);
 		
 		addBackupNodes(differentialTree, backupTreeData);
 		
@@ -54,13 +54,13 @@ public class StructureDefinitionTreeDataProvider {
 		return differentialTree;
 	}
 	
-	private void cacheTreeLinks(FhirTreeData treeData) {
+	private void cacheTreeLinks(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		new NameLinkedNodeResolver(treeData).resolve();
 		new IdLinkedNodeResolver(treeData).resolve();
 		new SlicingDiscriminatorCacher(treeData).resolve();
 	}
 	
-	private void addBackupNodes(FhirTreeData differentialTree, FhirTreeData snapshotTreeData) {
+	private void addBackupNodes(FhirTreeData<AbstractFhirTreeTableContent> differentialTree, FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData) {
 		for (AbstractFhirTreeTableContent differentialNode : differentialTree) {
 			FhirTreeNode backupNode = findBackupNode(differentialNode, snapshotTreeData);
 			differentialNode.setBackupNode(backupNode);
@@ -72,7 +72,7 @@ public class StructureDefinitionTreeDataProvider {
 	 * Every node in the differential should be present in the snapshot.
 	 * Sliced nodes need disambiguating on their discriminators to find the correct match.
 	 */
-	private FhirTreeNode findBackupNode(AbstractFhirTreeTableContent differentialNode, FhirTreeData snapshotTreeData) {
+	private FhirTreeNode findBackupNode(AbstractFhirTreeTableContent differentialNode, FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData) {
 		
 		FhirTreeNode searchRoot = (FhirTreeNode) snapshotTreeData.getRoot();
 		if (hasSlicedParent(differentialNode)) {
@@ -225,7 +225,7 @@ public class StructureDefinitionTreeDataProvider {
 	private List<FhirTreeNode> findMatchingSnapshotNodes(String differentialPath, FhirTreeNode searchRoot) {
 		List<FhirTreeNode> matchingNodes = Lists.newArrayList();
 		
-		for (AbstractFhirTreeTableContent node : new FhirTreeData(searchRoot)) {
+		for (AbstractFhirTreeTableContent node : new FhirTreeData<>(searchRoot)) {
 			if (node.getPath().equals(differentialPath)) {
 				if (node instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)node;

@@ -7,13 +7,13 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
 
 public class RedundantValueNodeRemover {
 
-	private final FhirTreeData differentialTreeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData;
 
-	public RedundantValueNodeRemover(FhirTreeData differentialTreeData) {
+	public RedundantValueNodeRemover(FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData) {
 		this.differentialTreeData = differentialTreeData;
 	}
 
-	public void process(FhirTreeData snapshotTreeData) {
+	public void process(FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData) {
 		stripExpandedPrimitiveValueNodes(snapshotTreeData.getRoot());
 	}
 

@@ -8,9 +8,9 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
 
 public class ComplexExtensionChildrenStripper {
 	
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 
-	public ComplexExtensionChildrenStripper(FhirTreeData treeData) {
+	public ComplexExtensionChildrenStripper(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 

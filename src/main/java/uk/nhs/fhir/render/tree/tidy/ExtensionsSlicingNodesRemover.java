@@ -9,9 +9,9 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
  * Tree tidier to remove slicing nodes associated with an extension node
  */
 public class ExtensionsSlicingNodesRemover {
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 
-	public ExtensionsSlicingNodesRemover(FhirTreeData treeData) {
+	public ExtensionsSlicingNodesRemover(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 	

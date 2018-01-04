@@ -10,9 +10,9 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
  * These should generally not be displayed.
  */
 public class ChildlessDummyNodeRemover {
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 
-	public ChildlessDummyNodeRemover(FhirTreeData treeData) {
+	public ChildlessDummyNodeRemover(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 

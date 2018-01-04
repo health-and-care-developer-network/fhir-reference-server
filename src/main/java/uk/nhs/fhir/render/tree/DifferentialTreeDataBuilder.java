@@ -3,11 +3,9 @@ package uk.nhs.fhir.render.tree;
 public class DifferentialTreeDataBuilder<T extends TreeContent<T>> extends FhirTreeDataBuilder<T> {
 
 	private final DummyNodeFactory<T> dummyNodeFactory;
-	private final TreeDataFactory<T> fhirTreeDataFactory;
 	
-	public DifferentialTreeDataBuilder(DummyNodeFactory<T> dummyNodeFactory, TreeDataFactory<T> fhirTreeDataFactory) {
+	public DifferentialTreeDataBuilder(DummyNodeFactory<T> dummyNodeFactory) {
 		this.dummyNodeFactory = dummyNodeFactory;
-		this.fhirTreeDataFactory = fhirTreeDataFactory;
 	}
 	
 	@Override
@@ -23,9 +21,5 @@ public class DifferentialTreeDataBuilder<T extends TreeContent<T>> extends FhirT
 
 			appendNode(dummyNodeFactory.create(currentNode, path));
 		}
-	}
-	
-	public FhirTreeData getTree() {
-		return fhirTreeDataFactory.create(rootNode);
 	}
 }

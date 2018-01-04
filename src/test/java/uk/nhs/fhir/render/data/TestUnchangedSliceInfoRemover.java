@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 
 import junit.framework.Assert;
 import uk.nhs.fhir.render.format.structdef.UnchangedSliceInfoRemover;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
 
@@ -14,14 +15,14 @@ public class TestUnchangedSliceInfoRemover {
 	public void testHideOne() {
 		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
 		root.addChild(TestFhirTreeNode.testNode("CHILD", "Test.child"));
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
 		
 		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
 		diffRoot.setBackupNode(root);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData(diffRoot));
+		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
 		remover.process(data);
 		
 		Assert.assertEquals(1, TestFhirTreeData.nodesCount(data));
@@ -32,7 +33,7 @@ public class TestUnchangedSliceInfoRemover {
 		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
 		FhirTreeNode child = TestFhirTreeNode.testNode("CHILD", "Test.child");
 		root.addChild(child);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
 		
@@ -42,7 +43,7 @@ public class TestUnchangedSliceInfoRemover {
 		diffChild.setBackupNode(child);
 		diffRoot.addChild(diffChild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData(diffRoot));
+		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
 		remover.process(data);
 		
 		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
@@ -55,7 +56,7 @@ public class TestUnchangedSliceInfoRemover {
 		root.addChild(child);
 		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
 		
@@ -65,7 +66,7 @@ public class TestUnchangedSliceInfoRemover {
 		diffChild.setBackupNode(child);
 		diffRoot.addChild(diffChild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData(diffRoot));
+		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
 		remover.process(data);
 		
 		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
@@ -78,7 +79,7 @@ public class TestUnchangedSliceInfoRemover {
 		root.addChild(child);
 		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
 		
@@ -91,7 +92,7 @@ public class TestUnchangedSliceInfoRemover {
 		diffGrandchild.setBackupNode(grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData(diffRoot));
+		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
 		remover.process(data);
 		
 		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
@@ -104,7 +105,7 @@ public class TestUnchangedSliceInfoRemover {
 		root.addChild(child);
 		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
 		
@@ -117,7 +118,7 @@ public class TestUnchangedSliceInfoRemover {
 		diffGrandchild.setBackupNode(grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData(diffRoot));
+		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
 		remover.process(data);
 		
 		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));

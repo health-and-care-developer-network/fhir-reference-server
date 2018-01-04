@@ -14,7 +14,7 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
 
 public class IdLinkedNodeResolver extends LinkedNodeResolver {
 	
-	public IdLinkedNodeResolver(FhirTreeData treeData) {
+	public IdLinkedNodeResolver(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		super(treeData);
 	}
 	

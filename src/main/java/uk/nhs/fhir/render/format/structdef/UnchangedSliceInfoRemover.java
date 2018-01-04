@@ -12,13 +12,13 @@ import uk.nhs.fhir.render.tree.FhirTreeData;
  */
 public class UnchangedSliceInfoRemover {
 	
-	private final FhirTreeData differentialTree;
+	private final FhirTreeData<AbstractFhirTreeTableContent> differentialTree;
 
-	public UnchangedSliceInfoRemover(FhirTreeData differentialTree) {
+	public UnchangedSliceInfoRemover(FhirTreeData<AbstractFhirTreeTableContent> differentialTree) {
 		this.differentialTree = differentialTree;
 	}
 	
-	public void process(FhirTreeData treeToModify) {
+	public void process(FhirTreeData<AbstractFhirTreeTableContent> treeToModify) {
 		removeNonDifferentialSlicingChildren(treeToModify.getRoot());
 	}
 	

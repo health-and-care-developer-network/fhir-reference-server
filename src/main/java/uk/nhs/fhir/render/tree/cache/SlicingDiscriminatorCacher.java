@@ -6,9 +6,9 @@ import uk.nhs.fhir.render.tree.FhirTreeNode;
 
 public class SlicingDiscriminatorCacher {
 	
-	private final FhirTreeData treeData;
+	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 	
-	public SlicingDiscriminatorCacher(FhirTreeData treeData) {
+	public SlicingDiscriminatorCacher(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 	

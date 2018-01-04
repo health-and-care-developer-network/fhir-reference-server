@@ -12,9 +12,9 @@ import uk.nhs.fhir.render.tree.FhirTreeNode;
 
 public abstract class LinkedNodeResolver {
 
-	protected final FhirTreeData treeData;
+	protected final FhirTreeData<AbstractFhirTreeTableContent> treeData;
 	
-	public LinkedNodeResolver(FhirTreeData treeData) {
+	public LinkedNodeResolver(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
 		this.treeData = treeData;
 	}
 	

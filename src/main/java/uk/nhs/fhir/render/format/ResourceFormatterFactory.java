@@ -76,15 +76,12 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
 			
-			if (!wrappedStructureDefinition.getConstrainedType().equals("Extension")) {
+			if (!wrappedStructureDefinition.isExtension()) {
 				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition), outputDirectory, "differential.html"));
 			}
-		}
-		else {
+		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
 		}
-		
-		
 		
 		return formatSpecs;
 	}

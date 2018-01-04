@@ -44,18 +44,18 @@ public class FhirTreeTable {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(FhirTreeTable.class);
 	
-	private final FhirTreeData data;
+	private final FhirTreeData<AbstractFhirTreeTableContent> data;
 	private final Style lineStyle = uk.nhs.fhir.render.html.tree.Style.DOTTED;
 	private final FhirVersion version;
 	
 	private final FhirIconProvider icons = new FhirIconProvider();
 	
-	public FhirTreeTable(FhirTreeData data, FhirVersion version) {
+	public FhirTreeTable(FhirTreeData<AbstractFhirTreeTableContent> data, FhirVersion version) {
 		this.data = data;
 		this.version = version;
 	}
 	
-	public FhirTreeData getData() {
+	public FhirTreeData<AbstractFhirTreeTableContent> getData() {
 		return data;
 	}
 

@@ -9,7 +9,7 @@ import uk.nhs.fhir.render.tree.FhirTreeNode;
 
 public class TestFhirTreeData {
 	
-	public static int nodesCount(FhirTreeData data) {
+	public static int nodesCount(FhirTreeData<AbstractFhirTreeTableContent> data) {
 		int total = 0;
 		
 		for (AbstractFhirTreeTableContent node : data) {
@@ -26,7 +26,7 @@ public class TestFhirTreeData {
 	@Test
 	public void testIterateSingleNode() {
 		FhirTreeNode root = TestFhirTreeNode.testNode("ROOT", "Test");
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 		
 		Assert.assertEquals(1, nodesCount(data));
 	}
@@ -40,7 +40,7 @@ public class TestFhirTreeData {
 	public void testIterateNodeWithChild() {
 		FhirTreeNode root = TestFhirTreeNode.testNode("ROOT", "Test");
 		root.addChild(TestFhirTreeNode.testNode("CHILD", "Test.child"));
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 
 		Assert.assertEquals(2, nodesCount(data));
 	}
@@ -59,7 +59,7 @@ public class TestFhirTreeData {
 		root.addChild(childNode);
 		FhirTreeNode grandchildNode = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
 		childNode.addChild(grandchildNode);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 
 		Assert.assertEquals(3, nodesCount(data));
 	}
@@ -76,7 +76,7 @@ public class TestFhirTreeData {
 		FhirTreeNode root = TestFhirTreeNode.testNode("ROOT", "Test");
 		root.addChild(TestFhirTreeNode.testNode("CHILD1", "Test.child1"));
 		root.addChild(TestFhirTreeNode.testNode("CHILD2", "Test.child2"));
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 
 		Assert.assertEquals(3, nodesCount(data));
 	}
@@ -103,7 +103,7 @@ public class TestFhirTreeData {
 		root.addChild(child2);
 		FhirTreeNode grandchild2 = TestFhirTreeNode.testNode("GRANDCHILD2", "Test.child2.grandchild2");
 		child2.addChild(grandchild2);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 
 		Assert.assertEquals(5, nodesCount(data));
 	} 
@@ -142,7 +142,7 @@ public class TestFhirTreeData {
 		child2.addChild(grandchild2a);
 		FhirTreeNode grandchild2b = TestFhirTreeNode.testNode("GRANDCHILD2A", "Test.child2.grandchild2b");
 		child2.addChild(grandchild2b);
-		FhirTreeData data = new FhirTreeData(root);
+		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
 
 		Assert.assertEquals(8, nodesCount(data));
 	} 

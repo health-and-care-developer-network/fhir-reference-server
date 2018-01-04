@@ -517,7 +517,7 @@ public class FhirTreeNode extends AbstractFhirTreeTableContent {
 		String fullPath = getPath() + "." + relativePath;
 		
 		List<AbstractFhirTreeTableContent> childNodesMatchingDiscriminatorPath = Lists.newArrayList();
-		for (AbstractFhirTreeTableContent descendantNode : new FhirTreeData(this)) {
+		for (AbstractFhirTreeTableContent descendantNode : new FhirTreeData<>(this)) {
 			if (descendantNode.getPath().equals(fullPath)) {
 				if (descendantNode instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)descendantNode;
