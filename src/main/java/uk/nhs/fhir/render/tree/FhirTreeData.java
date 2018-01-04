@@ -5,15 +5,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 
-import uk.nhs.fhir.util.StringUtil;
-
 public class FhirTreeData implements Iterable<AbstractFhirTreeTableContent> {
-	private static Logger LOG = LoggerFactory.getLogger(FhirTreeData.class);
 	
 	private final AbstractFhirTreeTableContent root;
 	
@@ -31,16 +25,6 @@ public class FhirTreeData implements Iterable<AbstractFhirTreeTableContent> {
 	public Iterator<AbstractFhirTreeTableContent> iterator() {
 		return new FhirTreeIterator (this);
 	}
-	
-	public void dumpTreeStructure() {
-		for (AbstractFhirTreeTableContent node : this) {
-			int indentSize = node.getPath().split("\\.").length - 1;
-			String indent = StringUtil.nChars(indentSize, '\t');
-			LOG.debug(indent + node.getDisplayName());
-		}
-	}
-
-	
 
 	public void cacheSlicingDiscriminators() {
 		for (AbstractFhirTreeTableContent content : this) {

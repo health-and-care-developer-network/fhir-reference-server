@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 
 /**
  * Builds up a tree structure from a list of FhirTreeNodes, based primarily on their 'path' attributes.
- * @author jon
  */
 public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
 	
