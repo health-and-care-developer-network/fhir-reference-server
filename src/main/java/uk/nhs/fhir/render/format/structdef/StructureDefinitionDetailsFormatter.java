@@ -30,9 +30,9 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
 import uk.nhs.fhir.render.html.style.FhirFont;
 import uk.nhs.fhir.render.html.table.Table;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
@@ -67,7 +67,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		
 		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();
 		
-		for (FhirTreeTableContent node : snapshotTreeData) {
+		for (AbstractFhirTreeTableContent node : snapshotTreeData) {
 			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
 			
 			String pathName = fhirTreeNode.getPathName();
@@ -123,7 +123,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	private void splitConstraints(FhirTreeNode node, FhirTreeData differentialTreeData,
 			List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
 		
-		Optional<FhirTreeTableContent> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
+		Optional<AbstractFhirTreeTableContent> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
 			.filter(differentialNode -> differentialNode.getBackupNode().get().equals(node))
 			.findFirst();
 		

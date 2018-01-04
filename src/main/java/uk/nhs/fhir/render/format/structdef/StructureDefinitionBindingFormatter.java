@@ -29,7 +29,7 @@ import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirIcon;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -84,7 +84,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                 ));
         StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 
-        for (FhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
+        for (AbstractFhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
             processNode(content);
         }
 
@@ -102,7 +102,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
 		return section;
 	}
 
-	private void processNode(FhirTreeTableContent node)
+	private void processNode(AbstractFhirTreeTableContent node)
     {
         if (node.getBinding().isPresent()) {
 

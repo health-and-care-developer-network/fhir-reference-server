@@ -2,8 +2,8 @@ package uk.nhs.fhir.render.format.structdef;
 
 import java.util.stream.StreamSupport;
 
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
 
 public class RedundantValueNodeRemover {
 
@@ -28,9 +28,9 @@ public class RedundantValueNodeRemover {
 	 * We should remove these nodes since the information is redundant (should probably appear as a constraint on the element if anything?)
 	 * and there isn't a sensible 'type' to assign to them, so they look peculiar in the tree. Simplifier seems not to display them.
 	 */
-	private void stripExpandedPrimitiveValueNodes(FhirTreeTableContent node) {
+	private void stripExpandedPrimitiveValueNodes(AbstractFhirTreeTableContent node) {
 		for (int i=node.getChildren().size()-1; i>=0; i--) {
-			FhirTreeTableContent child = node.getChildren().get(i);
+			AbstractFhirTreeTableContent child = node.getChildren().get(i);
 
 			if (child.getPathName().equals("value")
 			  && child.getParent() != null
@@ -44,7 +44,7 @@ public class RedundantValueNodeRemover {
 		}
 	}
 
-	private boolean isDifferentialBackupNode(FhirTreeTableContent candidateForRemoval) {
+	private boolean isDifferentialBackupNode(AbstractFhirTreeTableContent candidateForRemoval) {
 		return StreamSupport.stream(differentialTreeData.spliterator(), false)
 			.anyMatch(differentialNode -> differentialNode.getBackupNode().get().equals(candidateForRemoval));
 	}

@@ -25,28 +25,28 @@ import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.StringUtil;
 
-public class FhirTreeData implements Iterable<FhirTreeTableContent> {
+public class FhirTreeData implements Iterable<AbstractFhirTreeTableContent> {
 	private static Logger LOG = LoggerFactory.getLogger(FhirTreeData.class);
 	
-	private final FhirTreeTableContent root;
+	private final AbstractFhirTreeTableContent root;
 	
-	public FhirTreeData(FhirTreeTableContent root) {
+	public FhirTreeData(AbstractFhirTreeTableContent root) {
 		Preconditions.checkNotNull(root);
 		
 		this.root = root;
 	}
 
-	public FhirTreeTableContent getRoot() {
+	public AbstractFhirTreeTableContent getRoot() {
 		return root;
 	}
 
 	@Override
-	public Iterator<FhirTreeTableContent> iterator() {
+	public Iterator<AbstractFhirTreeTableContent> iterator() {
 		return new FhirTreeIterator (this);
 	}
 	
 	public void dumpTreeStructure() {
-		for (FhirTreeTableContent node : this) {
+		for (AbstractFhirTreeTableContent node : this) {
 			int indentSize = node.getPath().split("\\.").length - 1;
 			String indent = StringUtil.nChars(indentSize, '\t');
 			LOG.debug(indent + node.getDisplayName());
@@ -61,17 +61,17 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 	
 	// Remove inlined child nodes of complex extensions
-	private void stripComplexExtensionChildren(FhirTreeTableContent node) {
+	private void stripComplexExtensionChildren(AbstractFhirTreeTableContent node) {
 		boolean isComplexExtension = node.getExtensionType().isPresent() 
 		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
 		  // exclude root node
 		  && node.getPath().contains(".");
 		
-		List<? extends FhirTreeTableContent> children = node.getChildren();
+		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
 		
 		for (int i=children.size()-1; i>=0; i--) {
 			
-			FhirTreeTableContent child = children.get(i);
+			AbstractFhirTreeTableContent child = children.get(i);
 			if (isComplexExtension) {
 				children.remove(i);
 			} else {
@@ -82,8 +82,8 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 
 	private static final Set<String> constraintKeysToRemove = new HashSet<>(Arrays.asList(new String[] {"ele-1"}));
 	
-	private void removeUnwantedConstraints(FhirTreeTableContent node) {
-		for (FhirTreeTableContent child : node.getChildren()) {
+	private void removeUnwantedConstraints(AbstractFhirTreeTableContent node) {
+		for (AbstractFhirTreeTableContent child : node.getChildren()) {
 			List<ConstraintInfo> constraints = child.getConstraints();
 			for (int constraintIndex=constraints.size()-1; constraintIndex>=0; constraintIndex--) {
 				ConstraintInfo constraint = constraints.get(constraintIndex);
@@ -96,9 +96,9 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 		}
 	}
 
-	private void stripChildlessDummyNodes(FhirTreeTableContent node) {
+	private void stripChildlessDummyNodes(AbstractFhirTreeTableContent node) {
 		for (int i=node.getChildren().size()-1; i>=0; i--) {
-			FhirTreeTableContent child = node.getChildren().get(i);
+			AbstractFhirTreeTableContent child = node.getChildren().get(i);
 			
 			stripChildlessDummyNodes(child);
 			
@@ -109,12 +109,12 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 		}
 	}
 
-	private void removeExtensionsSlicingNodes(FhirTreeTableContent node) {
-		List<? extends FhirTreeTableContent> children = node.getChildren();
+	private void removeExtensionsSlicingNodes(AbstractFhirTreeTableContent node) {
+		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
 		
 		// if there is an extensions slicing node (immediately under root), remove it.
 		for (int i=children.size()-1; i>=0; i--) {
-			FhirTreeTableContent child = children.get(i);
+			AbstractFhirTreeTableContent child = children.get(i);
 			if (child.getPathName().equals("extension")
 			  && child.hasSlicingInfo()) {
 				children.remove(i);
@@ -132,12 +132,12 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	/**
 	 * Remove all nodes that have cardinality max = 0 (and their children)
 	 */
-	private void stripRemovedElements(FhirTreeTableContent node) {
-		List<? extends FhirTreeTableContent> children = node.getChildren();
+	private void stripRemovedElements(AbstractFhirTreeTableContent node) {
+		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
 		
 		for (int i=children.size()-1; i>=0; i--) {
 			
-			FhirTreeTableContent child = children.get(i);
+			AbstractFhirTreeTableContent child = children.get(i);
 			
 			if (child.isRemovedByProfile()) {
 				children.remove(i);
@@ -153,10 +153,10 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	private void resolveIdLinkedNodes() {
-		Map<String, List<FhirTreeTableContent>> expectedIds = Maps.newHashMap();
-		Map<String, FhirTreeTableContent> nodesWithId = Maps.newHashMap();
+		Map<String, List<AbstractFhirTreeTableContent>> expectedIds = Maps.newHashMap();
+		Map<String, AbstractFhirTreeTableContent> nodesWithId = Maps.newHashMap();
 		
-		for (FhirTreeTableContent node : this) {
+		for (AbstractFhirTreeTableContent node : this) {
 			
 			Optional<String> id = node.getId();
 			boolean hasId = id.isPresent();
@@ -167,7 +167,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			Optional<String> linkedNodeId = node.getLinkedNodeId();
 			boolean hasIdLinkedNode = linkedNodeId.isPresent();
 			if (hasIdLinkedNode) {
-				List<FhirTreeTableContent> nodesLinkingToThisId;
+				List<AbstractFhirTreeTableContent> nodesLinkingToThisId;
 				if (expectedIds.containsKey(linkedNodeId.get())) {
 					nodesLinkingToThisId = expectedIds.get(linkedNodeId.get());
 				} else {
@@ -194,14 +194,14 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 		setLinkedNodes(expectedIds, nodesWithId);
 	}
 
-	void setLinkedNodes(Map<String, List<FhirTreeTableContent>> expectedIds,
-			Map<String, FhirTreeTableContent> nodesWithId) {
-		for (Map.Entry<String, List<FhirTreeTableContent>> expectedIdEntry : expectedIds.entrySet()) {
+	void setLinkedNodes(Map<String, List<AbstractFhirTreeTableContent>> expectedIds,
+			Map<String, AbstractFhirTreeTableContent> nodesWithId) {
+		for (Map.Entry<String, List<AbstractFhirTreeTableContent>> expectedIdEntry : expectedIds.entrySet()) {
 			String expectedId = expectedIdEntry.getKey();
-			List<FhirTreeTableContent> nodesWithLink = expectedIdEntry.getValue();
+			List<AbstractFhirTreeTableContent> nodesWithLink = expectedIdEntry.getValue();
 			
 			if (nodesWithId.containsKey(expectedId)) {
-				for (FhirTreeTableContent nodeWithLink : nodesWithLink) {
+				for (AbstractFhirTreeTableContent nodeWithLink : nodesWithLink) {
 					if (nodeWithLink instanceof FhirTreeNode) {
 						((FhirTreeNode)nodeWithLink).setLinkedNode(nodesWithId.get(expectedId));
 					}
@@ -222,10 +222,10 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	public void resolveNameLinkedNodes() {
-		Map<String, List<FhirTreeTableContent>> expectedNames = Maps.newHashMap();
-		Map<String, FhirTreeTableContent> namedNodes = Maps.newHashMap();
+		Map<String, List<AbstractFhirTreeTableContent>> expectedNames = Maps.newHashMap();
+		Map<String, AbstractFhirTreeTableContent> namedNodes = Maps.newHashMap();
 		
-		for (FhirTreeTableContent node : this) {
+		for (AbstractFhirTreeTableContent node : this) {
 			boolean hasName = node.getName().isPresent();
 			if (hasName) {
 				namedNodes.put(node.getName().get(), node);
@@ -233,7 +233,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 			
 			boolean hasLinkedNode = node.getLinkedNodeName().isPresent();
 			if (hasLinkedNode) {
-				List<FhirTreeTableContent> nodesLinkingToThisName;
+				List<AbstractFhirTreeTableContent> nodesLinkingToThisName;
 				if (expectedNames.containsKey(node.getLinkedNodeName().get())) {
 					nodesLinkingToThisName = expectedNames.get(node.getLinkedNodeName().get());
 				} else {
@@ -262,7 +262,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 
 	public void cacheSlicingDiscriminators() {
-		for (FhirTreeTableContent content : this) {
+		for (AbstractFhirTreeTableContent content : this) {
 			if (content instanceof FhirTreeNode) {
 				FhirTreeNode node = (FhirTreeNode)content;
 				node.cacheSlicingDiscriminator();
@@ -271,7 +271,7 @@ public class FhirTreeData implements Iterable<FhirTreeTableContent> {
 	}
 }
 
-class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
+class FhirTreeIterator implements Iterator<AbstractFhirTreeTableContent> {
 
 	// Each node down the tree to the current node
 	Deque<FhirNodeAndChildIndex> chain = new ArrayDeque<>();
@@ -304,7 +304,7 @@ class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
 	}
 
 	@Override
-	public FhirTreeTableContent next() {
+	public AbstractFhirTreeTableContent next() {
 		if (!returnedRoot()) {
 			return supplyRoot();
 		}
@@ -347,23 +347,23 @@ class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
 		throw new NoSuchElementException();*/
 	}
 
-	private FhirTreeTableContent supplyRoot() {
-		FhirTreeTableContent root = data.getRoot();
+	private AbstractFhirTreeTableContent supplyRoot() {
+		AbstractFhirTreeTableContent root = data.getRoot();
 		chain.add(new FhirNodeAndChildIndex(root));
 		return root;
 	}
 	
-	private FhirTreeTableContent nextChildOfCurrent() {
-		FhirTreeTableContent child = chain.getLast().nextChild();
+	private AbstractFhirTreeTableContent nextChildOfCurrent() {
+		AbstractFhirTreeTableContent child = chain.getLast().nextChild();
 		chain.add(new FhirNodeAndChildIndex(child));
 		return child;
 	}
 	
 	private class FhirNodeAndChildIndex {
-		private final FhirTreeTableContent node;
+		private final AbstractFhirTreeTableContent node;
 		private Integer currentChildIndex;
 		
-		FhirNodeAndChildIndex(FhirTreeTableContent node) {
+		FhirNodeAndChildIndex(AbstractFhirTreeTableContent node) {
 			this.node = node;
 			this.currentChildIndex = null;
 		}
@@ -379,7 +379,7 @@ class FhirTreeIterator implements Iterator<FhirTreeTableContent> {
 			}
 		}
 		
-		public FhirTreeTableContent nextChild() {
+		public AbstractFhirTreeTableContent nextChild() {
 			if (currentChildIndex == null) {
 				currentChildIndex = 0;
 			} else {

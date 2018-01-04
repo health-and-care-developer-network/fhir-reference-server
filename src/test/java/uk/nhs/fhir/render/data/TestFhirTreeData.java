@@ -3,16 +3,16 @@ package uk.nhs.fhir.render.data;
 import org.junit.Test;
 
 import junit.framework.Assert;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
 
 public class TestFhirTreeData {
 	
 	public static int nodesCount(FhirTreeData data) {
 		int total = 0;
 		
-		for (FhirTreeTableContent node : data) {
+		for (AbstractFhirTreeTableContent node : data) {
 			Assert.assertNotNull(node);
 			total++;
 		}

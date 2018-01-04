@@ -2,11 +2,11 @@ package uk.nhs.fhir.render.html.tree;
 
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 
 public class FhirIconProvider {
 
-	public FhirIcon getIcon(FhirTreeTableContent node) {
+	public FhirIcon getIcon(AbstractFhirTreeTableContent node) {
 		
 		if (node.getLinkedNode().isPresent()) {
 			return FhirIcon.REUSE;

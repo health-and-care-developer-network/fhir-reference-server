@@ -36,7 +36,7 @@ public abstract class AbstractRendererEventHandler extends AbstractEventHandler 
 	}
 	
 	/*
-	 * Ensure that we only LoggedRenderingExceptions. This allows us to distinguish between errors that
+	 * Ensure that we only throw LoggedRenderingExceptions. This allows us to distinguish between errors that
 	 * have been handled and errors that haven't, and prevent errors being reported twice.
 	 */
 	public final void error(Optional<String> info, Optional<Exception> error) {

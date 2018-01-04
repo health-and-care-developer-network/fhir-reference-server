@@ -34,9 +34,9 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.table.TableRow;
 import uk.nhs.fhir.render.html.table.TableTitle;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.FhirTreeNode;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
 
@@ -78,7 +78,7 @@ public class FhirTreeTable {
 		
 		data.tidyData();
 		
-		FhirTreeTableContent root = data.getRoot();
+		AbstractFhirTreeTableContent root = data.getRoot();
 		
 		List<Boolean> rootVlines = Lists.newArrayList(root.hasChildren());
 		List<FhirTreeIcon> rootIcons = Lists.newArrayList();
@@ -89,11 +89,11 @@ public class FhirTreeTable {
 		return tableRows;
 	}
 
-	private void addChildrenRows(FhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
+	private void addChildrenRows(AbstractFhirTreeTableContent node, List<TableRow> tableRows, List<Boolean> vlines) {
 		
-		List<? extends FhirTreeTableContent> children = node.getChildren();
+		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
 		for (int i=0; i<children.size(); i++) {
-			FhirTreeTableContent childNode = children.get(i);
+			AbstractFhirTreeTableContent childNode = children.get(i);
 			
 			List<Boolean> childVlines = Lists.newArrayList(vlines);
 			childVlines.add(childNode.hasChildren());
@@ -124,11 +124,11 @@ public class FhirTreeTable {
 		}
 	}
 
-	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
+	private void addTableRow(List<TableRow> tableRows, AbstractFhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons) {
 		addTableRow(tableRows, nodeToAdd, rootVlines, treeIcons, false);
 	}
 	
-	private void addTableRow(List<TableRow> tableRows, FhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean isRoot) {
+	private void addTableRow(List<TableRow> tableRows, AbstractFhirTreeTableContent nodeToAdd, List<Boolean> rootVlines, List<FhirTreeIcon> treeIcons, boolean isRoot) {
 		boolean[] vlinesRequired = listToBoolArray(rootVlines);
 		String backgroundCSSClass = TablePNGGenerator.getCSSClass(lineStyle, vlinesRequired);
 		LinkDatas typeLinks = nodeToAdd.getTypeLinks();
@@ -151,7 +151,7 @@ public class FhirTreeTable {
 				new ValueWithInfoCell(nodeToAdd.getInformation(), getNodeResourceInfos(nodeToAdd))));
 	}
 	
-	private List<ResourceInfo> getNodeResourceInfos(FhirTreeTableContent node) {
+	private List<ResourceInfo> getNodeResourceInfos(AbstractFhirTreeTableContent node) {
 		List<ResourceInfo> resourceInfos = Lists.newArrayList();
 		
 		for (ConstraintInfo constraint : node.getConstraints()) {
@@ -169,7 +169,7 @@ public class FhirTreeTable {
 		}
 		
 		// slicing discriminator
-		FhirTreeTableContent ancestor = node.getParent();
+		AbstractFhirTreeTableContent ancestor = node.getParent();
 		while (ancestor != null) {
 			if (ancestor.hasSlicingInfo()) {
 				Set<String> discriminatorPaths = ancestor.getSlicingInfo().get().getDiscriminatorPaths();

@@ -8,29 +8,29 @@ import com.google.common.collect.Lists;
  * Builds up a tree structure from a list of FhirTreeNodes, based primarily on their 'path' attributes.
  * @author jon
  */
-public class FhirTreeDataBuilder {
+public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
 	
-	private List<String> path = Lists.newArrayList();
-	private FhirTreeTableContent rootNode = null;
-	private FhirTreeTableContent currentNode = null;
-	private boolean allowDummyNodes = false;
+	protected abstract void stepToNonAncestorPath(NodePath targetPath);
+	public abstract FhirTreeData getTree();
 	
-	public void permitDummyNodes() {
-		this.allowDummyNodes = true;
-	}
+	protected final NodePath path = new NodePath();
+	protected T rootNode = null;
+	protected T currentNode = null;
 	
-	public void addFhirTreeNode(FhirTreeNode node) {
-		String nodePath = node.getPath();
-		List<String> tailPathParts = Lists.newArrayList(nodePath.split("\\."));
-		String headPathPart = tailPathParts.remove(tailPathParts.size() - 1);
+	public void addFhirTreeNode(T node) {
+		NodePath nodeParentPathParts = new NodePath(node.getPath());
 		
-		stepOutTo(tailPathParts);
+		// pop the last part of the path (node name) off the end, leaving the parent path 
+		String nodeName = nodeParentPathParts.stepOut();
+		
+		// update state so that we are ready to append the next node
+		stepTo(nodeParentPathParts);
 		
 		appendNode(node);
-		path.add(headPathPart);
+		path.stepInto(nodeName);
 	}
 	
-	private void appendNode(FhirTreeTableContent newNode) {
+	protected void appendNode(T newNode) {
 		if (currentNode == null) {
 			rootNode = newNode;
 			currentNode = newNode;
@@ -39,55 +39,84 @@ public class FhirTreeDataBuilder {
 			currentNode = newNode;
 		}
 	}
-	private void stepOutTo(List<String> targetPath) {
-		if (pathIsSubpath(path, targetPath)) {
-			int stepOutCount = path.size() - targetPath.size();
-			for (int i=0; i<stepOutCount; i++) {
-				stepOut();
-			}
-		} else if (allowDummyNodes) {
-			// trim path back until it only has nodes in common with the target path
-			while (!pathIsSubpath(targetPath, path)) {
-				stepOut();
-			}
-			
-			// add dummy nodes until we reach the target path
-			for (int i=path.size(); i<targetPath.size(); i++) {
-				String nextPathSegment = targetPath.get(i);
-				path.add(nextPathSegment);
-				String nextFullPath = String.join(".", path);
-				FhirTreeTableContent dummyNode = new DummyFhirTreeNode(currentNode, nextFullPath);
-				appendNode(dummyNode);
-			}
+	
+	private void stepTo(NodePath targetPath) {
+		if (path.isSubpath(targetPath)) {
+			stepOutToAncestorPath(targetPath);
 		} else {
-			throw new IllegalArgumentException("Cannot step out from " + String.join(".", path) + " to " + String.join(".", targetPath));
+			stepToNonAncestorPath(targetPath);
 		}
 		
-		if (currentNode != null
-		  && currentNode.getPath().split("\\.").length != path.size()) {
-			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + String.join(", ", path));
+		sanityCheck();
+	}
+	
+	private void stepOutToAncestorPath(NodePath ancestorPath) {
+		while (path.size() > ancestorPath.size()) {
+			stepOut();
 		}
 	}
 
-	private void stepOut() {
+	protected void stepOut() {
 		currentNode = currentNode.getParent();
-		path.remove(path.size() - 1);
+		path.stepOut();
+	}
+
+	private void sanityCheck() {
+		if (currentNode != null
+		  && currentNode.getPath().split("\\.").length != path.size()) {
+			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + path.toPathString());
+		}
+	}
+}
+
+// A stack of strings representing the period-separated path of a node within a FHIR tree (the <path> tag of a node).
+class NodePath {
+	private final List<String> pathParts;
+	
+	public NodePath() {
+		this.pathParts = Lists.newArrayList();
 	}
 	
-	private static boolean pathIsSubpath(List<String> path, List<String> ancestorPath) {
-		if (ancestorPath.size() > path.size()) {
+	public NodePath(String nodePath) {
+		String[] partsArray = nodePath.split("\\.");
+		this.pathParts = Lists.newArrayList(partsArray);
+	}
+	
+	public NodePath(List<String> pathParts) {
+		this.pathParts = pathParts;
+	}
+	
+	public void stepInto(String newPathPart) {
+		pathParts.add(newPathPart);
+	}
+	
+	public String stepOut() {
+		return pathParts.remove(pathParts.size() - 1);
+	}
+	
+	public int size() {
+		return pathParts.size();
+	}
+	
+	public String getPart(int i) {
+		return pathParts.get(i);
+	}
+	
+	// Returns true if this path begin with the entirety of ancestorPath
+	public boolean isSubpath(NodePath ancestorPath) {
+		if (ancestorPath.size() > size()) {
 			return false;
 		}
 		
 		for (int i=0; i<ancestorPath.size(); i++) {
-			if (!path.get(i).equals(ancestorPath.get(i))) {
+			if (!pathParts.get(i).equals(ancestorPath.getPart(i))) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public FhirTreeData getTree() {
-		return new FhirTreeData(rootNode); 
+	public String toPathString() {
+		return String.join(".", pathParts);
 	}
 }

@@ -32,7 +32,7 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class FhirTreeNode implements FhirTreeTableContent {
+public class FhirTreeNode extends AbstractFhirTreeTableContent {
 	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;
@@ -58,14 +58,14 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	private List<String> aliases = Lists.newArrayList();
 	private Optional<String> linkedNodeName = Optional.empty();
 	private Optional<String> linkedNodeId = Optional.empty();
-	private Optional<FhirTreeTableContent> linkedNode = Optional.empty();
+	private Optional<AbstractFhirTreeTableContent> linkedNode = Optional.empty();
 	private Optional<String> discriminatorValue = Optional.empty();
 	private List<FhirElementMapping> mappings = Lists.newArrayList();
 
-	private FhirTreeTableContent parent = null;
+	private AbstractFhirTreeTableContent parent = null;
 	private FhirTreeNode backupNode = null;
 
-	private final List<FhirTreeTableContent> children = Lists.newArrayList();
+	private final List<AbstractFhirTreeTableContent> children = Lists.newArrayList();
 
 	public FhirTreeNode(
 			Optional<String> name,
@@ -235,7 +235,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 	public String getNodeKey() {
 		Deque<String> ancestorKeys = new LinkedList<>();
 		
-		for (FhirTreeTableContent ancestor = this; ancestor != null; ancestor = ancestor.getParent()) {
+		for (AbstractFhirTreeTableContent ancestor = this; ancestor != null; ancestor = ancestor.getParent()) {
 			ancestorKeys.addFirst(ancestor.getKeySegment());
 		}
 		
@@ -276,8 +276,8 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		  			  && child.hasSlicingInfo());
 	}
 	
-	public FhirTreeTableContent getSlicingSibling() {
-		List<? extends FhirTreeTableContent> slicingSiblings = parent.getChildren()
+	public AbstractFhirTreeTableContent getSlicingSibling() {
+		List<? extends AbstractFhirTreeTableContent> slicingSiblings = getParent().getChildren()
 			.stream()
 			.filter(child -> child.getPath().equals(getPath()) && child.hasSlicingInfo())
 			.collect(Collectors.toList());
@@ -317,25 +317,20 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return constraints;
 	}
 
-	public void addChild(int index, FhirTreeTableContent child) {
-		children.add(index, child);
-		child.setParent(this);
-	}
-
-	public void addChild(FhirTreeTableContent child) {
+	public void addChild(AbstractFhirTreeTableContent child) {
 		children.add(child);
 		child.setParent(this);
 	}
 
-	public FhirTreeTableContent getParent() {
+	public AbstractFhirTreeTableContent getParent() {
 		return parent;
 	}
 
-	public void setParent(FhirTreeTableContent fhirTreeNode) {
+	public void setParent(AbstractFhirTreeTableContent fhirTreeNode) {
 		this.parent = fhirTreeNode;
 	}
 
-	public List<? extends FhirTreeTableContent> getChildren() {
+	public List<? extends AbstractFhirTreeTableContent> getChildren() {
 		return children;
 	}
 
@@ -478,11 +473,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 		return extensionType;
 	}
 	
-	public void setLinkedNode(FhirTreeTableContent linkedNode) {
+	public void setLinkedNode(AbstractFhirTreeTableContent linkedNode) {
 		this.linkedNode = Optional.of(linkedNode);
 	}
 	
-	public Optional<FhirTreeTableContent> getLinkedNode() {
+	public Optional<AbstractFhirTreeTableContent> getLinkedNode() {
 		if ((linkedNodeName.isPresent() || linkedNodeId.isPresent())
 		  && !linkedNode.isPresent()) {
 			
@@ -518,11 +513,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			.collect(Collectors.toSet());
 	}
 
-	public Optional<FhirTreeTableContent> findUniqueDescendantMatchingPath(String relativePath) {
+	public Optional<AbstractFhirTreeTableContent> findUniqueDescendantMatchingPath(String relativePath) {
 		String fullPath = getPath() + "." + relativePath;
 		
-		List<FhirTreeTableContent> childNodesMatchingDiscriminatorPath = Lists.newArrayList();
-		for (FhirTreeTableContent descendantNode : new FhirTreeData(this)) {
+		List<AbstractFhirTreeTableContent> childNodesMatchingDiscriminatorPath = Lists.newArrayList();
+		for (AbstractFhirTreeTableContent descendantNode : new FhirTreeData(this)) {
 			if (descendantNode.getPath().equals(fullPath)) {
 				if (descendantNode instanceof FhirTreeNode) {
 					FhirTreeNode matchedFhirTreeNode = (FhirTreeNode)descendantNode;
@@ -533,7 +528,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 			}
 		}
 		
-		FhirTreeTableContent discriminatorDescendant;
+		AbstractFhirTreeTableContent discriminatorDescendant;
 		if (childNodesMatchingDiscriminatorPath.size() == 1) {
 			discriminatorDescendant = childNodesMatchingDiscriminatorPath.get(0);
 		} else if (childNodesMatchingDiscriminatorPath.size() == 0) {
@@ -582,7 +577,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 				
 				if (discriminators.isEmpty()) {
 					if (discriminatorPath.endsWith("@type")) {
-						Optional<FhirTreeTableContent> discriminatorNode;
+						Optional<AbstractFhirTreeTableContent> discriminatorNode;
 						if (discriminatorPath.equals("@type")) {
 							discriminatorNode = Optional.of(this);
 						} else {
@@ -606,7 +601,7 @@ public class FhirTreeNode implements FhirTreeTableContent {
 					} else {
 						// most discriminators
 						
-						Optional<FhirTreeTableContent> discriminatorNode = findUniqueDescendantMatchingPath(discriminatorPath);
+						Optional<AbstractFhirTreeTableContent> discriminatorNode = findUniqueDescendantMatchingPath(discriminatorPath);
 						boolean foundNode = discriminatorNode.isPresent(); 
 						boolean isFixed = foundNode && discriminatorNode.get().isFixedValue();
 						boolean hasBinding = foundNode && discriminatorNode.get().hasBinding();

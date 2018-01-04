@@ -15,32 +15,19 @@ import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 
-public class DummyFhirTreeNode implements FhirTreeTableContent {
+public class DummyFhirTreeNode extends AbstractFhirTreeTableContent {
 
 	public static final boolean DISPLAY_DUMMY_NODE_TYPES = true;
 	
 	private FhirTreeNode backup = null;
-	private FhirTreeTableContent parent;
-	private final List<FhirTreeTableContent> children = Lists.newArrayList();
 	private final String path;
 	
-	public DummyFhirTreeNode(FhirTreeTableContent parent, String path) {
-		//Preconditions.checkNotNull(parent);
+	public DummyFhirTreeNode(AbstractFhirTreeTableContent parent, String path) {
+		super(parent);
+		
 		Preconditions.checkNotNull(path);
 		
-		this.parent = parent;
 		this.path = path;
-	}
-	
-	@Override
-	public void addChild(FhirTreeTableContent child) {
-		children.add(child);
-		child.setParent(this);
-	}
-
-	@Override
-	public FhirTreeTableContent getParent() {
-		return parent;
 	}
 	
 	@Override
@@ -49,23 +36,13 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public List<FhirTreeTableContent> getChildren() {
-		return children;
-	}
-
-	@Override
 	public boolean hasChildren() {
 		// a dummy node only exists to hold a non-dummy child
-		if (children.isEmpty()) {
+		if (getChildren().isEmpty()) {
 			throw new IllegalStateException("Dummy FHIR tree node without children");
 		}
 		
 		return true;
-	}
-
-	@Override
-	public void setParent(FhirTreeTableContent parent) {
-		this.parent = parent;
 	}
 
 	@Override
@@ -221,7 +198,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public FhirTreeTableContent getSlicingSibling() {
+	public AbstractFhirTreeTableContent getSlicingSibling() {
 		return backup.getSlicingSibling();
 	}
 
@@ -251,7 +228,7 @@ public class DummyFhirTreeNode implements FhirTreeTableContent {
 	}
 
 	@Override
-	public Optional<FhirTreeTableContent> getLinkedNode() {
+	public Optional<AbstractFhirTreeTableContent> getLinkedNode() {
 		return backup.getLinkedNode();
 	}
 	

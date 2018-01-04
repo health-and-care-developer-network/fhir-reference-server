@@ -3,8 +3,8 @@ package uk.nhs.fhir.render.format.structdef;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeTableContent;
 
 /**
  * Takes a FHIR tree data and its differential data. Removes any children of slice nodes if they are not modified 
@@ -22,22 +22,22 @@ public class UnchangedSliceInfoRemover {
 		removeNonDifferentialSlicingChildren(treeToModify.getRoot());
 	}
 	
-	public void removeNonDifferentialSlicingChildren(FhirTreeTableContent currentNode) {
+	public void removeNonDifferentialSlicingChildren(AbstractFhirTreeTableContent currentNode) {
 		
 		if (currentNode.hasSlicingInfo()) {
 			removeNonDifferentialDescendants(currentNode);
 		} else {
-			for (FhirTreeTableContent child : currentNode.getChildren()) {
+			for (AbstractFhirTreeTableContent child : currentNode.getChildren()) {
 				removeNonDifferentialSlicingChildren(child);
 			}
 		}
 	}
 	
-	private void removeNonDifferentialDescendants(FhirTreeTableContent node) {
-		List<? extends FhirTreeTableContent> children = node.getChildren();
+	private void removeNonDifferentialDescendants(AbstractFhirTreeTableContent node) {
+		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
 		
 		for (int i=children.size()-1; i>=0; i--) {
-			FhirTreeTableContent child = children.get(i);
+			AbstractFhirTreeTableContent child = children.get(i);
 			if (!isDifferentialBackupNode(child)) {
 				children.remove(i);
 			} else {
@@ -46,7 +46,7 @@ public class UnchangedSliceInfoRemover {
 		}
 	}
 
-	private boolean isDifferentialBackupNode(FhirTreeTableContent candidateForRemoval) {
+	private boolean isDifferentialBackupNode(AbstractFhirTreeTableContent candidateForRemoval) {
 		return StreamSupport.stream(differentialTree.spliterator(), false)
 			.anyMatch(differentialNode -> differentialNode.getBackupNode().get().equals(candidateForRemoval));
 	}
