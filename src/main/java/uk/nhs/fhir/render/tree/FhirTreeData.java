@@ -27,6 +27,10 @@ public class FhirTreeData<T extends TreeContent<T>> implements Iterable<T> {
 	}
 }
 
+/**
+ * A depth-first iterator over every node in a tree.
+ * Maintains a list of nodes ('chain') which may still have children to offer.
+ */
 class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 
 	// Each node down the tree to the current node
@@ -59,6 +63,9 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 		return !chain.isEmpty();
 	}
 
+	/**
+	 * returns the next child of the last node in that chain that still has children to offer, stripping off any that are fully consumed.
+	 */
 	@Override
 	public T next() {
 		if (!returnedRoot()) {
@@ -71,6 +78,7 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 			} else if (chain.size() > 1) {
 				chain.removeLast();
 			} else {
+				// Only root node remains, but it has no more children. Fully consumed.
 				throw new NoSuchElementException();
 			}
 		}
@@ -88,6 +96,10 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 		return child;
 	}
 	
+	/**
+	 * Wrapper around a node, holding a reference to the index, allowing iteration over an individual
+	 * node's children.
+	 */
 	private class NodeAndChildIndex {
 		private final T node;
 		private Integer currentChildIndex;

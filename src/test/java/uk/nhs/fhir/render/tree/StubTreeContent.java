@@ -13,4 +13,7 @@ public class StubTreeContent extends TreeContent<StubTreeContent> {
 		return path;
 	}
 	
+	public boolean isDummy() {
+		return false;
+	}
 }
