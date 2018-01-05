@@ -8,7 +8,7 @@ public class TestFhirTreeDataBuilder {
 	@Test
 	public void testSingleNodeTree() {
 		StubTreeContent root = new StubTreeContent("test");
-		SnapshotTreeDataBuilder<StubTreeContent> treeBuilder = new SnapshotTreeDataBuilder<>();
+		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
 		treeBuilder.addFhirTreeNode(root);
 		
 		FhirTreeData<StubTreeContent> tree = treeBuilder.getTree();

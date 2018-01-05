@@ -1,19 +1,32 @@
 package uk.nhs.fhir.render.tree;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
 /**
  * Builds up a tree structure from a list of FhirTreeNodes, based primarily on their 'path' attributes.
  */
-public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
+public class FhirTreeDataBuilder<T extends TreeContent<T>> {
 	
-	protected abstract void stepToNonAncestorPath(NodePath targetPath);
+	private final NodePath path = new NodePath();
+	private final Optional<DummyNodeFactory<T>> dummyNodeFactory;
 	
-	protected final NodePath path = new NodePath();
-	protected T rootNode = null;
-	protected T currentNode = null;
+	private T rootNode = null;
+	private T currentNode = null;
+	
+	public FhirTreeDataBuilder() {
+		this(Optional.empty());
+	}
+	
+	public FhirTreeDataBuilder(DummyNodeFactory<T> dummyNodeFactory) {
+		this(Optional.of(dummyNodeFactory));
+	}
+	
+	public FhirTreeDataBuilder(Optional<DummyNodeFactory<T>> dummyNodeFactory) {
+		this.dummyNodeFactory = dummyNodeFactory;
+	}
 	
 	public void addFhirTreeNode(T node) {
 		NodePath nodeParentPathParts = new NodePath(node.getPath());
@@ -48,6 +61,25 @@ public abstract class FhirTreeDataBuilder<T extends TreeContent<T>> {
 		sanityCheck();
 	}
 	
+	private void stepToNonAncestorPath(NodePath targetPath) {
+		if (dummyNodeFactory.isPresent()) {
+			// trim path back until it only has nodes in common with the target path
+			while (!targetPath.isSubpath(path)) {
+				stepOut();
+			}
+			
+			// add dummy nodes until we reach the target path
+			DummyNodeFactory<T> unwrappedDummyNodefactory = dummyNodeFactory.get();
+			for (int i=path.size(); i<targetPath.size(); i++) {
+				path.stepInto(targetPath.getPart(i));
+	
+				appendNode(unwrappedDummyNodefactory.create(currentNode, path));
+			}
+		} else {
+			throw new IllegalArgumentException("Cannot step to " + targetPath.toPathString() + " from " + path.toPathString() + " (no dummy node factory)");
+		}
+	}
+
 	private void stepOutToAncestorPath(NodePath ancestorPath) {
 		while (path.size() > ancestorPath.size()) {
 			stepOut();
