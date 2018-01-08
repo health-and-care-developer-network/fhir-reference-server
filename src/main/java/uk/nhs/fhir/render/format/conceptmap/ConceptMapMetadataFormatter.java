@@ -42,7 +42,7 @@ public class ConceptMapMetadataFormatter extends TableFormatter<WrappedConceptMa
 		// These are all required and so should always be present
 		String name = wrappedResource.getName();
 
-		String status = wrappedResource.getStatus().toString();
+		String status = wrappedResource.getStatus();
 
 		Optional<String> version = wrappedResource.getVersion();
 
