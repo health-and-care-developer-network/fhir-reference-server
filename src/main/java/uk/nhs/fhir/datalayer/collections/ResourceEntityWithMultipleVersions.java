@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceStatus;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 
@@ -32,9 +33,9 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	public void add(ResourceMetadata entity) {
 		latest = largestVersion(latest, entity.getVersionNo());
 		
-		if (entity.getStatus().equals("active")) {
+		if (entity.getStatus().equals(ResourceStatus.active)) {
 			latestActive = largestVersion(latestActive, entity.getVersionNo());
-		} else if (entity.getStatus().equals("draft")) {
+		} else if (entity.getStatus().equals(ResourceStatus.draft)) {
 			latestDraft = largestVersion(latestDraft, entity.getVersionNo());
 		}
 		
