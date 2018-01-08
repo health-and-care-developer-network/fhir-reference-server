@@ -3,6 +3,7 @@ package uk.nhs.fhir.servlet.browser;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -405,13 +406,13 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		if (Strings.isNullOrEmpty(queryString)) {
 			return Maps.newHashMap();
 		}
-		/*else if  (request.getMethod().toLowerCase().equals("post") 
+		/*else if  (request.getMethod().toLowerCase(Locale.UK).equals("post") 
 		  && isNotBlank(contentType)
 		  && contentType.startsWith(Constants.CT_X_FORM_URLENCODED)) {
 			String requestBody = new String(requestDetails.loadRequestContents(), Constants.CHARSET_UTF8);
 			params = UrlUtil.parseQueryStrings(theRequest.getQueryString(), requestBody);
 		}*/
-		else if (request.getMethod().toLowerCase().equals("get")) {
+		else if (request.getMethod().toLowerCase(Locale.UK).equals("get")) {
 			return UrlUtil.parseQueryString(queryString);
 		} else {
 			return Maps.newHashMap();

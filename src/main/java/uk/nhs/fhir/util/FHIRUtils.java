@@ -16,7 +16,8 @@
 package uk.nhs.fhir.util;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
@@ -49,7 +50,7 @@ public class FHIRUtils {
     	IParser xmlParser = FhirContexts.xmlParser(fhirVersion);
     	
     	IBaseResource resource = null;
-        try (FileReader fr = new FileReader(file)) {
+        try (InputStreamReader fr = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
 			resource = xmlParser.parseResource(fr);
             
             LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());

@@ -4,6 +4,7 @@ import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,7 @@ public class ServletStreamExample {
 			MimeType mimeType = null;
 			
 			// Indent XML
-			if (srcFile.getName().toLowerCase().endsWith("xml")) {
+			if (srcFile.getName().toLowerCase(Locale.UK).endsWith("xml")) {
 				mimeType = MimeType.XML;
 				try {
 					String prettyPrinted = ServletUtils.prettyPrintXML(fileContent);
@@ -56,7 +57,7 @@ public class ServletStreamExample {
 				}
 				// Pretty print XML
 				fileContent = syntaxHighlight(fileContent);
-			} else if (srcFile.getName().toLowerCase().endsWith("json")) {
+			} else if (srcFile.getName().toLowerCase(Locale.UK).endsWith("json")) {
 				mimeType = MimeType.JSON;
 			} else {
 				mimeType = MimeType.UNKNOWN_MIME;
