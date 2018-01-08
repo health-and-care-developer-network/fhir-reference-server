@@ -12,18 +12,7 @@ public class ResourceMetadata {
 	/**
 	 * Allow resources to be sorted by name
 	 */
-	public static final Comparator<ResourceMetadata> BY_RESOURCE_NAME = new Comparator<ResourceMetadata>() {
-
-		@Override
-		public int compare(ResourceMetadata resource1, ResourceMetadata resource2) {
-			if (resource1.resourceName.equals(resource2.resourceName) && resource1.resourceType == resource2.resourceType) {
-				return 0;
-			} else {
-				return resource1.resourceName.compareTo(resource2.resourceName);
-			}
-		}
-		
-	};
+	public static final Comparator<ResourceMetadata> BY_RESOURCE_NAME = Comparator.comparing(ResourceMetadata::getResourceName);
 	
 	private String resourceName = null;
 	private String resourceID = null;
