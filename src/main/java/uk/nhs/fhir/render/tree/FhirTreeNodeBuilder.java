@@ -76,7 +76,8 @@ public class FhirTreeNodeBuilder {
 				ConstraintInfo constraint2 = constraints.get(j);
 				if (constraint1.getKey().equals(constraint2.getKey())) {
 					EventHandlerContext.forThread().event(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, 
-						"Node constraints with duplicate keys: '" + constraint1.getKey() + "'");
+						"Node constraints with duplicate keys: '" + constraint1.getKey() + "' for node "
+						+ elementDefinition.getId().orElse(elementDefinition.getPath()));
 				}
 			}
 		}
