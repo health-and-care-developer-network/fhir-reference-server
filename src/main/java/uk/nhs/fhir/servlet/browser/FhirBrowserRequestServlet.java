@@ -225,7 +225,7 @@ public class FhirBrowserRequestServlet extends HttpServlet {
     	
 		ResourceType resourceType = ResourceType.getTypeFromHAPIName(typeInRequest);
 		
-        LOG.info("Request received - operation: " + requestOperation.toString() + ", type: " + resourceType.toString());
+        LOG.info("Request received - operation: " + requestOperation.orElse("[None]") + ", type: " + resourceType.toString());
         
         String content;
 		if (!requestOperation.isPresent()) {

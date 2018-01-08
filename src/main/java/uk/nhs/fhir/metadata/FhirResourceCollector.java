@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import uk.nhs.fhir.event.EventHandler;
+import uk.nhs.fhir.event.AbstractEventHandler;
 import uk.nhs.fhir.event.LoggingEventHandler;
 import uk.nhs.fhir.load.RootedXmlFileFinder;
 import uk.nhs.fhir.util.FhirFileRegistry;
@@ -12,13 +12,13 @@ import uk.nhs.fhir.util.FhirFileRegistry;
 public class FhirResourceCollector {
 
 	private final RootedXmlFileFinder fileFinder;
-	private final EventHandler errorHandler;
+	private final AbstractEventHandler errorHandler;
 
 	public FhirResourceCollector(Path root) {
 		this(root, new LoggingEventHandler());
 	}
 	
-	public FhirResourceCollector(Path root, EventHandler errorHandler) {
+	public FhirResourceCollector(Path root, AbstractEventHandler errorHandler) {
 		this.fileFinder = new RootedXmlFileFinder(root);
 		this.errorHandler = errorHandler;
 	}
