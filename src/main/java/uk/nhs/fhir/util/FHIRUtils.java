@@ -24,8 +24,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
+import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.load.FileLoader;
 
 public class FHIRUtils {
@@ -37,9 +37,6 @@ public class FHIRUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(FHIRUtils.class.getName());
 
-    private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
-    private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
-
     /**
      * Method to load a fhir resource from a file.
      * 
@@ -47,15 +44,13 @@ public class FHIRUtils {
      * @return A resource object
      */
     public static IBaseResource loadResourceFromFile(FhirVersion fhirVersion, final File file) {
-        IBaseResource resource = null;
-        try {
-        	FileReader fr = new FileReader(file);
-        	
-        	if (fhirVersion.equals(FhirVersion.DSTU2)) {
-        		resource = ctxDSTU2.newXmlParser().parseResource(fr);
-        	} else if (fhirVersion.equals(FhirVersion.STU3)) {
-        		resource = ctxSTU3.newXmlParser().parseResource(fr);
-        	}
+    	
+    	// ensure that we throw for unhandled FHIR Version by calling this before the try/catch
+    	IParser xmlParser = FhirContexts.xmlParser(fhirVersion);
+    	
+    	IBaseResource resource = null;
+        try (FileReader fr = new FileReader(file)) {
+			resource = xmlParser.parseResource(fr);
             
             LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
             
