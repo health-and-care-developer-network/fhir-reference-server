@@ -77,7 +77,7 @@ public class TablePNGGenerator {
 	private void cache(String key, Style style, boolean[] vlinesRequired) {
 		int maxVlines = (width - firstLinePixelIndex) / pixelsBetweenLines;
 		if (vlinesRequired.length > maxVlines) {
-			throw new IllegalArgumentException("Too many vlines required: [" + vlinesRequired + " : " + maxVlines + "]");
+			throw new IllegalArgumentException("Too many vlines required: [" + Arrays.toString(vlinesRequired) + " : " + maxVlines + "]");
 		}
 
 		try {

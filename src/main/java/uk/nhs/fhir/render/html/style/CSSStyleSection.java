@@ -97,7 +97,7 @@ public class CSSStyleSection {
 		}		
 		Map<String, String> rulesForSelector = rulesAdded.get(selector);
 		
-		if (rulesForSelector.containsKey(rule)) {
+		if (rulesForSelector.containsKey(rule.getName())) {
 			throw new IllegalStateException("Overwriting rule for selector " + selector + ": " + rule.getName());
 		} else {
 			rulesForSelector.put(rule.getName(), rule.getArguments());
