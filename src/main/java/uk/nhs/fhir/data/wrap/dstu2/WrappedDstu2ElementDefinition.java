@@ -202,13 +202,6 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 				BasePrimitive<?> fixedPrimitive = (BasePrimitive<?>)fixed;
 				String fixedValueAsString = fixedPrimitive.getValueAsString();
 				
-				if (fixedValueAsString.equals("https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1")) {
-					String correctedUrl = "https://fhir.hl7.org.uk/CareConnect-ConditionCategory-1";
-					EventHandlerContext.forThread().event(RendererEventType.HL7_ORG_UK_HOST, 
-						"Fixing https://hl7.org.uk/fhir/CareConnect-ConditionCategory-1 to " + correctedUrl);
-					fixedValueAsString = correctedUrl;
-				}
-				
 				return Optional.of(fixedValueAsString);
 			} else {
 				throw new IllegalStateException("Unhandled type for fixed value: " + fixed.getClass().getName());

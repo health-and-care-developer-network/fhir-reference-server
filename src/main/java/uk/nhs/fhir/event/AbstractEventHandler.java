@@ -3,6 +3,10 @@ package uk.nhs.fhir.event;
 import java.util.Optional;
 
 public abstract class AbstractEventHandler implements EventHandler {
+
+	public abstract void ignore(String info, Optional<Exception> throwable);
+	public abstract void log(String info, Optional<Exception> throwable);
+	public abstract void error(Optional<String> info, Optional<Exception> throwable);
 	
 	public void event(RendererEventType errorType, String message) {
 		event(errorType, message, Optional.empty());

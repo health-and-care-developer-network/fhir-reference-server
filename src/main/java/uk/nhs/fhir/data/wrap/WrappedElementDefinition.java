@@ -24,7 +24,7 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
-public abstract class WrappedElementDefinition {
+public abstract class WrappedElementDefinition implements HasConstraints {
 
 	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 	
@@ -65,6 +65,10 @@ public abstract class WrappedElementDefinition {
 		} else {
 			throw new IllegalStateException("Can't wrap element definition class " + definition.getClass().getCanonicalName());
 		}
+	}
+	
+	public String getIdentifierString() {
+		return getId().orElse(getPath());
 	}
 	
 	public String[] getPathParts() {

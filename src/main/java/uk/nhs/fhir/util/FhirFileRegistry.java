@@ -24,7 +24,7 @@ import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.event.EventHandler;
+import uk.nhs.fhir.event.AbstractEventHandler;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.load.FhirFileParser;
@@ -70,7 +70,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		}
 	}
 	
-	public void registerMany(List<File> potentialFhirFiles, EventHandler errorHandler) {
+	public void registerMany(List<File> potentialFhirFiles, AbstractEventHandler errorHandler) {
 		for (File potentialFhirFile : potentialFhirFiles) {
 			try {
 				register(potentialFhirFile);
