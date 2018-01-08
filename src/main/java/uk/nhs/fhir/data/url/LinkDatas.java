@@ -114,8 +114,9 @@ public class LinkDatas {
 		return true;
 	}
 	
-	public long hashcode() {
-		long hc = 0;
+	@Override
+	public int hashCode() {
+		int hc = 0;
 
 		for (Entry<LinkData, List<LinkData>> e : links.entrySet()) {
 			LinkData key = e.getKey();
