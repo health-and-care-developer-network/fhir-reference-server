@@ -11,11 +11,8 @@ public class FhirConceptMapElementTarget {
 	private final Optional<String> comments;
 	
 	public FhirConceptMapElementTarget(String code, String equivalence, Optional<String> comments) {
-		Preconditions.checkNotNull(code);
-		Preconditions.checkNotNull(equivalence);
-		
-		this.code = code;
-		this.equivalence = equivalence;
+		this.code = Preconditions.checkNotNull(code);
+		this.equivalence = Preconditions.checkNotNull(equivalence);
 		this.comments = comments;
 	}
 

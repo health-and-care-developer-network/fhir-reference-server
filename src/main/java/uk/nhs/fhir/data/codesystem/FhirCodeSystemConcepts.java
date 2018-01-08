@@ -11,9 +11,7 @@ public class FhirCodeSystemConcepts {
 	private final List<FhirCodeSystemConcept> concepts = new ArrayList<>();
 
 	public FhirCodeSystemConcepts(String system) {
-		Preconditions.checkNotNull(system, "Code system cannot be null");
-		
-		this.system = system;
+		this.system = Preconditions.checkNotNull(system, "Code system cannot be null");
 	}
 	
 	public String getSystem() {

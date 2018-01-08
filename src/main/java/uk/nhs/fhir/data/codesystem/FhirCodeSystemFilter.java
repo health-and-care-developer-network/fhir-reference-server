@@ -14,11 +14,8 @@ public class FhirCodeSystemFilter {
 	
 	
 	public FhirCodeSystemFilter(String code, String documentation, String value) {
-		Preconditions.checkNotNull(code);
-		Preconditions.checkNotNull(value);
-		
-		this.code = code;
-		this.value = value;
+		this.code = Preconditions.checkNotNull(code);
+		this.value = Preconditions.checkNotNull(value);
 		this.documentation = Optional.ofNullable(documentation);
 	}
 	

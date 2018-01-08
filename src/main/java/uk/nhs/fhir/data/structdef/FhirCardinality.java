@@ -11,11 +11,8 @@ public class FhirCardinality {
 	}
 	
 	public FhirCardinality(String minRaw, String maxRaw) {
-		Preconditions.checkNotNull(minRaw);
-		Preconditions.checkNotNull(maxRaw);
-		
-		this.min = FhirElementCount.fromString(minRaw);
-		this.max = FhirElementCount.fromString(maxRaw);
+		this.min = FhirElementCount.fromString(Preconditions.checkNotNull(minRaw));
+		this.max = FhirElementCount.fromString(Preconditions.checkNotNull(maxRaw));
 		
 		Preconditions.checkArgument(FhirElementCount.validMinMaxPair(min, max), "Invalid min and max pair [" + minRaw + ".." + maxRaw + "]");
 	}

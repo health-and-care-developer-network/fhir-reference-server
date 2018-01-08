@@ -21,11 +21,8 @@ public class SupportingArtefact {
 	private final ArtefactType artefactType;
 	
 	public SupportingArtefact(File filename, ArtefactType artefactType) {
-		Preconditions.checkNotNull(filename);
-		Preconditions.checkNotNull(artefactType);
-		
-		this.filename = filename;
-		this.artefactType = artefactType;
+		this.filename = Preconditions.checkNotNull(filename);
+		this.artefactType = Preconditions.checkNotNull(artefactType);
 	}
 
 	public File getFilename() {

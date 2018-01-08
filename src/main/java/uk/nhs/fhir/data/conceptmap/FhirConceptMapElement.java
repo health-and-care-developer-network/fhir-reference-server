@@ -11,9 +11,7 @@ public class FhirConceptMapElement {
 	private final List<FhirConceptMapElementTarget> targets = Lists.newArrayList();
 	
 	public FhirConceptMapElement(String code) {
-		Preconditions.checkNotNull(code);
-		
-		this.code = code;
+		this.code = Preconditions.checkNotNull(code);
 	}
 
 	public String getCode() {

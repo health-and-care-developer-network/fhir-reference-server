@@ -11,9 +11,7 @@ public class FhirCodeSystemConcept {
 	private final Optional<String> definition;
 
 	public FhirCodeSystemConcept(String code, String description, String definition) {
-		Preconditions.checkNotNull(code);
-		
-		this.code = code;
+		this.code = Preconditions.checkNotNull(code);
 		this.description = Optional.ofNullable(description);
 		this.definition = Optional.ofNullable(definition);
 	}

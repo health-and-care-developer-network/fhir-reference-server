@@ -11,9 +11,7 @@ public class FhirMapping {
 	private final Optional<String> comments;
 	
 	public FhirMapping(String identity, String mappingUri, String mappingName, String mappingComments) {
-		Preconditions.checkNotNull(identity);
-		
-		this.identity = identity;
+		this.identity = Preconditions.checkNotNull(identity);
 		this.uri = Optional.ofNullable(mappingUri);
 		this.name = Optional.ofNullable(mappingName);
 		this.comments = Optional.ofNullable(mappingComments);

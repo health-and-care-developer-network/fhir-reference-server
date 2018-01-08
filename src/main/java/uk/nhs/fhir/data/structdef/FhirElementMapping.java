@@ -10,13 +10,9 @@ public class FhirElementMapping {
 	private final Optional<String> language;
 	
 	public FhirElementMapping(String identity, String map, Optional<String> language) {
-		Preconditions.checkNotNull(identity);
-		Preconditions.checkNotNull(map);
-		Preconditions.checkNotNull(language);
-		
-		this.identity = identity;
-		this.map = map;
-		this.language = language;
+		this.identity = Preconditions.checkNotNull(identity);
+		this.map = Preconditions.checkNotNull(map);
+		this.language = Preconditions.checkNotNull(language);
 	}
 	
 	public String getIdentity() {
