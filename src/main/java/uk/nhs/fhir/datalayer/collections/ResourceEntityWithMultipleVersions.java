@@ -10,7 +10,7 @@ import uk.nhs.fhir.data.metadata.ResourceStatus;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 
-public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
+public class ResourceEntityWithMultipleVersions {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
@@ -71,15 +71,6 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 		} else {
 			return previousLatest;
 		}
-	}
-	
-	/**
-	 * Allow resources to be sorted by name
-	 */
-	@Override
-	public int compareTo(ResourceEntityWithMultipleVersions arg0) {
-		ResourceEntityWithMultipleVersions other = (ResourceEntityWithMultipleVersions)arg0;
-		return ResourceMetadata.BY_RESOURCE_NAME.compare(this.getLatest(), other.getLatest());
 	}
 
 	public String getResourceID() {
