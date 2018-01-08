@@ -10,9 +10,8 @@ import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.event.EventHandlerContext;
-import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.render.RendererContext;
+import uk.nhs.fhir.render.tree.validate.ConstraintsValidator;
 import uk.nhs.fhir.util.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -57,30 +56,8 @@ public class FhirTreeNodeBuilder {
 			shortDescription = "";
 		}
 		
-		Set<String> conditionIds = elementDefinition.getConditionIds();
-		
 		List<ConstraintInfo> constraints = elementDefinition.getConstraintInfos();
-		
-		for (ConstraintInfo constraint : constraints) {
-			String key = constraint.getKey();
-			if (!conditionIds.contains(key)) {
-				EventHandlerContext.forThread().event(RendererEventType.CONSTRAINT_WITHOUT_CONDITION, 
-					"Constraint " + key + " doesn't have an associated condition pointing at it");
-			}
-		}
-
-		//check for duplicate keys
-		for (int i=0; i<constraints.size(); i++) {
-			ConstraintInfo constraint1 = constraints.get(i);
-			for (int j=i+1; j<constraints.size(); j++) {
-				ConstraintInfo constraint2 = constraints.get(j);
-				if (constraint1.getKey().equals(constraint2.getKey())) {
-					EventHandlerContext.forThread().event(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, 
-						"Node constraints with duplicate keys: '" + constraint1.getKey() + "' for node "
-						+ elementDefinition.getId().orElse(elementDefinition.getPath()));
-				}
-			}
-		}
+		new ConstraintsValidator(elementDefinition).validate();
 		
 		String path = elementDefinition.getPath();
 		FhirVersion version = elementDefinition.getVersion();
@@ -137,7 +114,7 @@ public class FhirTreeNodeBuilder {
 		}
 		
 		node.setMappings(elementDefinition.getMappings());
-		NodeMappingValidator.validate(node);
+		new NodeMappingValidator(node).validate();
 		
 		node.setSliceName(elementDefinition.getSliceName());
 		

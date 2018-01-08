@@ -31,7 +31,7 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class FhirTreeNode extends AbstractFhirTreeTableContent {
+public class FhirTreeNode extends AbstractFhirTreeTableContent implements HasMappings {
 	private final Optional<String> name;
 	private final ResourceFlags resourceFlags;
 	private final Optional<Integer> min;

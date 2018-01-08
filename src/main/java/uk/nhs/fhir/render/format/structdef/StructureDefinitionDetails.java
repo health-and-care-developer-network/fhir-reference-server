@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.format.structdef;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -31,6 +32,8 @@ import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
+	
+	public static final Set<String> IGNORABLE_VALUES = Sets.newHashSet("n/a", "N/A");
 	
 	private final String pathName;
 	private final String key;
@@ -315,8 +318,7 @@ public class StructureDefinitionDetails {
 			
 			String value = mapping.getMap();
 			
-			if (value.equals("n/a")
-			  || value.equals("N/A")) {
+			if (IGNORABLE_VALUES.contains(value)) {
 				continue;
 			}
 			
