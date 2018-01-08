@@ -27,18 +27,12 @@ public class TreeNodeCell extends TableCell {
 	
 	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean removed, String nodeKey, Optional<String> mouseOverText) {
 		super(false, false, removed);
-		
-		Preconditions.checkNotNull(name);
-		Preconditions.checkNotNull(fhirIcon);
-		Preconditions.checkNotNull(treeIcons);
-		Preconditions.checkNotNull(backgroundClass);
-		Preconditions.checkNotNull(nodeKey);
-		
-		this.name = name;
-		this.fhirIcon = fhirIcon;
-		this.treeIcons = treeIcons;
-		this.backgroundClass = backgroundClass;
-		this.nodeKey = nodeKey;
+
+		this.name = Preconditions.checkNotNull(name);
+		this.fhirIcon = Preconditions.checkNotNull(fhirIcon);
+		this.treeIcons = Preconditions.checkNotNull(treeIcons);
+		this.backgroundClass = Preconditions.checkNotNull(backgroundClass);
+		this.nodeKey = Preconditions.checkNotNull(nodeKey);
 		this.mouseOverText = mouseOverText;
 		this.removed = removed;
 	}

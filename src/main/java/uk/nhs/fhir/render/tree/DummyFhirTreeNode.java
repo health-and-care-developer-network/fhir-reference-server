@@ -25,9 +25,7 @@ public class DummyFhirTreeNode extends AbstractFhirTreeTableContent {
 	public DummyFhirTreeNode(AbstractFhirTreeTableContent parent, String path) {
 		super(parent);
 		
-		Preconditions.checkNotNull(path);
-		
-		this.path = path;
+		this.path = Preconditions.checkNotNull(path);
 	}
 	
 	@Override
@@ -148,8 +146,7 @@ public class DummyFhirTreeNode extends AbstractFhirTreeTableContent {
 	}
 	
 	public void setBackupNode(FhirTreeNode backupNode) {
-		Preconditions.checkNotNull(backupNode);
-		this.backup = backupNode;
+		this.backup = Preconditions.checkNotNull(backupNode);
 	}
 
 	@Override

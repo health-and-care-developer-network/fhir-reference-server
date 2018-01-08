@@ -55,14 +55,17 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 	}
 		
 	protected Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig) {
-		Preconditions.checkNotNull(value, "value data");
+		String nonNullValue = Preconditions.checkNotNull(value, "value data");
+		boolean hasValue = !nonNullValue.isEmpty();
 		
 		List<Element> cellSpans = Lists.newArrayList();
+		
 		if (label.length() > 0) {
-			cellSpans.add(labelSpan(label, value.isEmpty()));
+			cellSpans.add(labelSpan(label, hasValue));
 		}
-		if (value.length() > 0) {
-			cellSpans.add(valueSpan(value, alwaysBig));
+		
+		if (hasValue) {
+			cellSpans.add(valueSpan(nonNullValue, alwaysBig));
 		}
 		
 		return cell(cellSpans, colspan);
@@ -76,9 +79,9 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 			content);
 	}
 	
-	protected Element labelSpan(String label, boolean valueIsEmpty) {
+	protected Element labelSpan(String label, boolean hasValue) {
 		String cssClass = FhirCSS.DATA_LABEL;
-		if (valueIsEmpty) {
+		if (!hasValue) {
 			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		

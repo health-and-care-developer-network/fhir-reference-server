@@ -14,11 +14,8 @@ public class CSSStyleBlock {
 	}
 	
 	public CSSStyleBlock(List<String> selectors, List<CSSRule> rules) {
-		Preconditions.checkNotNull(selectors, "selectors cannot be null");
-		Preconditions.checkNotNull(rules, "rules cannot be null");
-		
-		this.selectors = selectors;
-		this.rules = rules;
+		this.selectors = Preconditions.checkNotNull(selectors, "selectors cannot be null");
+		this.rules = Preconditions.checkNotNull(rules, "rules cannot be null");
 	}
 	
 	public void addSelector(String selector) {

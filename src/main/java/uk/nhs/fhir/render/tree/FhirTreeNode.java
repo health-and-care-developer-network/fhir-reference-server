@@ -405,8 +405,7 @@ public class FhirTreeNode extends AbstractFhirTreeTableContent implements HasMap
 	}
 
 	public void setBackupNode(FhirTreeNode backupNode) {
-		Preconditions.checkNotNull(backupNode);
-		this.backupNode = backupNode;
+		this.backupNode = Preconditions.checkNotNull(backupNode);
 	}
 
 	@Override

@@ -12,9 +12,7 @@ public class FhirTreeData<T extends TreeContent<T>> implements Iterable<T> {
 	private final T root;
 	
 	public FhirTreeData(T root) {
-		Preconditions.checkNotNull(root);
-		
-		this.root = root;
+		this.root = Preconditions.checkNotNull(root);
 	}
 
 	public T getRoot() {
@@ -39,8 +37,7 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 	private final FhirTreeData<T> data;
 	
 	public TreeIterator(FhirTreeData<T> data) {
-		Preconditions.checkNotNull(data);
-		this.data = data;
+		this.data = Preconditions.checkNotNull(data);
 	}
 
 	@Override

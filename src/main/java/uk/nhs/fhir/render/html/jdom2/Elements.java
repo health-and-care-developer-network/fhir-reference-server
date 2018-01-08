@@ -65,14 +65,10 @@ public class Elements {
     	return withAttributesAndChildren(name, attributes, Lists.newArrayList(child));
     }
 	
-    public static Element withAttributesAndChildren(String name, List<Attribute> attributes, List<? extends Content> children){
-    	Preconditions.checkNotNull(name, "name");
-		Preconditions.checkNotNull(attributes, "attributes");
-		Preconditions.checkNotNull(children, "children");
-        
-        Element e = new Element(name, HTML_NS_URL);
-        attributes.forEach(e::setAttribute);
-        children.forEach(e::addContent);
+    public static Element withAttributesAndChildren(String name, List<Attribute> attributes, List<? extends Content> children) {
+        Element e = new Element(Preconditions.checkNotNull(name, "name"), HTML_NS_URL);
+        Preconditions.checkNotNull(attributes, "attributes").forEach(e::setAttribute);
+        Preconditions.checkNotNull(children, "children").forEach(e::addContent);
         return e;
     }
     

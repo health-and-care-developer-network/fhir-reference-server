@@ -10,9 +10,7 @@ public class CodeSystemConceptTableRowData {
 	private final Optional<String> definition;
 
 	public CodeSystemConceptTableRowData(String code, Optional<String> description, Optional<String> definition) {
-		Preconditions.checkNotNull(code);
-		
-		this.code = code;
+		this.code = Preconditions.checkNotNull(code);
 		this.description = description;
 		this.definition = definition;
 	}

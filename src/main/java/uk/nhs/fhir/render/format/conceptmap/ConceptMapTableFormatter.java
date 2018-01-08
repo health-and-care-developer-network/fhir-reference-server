@@ -85,14 +85,17 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 	}
 
 	private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig, boolean alwaysBold) {
-		Preconditions.checkNotNull(value, "value data");
+		String nonNullValue = Preconditions.checkNotNull(value, "value data");
+		boolean hasValue = !nonNullValue.isEmpty();
 		
 		List<Element> cellSpans = Lists.newArrayList();
+		
 		if (label.length() > 0) {
-			cellSpans.add(labelSpan(label, value.isEmpty(), alwaysBold));
+			cellSpans.add(labelSpan(label, hasValue, alwaysBold));
 		}
-		if (value.length() > 0) {
-			cellSpans.add(valueSpan(value, alwaysBig));
+		
+		if (hasValue) {
+			cellSpans.add(valueSpan(nonNullValue, alwaysBig));
 		}
 		
 		return cell(cellSpans, colspan);
@@ -104,9 +107,9 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
         return cell(cellSpans, colspan);
     }
 	
-	private Element labelSpan(String label, boolean valueIsEmpty, boolean alwaysBold) {
+	private Element labelSpan(String label, boolean hasValue, boolean alwaysBold) {
 		String cssClass = FhirCSS.DATA_LABEL;
-		if (valueIsEmpty && !alwaysBold) {
+		if (!hasValue && !alwaysBold) {
 			cssClass += " " + FhirCSS.DATA_LABEL_EMPTY;
 		}
 		
