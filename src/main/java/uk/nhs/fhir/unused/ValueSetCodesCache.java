@@ -29,7 +29,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
  * @author Adam Hatherly
  */
 public class ValueSetCodesCache {
-    private static List<cacheObject> _cache;
+    private static List<CacheObject> _cache;
     private static ValueSetCodesCache _instance = null;
 
     /**
@@ -52,16 +52,16 @@ public class ValueSetCodesCache {
     public void cacheValueSet(ValueSet theSet) {
         
         // First we should remove any items previously added from this ValueSet
-        for(cacheObject cacheItem : _cache) {
-            if(cacheItem._valueSetID.equals(theSet.getId().getIdPart())) {
-                _cache.remove(cacheItem);
+        for(CacheObject cacheItem : _cache) {
+        	if (cacheItem._valueSetID.equals(theSet.getId().getIdPart())) {
+        		_cache.remove(cacheItem);
             }
         }
         
         // Now we simply iterate through the ValueSet, adding each code we come across.
         List<CodeSystemConcept> codes = theSet.getCodeSystem().getConcept();
         for(CodeSystemConcept code : codes) {
-            _cache.add(new cacheObject(code.getCode(), theSet.getId().getIdPart()));
+            _cache.add(new CacheObject(code.getCode(), theSet.getId().getIdPart()));
         }
     }
     
@@ -90,7 +90,7 @@ public class ValueSetCodesCache {
     public static List<String> findCode(String code) {
         List<String> matches = new ArrayList<String>();
         
-        for(cacheObject cacheItem : _cache) {
+        for(CacheObject cacheItem : _cache) {
             if(cacheItem._code.equals(code)) {
                 matches.add(cacheItem._valueSetID);
             }
@@ -103,9 +103,9 @@ public class ValueSetCodesCache {
      * code, and the ValueSet ID.
      * 
      */
-    private class cacheObject {
-        protected String _code;
-        protected String _valueSetID;
+    private class CacheObject {
+    	protected String _code;
+    	protected String _valueSetID;
 
         /**
          * Constructor.
@@ -113,9 +113,9 @@ public class ValueSetCodesCache {
          * @param newCode
          * @param newValueSetID
          */
-        public cacheObject(String newCode, String newValueSetID) {
-            this._code = newCode;
-            this._valueSetID = newValueSetID;
+        public CacheObject(String newCode, String newValueSetID) {
+        	this._code = newCode;
+        	this._valueSetID = newValueSetID;
         }
     }
 }

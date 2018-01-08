@@ -198,7 +198,10 @@ public class FileCache {
     	// Call pre-processor to copy files into the versioned directory
         Path renderedExamplesPath = fhirFileLocator.getSourcePathForResourceType(EXAMPLES, fhirVersion);
         Path importedExamplesPath = fhirFileLocator.getDestinationPathForResourceType(EXAMPLES, fhirVersion);
-        importedExamplesPath.toFile().mkdirs();
+        
+        if (!importedExamplesPath.toFile().mkdirs()) {
+        	throw new IllegalStateException("Failed to create directory [" + importedExamplesPath.toString() + "]");
+        }
         
 		List<File> renderedFiles = resourceFileFinder.findFiles(renderedExamplesPath.toFile());
         
