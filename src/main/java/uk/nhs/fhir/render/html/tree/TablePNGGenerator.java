@@ -2,7 +2,9 @@ package uk.nhs.fhir.render.html.tree;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
@@ -33,7 +35,7 @@ public class TablePNGGenerator {
 	 */
 	public static String getCSSClass(Style style, boolean[] vlinesRequired) {
 		StringBuilder cssClass = new StringBuilder("fhirtreebg-");
-		cssClass.append(style.name().toLowerCase());
+		cssClass.append(style.name().toLowerCase(Locale.UK));
 		cssClass.append("-");
 		for (boolean b : vlinesRequired) {
 			cssClass.append(b ? "1" : "0");
@@ -48,7 +50,7 @@ public class TablePNGGenerator {
 			throw new IllegalArgumentException(key);
 		}
 		
-		Style style = Style.valueOf(tokens[1].toUpperCase());
+		Style style = Style.valueOf(tokens[1].toUpperCase(Locale.UK));
 		
 		char[] chars = tokens[2].toCharArray();
 		boolean[] vlinesRequired = new boolean[chars.length];
@@ -82,7 +84,7 @@ public class TablePNGGenerator {
 
 		try {
 			byte[] pngBytes = getPngBytes(style, vlinesRequired);
-			String base64Png = new String(Base64.encodeBase64(pngBytes));
+			String base64Png = new String(Base64.encodeBase64(pngBytes), "UTF-8");
 			cache.put(key, base64Png);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

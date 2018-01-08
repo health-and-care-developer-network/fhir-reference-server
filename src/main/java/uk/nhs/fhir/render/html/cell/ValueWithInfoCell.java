@@ -1,6 +1,7 @@
 package uk.nhs.fhir.render.html.cell;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -70,7 +71,7 @@ public class ValueWithInfoCell extends TableCell {
 		
 		String qualifier = resourceInfo.getQualifier();
 		if (!Strings.isNullOrEmpty(qualifier)) {
-			name += " " + qualifier.toLowerCase();
+			name += " " + qualifier.toLowerCase(Locale.UK);
 		}
 		
 		name += ": ";
