@@ -34,11 +34,12 @@ public class ServletStreamRawFile {
 			response.setContentType(mimeType);
 			
 			PrintWriter outputStream = response.getWriter();
-	        InputStream is = ServletStreamRawFile.class.getResourceAsStream(filename);
-	        int b = is.read();
-	        while (b != -1) {
-	        	outputStream.write(b);
-	        	b = is.read();
+	        try (InputStream is = ServletStreamRawFile.class.getResourceAsStream(filename)) {
+		        int b = is.read();
+		        while (b != -1) {
+		        	outputStream.write(b);
+		        	b = is.read();
+		        }
 	        }
     	} catch (Exception e) {
     		LOG.error("Error streaming raw file to requestor: " + filename + " - error: " + e.getMessage());
