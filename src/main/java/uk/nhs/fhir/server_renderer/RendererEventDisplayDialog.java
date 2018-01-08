@@ -171,7 +171,7 @@ public class RendererEventDisplayDialog extends JDialog {
 		
 		String truncatedFilePath = "";
 		if (trimmedFilePath.length() > 0) {
-			truncatedFilePath = " (" + File.separator + trimmedFilePath + ")";
+			truncatedFilePath = " (" + trimmedFilePath + ")";
 		}
 
 		String name;
