@@ -39,7 +39,7 @@ public enum FhirTreeIcon {
 		return base64;
 	}
 	
-	public String getCssClass() {
+	public String getCSSClass() {
 		return cssClass;
 	}
 	

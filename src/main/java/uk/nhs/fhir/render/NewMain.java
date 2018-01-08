@@ -232,7 +232,9 @@ public class NewMain {
 						.resolve(exampleVersion.toString())
 						.resolve("Examples");
 				
-				outputDir.toFile().mkdirs();
+				if (!outputDir.toFile().mkdirs()) {
+		        	throw new IllegalStateException("Failed to create directory [" + outputDir.toString() + "]");
+		        }
 				
 				Path output = outputDir.resolve(entry.getKey().getName());
 		    	

@@ -44,7 +44,9 @@ public class FileProcessor {
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
-		outDirPath.toFile().mkdirs();
+		if (!outDirPath.toFile().mkdirs()) {
+        	throw new IllegalStateException("Failed to create directory [" + outDirPath.toString() + "]");
+        }
 		Path outFilePath = outDirPath.resolve(RendererContext.forThread().getCurrentSource().getName());
 		
 		LOG.debug("Generating " + outFilePath.toString());	    
