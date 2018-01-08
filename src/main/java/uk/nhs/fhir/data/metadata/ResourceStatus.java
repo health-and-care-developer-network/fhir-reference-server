@@ -1,5 +1,7 @@
 package uk.nhs.fhir.data.metadata;
 
+import java.util.Locale;
+
 public enum ResourceStatus {
 
 	draft("<span class='status-draft'>Draft</span>"),
@@ -19,7 +21,7 @@ public enum ResourceStatus {
 	}
 	
 	public static ResourceStatus getStatus(String status) {
-		status = status.toLowerCase();
+		status = status.toLowerCase(Locale.UK);
 		for (ResourceStatus resourceStatus : ResourceStatus.values()) {
 			if (resourceStatus.name().equals(status)) {
 				return resourceStatus;

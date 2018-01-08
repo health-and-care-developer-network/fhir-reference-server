@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.structdef;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class FhirElementDataTypeDstu2 {
 
 	public static FhirElementDataType forType(String typeName) {
-		typeName = typeName.toLowerCase();
+		typeName = typeName.toLowerCase(Locale.UK);
 		
 		// mysteriously missing any object representation
 		if (typeName.equals("backboneelement")) {

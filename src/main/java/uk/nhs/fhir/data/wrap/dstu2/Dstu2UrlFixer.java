@@ -1,5 +1,6 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
+import java.util.Locale;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -26,7 +27,7 @@ public class Dstu2UrlFixer extends UrlFixer {
 		
 		// sanity check
 		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT + "/")
-		  && !hostAndPath.toLowerCase().contains("dstu2")) {
+		  && !hostAndPath.toLowerCase(Locale.UK).contains("dstu2")) {
 			EventHandlerContext.forThread().event(RendererEventType.HL7_URL_WITHOUT_DSTU2, 
 				"Should " + hostAndPath + " have been modified to contain /dstu2/ ?");
 			
@@ -42,10 +43,10 @@ public class Dstu2UrlFixer extends UrlFixer {
 		if (hostAndPath.startsWith(FhirURLConstants.HL7_DSTU2_STRUCTURE_DEF)) {
 			String urlEnd = hostAndPath.substring(FhirURLConstants.HL7_DSTU2_STRUCTURE_DEF.length() + 1);
 			
-			if (extensionStructureDefinitions.contains(urlEnd.toLowerCase())) {
-				urlEnd = "extension-" + urlEnd.toLowerCase() + ".html";
+			if (extensionStructureDefinitions.contains(urlEnd.toLowerCase(Locale.UK))) {
+				urlEnd = "extension-" + urlEnd.toLowerCase(Locale.UK) + ".html";
 			} else if (datatypeStructureDefinitions.contains(urlEnd)) {
-				urlEnd = "datatypes.html#" + urlEnd.toLowerCase();
+				urlEnd = "datatypes.html#" + urlEnd.toLowerCase(Locale.UK);
 			} else {
 				urlEnd = ensureHtmlEnd(urlEnd);
 			}

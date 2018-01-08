@@ -1,5 +1,7 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
+import java.util.Locale;
+
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
 import ca.uhn.fhir.model.primitive.CodeDt;
@@ -82,10 +84,10 @@ public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/" + complexTypeName.toLowerCase() + ".html";
+		return FhirURLConstants.HTTP_HL7_DSTU2 + "/" + complexTypeName.toLowerCase(Locale.UK) + ".html";
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase();
+		return FhirURLConstants.HTTP_HL7_DSTU2 + "/datatypes.html#" + dataTypeName.toLowerCase(Locale.UK);
 	}
 }

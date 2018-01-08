@@ -108,7 +108,7 @@ public class FileLoader {
             while ((c = is.read()) > -1) {
                 bOutStream.write(c);
             }
-            content = bOutStream.toString();
+            content = bOutStream.toString("UTF-8");
         } catch (IOException ex) {
         	LOG.error("Error loading file: " + ex.getMessage());
         } finally {

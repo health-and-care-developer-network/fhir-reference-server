@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.common.collect.Lists;
 
@@ -15,7 +16,7 @@ public class XmlFileFinder {
 	
 	public static final FilenameFilter XML_FILE_FILTER = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
-            return name.toLowerCase().endsWith(XML_EXTENSION);
+            return name.toLowerCase(Locale.UK).endsWith(XML_EXTENSION);
         }
 	};
     

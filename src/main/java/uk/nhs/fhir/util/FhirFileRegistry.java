@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -169,7 +170,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	}
 		
 	public void register(File xmlFile, IBaseResource parsedFile) {
-		possibleFileNames.add(StringUtil.getTrimmedFileName(xmlFile).toLowerCase());
+		possibleFileNames.add(StringUtil.getTrimmedFileName(xmlFile).toLowerCase(Locale.UK));
 		
 		if (FhirFileParser.isSupported(parsedFile)) {
 			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
@@ -279,7 +280,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		if (matchingDefinitions.size() == 1) {
 			return matchingDefinitions.get(0);
 		} else {
-			String lastUrlPart = StringUtil.getLastPartOfUrlWithoutExtension(url).toLowerCase();
+			String lastUrlPart = StringUtil.getLastPartOfUrlWithoutExtension(url).toLowerCase(Locale.UK);
 			if (FhirURLConstants.isNhsResourceUrl(url)
 			  && possibleFileNames.contains(lastUrlPart)) {
 				throw new IllegalStateException("Cannot find NHS extension " + url + " (did rendering fail for this extension?)");

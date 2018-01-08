@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import uk.nhs.fhir.util.FhirVersion;
@@ -219,7 +220,7 @@ public class ResourceMetadata {
 	
 	public String getFhirVersionLabel() {
 		String fhirVersion = getFhirVersion().toString();
-		return "<span class='" + fhirVersion.toLowerCase() + "'>" + fhirVersion.toUpperCase() + "</span>";
+		return "<span class='" + fhirVersion.toLowerCase(Locale.UK) + "'>" + fhirVersion.toUpperCase(Locale.UK) + "</span>";
 	}
 	
 	public String getVersionedFileName() {

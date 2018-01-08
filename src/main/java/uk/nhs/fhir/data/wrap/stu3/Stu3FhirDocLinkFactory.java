@@ -83,10 +83,10 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 	}
 
 	private String urlForComplexDataType(String complexTypeName) {
-		return FhirURLConstants.HTTP_HL7_STU3 + "/" + complexTypeName.toLowerCase() + ".html";
+		return FhirURLConstants.HTTP_HL7_STU3 + "/" + complexTypeName.toLowerCase(Locale.UK) + ".html";
 	}
 	
 	private String urlForSimpleDataType(String dataTypeName) {
-		return FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName.toLowerCase();
+		return FhirURLConstants.HTTP_HL7_STU3 + "/datatypes.html#" + dataTypeName.toLowerCase(Locale.UK);
 	}
 }
