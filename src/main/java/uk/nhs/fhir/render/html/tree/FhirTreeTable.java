@@ -231,7 +231,7 @@ public class FhirTreeTable {
 				}
 			}
 			
-			if (bindingToAdd.getDescription().equals(BindingInfo.STAND_IN_DESCRIPTION)) {
+			if (bindingToAdd.getDescription().map(description -> description.equals(BindingInfo.STAND_IN_DESCRIPTION)).orElse(Boolean.FALSE)) {
 				EventHandlerContext.forThread().event(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED,
 					"Stand-in description being displayed - expected this to have been removed by cardinality in profile");
 			} else {
@@ -256,7 +256,8 @@ public class FhirTreeTable {
 	}
 
 	private ResourceInfo makeResourceInfoWithMaybeUrl(String title, String value, ResourceInfoType type) {
-		if (looksLikeUrl(value)) {
+		if (looksLikeUrl(value)
+		  && !FhirURL.isLogicalUrl(value)) {
 			try {
 				return new ResourceInfo(title, FhirURL.buildOrThrow(value, version), type);
 			} catch (IllegalStateException e) {

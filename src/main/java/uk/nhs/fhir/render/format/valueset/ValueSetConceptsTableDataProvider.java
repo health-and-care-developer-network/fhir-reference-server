@@ -41,7 +41,7 @@ public class ValueSetConceptsTableDataProvider {
 				// try to find the concept map from the registry
 				WrappedCodeSystem standaloneCodeSystem = RendererContext.forThread().getFhirFileRegistry().getCodeSystem(include.getSystem());
 				if (standaloneCodeSystem != null) {
-						addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
+					addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
 					EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
 						"Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
@@ -56,8 +56,8 @@ public class ValueSetConceptsTableDataProvider {
 		return rows;
 	}
 
-	private void addConcepts(List<ValueSetConceptsTableDataCodeSystem> rows, String system, List<FhirCodeSystemConcept> concepts) {
-		ValueSetConceptsTableDataCodeSystem systemRow = findOrAddSystem(rows, system);
+	private void addConcepts(List<ValueSetConceptsTableDataCodeSystem> codeSystems, String system, List<FhirCodeSystemConcept> concepts) {
+		ValueSetConceptsTableDataCodeSystem codeSystemWithConcepts = findOrAddSystem(codeSystems, system);
 		
 		for (FhirCodeSystemConcept concept : concepts) {
 			String code = concept.getCode();
@@ -87,26 +87,24 @@ public class ValueSetConceptsTableDataProvider {
 			
 			Optional<String> mappingString = Optional.ofNullable(mappedCode);
 			
-			systemRow.addConcept(code, concept.getDescription(), concept.getDefinition(), mappingString);
+			codeSystemWithConcepts.addConcept(code, concept.getDescription(), concept.getDefinition(), mappingString);
 		}
 	}
 
-	private ValueSetConceptsTableDataCodeSystem findOrAddSystem(List<ValueSetConceptsTableDataCodeSystem> rows, String system) {
+	private ValueSetConceptsTableDataCodeSystem findOrAddSystem(List<ValueSetConceptsTableDataCodeSystem> conceptsHeaders, String system) {
 		ValueSetConceptsTableDataCodeSystem systemRow = null;
 		
-		for (ValueSetConceptsTableDataCodeSystem potentialSystemRow : rows) {
-			if (potentialSystemRow.getCodeSystem().equals(system)) {
-				systemRow = potentialSystemRow;
-				break;
+		for (ValueSetConceptsTableDataCodeSystem potentialMatchingConceptsHeader : conceptsHeaders) {
+			String headerCodeSystem = potentialMatchingConceptsHeader.getCodeSystem().toFullString();
+			
+			if (headerCodeSystem.equals(system)) {
+				return potentialMatchingConceptsHeader;
 			}
 		}
 		
-		if (systemRow == null) {
-			FhirURL systemUrl = FhirURL.buildOrThrow(system, valueSet.getImplicitFhirVersion());
-			systemRow = new ValueSetConceptsTableDataCodeSystem(systemUrl);
-			rows.add(systemRow);
-		}
-		
+		FhirURL systemUrl = FhirURL.buildOrThrow(system, valueSet.getImplicitFhirVersion());
+		systemRow = new ValueSetConceptsTableDataCodeSystem(systemUrl);
+		conceptsHeaders.add(systemRow);
 		return systemRow;
 	}
 
