@@ -33,7 +33,7 @@ public class NodeMappingValidator {
 				.computeIfAbsent(mappingId, id -> Lists.newArrayList())
 				.add(mappingMap);
 			
-			if (StructureDefinitionDetails.IGNORABLE_VALUES.contains(mappingMap)) {
+			if (StructureDefinitionDetails.IGNORABLE_MAPPING_VALUES.contains(mappingMap)) {
 				EventHandlerContext.forThread().event(RendererEventType.IGNORABLE_MAPPING_ID, 
 					"Found ignorable mapping (" + mappingMap + ") for identity " + mappingId);
 			} else {

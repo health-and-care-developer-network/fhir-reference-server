@@ -33,7 +33,7 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
 	
-	public static final Set<String> IGNORABLE_VALUES = Sets.newHashSet("n/a", "N/A");
+	public static final Set<String> IGNORABLE_MAPPING_VALUES = Sets.newHashSet("n/a", "N/A");
 	
 	private final String pathName;
 	private final String key;
@@ -318,7 +318,7 @@ public class StructureDefinitionDetails {
 			
 			String value = mapping.getMap();
 			
-			if (IGNORABLE_VALUES.contains(value)) {
+			if (IGNORABLE_MAPPING_VALUES.contains(value)) {
 				continue;
 			}
 			

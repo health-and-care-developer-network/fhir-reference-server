@@ -22,7 +22,7 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionDetails;
 
 public class TestNodeMappingValidator {
-	private static final String AN_IGNORABLE_VALUE = StructureDefinitionDetails.IGNORABLE_VALUES.iterator().next();
+	private static final String AN_IGNORABLE_VALUE = StructureDefinitionDetails.IGNORABLE_MAPPING_VALUES.iterator().next();
 	
 	private TestEventHandlerContext thisEventHandler;
 	private EventHandler eventHandlerBefore = null;
