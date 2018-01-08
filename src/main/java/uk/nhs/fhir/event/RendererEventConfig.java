@@ -18,10 +18,10 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.IGNORE);
 		
 		// Error in profile
-		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.THROW);
+		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.LOG_WARNING);
+
 		
 		// Perhaps valid?
-		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.TYPELINK_STRING_WITH_PROFILE, RendererEventResponse.LOG_WARNING);
 		
@@ -38,6 +38,7 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.LOG_WARNING);
 
 		// Currently not hit
+		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.THROW);
 		responses.put(RendererEventType.METADATA_NOT_AVAILABLE, RendererEventResponse.THROW);
 		responses.put(RendererEventType.VERSION_NOT_AVAILABLE, RendererEventResponse.THROW);
 		responses.put(RendererEventType.NO_DISCRIMINATORS_FOUND, RendererEventResponse.THROW);
