@@ -134,6 +134,7 @@ public class NewMain {
 				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
 				rendererContext.setCurrentParsedResource(Optional.of(wrappedResource));
 			} catch (Exception e) {
+				eventHandler.ignore("Failed to create WrappedResource from " + potentialFhirFile.getPath().toString(), Optional.of(e));
 				// if wrapping failed, leave 'current parsed resource' as null
 			}
 
