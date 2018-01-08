@@ -18,7 +18,6 @@ package uk.nhs.fhir.resourcehandlers;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
@@ -53,7 +52,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
         
-        if (ArrayUtils.contains(FhirBrowserRequestServlet.getIndexedTypes(), resourceType)) {
+        if (FhirBrowserRequestServlet.isIndexedType(resourceType)) {
             if (resourceType == ResourceType.STRUCTUREDEFINITION) {
             	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {

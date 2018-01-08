@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.rest.api.Constants;
@@ -129,15 +130,15 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 
 	// Types for which index pages exist
 	// TODO: can we include Extensions here?
-	private static final ResourceType[] INDEXED_TYPES = new ResourceType[] {
+	private static final List<ResourceType> INDEXED_TYPES = Lists.newArrayList(
 		ResourceType.STRUCTUREDEFINITION,
 		ResourceType.VALUESET,
 		ResourceType.OPERATIONDEFINITION,
 		ResourceType.CONCEPTMAP,
-		ResourceType.CODESYSTEM};
+		ResourceType.CODESYSTEM);
 	
-	public static ResourceType[] getIndexedTypes() {
-		return INDEXED_TYPES;
+	public static boolean isIndexedType(ResourceType type) {
+		return INDEXED_TYPES.contains(type);
 	}
 
 	private void serviceBrowserRequest(HttpServletRequest request, HttpServletResponse response) {
@@ -195,7 +196,7 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		Map<String, String[]> params = getSafeParameterMap(request);
 		
 		// Pages that display a list of resources, whether as an index or the results of a search
-		for (ResourceType type : getIndexedTypes()) {
+		for (ResourceType type : INDEXED_TYPES) {
 			if (uriAfterBase.equals("/" + type.getHAPIName())) {
 				if (uriAfterBase.equals(fullUri)) {
 					showListPage(requestVersion, request, response, type, params);

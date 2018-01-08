@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -68,6 +69,8 @@ public class FileCache {
     	preprocessor.setFhirFileLocator(versionedFileLocator);
     }
     
+    private static Object CACHE_COLLECTION_SYNCH_OBJECT = new Object();
+    
     // Singleton object to act as a cache of the files in the profiles and valueset directories
     private static Map<FhirVersion, List<ResourceEntityWithMultipleVersions>> resourceListByFhirVersion = null;
     private static Map<FhirVersion, Map<String, List<ResourceMetadata>>> examplesListByFhirVersion = null;
@@ -79,11 +82,13 @@ public class FileCache {
     	cacheNeedsUpdating = true;
     }
     
-    public static void clearCache() {
-    	resourceListByFhirVersion = null;
-    	examplesListByFhirVersion = null;
-    	examplesListByName = null;
-    	invalidateCache();
+    public static synchronized void clearCache() {
+    	synchronized(CACHE_COLLECTION_SYNCH_OBJECT) {
+	    	resourceListByFhirVersion = null;
+	    	examplesListByFhirVersion = null;
+	    	examplesListByName = null;
+	    	invalidateCache();
+    	}
     }
     
     private static boolean updateRequired() {
@@ -296,12 +301,6 @@ public class FileCache {
         resourceListByFhirVersion.put(fhirVersion, newResourcesList);
 	}
 
-	static void ensureResourceListByFhirVersion() {
-		if (resourceListByFhirVersion == null) {
-        	resourceListByFhirVersion = Maps.newConcurrentMap();
-        }
-	}
-
 	static void updateExamplesList(FhirVersion fhirVersion, Map<String, List<ResourceMetadata>> newExamplesList) {
 		ensureExamplesListByFhirVersionExists(fhirVersion);
         examplesListByFhirVersion.put(fhirVersion, newExamplesList);
@@ -310,16 +309,28 @@ public class FileCache {
         examplesListByName.put(fhirVersion, buildExampleListByName(newExamplesList));
 	}
 
+	static void ensureResourceListByFhirVersion() {
+    	synchronized(CACHE_COLLECTION_SYNCH_OBJECT) {
+			if (resourceListByFhirVersion == null) {
+	        	resourceListByFhirVersion = Maps.newConcurrentMap();
+	        }
+    	}
+	}
+
 	static void ensureExamplesListByFhirVersionExists(FhirVersion fhirVersion) {
-		if (examplesListByFhirVersion == null) {
-        	examplesListByFhirVersion = Maps.newConcurrentMap();
-        }
+    	synchronized(CACHE_COLLECTION_SYNCH_OBJECT) {
+			if (examplesListByFhirVersion == null) {
+	        	examplesListByFhirVersion = Maps.newConcurrentMap();
+	        }
+    	}
 	}
 
 	static void ensureExamplesListByNameExists() {
-		if (examplesListByName == null) {
-        	examplesListByName = Maps.newConcurrentMap();
-        }
+    	synchronized(CACHE_COLLECTION_SYNCH_OBJECT) {
+			if (examplesListByName == null) {
+	        	examplesListByName = Maps.newConcurrentMap();
+	        }
+    	}
 	}
     
     /**
@@ -329,21 +340,15 @@ public class FileCache {
      * @return
      */
     private static Map<String, ResourceMetadata> buildExampleListByName(Map<String, List<ResourceMetadata>> oldList) {
-    	Map<String, ResourceMetadata> newList = Maps.newConcurrentMap();
-    	for (String key : oldList.keySet()) {
-    		List<ResourceMetadata> examples = oldList.get(key);
-    		for (ResourceMetadata example : examples) {
-    			newList.put(example.getResourceName(), example);
-    		}
-    	}
-    	return newList;
+    	return 
+    		oldList
+    			.values()
+    			.stream()
+    			.flatMap(metadatas -> metadatas.stream())
+    			.collect(Collectors.toConcurrentMap(
+    				example -> example.getResourceName(),
+    				example -> example));
     }
-
-    
-    
-    
-    
-    
     
     /**
      * Method to get the cached set of Resource names of the specified type

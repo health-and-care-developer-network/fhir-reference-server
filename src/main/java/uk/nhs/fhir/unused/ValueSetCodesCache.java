@@ -30,17 +30,14 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
  */
 public class ValueSetCodesCache {
     private static List<CacheObject> _cache;
-    private static ValueSetCodesCache _instance = null;
+    private static final ValueSetCodesCache _instance = new ValueSetCodesCache();
 
     /**
      * Method to get our one instance of this object.
      * 
      * @return the singleton instance of our cache.
      */
-    public static ValueSetCodesCache getInstance() {
-        if(_instance == null) {
-            _instance = new ValueSetCodesCache();
-        }
+    public static synchronized ValueSetCodesCache getInstance() {
         return _instance;
     }
     
