@@ -1,12 +1,14 @@
 package uk.nhs.fhir.util;
 
+import com.google.common.collect.ImmutableList;
+
 public enum FhirVersion {
 	DSTU1,
 	DSTU2,
 	STU3;
 	
-	private static FhirVersion[] supportedVersions = new FhirVersion[]{DSTU2, STU3};
-	public static FhirVersion[] getSupportedVersions() {
+	private static final ImmutableList<FhirVersion> supportedVersions = ImmutableList.<FhirVersion>builder().add(DSTU2, STU3).build();
+	public static ImmutableList<FhirVersion> getSupportedVersions() {
 		return supportedVersions;
 	}
 	

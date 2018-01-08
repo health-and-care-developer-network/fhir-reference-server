@@ -1,5 +1,8 @@
 package uk.nhs.fhir.util;
 
+import java.util.Arrays;
+import java.util.stream.StreamSupport;
+
 public class FhirURLConstants {
 	public static final String HL7_ROOT = "hl7.org";
 	public static final String HL7_FHIR = HL7_ROOT + "/fhir";
@@ -49,14 +52,10 @@ public class FhirURLConstants {
 		}
 	}
 	
-	public static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK};
+	private static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK};
 	public static boolean isNhsResourceUrl(String url) {
-		for (String prefix : NHS_PROFILE_PREFIXES) {
-			if (url.startsWith(prefix)) {
-				return true;
-			}
-		}
-		
-		return false;
+		return StreamSupport
+			.stream(Arrays.spliterator(NHS_PROFILE_PREFIXES), false)
+			.anyMatch(prefix -> url.startsWith(prefix));
 	}
 }

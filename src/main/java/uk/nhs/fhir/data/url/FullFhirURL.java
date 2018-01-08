@@ -16,9 +16,9 @@ import uk.nhs.fhir.util.FhirVersion;
 public class FullFhirURL extends FhirURL {
 
 	// convert any links with host fhir.hl7.org.uk into relative links
-	public static boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
+	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
-	public static boolean TEST_LINK_URLS = false;
+	public static final boolean TEST_LINK_URLS = false;
 	
 	private static final String SCHEME_END = "://";
 
