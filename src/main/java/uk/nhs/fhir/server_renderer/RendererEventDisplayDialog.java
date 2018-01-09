@@ -2,7 +2,6 @@ package uk.nhs.fhir.server_renderer;
 
 import java.awt.BorderLayout;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +74,42 @@ public class RendererEventDisplayDialog extends JDialog {
 			}
 		}
 	}
+	
+	/**
+	 * Ensures that all resources are sorted by their resource names.
+	 * For any files that couldn't be parsed, so we don't have their names, they should appear at the top of the list, sorted
+	 * by file path.
+	 */
+	private static class SortOptionalWrappedResourcesByFilePath implements Comparator<Map.Entry<String, DefaultMutableTreeNode>> {
+		private final Map<String, Optional<WrappedResource<?>>> resourcesByFilePath;
+
+		public SortOptionalWrappedResourcesByFilePath(Map<String, Optional<WrappedResource<?>>> resourcesByFilePath) {
+			this.resourcesByFilePath = resourcesByFilePath;
+		}
+		
+		@Override
+		public int compare(Entry<String, DefaultMutableTreeNode> o1, Entry<String, DefaultMutableTreeNode> o2) {
+			String filepath1 = o1.getKey();
+			Optional<WrappedResource<?>> wrappedResource1 = resourcesByFilePath.get(filepath1);
+			String filepath2 = o2.getKey();
+			Optional<WrappedResource<?>> wrappedResource2 = resourcesByFilePath.get(filepath2);
+			
+			boolean hasResource1 = wrappedResource1.isPresent();
+			boolean hasResource2 = wrappedResource2.isPresent();
+			
+			if (hasResource1 && !hasResource2) {
+				return 1;
+			} else if (!hasResource1 && hasResource2) {
+				return -1;
+			} else if (!hasResource1 && !hasResource2) {
+				// order by filepaths
+				return filepath1.compareTo(filepath2);
+			} else {
+				// hasResource1 && hasResource2
+				return wrappedResource1.get().getName().compareTo(wrappedResource2.get().getName());
+			}
+		}
+	}
 
 	private TreeNode createNodes(List<RendererEvents> eventsList) {
 		Map<String, DefaultMutableTreeNode> nodesByFilePath = new HashMap<>();
@@ -121,23 +156,12 @@ public class RendererEventDisplayDialog extends JDialog {
 			}
 		}
 		
-		List<Map.Entry<String, DefaultMutableTreeNode>> sortedNodes = new ArrayList<>(nodesByFilePath.entrySet());
-		
-		// Order by file path
-		sortedNodes.sort(new Comparator<Map.Entry<String, DefaultMutableTreeNode>>(){
-			@Override
-			public int compare(Entry<String, DefaultMutableTreeNode> o1, Entry<String, DefaultMutableTreeNode> o2) {
-				Optional<WrappedResource<?>> wrappedResource1 = resourcesByFilePath.get(o1.getKey());
-				Optional<WrappedResource<?>> wrappedResource2 = resourcesByFilePath.get(o2.getKey());
-				
-				if (!wrappedResource1.isPresent() 
-				  || !wrappedResource2.isPresent()) {
-					return 0;
-				}
-				
-				return wrappedResource1.get().getName().compareTo(wrappedResource2.get().getName());
-			}
-		});
+		List<Map.Entry<String, DefaultMutableTreeNode>> sortedNodes = 
+			nodesByFilePath
+				.entrySet()
+				.stream()
+				.sorted(new SortOptionalWrappedResourcesByFilePath(resourcesByFilePath))
+				.collect(Collectors.toList());
 		
 		for (Map.Entry<String, DefaultMutableTreeNode> entry : sortedNodes) {
 			if (filesWithErrors.contains(entry.getKey())) {

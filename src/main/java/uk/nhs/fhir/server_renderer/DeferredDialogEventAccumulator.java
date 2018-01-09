@@ -43,12 +43,19 @@ public class DeferredDialogEventAccumulator extends RendererEventAccumulator {
 	protected void displaySortedEvents(List<RendererEvents> events) {
 		final RendererEventDisplayDialog rendererEvents = new RendererEventDisplayDialog(events, parentWindow);
 
-		SwingUtilities.invokeLater(new Runnable(){
-			@Override
-			public void run() {
-				rendererEvents.setVisible(true);
-			}
-		});
+		SwingUtilities.invokeLater(new ShowRendererEventsAWT(rendererEvents));
 	}
 
+	private static class ShowRendererEventsAWT implements Runnable {
+		private final RendererEventDisplayDialog rendererEvents;
+		
+		public ShowRendererEventsAWT(RendererEventDisplayDialog rendererEvents) {
+			this.rendererEvents = rendererEvents;
+		}
+		
+		@Override
+		public void run() {
+			rendererEvents.setVisible(true);
+		}
+	}
 }

@@ -1,10 +1,12 @@
 package uk.nhs.fhir.server_renderer;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFrame;
+
+import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.render.NewMain;
 
@@ -12,13 +14,13 @@ public class RendererSupervisor {
 
 	private final RendererOutputDisplay output;
 	private final AtomicBoolean isRendering;
-	private final ArrayList<RendererListener> listeners;
+	private final List<RendererListener> listeners;
 	
 	public RendererSupervisor(RendererOutputDisplay output) {
 		this.output = output;
 		
 		isRendering = new AtomicBoolean(false);
-		listeners = new ArrayList<>();
+		listeners = Lists.newArrayList();
 	}
 
 	public void tryStartRendering(Path sourceDirectory, Path destinationDirectory, JFrame mainAppWindow) {
