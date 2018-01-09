@@ -18,6 +18,8 @@ package uk.nhs.fhir.unused;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
 
@@ -29,7 +31,7 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
  * @author Adam Hatherly
  */
 public class ValueSetCodesCache {
-    private static List<CacheObject> _cache;
+    private static List<CacheObject> _cache = Lists.newArrayList();
     private static final ValueSetCodesCache _instance = new ValueSetCodesCache();
 
     /**
@@ -63,11 +65,9 @@ public class ValueSetCodesCache {
     }
     
     /**
-     * Constructor which is never directly called, instead, getInstance should be called.
+     * Constructor which is never called (use getInstance()).
      */
-    private ValueSetCodesCache() {
-        _cache = new ArrayList<>();
-    }   
+    private ValueSetCodesCache() {}
     
     /**
      * Method to return a list of the ValueSets which contain a definition of the
@@ -100,7 +100,7 @@ public class ValueSetCodesCache {
      * code, and the ValueSet ID.
      * 
      */
-    private class CacheObject {
+    private static class CacheObject {
     	protected String _code;
     	protected String _valueSetID;
 

@@ -42,7 +42,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 				LOG.error("Failed to copy files to versioned folder", e);
 			}
 		} else {
-			LOG.error("Failed to import file " + sourceFile.getPath() + " due to invalid version " + versionNo);
+			LOG.error("Failed to import file " + sourceFile.getPath() + " due to null version");
 		}
 	}
 

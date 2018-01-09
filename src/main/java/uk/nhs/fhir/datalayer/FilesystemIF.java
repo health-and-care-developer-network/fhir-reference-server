@@ -279,7 +279,7 @@ public class FilesystemIF {
 					Integer i = results.get(type);
 					results.put(type, i + 1);
 				} else {
-					results.put(type, new Integer(1));
+					results.put(type, 1);
 				}
 			}
 		}

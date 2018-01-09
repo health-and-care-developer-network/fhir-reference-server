@@ -15,10 +15,12 @@ public class DataLoaderMessages {
 	}
 	
 	public static String getProfileLoadMessages() {
-		String messages = "Messages from profile loader:\n\n";
+		StringBuilder messages = new StringBuilder("Messages from profile loader:\n\n");
+		
 		for (String message : profileLoadMessages) {
-			messages = messages + message + "\n";
+			messages.append(message).append("\n");
 		}
-		return messages;
+		
+		return messages.toString();
 	}
 }

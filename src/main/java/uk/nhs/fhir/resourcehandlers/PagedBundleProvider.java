@@ -80,13 +80,13 @@ public class PagedBundleProvider implements IBundleProvider {
 		
 		switch(searchType) {
 		case SEARCH_BY_TYPE:
-			return new Integer(dataSource.getResourceCount(this.fhirVersion, this.resourceType));
+			return dataSource.getResourceCount(this.fhirVersion, this.resourceType);
 		case SEARCH_BY_NAME:
-			return new Integer(dataSource.getResourceCountByName(this.fhirVersion, this.resourceType, this.searchParam));
+			return dataSource.getResourceCountByName(this.fhirVersion, this.resourceType, this.searchParam);
 		case SEARCH_BY_URL:
 			return dataSource.getResourceCountByURL(this.fhirVersion, this.resourceType, this.searchParam);
 		}
-		return new Integer(0);
+		return 0;
 	}
 
 	@Override

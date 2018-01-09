@@ -87,11 +87,13 @@ public class ResourceEntityWithMultipleVersions {
 	
 	@Override
 	public String toString() {
-		String result = "  - ResourceEntityWithMultipleVersions [ID=" + resourceID + ", latestVersion=" + latest + "] - Versions:";
-		for (VersionNumber version : metadataByVersion.keySet()) {
-			result = result + "\n" + metadataByVersion.get(version).toString();
+		StringBuilder result = new StringBuilder("  - ResourceEntityWithMultipleVersions [ID=" + resourceID + ", latestVersion=" + latest + "] - Versions:");
+		
+		for (ResourceMetadata metadata : metadataByVersion.values()) {
+			result.append("\n").append(metadata.toString());
 		}
-		return result;
+		
+		return result.toString();
 	}
 
 	public HashMap<VersionNumber, ResourceMetadata> getVersionList() {

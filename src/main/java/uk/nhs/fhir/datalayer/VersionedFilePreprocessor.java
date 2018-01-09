@@ -11,6 +11,8 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -110,6 +112,7 @@ public class VersionedFilePreprocessor {
 	 * @param dest New filename of resource
 	 */
 	protected void copyOtherResources(Path source, Path dest) {
+		source = Preconditions.checkNotNull(source);
 		
 		Path oldDir = source.getParent();
 		String oldName = FileLoader.removeFileExtension(source.getFileName().toString());

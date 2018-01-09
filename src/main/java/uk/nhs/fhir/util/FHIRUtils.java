@@ -18,14 +18,11 @@ package uk.nhs.fhir.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 
-import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.load.FileLoader;
 
@@ -73,45 +70,7 @@ public class FHIRUtils {
         return resource;
     }
     
-    public static boolean isValueSetSNOMED(ca.uhn.fhir.model.dstu2.resource.ValueSet vs) {
-    	if (vs.getCompose() != null
-    	  && vs.getCompose().getInclude() != null) {
-    		
-			List<ComposeInclude> includeList = vs.getCompose().getInclude();
-			
-			for (ComposeInclude includeEntry : includeList) {
-				
-				if (includeEntry.getSystem() != null
-				  && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-			
-					return true;
-				}
-			}
-    	}
-    	
-    	return false;
-    }
-    
-    public static boolean isSTU3ValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
-    	if (vs.getCompose() != null
-    	  && vs.getCompose().getInclude() != null) {
-    		
-			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
-			
-			for (ConceptSetComponent includeEntry : includeList) {
-				
-				if (includeEntry.getSystem() != null
-				 && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-					
-					return true;
-				}
-			}
-    	}
-    	
-    	return false;
-    }
-    
-    public static String getResourceIDFromURL(String url, String def) {
+    private static String getResourceIDFromURL(String url, String def) {
     	// Find the actual name of the resource from the URL
         int idx = url.lastIndexOf('/');
         if (idx > -1) {

@@ -46,6 +46,7 @@ import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.load.FhirFileParser;
+import uk.nhs.fhir.load.FhirParsingFailedException;
 import uk.nhs.fhir.load.XmlFileFinder;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FHIRUtils;
@@ -285,7 +286,7 @@ public class FileCache {
 	                    }
                 	}
 	                
-                } catch (Exception ex) {
+                } catch (FhirParsingFailedException | RuntimeException ex) {
                 	LOG.error("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
                 	addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " message: " + ex.getMessage());
                 }
