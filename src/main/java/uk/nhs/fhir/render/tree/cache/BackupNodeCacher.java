@@ -91,10 +91,8 @@ public class BackupNodeCacher {
 		} else if (matchingNodes.size() == 0) {
 			String differentialPath = differentialNode.getPath();
 			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> differentialPath.endsWith(suffix)).findFirst();
-			if (choiceSuffix.isPresent()) {
-				
-			}
-			throw new IllegalStateException("No nodes matched for differential element path " + differentialNode.getPath());
+			// handle this if it comes up
+			throw new IllegalStateException("No nodes matched for differential element path " + differentialNode.getPath() + " choice suffix = " + choiceSuffix.toString());
 		} else {
 			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + differentialNode.getPath() + ", but first wasn't a slicing node");
 		}

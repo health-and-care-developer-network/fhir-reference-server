@@ -1,7 +1,6 @@
 package uk.nhs.fhir.event;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -83,7 +82,7 @@ public abstract class RendererEventAccumulator extends AbstractRendererEventHand
 	
 	@Override
 	public void displayOutstandingEvents() {
-		List<RendererEvents> events = new ArrayList<>(this.events.values());
+		List<RendererEvents> events = Lists.newArrayList(this.events.values());
 		
 		// sort first by resourceType, then by filename
 		Collections.sort(events, BY_TYPE_THEN_NAME);

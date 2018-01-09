@@ -1,5 +1,6 @@
 package uk.nhs.fhir.render;
 
+import java.io.File;
 import java.nio.file.Path;
 
 import org.jdom2.Document;
@@ -44,7 +45,8 @@ public class FileProcessor {
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
 		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
-		if (!outDirPath.toFile().mkdirs()) {
+		File outDirFile = outDirPath.toFile();
+		if (!outDirFile.exists() && !outDirFile.mkdirs()) {
         	throw new IllegalStateException("Failed to create directory [" + outDirPath.toString() + "]");
         }
 		Path outFilePath = outDirPath.resolve(RendererContext.forThread().getCurrentSource().getName());

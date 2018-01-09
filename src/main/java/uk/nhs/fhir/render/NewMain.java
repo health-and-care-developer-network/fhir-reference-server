@@ -134,7 +134,7 @@ public class NewMain {
 				WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
 				rendererContext.setCurrentParsedResource(Optional.of(wrappedResource));
 			} catch (Exception e) {
-				eventHandler.ignore("Failed to create WrappedResource from " + potentialFhirFile.getPath().toString(), Optional.of(e));
+				eventHandler.ignore("Failed to create WrappedResource from " + potentialFhirFile.getPath(), Optional.of(e));
 				// if wrapping failed, leave 'current parsed resource' as null
 			}
 
@@ -233,7 +233,8 @@ public class NewMain {
 						.resolve(exampleVersion.toString())
 						.resolve("Examples");
 				
-				if (!outputDir.toFile().mkdirs()) {
+				File outputDirFile = outputDir.toFile();
+				if (!outputDirFile.exists() && !outputDirFile.mkdirs()) {
 		        	throw new IllegalStateException("Failed to create directory [" + outputDir.toString() + "]");
 		        }
 				

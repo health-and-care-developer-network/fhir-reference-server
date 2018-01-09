@@ -1,6 +1,5 @@
 package uk.nhs.fhir.render.format.structdef;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +41,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     private static final String BLANK = "";
 
     private List<Element> tableContent = null;
-    List<String> done = new ArrayList<String>();
+    List<String> done = Lists.newArrayList();
 
     Boolean foundBinding = false;
 

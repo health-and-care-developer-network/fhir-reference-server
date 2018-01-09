@@ -10,6 +10,7 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -33,7 +34,7 @@ import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
 	
-	public static final Set<String> IGNORABLE_MAPPING_VALUES = Sets.newHashSet("n/a", "N/A");
+	public static final Set<String> IGNORABLE_MAPPING_VALUES = ImmutableSet.<String>builder().add("n/a", "N/A").build();
 	
 	private final String pathName;
 	private final String key;

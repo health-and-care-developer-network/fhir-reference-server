@@ -34,7 +34,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 
 		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
-			FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = isExtension ? null : dataProvider.getDifferentialTreeData(snapshotTreeData);
+			FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);
 			new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
 		}

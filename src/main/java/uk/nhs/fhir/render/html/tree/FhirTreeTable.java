@@ -1,6 +1,5 @@
 package uk.nhs.fhir.render.html.tree;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -101,7 +100,7 @@ public class FhirTreeTable {
 				childVlines.set(childVlines.size()-2, Boolean.FALSE);
 			}
 			
-			ArrayList<FhirTreeIcon> treeIcons = Lists.newArrayList();
+			List<FhirTreeIcon> treeIcons = Lists.newArrayList();
 			for (int j=0; j<vlines.size(); j++) {
 				boolean lineBelow = childVlines.get(j);
 				boolean lastIcon = (j == vlines.size() - 1);

@@ -62,10 +62,8 @@ public class FormattedOutputSpec<T extends WrappedResource<T>> {
 
 	private void ensureOutputDirectoryExists(String inputPath) {
 		File directory = getOutputDirectory(inputPath).toFile();
-		if (!directory.exists()) {
-			if (!directory.mkdirs()) {
-	        	throw new IllegalStateException("Failed to create directory [" + directory.toString() + "]");
-	        }
+		if (!directory.exists() && !directory.mkdirs()) {
+        	throw new IllegalStateException("Failed to create directory [" + directory.toString() + "]");
 		}
 	}
 	
