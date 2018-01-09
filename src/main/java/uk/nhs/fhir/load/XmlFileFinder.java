@@ -20,7 +20,7 @@ public class XmlFileFinder {
         }
 	};
     
-	private final FileFilter directoryFileFilter = new FileFilter() {
+	private static final FileFilter directoryFileFilter = new FileFilter() {
 		@Override public boolean accept(File f) {
 			return f.isDirectory();
 		}

@@ -10,9 +10,7 @@ import java.util.Optional;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class ResourceMetadata {
-	/**
-	 * Allow resources to be sorted by name
-	 */
+	
 	public static final Comparator<ResourceMetadata> BY_RESOURCE_NAME = Comparator.comparing(ResourceMetadata::getResourceName);
 	
 	private String resourceName = null;

@@ -39,22 +39,16 @@ public class Dstu2FhirDocLinkFactory extends FhirDocLinkFactory {
 				url = urlForExtension();
 				break;
 			case RESOURCE:
-				url = urlForComplexDataType(dataTypeName);
-				break;
-			case SIMPLE_ELEMENT:
-				url = urlForSimpleDataType(dataTypeName);
-				break;
-			case PRIMITIVE:
-				url = urlForSimpleDataType(dataTypeName);
-				break;
+			case ELEMENT:
 			case COMPLEX_ELEMENT:
 				url = urlForComplexDataType(dataTypeName);
 				break;
+			case SIMPLE_ELEMENT:
+			case PRIMITIVE:
+				url = urlForSimpleDataType(dataTypeName);
+				break;
 			case DOMAIN_RESOURCE:
 				url = urlForDomainResource();
-				break;
-			case ELEMENT:
-				url = urlForComplexDataType(dataTypeName);
 				break;
 			case UNKNOWN:
 				// The code doesn't represent an element or a resource. 

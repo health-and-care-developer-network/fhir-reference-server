@@ -71,9 +71,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 		List<FhirIdentifier> identifiers = Lists.newArrayList();
 		
 		IdentifierDt identifier = definition.getIdentifier();
-		if (identifier != null) {
-			identifiers.add(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
-		}
+		identifiers.add(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
 
 		return identifiers;
 	}
@@ -276,19 +274,12 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 
 	@Override
 	public boolean isSNOMED() {
-		Compose compose = definition.getCompose();
-		
-		if (compose != null
-		  && compose.getInclude() != null) {
-			
-			return compose
-					.getInclude()
-					.stream()
-					.anyMatch(include -> FhirURLConstants.SNOMED_ID.equals(include.getSystem()));
-			
-    	} else {
-    		return false;
-    	}
+		// getCompose() and getInclude() never return null
+		return definition
+			.getCompose()
+			.getInclude()
+			.stream()
+			.anyMatch(include -> FhirURLConstants.SNOMED_ID.equals(include.getSystem()));
 	}
 
 }

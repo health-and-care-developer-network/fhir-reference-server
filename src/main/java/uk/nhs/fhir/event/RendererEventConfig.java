@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class RendererEventConfig {
-	public static final boolean STRICT = false;
 	
 	private static final Map<RendererEventType, RendererEventResponse> responses = new ConcurrentHashMap<>();
 

@@ -359,8 +359,7 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 	public boolean isSNOMED() {
 		ValueSetComposeComponent compose = definition.getCompose();
 		
-		if (compose != null
-		  && compose.getInclude() != null) {
+		if (compose != null) {
 			
 			return compose
 				.getInclude()
