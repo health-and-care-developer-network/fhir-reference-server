@@ -15,7 +15,6 @@
  */
 package uk.nhs.fhir.unused;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -85,7 +84,7 @@ public class ValueSetCodesCache {
      * @return A List of ValueSet IDs, where this code was found.
      */
     public static List<String> findCode(String code) {
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = Lists.newArrayList();
         
         for(CacheObject cacheItem : _cache) {
             if(cacheItem._code.equals(code)) {

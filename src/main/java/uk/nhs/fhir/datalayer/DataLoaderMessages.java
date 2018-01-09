@@ -1,10 +1,12 @@
 package uk.nhs.fhir.datalayer;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class DataLoaderMessages {
 
-	private static ArrayList<String> profileLoadMessages = new ArrayList<String>(); 
+	private static List<String> profileLoadMessages = Lists.newArrayList(); 
 	
 	public static void addMessage(String msg) {
 		profileLoadMessages.add(msg);

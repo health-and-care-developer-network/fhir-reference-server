@@ -110,8 +110,9 @@ public class VersionedFilePreprocessor {
 	 * 
 	 * @param source Original filename
 	 * @param dest New filename of resource
+	 * @throws IOException 
 	 */
-	protected void copyOtherResources(Path source, Path dest) {
+	protected void copyOtherResources(Path source, Path dest) throws IOException {
 		source = Preconditions.checkNotNull(source);
 		
 		Path oldDir = source.getParent();
@@ -121,25 +122,18 @@ public class VersionedFilePreprocessor {
 		Path newDir = dest.getParent();
 		String newName = FileLoader.removeFileExtension(dest.getFileName().toString());
 		File targetDir = newDir.resolve(newName).toFile();
-		//System.out.println(targetDir.getAbsolutePath());
 		
-		if(sourceDir.exists()
-		  && sourceDir.isDirectory()) { 
-			try {
-				// Create target dir
-				FileUtils.forceMkdir(sourceDir);
-				
-				// Now, loop through and copy any files into the target directory
-	            File[] fileList = sourceDir.listFiles();
-	            if (fileList != null) {
-	    	        for (File thisFile : fileList) {
-	    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);
-	    	        }
-	            }
-			} catch (IOException e) {
-				LOG.error("Unable to copy supporting resources!");
-				e.printStackTrace();
-			}
+		if (sourceDir.isDirectory()) { 
+			// Create target dir
+			FileUtils.forceMkdir(sourceDir);
+			
+			// Now, loop through and copy any files into the target directory
+            File[] fileList = sourceDir.listFiles();
+            if (fileList != null) {
+    	        for (File thisFile : fileList) {
+    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);
+    	        }
+            }
 		}
 	}
 

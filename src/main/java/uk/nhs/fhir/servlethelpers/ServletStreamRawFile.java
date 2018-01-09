@@ -14,7 +14,7 @@ public class ServletStreamRawFile {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServletStreamRawFile.class.getName());
 	
-	public static void streamRawFileFromClasspath(HttpServletResponse response, String mimeType, String filename) throws IOException {
+	public static void streamRawFileFromClasspath(HttpServletResponse response, String mimeType, String filename) {
     	//LOG.info("Streaming raw file from classpath: " + filename);
 
     	try {
@@ -41,7 +41,7 @@ public class ServletStreamRawFile {
 		        	b = is.read();
 		        }
 	        }
-    	} catch (Exception e) {
+    	} catch (IOException | RuntimeException e) {
     		LOG.error("Error streaming raw file to requestor: " + filename + " - error: " + e.getMessage());
     		response.setStatus(404);
     	}

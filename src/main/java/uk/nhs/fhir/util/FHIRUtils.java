@@ -17,6 +17,7 @@ package uk.nhs.fhir.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -47,10 +48,11 @@ public class FHIRUtils {
     	IParser xmlParser = FhirContexts.xmlParser(fhirVersion);
     	
     	IBaseResource resource = null;
+        LOG.debug("Loading resource from file: " + file.getName());
         try (InputStreamReader fr = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
 			resource = xmlParser.parseResource(fr);
             
-            LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
+            LOG.debug("Parsed resource and identified its class as: " + resource.getClass().getName());
             
             // getUrl() is declared on each class individually.
             // Avoids a big if/else block
@@ -62,11 +64,11 @@ public class FHIRUtils {
             	id = getResourceIDFromURL(url, id);
             }
             resource.setId(id);
-            
-        } catch (Exception e) {
+
+        } catch (IOException | RuntimeException e) {
             e.printStackTrace();
         }
-        LOG.debug("Resource loaded from file: " + file.getName());
+        
         return resource;
     }
     

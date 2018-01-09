@@ -16,7 +16,6 @@
 package uk.nhs.fhir.datalayer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,6 +25,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
@@ -114,7 +115,7 @@ public class FilesystemIF {
     				String theNamePart, int theFromIndex, int theToIndex) {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
-        List<IBaseResource> list = new ArrayList<IBaseResource>();
+        List<IBaseResource> list = Lists.newArrayList();
         List<ResourceMetadata> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
 
         int counter = 0;
@@ -143,7 +144,7 @@ public class FilesystemIF {
 	public List<IBaseResource> getResourceMatchByURL(FhirVersion fhirVersion, ResourceType resourceType, String theURL,
 															int theFromIndex, int theToIndex) {
 		List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
-        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
+        List<IBaseResource> matches = Lists.newArrayList();
         int counter = 0;
         for (ResourceMetadata entry : resourceList) {
         	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
@@ -195,7 +196,7 @@ public class FilesystemIF {
     public List<ResourceMetadata> getExtensions()  {
     	LOG.info("Getting all Extensions");
         
-    	List<ResourceMetadata> result = new ArrayList<ResourceMetadata>();
+    	List<ResourceMetadata> result = Lists.newArrayList();
     	
     	for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
     		result.addAll(FileCache.getExtensions(fhirVersion));
@@ -238,7 +239,7 @@ public class FilesystemIF {
         List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
         
         // Now filter the list to those matching our criteria
-        List<ResourceMetadata> matches = new ArrayList<ResourceMetadata>();
+        List<ResourceMetadata> matches = Lists.newArrayList();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
         

@@ -21,7 +21,6 @@ import static uk.nhs.fhir.datalayer.DataLoaderMessages.addMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,7 +128,7 @@ public class FileCache {
 		return newList;
 	}
     
-    private static ArrayList<ResourceEntityWithMultipleVersions> cacheFHIRResources(FhirVersion fhirVersion, ResourceType resourceType) {
+    private static List<ResourceEntityWithMultipleVersions> cacheFHIRResources(FhirVersion fhirVersion, ResourceType resourceType) {
     	
     	// Call pre-processor to copy files into the versioned directory
     	try {
@@ -142,7 +141,7 @@ public class FileCache {
 		addMessage("Started loading " + resourceType + " resources into cache");
     	
         // Now, read the resources from the versioned path into our cache
-    	ArrayList<ResourceEntityWithMultipleVersions> newFileList = new ArrayList<>();
+    	List<ResourceEntityWithMultipleVersions> newFileList = Lists.newArrayList();
     	String sourcePathForResourceAndVersion = fhirFileLocator.getDestinationPathForResourceType(resourceType, fhirVersion).toString();
     	LOG.debug("Reading pre-processed files from path: " + sourcePathForResourceAndVersion);
         List<File> fileList = resourceFileFinder.findFiles(sourcePathForResourceAndVersion);
@@ -179,7 +178,7 @@ public class FileCache {
         return newFileList;
     }
     
-    private static void addToResourceList(ArrayList<ResourceEntityWithMultipleVersions> list,
+    private static void addToResourceList(List<ResourceEntityWithMultipleVersions> list,
     										ResourceMetadata entry) {
     	boolean found = false;
     	for (ResourceEntityWithMultipleVersions listItem : list) {
@@ -205,7 +204,8 @@ public class FileCache {
         Path renderedExamplesPath = fhirFileLocator.getSourcePathForResourceType(EXAMPLES, fhirVersion);
         Path importedExamplesPath = fhirFileLocator.getDestinationPathForResourceType(EXAMPLES, fhirVersion);
         
-        if (!importedExamplesPath.toFile().mkdirs()) {
+        File importedExamplesPathFile = importedExamplesPath.toFile();
+		if (!importedExamplesPathFile.exists() && !importedExamplesPathFile.mkdirs()) {
         	throw new IllegalStateException("Failed to create directory [" + importedExamplesPath.toString() + "]");
         }
         
@@ -366,7 +366,7 @@ public class FileCache {
         		if (!names.contains(entry.getLatest().getResourceName()))
         			names.add(entry.getLatest().getResourceName());
         }
-        ArrayList<String> nameList = new ArrayList<>(names);
+        List<String> nameList = Lists.newArrayList(names);
         return nameList;
     }
     
@@ -375,7 +375,7 @@ public class FileCache {
      * @return
      */
     public static List<ResourceMetadata> getExtensions(FhirVersion fhirVersion)  {
-    	List<ResourceMetadata> results = new ArrayList<>();
+    	List<ResourceMetadata> results = Lists.newArrayList();
     	if(updateRequired()) {
             updateCache();
         }
@@ -413,7 +413,7 @@ public class FileCache {
 			                    List<ResourceMetadata> resultEntry = result.get(group);
 			                    resultEntry.add(entry.getLatest());
 			                } else {
-			                    List<ResourceMetadata> resultEntry = new ArrayList<>();
+			                    List<ResourceMetadata> resultEntry = Lists.newArrayList();
 			                    resultEntry.add(entry.getLatest());
 			                    result.put(group, resultEntry);
 			                }
@@ -442,7 +442,7 @@ public class FileCache {
         }
         // Load each resource file and put them in a list to return
         int counter = 0;
-        ArrayList<IBaseResource> allFiles = new ArrayList<>();
+        List<IBaseResource> allFiles = Lists.newArrayList();
         for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType) {
         		if (counter >= theFromIndex && counter < theToIndex) {
@@ -509,7 +509,7 @@ public class FileCache {
             updateCache();
         }
 		
-		List<ResourceMetadata> latestResourcesList = new ArrayList<>();
+		List<ResourceMetadata> latestResourcesList = Lists.newArrayList();
 		for (ResourceEntityWithMultipleVersions item : resourceListByFhirVersion.get(fhirVersion)) {
 			latestResourcesList.add(item.getLatest());
 		}

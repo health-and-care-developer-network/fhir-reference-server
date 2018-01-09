@@ -232,6 +232,12 @@ public class FhirBrowserRequestServlet extends HttpServlet {
         String content;
 		if (!requestOperation.isPresent()) {
     		ResourceMetadata resourceEntityByID = data.getResourceEntityByID(requestVersion, requestId.get());
+    		
+    		if (resourceEntityByID == null) {
+    			// TODO: show a proper error page rather than stacktrace
+                throw new IllegalStateException("Couldn't find " + requestVersion.toString() + " resource " + requestId.get());
+    		}
+    		
     		String resourceName = resourceEntityByID.getResourceName();
 
         	String[] formatParams = params.get("_format");

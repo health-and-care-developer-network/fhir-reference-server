@@ -11,22 +11,20 @@ import org.junit.Test;
 public class VersionedFilePreprocessorTest {
 
 	private static final File incomingFile = new File("./src/test/resources/TestIncoming/CareConnect-GPC-MedicationOrder-1.xml");
-	private static final File outgoingFile = new File("./src/test/resources/TestOutgoing/outfile-versioned-1.xml");
+	private static final File outgoingDir = new File("./src/test/resources/TestOutgoing/outfile-versioned-1.xml");
 
 	private static final File expectedFile1 = new File("./src/test/resources/TestOutgoing/outfile-versioned-1/bindings.html");
 	private static final File expectedFile2 = new File("./src/test/resources/TestOutgoing/outfile-versioned-1/details.html");
 	
-	private static final File cleanUpDir = new File("./src/test/resources/TestOutgoing/outfile-versioned-1");
-	
 	@Test
 	public void testCopyOtherResources() throws IOException {
-		new VersionedFilePreprocessor(new PropertiesFhirFileLocator()).copyOtherResources(incomingFile.toPath(), outgoingFile.toPath());
+		new VersionedFilePreprocessor(new PropertiesFhirFileLocator()).copyOtherResources(incomingFile.toPath(), outgoingDir.toPath());
 		
 		// Check the supporting resources have been copied properly
 		assertTrue(expectedFile1.exists());
 		assertTrue(expectedFile2.exists());
 		
 		// Clean up
-		FileUtils.deleteDirectory(cleanUpDir);
+		FileUtils.deleteDirectory(outgoingDir);
 	}
 }
