@@ -2,7 +2,6 @@ package uk.nhs.fhir.render.html.tree;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;

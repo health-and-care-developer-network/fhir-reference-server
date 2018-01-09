@@ -32,7 +32,7 @@ public class FhirTreeData<T extends TreeContent<T>> implements Iterable<T> {
 class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 
 	// Each node down the tree to the current node
-	Deque<NodeAndChildIndex> chain = new ArrayDeque<>();
+	Deque<NodeAndChildIndex<T>> chain = new ArrayDeque<>();
 	
 	private final FhirTreeData<T> data;
 	
@@ -47,7 +47,7 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 		}
 
 		// true if any node in the chain to the current node has further children to offer
-		for (NodeAndChildIndex node : chain) {
+		for (NodeAndChildIndex<T> node : chain) {
 			if (node.hasMoreChildren()) {
 				return true;
 			}
@@ -83,29 +83,29 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 
 	private T supplyRoot() {
 		T root = data.getRoot();
-		chain.add(new NodeAndChildIndex(root));
+		chain.add(new NodeAndChildIndex<>(root));
 		return root;
 	}
 	
 	private T nextChildOfCurrent() {
 		T child = chain.getLast().nextChild();
-		chain.add(new NodeAndChildIndex(child));
+		chain.add(new NodeAndChildIndex<>(child));
 		return child;
 	}
-	
+
 	/**
 	 * Wrapper around a node, holding a reference to the index, allowing iteration over an individual
 	 * node's children.
 	 */
-	private class NodeAndChildIndex {
-		private final T node;
+	private class NodeAndChildIndex<U extends TreeContent<U>> {
+		private final U node;
 		private Integer currentChildIndex;
 		
-		NodeAndChildIndex(T node) {
+		public NodeAndChildIndex(U node) {
 			this.node = node;
 			this.currentChildIndex = null;
 		}
-
+	
 		public boolean hasMoreChildren() {
 			if (node.getChildren().isEmpty()) {
 				return false;
@@ -117,7 +117,7 @@ class TreeIterator<T extends TreeContent<T>> implements Iterator<T> {
 			}
 		}
 		
-		public T nextChild() {
+		public U nextChild() {
 			if (currentChildIndex == null) {
 				currentChildIndex = 0;
 			} else {

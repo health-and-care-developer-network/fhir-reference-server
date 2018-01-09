@@ -84,8 +84,8 @@ public class NewMain {
             String outputDir = args[1];
             String newBaseURL = null;
             if (args.length == 3) {
-            	LOG.info("Using new base URL: " + newBaseURL);
             	newBaseURL = args[2];
+            	LOG.info("Using new base URL: " + newBaseURL);
             }
             
             NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), newBaseURL, new RendererLoggingEventHandler());

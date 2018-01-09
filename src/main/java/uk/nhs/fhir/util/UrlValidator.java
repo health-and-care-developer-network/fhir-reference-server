@@ -107,12 +107,9 @@ public class UrlValidator {
 			statusCode = sendTestRequest(client, linkUrl);
 		}
 		
-		if (statusCode >= 200 && statusCode < 300) {
+		// 2XX or 3XX is success, anything else is a failure
+		if (statusCode >= 200 && statusCode < 400) {
 			success.put(linkUrl, statusCode);
-		} else if (statusCode >= 300 && statusCode < 400) {
-			success.put(linkUrl, statusCode);
-		} else if (statusCode >= 400) {
-			failureMap.put(linkUrl, statusCode);
 		} else {
 			failureMap.put(linkUrl, statusCode);
 		}
