@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -82,11 +81,10 @@ public class FileLoader {
      * @throws FileNotFoundException 
      */
     private static String getCharset(File file) throws IOException {
-    	try (InputStream fis = new FileInputStream(file);
-			BOMInputStream bOMInputStream = new BOMInputStream(fis);) {
+    	try (BOMInputStream bomInputStream = new BOMInputStream(new FileInputStream(file))) {
     		
     		// Use commons.io to deal with byte-order-marker if present
-			ByteOrderMark bom = bOMInputStream.getBOM();
+			ByteOrderMark bom = bomInputStream.getBOM();
 			
 			if (bom != null) {
 				return bom.getCharsetName();
@@ -95,53 +93,6 @@ public class FileLoader {
 			}
 		}
 	}
-
-	/**
-     * @param is InputStream to load content from
-     * @return String containing content of specified file
-     */
-    public static String loadFile(final InputStream is) {
-        String content = null;
-        try {
-            ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();
-            int c = -1;
-            while ((c = is.read()) > -1) {
-                bOutStream.write(c);
-            }
-            content = bOutStream.toString("UTF-8");
-        } catch (IOException ex) {
-        	LOG.error("Error loading file: " + ex.getMessage());
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (IOException ex) { }
-        }
-        return content;
-    }
-    
-    /**
-     * @param fileName Name of file on the classpath to load
-     * @return String containing content of specified file
-     */
-    public static String loadFileOnClasspath(String fileName) {
-    		URL resource = FileLoader.class.getResource(fileName);
-    		if (resource != null) {
-    			return loadFile(FileLoader.class.getResourceAsStream(fileName));
-    		} else {
-    			LOG.error("Unable to load file from classpath: " + fileName);
-    			return null;
-    		}
-    }
-    
-    /**
-     * This method will remove any illegal characters from a filename to avoid any injection of
-     * script characters etc. when requesting a file using a parameter from the querystring.
-     * @param input string to clean
-     * @return cleaned string
-     */
-    public static String cleanFilename(String input) {
-    	return input.replaceAll("[^a-zA-Z0-9.-]", "_");
-    }
 
     /**
      * Removes the extension from a filename

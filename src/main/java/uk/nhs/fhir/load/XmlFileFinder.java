@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +33,7 @@ public class XmlFileFinder {
         File[] fileList = directory.listFiles(XML_FILE_FILTER);
         
         if (fileList == null) {
-        	return new ArrayList<>();
+        	return Lists.newArrayList();
         } else {
         	return Arrays.asList(fileList);
         }
@@ -49,12 +48,26 @@ public class XmlFileFinder {
 	}
 
 	private void findXmlFilesRecursive(List<File> xmlFiles, File searchDirectory) {
-		for (File xmlFile : searchDirectory.listFiles(XML_FILE_FILTER)) {
-        	xmlFiles.add(xmlFile);
-        }
+		if (!searchDirectory.isDirectory()) {
+			throw new IllegalStateException("Trying to search " + searchDirectory.getPath() + " which is not a directory");
+		}
 		
-		for (File childDirectory : searchDirectory.listFiles(directoryFileFilter)) {
-			findXmlFilesRecursive(xmlFiles, childDirectory);
+		File[] localXmlFiles = searchDirectory.listFiles(XML_FILE_FILTER);
+		if (localXmlFiles != null) {
+			for (File xmlFile : localXmlFiles) {
+	        	xmlFiles.add(xmlFile);
+	        }
+		} else {
+			throw new IllegalStateException("IOException finding XML files within " + searchDirectory.getPath());
+		}
+		
+		File[] childDirectories = searchDirectory.listFiles(directoryFileFilter);
+		if (childDirectories != null) {
+			for (File childDirectory : childDirectories) {
+				findXmlFilesRecursive(xmlFiles, childDirectory);
+			}
+		} else {
+			throw new IllegalStateException("IOException finding subdirectories within " + searchDirectory.getPath());
 		}
 	}
 

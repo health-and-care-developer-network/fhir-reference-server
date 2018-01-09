@@ -1,15 +1,17 @@
 package uk.nhs.fhir.data.wrap;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.metadata.ArtefactType;
@@ -70,7 +72,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
     public ResourceMetadata getMetadata(File source) {
     	ResourceMetadata resourceMetadata = getMetadataImpl(source);
     	
-    	ArrayList<SupportingArtefact> artefacts = getArtefacts(source);
+    	List<SupportingArtefact> artefacts = getArtefacts(source);
 
 		Collections.sort(artefacts, SupportingArtefact.BY_WEIGHT);
 		
@@ -79,8 +81,8 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		return resourceMetadata;
 	}
     
-	private ArrayList<SupportingArtefact> getArtefacts(File source) {
-		ArrayList<SupportingArtefact> artefacts = new ArrayList<>();
+	private List<SupportingArtefact> getArtefacts(File source) {
+		List<SupportingArtefact> artefacts = Lists.newArrayList();
 		
 		String resourceFilename = FileLoader.removeFileExtension(source.getName());
 		File dir = new File(source.getParent());

@@ -1,7 +1,6 @@
 package uk.nhs.fhir.data.metadata;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -172,7 +171,7 @@ public class ResourceMetadata {
 		return artefacts;
 	}
 
-	public void setArtefacts(ArrayList<SupportingArtefact> artefacts) {
+	public void setArtefacts(List<SupportingArtefact> artefacts) {
 		this.artefacts = artefacts;
 	}
 
@@ -188,7 +187,7 @@ public class ResourceMetadata {
 		return extensionContexts;
 	}
 
-	public void setExtensionContexts(ArrayList<String> extensionContexts) {
+	public void setExtensionContexts(List<String> extensionContexts) {
 		this.extensionContexts = extensionContexts;
 	}
 

@@ -1,10 +1,11 @@
 package uk.nhs.fhir.data.wrap;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -84,7 +85,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 			baseType = extensionBaseTypeDesc().get();
 		} else {
 			extensionCardinality = null;
-    		extensionContexts = new ArrayList<String>();
+    		extensionContexts = Lists.newArrayList();
 			extensionDescription = null;
     		
     		baseType = getConstrainedType().get();
