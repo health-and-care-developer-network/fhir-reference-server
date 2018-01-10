@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.CSSRule;
 import uk.nhs.fhir.render.html.style.CSSStyleBlock;
 import uk.nhs.fhir.render.html.style.CSSTag;

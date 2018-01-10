@@ -1,5 +1,10 @@
 package uk.nhs.fhir.render.html.style;
 
+/**
+ * A pair of strings representing a CSS rule.
+ * e.g. for rule "height: 80", name="height" and arguments="80"
+ * Arguments may be a space-delimited set of arguments in a single string.
+ */
 public class CSSRule {
 	
 	private final String name;

@@ -98,10 +98,8 @@ public class BackupNodeCacher {
 		}
 	}
 
-	List<FhirTreeNode> handleForgeRenamingDifferentialChoiceButNotSnapshot(String differentialPath, FhirTreeNode searchRoot) {
+	private List<FhirTreeNode> handleForgeRenamingDifferentialChoiceButNotSnapshot(String differentialPath, FhirTreeNode searchRoot) {
 		String confirmedSnapshotPath = "";
-		
-		FhirTreeNode localSearchRoot = searchRoot;
 		
 		for (String differentialPathElement : differentialPath.split("\\.")) {
 			String possibleSnapshotElementPath = confirmedSnapshotPath;
@@ -110,39 +108,57 @@ public class BackupNodeCacher {
 			}
 			possibleSnapshotElementPath += differentialPathElement;
 			
-			List<FhirTreeNode> possibleAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
-			if (possibleAncestorNodes.size() == 1) {
-				localSearchRoot = possibleAncestorNodes.get(0);
-				confirmedSnapshotPath = possibleSnapshotElementPath;
-			} else if (possibleAncestorNodes.isEmpty()) {
-				// try to match up with use of a choice suffix
-				final String possibleMatchingSnapshotElementPath = possibleSnapshotElementPath;
-				Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> possibleMatchingSnapshotElementPath.endsWith(suffix)).findFirst();
-				if (choiceSuffix.isPresent()) {
-					String suffix = choiceSuffix.get();
-					possibleSnapshotElementPath = possibleSnapshotElementPath.substring(0, possibleSnapshotElementPath.length() - suffix.length()) + "[x]";
-					
-					List<FhirTreeNode> possibleChoiceAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, localSearchRoot);
-					if (possibleChoiceAncestorNodes.isEmpty()) {
-						throw new IllegalStateException("Didn't find any matching paths, even after choice substitution to \"[x]\": " + differentialPath);
-					} else if (possibleChoiceAncestorNodes.size() == 1) {
-						confirmedSnapshotPath = possibleSnapshotElementPath;
-						searchRoot = possibleChoiceAncestorNodes.get(0);
-					} else {
-						throw new IllegalStateException("Found multiple possible matching resolved choice nodes in snapshot - implement match on discriminator? " + differentialPath);
-					}
-				} else {
-					throw new IllegalStateException("No matching paths found, and not a resolved choice node: " + differentialPath);
-				}
-			} else {
-				throw new IllegalStateException("Multiple matches on name - need finer grained handling (discriminators?) " + differentialPath);
-			}
+			searchRoot = findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(differentialPath, searchRoot, possibleSnapshotElementPath);
+			
+			confirmedSnapshotPath = searchRoot.getPath();
 		}
 		
 		EventHandlerContext.forThread().event(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, 
 			"Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
 		
-		return Lists.newArrayList(localSearchRoot);
+		return Lists.newArrayList(searchRoot);
+	}
+
+	private FhirTreeNode findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(String differentialPath, FhirTreeNode searchRoot,
+			String possibleSnapshotElementPath) {
+		List<FhirTreeNode> possibleAncestorNodes = findMatchingSnapshotNodes(possibleSnapshotElementPath, searchRoot);
+		if (possibleAncestorNodes.size() == 1) {
+			searchRoot = possibleAncestorNodes.get(0);
+		} else if (possibleAncestorNodes.isEmpty()) {
+			
+			String matchedSuffix = matchSuffixOrThrow(possibleSnapshotElementPath, differentialPath);
+			String restoredGenericChoicePath = reinstateChoiceSuffix(possibleSnapshotElementPath, matchedSuffix);
+			List<FhirTreeNode> possibleChoiceAncestorNodes = findMatchingSnapshotNodes(restoredGenericChoicePath, searchRoot);
+			
+			if (possibleChoiceAncestorNodes.isEmpty()) { 
+				throw new IllegalStateException("Didn't find any matching paths, even after choice substitution to \"[x]\": " + differentialPath);
+			}
+			
+			if (possibleChoiceAncestorNodes.size() > 1) {
+				throw new IllegalStateException("Found multiple possible matching resolved choice nodes in snapshot - implement match on discriminator? " + differentialPath);
+			}
+			
+			// Found a single matching node
+			searchRoot = possibleChoiceAncestorNodes.get(0);
+		} else {
+			throw new IllegalStateException("Multiple matches on name - need finer grained handling (discriminators?) " + differentialPath);
+		}
+		return searchRoot;
+	}
+
+	private String reinstateChoiceSuffix(String possibleSnapshotElementPath, String resolvedSuffix) {
+		int lengthWithoutSuffix = possibleSnapshotElementPath.length() - resolvedSuffix.length();
+		String truncatedPath = possibleSnapshotElementPath.substring(0, lengthWithoutSuffix);
+		return truncatedPath + "[x]";
+	}
+
+	private String matchSuffixOrThrow(String possibleSnapshotElementPath, String differentialPath) {
+		return
+			choiceSuffixes
+				.stream()
+				.filter(eachSuffix -> possibleSnapshotElementPath.endsWith(eachSuffix))
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("No matching paths found, and not a resolved choice node: " + differentialPath));
 	}
 
 	private FhirTreeNode getRootOrFirstSlicedParent(AbstractFhirTreeTableContent differentialNode) {

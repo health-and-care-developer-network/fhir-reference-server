@@ -13,7 +13,7 @@ import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.render.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;

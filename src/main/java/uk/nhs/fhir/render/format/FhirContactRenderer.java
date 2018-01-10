@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.FhirContact;
 import uk.nhs.fhir.data.structdef.FhirContacts;
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 
 public class FhirContactRenderer {

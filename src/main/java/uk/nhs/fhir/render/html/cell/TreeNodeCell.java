@@ -10,7 +10,7 @@ import org.jdom2.Element;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.tree.FhirIcon;
 import uk.nhs.fhir.render.html.tree.FhirTreeIcon;

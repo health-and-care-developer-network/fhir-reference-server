@@ -10,7 +10,7 @@ import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.table.TableRow;

@@ -3,7 +3,7 @@ package uk.nhs.fhir.render.html.cell;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 
 public class SimpleTextCell extends TableCell {
 	

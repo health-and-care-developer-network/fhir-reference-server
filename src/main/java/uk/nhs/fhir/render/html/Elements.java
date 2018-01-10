@@ -1,4 +1,4 @@
-package uk.nhs.fhir.render.html.jdom2;
+package uk.nhs.fhir.render.html;
 
 import java.util.Arrays;
 import java.util.List;

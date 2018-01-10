@@ -9,7 +9,7 @@ import com.google.common.collect.Maps;
 
 /**
  * Holds a document's styles.
- * Preserves the order of original addition (at the level of a CSSStyleBlock) while avoiding duplication and checking consistency.  
+ * Preserves the order of original addition (at the level of a CSSStyleBlock) while avoiding duplication and checking consistency.
  */
 public class CSSStyleSection {
 	private final Map<String, Map<String, String>> rulesAdded = Maps.newHashMap();

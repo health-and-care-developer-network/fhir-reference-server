@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
-import uk.nhs.fhir.render.html.jdom2.Elements;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;

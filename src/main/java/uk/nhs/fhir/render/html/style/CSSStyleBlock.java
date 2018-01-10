@@ -1,10 +1,13 @@
 package uk.nhs.fhir.render.html.style;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+/**
+ * A set of selectors (each of which may consist of multiple parts) and a set of style rules to be applied to the selected HTML elements.
+ */
 public class CSSStyleBlock {
 	private final List<String> selectors;
 	private final List<CSSRule> rules;
@@ -14,8 +17,15 @@ public class CSSStyleBlock {
 	}
 	
 	public CSSStyleBlock(List<String> selectors, List<CSSRule> rules) {
-		this.selectors = Preconditions.checkNotNull(selectors, "selectors cannot be null");
-		this.rules = Preconditions.checkNotNull(rules, "rules cannot be null");
+		if (selectors == null || selectors.isEmpty()) {
+			throw new IllegalArgumentException("selectors cannot be null or empty [" + selectors + "]");
+		}
+		if (rules == null || rules.isEmpty()) {
+			throw new IllegalArgumentException("rules cannot be null or empty [" + rules + "]");
+		}
+		
+		this.selectors = selectors;
+		this.rules = rules;
 	}
 	
 	public void addSelector(String selector) {
@@ -44,7 +54,7 @@ public class CSSStyleBlock {
 		return new StringBuilder()
 			.append(String.join(",\n", selectors)) 
 			.append(" {\n\t")
-			.append(String.join(";\n\t", ruleTexts))
+			.append(rules.stream().map(rule -> rule.toFormattedString()).collect(Collectors.joining(";\n\t")))
 			.append("\n}")
 			.toString();
 	}

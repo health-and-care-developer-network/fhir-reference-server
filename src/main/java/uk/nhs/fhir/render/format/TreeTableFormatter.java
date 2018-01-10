@@ -12,10 +12,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.cell.LinkCell;
 import uk.nhs.fhir.render.html.cell.ResourceFlagsCell;
 import uk.nhs.fhir.render.html.cell.ValueWithInfoCell;
-import uk.nhs.fhir.render.html.jdom2.Elements;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.CSSRule;
 import uk.nhs.fhir.render.html.style.CSSStyleBlock;

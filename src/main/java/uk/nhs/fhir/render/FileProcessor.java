@@ -14,8 +14,8 @@ import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.ResourceFormatter;
 import uk.nhs.fhir.render.format.ResourceFormatterFactory;
 import uk.nhs.fhir.render.format.SectionedHTMLDoc;
-import uk.nhs.fhir.render.html.jdom2.Elements;
-import uk.nhs.fhir.render.html.jdom2.HTMLUtil;
+import uk.nhs.fhir.render.html.Elements;
+import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.util.FhirFileUtils;
 
 public class FileProcessor {
