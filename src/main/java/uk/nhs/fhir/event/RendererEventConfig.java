@@ -14,7 +14,7 @@ public class RendererEventConfig {
 
 	static {
 		// Forge bug
-		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.IGNORE);
+		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.LOG_WARNING);
 		
 		// Error in profile
 		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.LOG_WARNING);
