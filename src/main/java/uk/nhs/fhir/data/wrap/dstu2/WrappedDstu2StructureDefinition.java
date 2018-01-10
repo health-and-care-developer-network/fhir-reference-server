@@ -115,13 +115,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 
 	@Override
 	public Optional<String> getFhirVersion() {
-		Optional<String> fhirVersionDesc = Optional.empty();
-		
-		if (!Strings.isNullOrEmpty(definition.getFhirVersion())) {
-			fhirVersionDesc = Optional.of(FhirRelease.forString(definition.getFhirVersion()).getDesc());
+		if (Strings.isNullOrEmpty(definition.getFhirVersion())) {
+			return Optional.empty();
+		} else {
+			return Optional.of(FhirRelease.forString(definition.getFhirVersion()).getDesc());
 		}
-		
-		return fhirVersionDesc;
 	}
 
 	@Override
