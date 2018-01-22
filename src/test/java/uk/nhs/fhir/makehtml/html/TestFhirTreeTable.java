@@ -18,7 +18,8 @@ import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.SnapshotData;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
 import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
@@ -29,7 +30,7 @@ import uk.nhs.fhir.util.FhirVersion;
 public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
-		FhirTreeNode node = new FhirTreeNode(
+		SnapshotData node = new SnapshotData(
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,
@@ -41,11 +42,11 @@ public class TestFhirTreeTable {
 			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
 		
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(node);
+		FhirTreeData<SnapshotData, SnapshotTreeNode> data = new FhirTreeData<>(new SnapshotTreeNode(node));
 		
-		FhirTreeTable fhirTreeTable = new FhirTreeTable(data, FhirVersion.DSTU2);
+		FhirTreeTable<SnapshotData, SnapshotTreeNode> fhirTreeTable = new FhirTreeTable<>(data, FhirVersion.DSTU2);
 
-		new RemovedElementStripper(data).process();
+		new RemovedElementStripper<>(data).process();
 		new ExtensionsSlicingNodesRemover(data).process();
 		new ChildlessDummyNodeRemover(data).process();
 		new UnwantedConstraintRemover(data).process();

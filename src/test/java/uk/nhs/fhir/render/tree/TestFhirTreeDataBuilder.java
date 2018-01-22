@@ -8,10 +8,10 @@ public class TestFhirTreeDataBuilder {
 	@Test
 	public void testSingleNodeTree() {
 		StubTreeContent root = new StubTreeContent("test");
-		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
+		FhirTreeDataBuilder<Object, StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
 		treeBuilder.addFhirTreeNode(root);
 		
-		FhirTreeData<StubTreeContent> tree = treeBuilder.getTree();
+		FhirTreeData<Object, StubTreeContent> tree = treeBuilder.getTree();
 		
 		Assert.assertEquals(root, tree.getRoot());
 		Assert.assertEquals(0, root.getChildren().size());
@@ -20,12 +20,12 @@ public class TestFhirTreeDataBuilder {
 	@Test
 	public void testRootAndChildTree() {
 		StubTreeContent rootNode = new StubTreeContent("root");
-		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
+		FhirTreeDataBuilder<Object, StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
 		treeBuilder.addFhirTreeNode(rootNode);
 		StubTreeContent child = new StubTreeContent("root.child");
 		treeBuilder.addFhirTreeNode(child);
 		
-		FhirTreeData<StubTreeContent> tree = treeBuilder.getTree();
+		FhirTreeData<Object, StubTreeContent> tree = treeBuilder.getTree();
 		
 		StubTreeContent root = tree.getRoot();
 		Assert.assertEquals(rootNode, root);
@@ -37,14 +37,14 @@ public class TestFhirTreeDataBuilder {
 	@Test
 	public void testRootAndChildAndGrandChildTree() {
 		StubTreeContent rootNode = new StubTreeContent("root");
-		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
+		FhirTreeDataBuilder<Object, StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
 		treeBuilder.addFhirTreeNode(rootNode);
 		StubTreeContent childNode = new StubTreeContent("root.child");
 		treeBuilder.addFhirTreeNode(childNode);
 		StubTreeContent grandchildNode = new StubTreeContent("root.child.grandchild");
 		treeBuilder.addFhirTreeNode(grandchildNode);
 		
-		FhirTreeData<StubTreeContent> tree = treeBuilder.getTree();
+		FhirTreeData<Object, StubTreeContent> tree = treeBuilder.getTree();
 		
 		StubTreeContent root = tree.getRoot();
 		Assert.assertEquals(rootNode, root);
@@ -61,7 +61,7 @@ public class TestFhirTreeDataBuilder {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testFailToMakeDummyIfNoDummyFactoryProvided() {
-		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
+		FhirTreeDataBuilder<Object, StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>();
 		
 		StubTreeContent rootNode = new StubTreeContent("root");
 		treeBuilder.addFhirTreeNode(rootNode);
@@ -71,14 +71,14 @@ public class TestFhirTreeDataBuilder {
 	
 	@Test
 	public void testMakeDummy() {
-		FhirTreeDataBuilder<StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>(new DummyStubTreeContentFactory());
+		FhirTreeDataBuilder<Object, StubTreeContent> treeBuilder = new FhirTreeDataBuilder<>(new DummyStubTreeContentFactory());
 		
 		StubTreeContent rootNode = new StubTreeContent("root");
 		treeBuilder.addFhirTreeNode(rootNode);
 		StubTreeContent grandchildNode = new StubTreeContent("root.child.grandchild");
 		treeBuilder.addFhirTreeNode(grandchildNode);
 		
-		FhirTreeData<StubTreeContent> tree = treeBuilder.getTree();
+		FhirTreeData<Object, StubTreeContent> tree = treeBuilder.getTree();
 		
 		StubTreeContent root = tree.getRoot();
 		Assert.assertEquals(rootNode, root);
@@ -106,7 +106,7 @@ class DummyStubTreeContent extends StubTreeContent {
 	}
 }
 
-class DummyStubTreeContentFactory implements DummyNodeFactory<StubTreeContent> {
+class DummyStubTreeContentFactory implements EmptyNodeFactory<Object, StubTreeContent> {
 
 	@Override
 	public StubTreeContent create(StubTreeContent parent, NodePath path) {

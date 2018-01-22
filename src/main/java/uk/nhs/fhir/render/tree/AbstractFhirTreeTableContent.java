@@ -11,77 +11,73 @@ import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.util.FhirVersion;
 
-public abstract class AbstractFhirTreeTableContent extends TreeContent<AbstractFhirTreeTableContent> {
-	public AbstractFhirTreeTableContent() {
-	}
+public interface AbstractFhirTreeTableContent extends HasMappings {
+
+	public boolean isRoot();
+
+	public String getPathName();
+
+	public boolean useBackupTypeLinks();
+	public LinkDatas getTypeLinks();
+
+	public String getDisplayName();
+
+	public ResourceFlags getResourceFlags();
+
 	
-	public AbstractFhirTreeTableContent(AbstractFhirTreeTableContent parent) {
-		super(parent);
-	}
+	public Optional<Integer> getMin();
+	public Optional<String> getMax();
+	/**
+	 * True if a node doesn't contain ANY cardinality information
+	 */
+	public boolean useBackupCardinality();
+	public FhirCardinality getCardinality();
 
-	public abstract boolean hasChildren();
+	public String getInformation();
 
-	public abstract boolean isRemovedByProfile();
-
-	public abstract String getPathName();
-
-	public abstract boolean useBackupTypeLinks();
-	public abstract LinkDatas getTypeLinks();
-
-	public abstract String getDisplayName();
-
-	public abstract ResourceFlags getResourceFlags();
-
-	public abstract boolean useBackupCardinality();
-	public abstract FhirCardinality getCardinality();
-
-	public abstract String getInformation();
-
-	public abstract boolean hasSlicingInfo();
-	public abstract Optional<SlicingInfo> getSlicingInfo();
+	public boolean hasSlicingInfo();
+	public Optional<SlicingInfo> getSlicingInfo();
 	
-	public abstract boolean isFixedValue();
-	public abstract Optional<String> getFixedValue();
+	public boolean isFixedValue();
+	public Optional<String> getFixedValue();
 
-	public abstract List<String> getExamples();
+	public List<String> getExamples();
 
-	public abstract boolean hasDefaultValue();
-	public abstract Optional<String> getDefaultValue();
+	public boolean hasDefaultValue();
+	public Optional<String> getDefaultValue();
 
-	public abstract boolean hasBinding();
-	public abstract Optional<BindingInfo> getBinding();
-
-	public abstract void setBackupNode(FhirTreeNode backupNode);
-	public abstract boolean hasBackupNode();
-	public abstract Optional<FhirTreeNode> getBackupNode();
+	public boolean hasBinding();
+	public Optional<BindingInfo> getBinding();
 	
-	abstract public List<ConstraintInfo> getConstraints();
-	
-	abstract public String getNodeKey();
+	public List<ConstraintInfo> getConstraints();
 
 	public abstract Optional<String> getName();
 
-	abstract public Optional<String> getDefinition();
+	public Optional<String> getDefinition();
 	
-	abstract public Optional<String> getLinkedNodeName();
-	abstract public Optional<String> getLinkedNodeId();
+	public Optional<SnapshotTreeNode> getLinkedNode();
 	
-	abstract public Optional<ExtensionType> getExtensionType();
-
-	public abstract boolean hasSlicingSibling();
-
-	abstract AbstractFhirTreeTableContent getSlicingSibling();
-
-	abstract String getKeySegment();
-
-	public abstract boolean isPrimitive();
-
-	public abstract FhirElementDataType getDataType();
-
-	abstract public Optional<String> getId();
-
-	public abstract Optional<AbstractFhirTreeTableContent> getLinkedNode();
+	public Optional<String> getLinkedNodeName();
+	public Optional<String> getLinkedNodeId();
 	
-	abstract public boolean isRoot();
+	public Optional<ExtensionType> getExtensionType();
+
+	public boolean isPrimitive();
+
+	public FhirElementDataType getDataType();
+
+	public Optional<String> getId();
+	
+	public Optional<String> getDiscriminatorValue();
+	
+	public void setSliceName(Optional<String> sliceName);
+
+	public boolean isExtension();
+	public boolean isSimpleExtension();
+	public boolean isComplexExtension();
+	public void setExtensionType(Optional<ExtensionType> extensionType);
+	
+	public FhirVersion getVersion();
 }

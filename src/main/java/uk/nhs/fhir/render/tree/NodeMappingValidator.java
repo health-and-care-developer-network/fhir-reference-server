@@ -13,18 +13,24 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionDetails;
 
 public class NodeMappingValidator {
-	
-	private final HasMappings node;
+
+	private final List<FhirElementMapping> mappings;
+	private final String path;
 	private final Map<String, List<String>> mappingsByIdentity = Maps.newHashMap();
 	private final Map<String, List<String>> mappingsByIdentityStripIgnorable = Maps.newHashMap();
 	
-	public NodeMappingValidator(HasMappings node) {
-		this.node = node;
+	public NodeMappingValidator(HasMappings hasMappings) {
+		this(hasMappings.getMappings(), hasMappings.getPath());
+	}
+	
+	public NodeMappingValidator(List<FhirElementMapping> mappings, String path) {
+		this.mappings = mappings;
+		this.path = path;
 	}
 	
 	public void validate() {
 		
-		for (FhirElementMapping mapping : node.getMappings()) {
+		for (FhirElementMapping mapping : mappings) {
 			
 			String mappingMap = mapping.getMap();
 			String mappingId = mapping.getIdentity();
@@ -54,11 +60,11 @@ public class NodeMappingValidator {
 			
 			if (nonIgnoredMappingsCount > 1) {
 				EventHandlerContext.forThread().event(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY, 
-					"Multiple mapping entries (" + nonIgnoredMappingsCount + ") on " + node.getPath()
+					"Multiple mapping entries (" + nonIgnoredMappingsCount + ") on " + path
 						+ " for identity " + identity + " [" + String.join(", ", nonIgnoredMappingsForKey + "]"));
 			} else if (allMappingsCount > 1) {
 				EventHandlerContext.forThread().event(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, 
-					"Multiple mapping entries (" + allMappingsCount + ") on " + node.getPath() + " for identity "
+					"Multiple mapping entries (" + allMappingsCount + ") on " + path + " for identity "
 						+ identity + " [" + String.join(", ", allMappingsForKey + "]"));
 			}
 		}

@@ -15,9 +15,17 @@ import uk.nhs.fhir.render.tree.validate.ConstraintsValidator;
 import uk.nhs.fhir.util.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirVersion;
 
-public class FhirTreeNodeBuilder {
+public class FhirTreeNodeBuilder<T, U extends TreeNode<T, U>> {
 	
-	public FhirTreeNode fromElementDefinition(WrappedElementDefinition elementDefinition) {
+	public SnapshotData buildSnapshotNode(WrappedElementDefinition elementDefinition) {
+		return fromElementDefinition(elementDefinition).toSnapshotData();
+	}
+	
+	public DifferentialData buildDifferentialNode(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode) {
+		return fromElementDefinition(elementDefinition).toDifferentialData(backupNode);
+	}
+	
+	public FhirTreeNodeDataBuilder fromElementDefinition(WrappedElementDefinition elementDefinition) {
 		
 		Optional<String> name = Optional.ofNullable(elementDefinition.getName());
 
@@ -48,9 +56,6 @@ public class FhirTreeNodeBuilder {
 
 		ResourceFlags flags = elementDefinition.getResourceFlags();
 		
-		Integer min = elementDefinition.getCardinalityMin();
-		String max = elementDefinition.getCardinalityMax();
-		
 		String shortDescription = elementDefinition.getShortDescription();
 		if (shortDescription == null) {
 			shortDescription = "";
@@ -62,11 +67,9 @@ public class FhirTreeNodeBuilder {
 		String path = elementDefinition.getPath();
 		FhirVersion version = elementDefinition.getVersion();
 
-		FhirTreeNode node = new FhirTreeNode(
+		FhirTreeNodeDataBuilder nodeBuilder = new FhirTreeNodeDataBuilder(
 			name,
 			flags,
-			min,
-			max,
 			typeLinks, 
 			shortDescription,
 			constraints,
@@ -76,51 +79,51 @@ public class FhirTreeNodeBuilder {
 
 		Optional<String> definition = elementDefinition.getDefinition();
 		if (definition.isPresent() && !definition.get().isEmpty()) {
-			node.setDefinition(definition);
+			nodeBuilder.setDefinition(definition);
 		}
 		
 		Optional<SlicingInfo> slicing = elementDefinition.getSlicing();
 		if (slicing.isPresent()) {
-			node.setSlicingInfo(slicing);	
+			nodeBuilder.setSlicingInfo(slicing);	
 		}
 		
-		node.setFixedValue(elementDefinition.getFixedValue());
-		node.setExamples(elementDefinition.getExamples());
-		node.setDefaultValue(elementDefinition.getDefaultValue());
-		node.setBinding(elementDefinition.getBinding());
+		nodeBuilder.setFixedValue(elementDefinition.getFixedValue());
+		nodeBuilder.setExamples(elementDefinition.getExamples());
+		nodeBuilder.setDefaultValue(elementDefinition.getDefaultValue());
+		nodeBuilder.setBinding(elementDefinition.getBinding());
 		
 		Optional<String> requirements = elementDefinition.getRequirements();
 		if (requirements.isPresent() && !requirements.get().isEmpty()) {
-			node.setRequirements(requirements);
+			nodeBuilder.setRequirements(requirements);
 		}
 
 		Optional<String> comments = elementDefinition.getComments();
 		if (comments.isPresent() && !comments.get().isEmpty()) {
-			node.setComments(comments);
+			nodeBuilder.setComments(comments);
 		}
 
-		node.setAliases(elementDefinition.getAliases());
+		nodeBuilder.setAliases(elementDefinition.getAliases());
 		FhirFileRegistry fhirFileRegistry = RendererContext.forThread().getFhirFileRegistry();
-		node.setExtensionType(elementDefinition.getExtensionType(fhirFileRegistry));
+		nodeBuilder.setExtensionType(elementDefinition.getExtensionType(fhirFileRegistry));
 		
 		Optional<String> nameReference = elementDefinition.getLinkedNodeName();
 		if (nameReference.isPresent() && !nameReference.get().isEmpty()) {
-			node.setLinkedNodeName(nameReference);
+			nodeBuilder.setLinkedNodeName(nameReference);
 		}
 		
 		Optional<String> nodePath = elementDefinition.getLinkedNodePath();
 		if (nodePath.isPresent() && !nodePath.get().isEmpty()) {
-			node.setLinkedNodeId(nodePath);
+			nodeBuilder.setLinkedNodeId(nodePath);
 		}
+
+		new NodeMappingValidator(elementDefinition.getMappings(), elementDefinition.getPath()).validate();
+		nodeBuilder.setMappings(elementDefinition.getMappings());
 		
-		node.setMappings(elementDefinition.getMappings());
-		new NodeMappingValidator(node).validate();
+		nodeBuilder.setSliceName(elementDefinition.getSliceName());
 		
-		node.setSliceName(elementDefinition.getSliceName());
+		nodeBuilder.setId(elementDefinition.getId());
 		
-		node.setId(elementDefinition.getId());
-		
-		return node;
+		return nodeBuilder;
 	}
 
 }

@@ -2,17 +2,20 @@ package uk.nhs.fhir.render.html.tree;
 
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
 
-public class FhirIconProvider {
+public class FhirIconProvider<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 
-	public FhirIcon getIcon(AbstractFhirTreeTableContent node) {
+	public FhirIcon getIcon(U node) {
 		
-		if (node.getLinkedNode().isPresent()) {
+		T nodeData = node.getData();
+		
+		if (nodeData.getLinkedNode().isPresent()) {
 			return FhirIcon.REUSE;
 		}
 		
-		if (node.getSlicingInfo().isPresent()) {
+		if (nodeData.getSlicingInfo().isPresent()) {
 			return FhirIcon.SLICE;
 		}
 		
@@ -20,8 +23,8 @@ public class FhirIconProvider {
 			return FhirIcon.RESOURCE;
 		}
 		
-		if (node.getExtensionType().isPresent()) {
-			ExtensionType extensionType = node.getExtensionType().get();
+		if (nodeData.getExtensionType().isPresent()) {
+			ExtensionType extensionType = nodeData.getExtensionType().get();
 			switch (extensionType) {
 				case SIMPLE:
 					return FhirIcon.EXTENSION_SIMPLE;
@@ -32,7 +35,7 @@ public class FhirIconProvider {
 			}
 		}
 
-		FhirElementDataType dataType = node.getDataType();
+		FhirElementDataType dataType = nodeData.getDataType();
 		switch (dataType) {
 			case CHOICE:
 				return FhirIcon.CHOICE;
