@@ -96,6 +96,19 @@ public class StringUtil {
 		return Optional.empty();
 	}
 	
+	@SafeVarargs
+	public static <T> Optional<T> firstPresent(Supplier<Optional<T>>... options) {
+		for (Supplier<Optional<T>> option : options) {
+			Optional<T> optional = option.get();
+			
+			if (optional.isPresent()) {
+				return optional;
+			}
+		}
+		
+		return Optional.empty();
+	}
+	
 	public static String nChars(int n, char c) {
 		char[] charArray = new char[n];
 		Arrays.fill(charArray, c);
