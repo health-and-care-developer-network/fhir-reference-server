@@ -619,9 +619,11 @@ public class FhirTreeNode implements FhirTreeTableContent {
 						} else if (hasBinding) {
 							BindingInfo bindingInfo = discriminatorNode.get().getBinding().get();
 							if (bindingInfo.getUrl().isPresent()) {
+								discriminators.add(bindingInfo.getUrl().get().toFullString());
+							} else if (bindingInfo.getDescription().isPresent()) {
 								discriminators.add(bindingInfo.getDescription().get());
 							} else {
-								discriminators.add(bindingInfo.getUrl().get().toFullString());
+								throw new IllegalStateException("Discriminator node " + discriminatorPath + " with binding without url or description for node " + getPath());
 							}
 						} else {
 							if (!getSliceName().isPresent()) {
