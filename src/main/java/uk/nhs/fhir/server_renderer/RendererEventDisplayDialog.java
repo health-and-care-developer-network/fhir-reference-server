@@ -41,11 +41,15 @@ public class RendererEventDisplayDialog extends JDialog {
 		setSize(1000, 500);
 		setLayout(new BorderLayout());
 
-		root.add(justWarnings);
-		root.add(withErrors);
-		
 		createNodes(events);
-	    
+		
+		if (justWarnings.getChildCount() > 0) {
+			root.add(justWarnings);
+		}
+		if (withErrors.getChildCount() > 0) {
+			root.add(withErrors);
+		}
+		
 	    add(treeView, BorderLayout.CENTER);
 	}
 	
