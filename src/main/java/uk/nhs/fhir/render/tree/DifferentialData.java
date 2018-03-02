@@ -3,6 +3,8 @@ package uk.nhs.fhir.render.tree;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
+
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
@@ -10,10 +12,12 @@ import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.render.tree.tidy.HasBackupNode;
+import uk.nhs.fhir.render.tree.tidy.HasSlicingInfo;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
-public class DifferentialData extends AbstractFhirTreeNodeData {
+public class DifferentialData extends AbstractFhirTreeNodeData implements HasBackupNode<SnapshotData, SnapshotTreeNode>, HasSlicingInfo {
 
 	protected final Optional<Integer> min;
 	protected final Optional<String> max;
@@ -33,11 +37,12 @@ public class DifferentialData extends AbstractFhirTreeNodeData {
 			FhirVersion version,
 			SnapshotTreeNode backupNode) {
 		super(name, flags, typeLinks, information, constraints, path, dataType, version);
-		this.min = min;
-		this.max = max;
-		this.backupNode = backupNode;
+		this.min = Preconditions.checkNotNull(min);
+		this.max = Preconditions.checkNotNull(max);
+		this.backupNode = Preconditions.checkNotNull(backupNode);
 	}
 	
+	@Override
 	public SnapshotTreeNode getBackupNode() {
 		return backupNode;
 	}
@@ -127,10 +132,12 @@ public class DifferentialData extends AbstractFhirTreeNodeData {
 		return max;
 	}
 
+	@Override
 	public boolean hasSlicingInfo() {
 		return super.hasSlicingInfo() || getBackupNode().getData().hasSlicingInfo();
 	}
-
+	
+	@Override
 	public Optional<SlicingInfo> getSlicingInfo() {
 		return StringUtil.firstPresent(
 			super.getSlicingInfo(), 

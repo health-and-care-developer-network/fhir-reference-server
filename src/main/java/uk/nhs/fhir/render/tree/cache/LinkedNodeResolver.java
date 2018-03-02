@@ -6,31 +6,27 @@ import java.util.stream.Collectors;
 
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 
-public abstract class LinkedNodeResolver {
+public abstract class LinkedNodeResolver<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 
-	protected final FhirTreeData<AbstractFhirTreeTableContent> treeData;
+	protected final FhirTreeData<T, U> treeData;
 	
-	public LinkedNodeResolver(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
+	public LinkedNodeResolver(FhirTreeData<T, U> treeData) {
 		this.treeData = treeData;
 	}
 	
-	protected void setLinkedNodes(Map<String, List<AbstractFhirTreeTableContent>> expectedIds,
-			Map<String, AbstractFhirTreeTableContent> nodesWithId) {
-		for (Map.Entry<String, List<AbstractFhirTreeTableContent>> expectedIdEntry : expectedIds.entrySet()) {
+	protected void setLinkedNodes(Map<String, List<U>> expectedIds, Map<String, SnapshotTreeNode> nodesWithId) {
+		for (Map.Entry<String, List<U>> expectedIdEntry : expectedIds.entrySet()) {
 			String expectedId = expectedIdEntry.getKey();
-			List<AbstractFhirTreeTableContent> nodesWithLink = expectedIdEntry.getValue();
+			List<U> nodesWithLink = expectedIdEntry.getValue();
 			
 			if (nodesWithId.containsKey(expectedId)) {
-				for (AbstractFhirTreeTableContent nodeWithLink : nodesWithLink) {
-					if (nodeWithLink instanceof FhirTreeNode) {
-						((FhirTreeNode)nodeWithLink).setLinkedNode(nodesWithId.get(expectedId));
-					}
-					// If we are in a dummy node, we don't need to do anything since the backup node
-					// should contain this information
+				for (U nodeWithLink : nodesWithLink) {
+					nodeWithLink.getData().setLinkedNode(nodesWithId.get(expectedId));
 				}
 			} else {
 				String nodesWithMissingLinkTarget = String.join(", ", 

@@ -1,8 +1,8 @@
 package uk.nhs.fhir.makehtml;
 
 import org.junit.Test;
+import org.junit.Assert;
 
-import junit.framework.Assert;
 import uk.nhs.fhir.render.html.tree.FhirIcon;
 
 public class TestFhirIcon {

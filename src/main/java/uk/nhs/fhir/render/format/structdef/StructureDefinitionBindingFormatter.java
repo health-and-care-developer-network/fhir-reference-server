@@ -28,7 +28,8 @@ import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirIcon;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.SnapshotData;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -83,7 +84,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                 ));
         StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 
-        for (AbstractFhirTreeTableContent content : dataProvider.getSnapshotTreeData()) {
+        for (SnapshotTreeNode content : dataProvider.getSnapshotTreeData().nodes()) {
             processNode(content);
         }
 
@@ -101,14 +102,16 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
 		return section;
 	}
 
-	private void processNode(AbstractFhirTreeTableContent node)
+	private void processNode(SnapshotTreeNode node)
     {
-        if (node.getBinding().isPresent()) {
+		SnapshotData data = node.getData();
+		
+        if (data.getBinding().isPresent()) {
 
-            Optional<String> description = node.getDefinition();
+            Optional<String> description = data.getDefinition();
             String displayDescription = description.isPresent() ? description.get() : BLANK;
            
-            BindingInfo bindingInfo = node.getBinding().get();
+            BindingInfo bindingInfo = data.getBinding().get();
 			Optional<FhirURL> url = bindingInfo.getUrl();
 
             //String displayValueSet = url.isPresent() ? url.get().toString() : "";

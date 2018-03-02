@@ -1,10 +1,10 @@
 package uk.nhs.fhir.makehtml.html;
 
 import org.junit.Test;
+import org.junit.Assert;
 
 import com.google.common.collect.Lists;
 
-import junit.framework.Assert;
 import uk.nhs.fhir.render.html.style.CSSRule;
 import uk.nhs.fhir.render.html.style.CSSStyleBlock;
 

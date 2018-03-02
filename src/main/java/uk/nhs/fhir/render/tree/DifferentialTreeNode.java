@@ -1,25 +1,24 @@
 package uk.nhs.fhir.render.tree;
 
-public class DifferentialTreeNode extends AbstractFhirTreeNode<DifferentialData, DifferentialTreeNode>	 {
+public class DifferentialTreeNode extends AbstractFhirTreeNode<DifferentialData, DifferentialTreeNode> implements MaybeDummy {
 
-	private final DifferentialData data;
+	private final boolean isDummy;
 
 	public DifferentialTreeNode(DifferentialData data) {
-		this(null, data);
+		this(data, null);
 	}
 
-	public DifferentialTreeNode(DifferentialTreeNode parent, DifferentialData data) {
-		super(parent);
-		this.data = data;
+	public DifferentialTreeNode(DifferentialData data, DifferentialTreeNode parent) {
+		this(data, parent, false);
 	}
 
-	@Override
-	public DifferentialData getData() {
-		return data;
+	public DifferentialTreeNode(DifferentialData data, DifferentialTreeNode parent, boolean isDummy) {
+		super(data, parent);
+		this.isDummy = isDummy;
 	}
 	
 	public SnapshotTreeNode getBackupNode() {
-		return data.getBackupNode();
+		return getData().getBackupNode();
 	}
 	
 	@Override
@@ -28,14 +27,12 @@ public class DifferentialTreeNode extends AbstractFhirTreeNode<DifferentialData,
 	}
 
 	@Override
-	public boolean hasSlicingSibling() {
-		return super.hasSlicingSibling()
-		  || getBackupNode().hasSlicingSibling();
-	}
-
-	@Override
 	public String getNodeKey() {
 		return getBackupNode().getNodeKey();
 	}
 
+	@Override
+	public boolean isDummy() {
+		return isDummy;
+	}
 }

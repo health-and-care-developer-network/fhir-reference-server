@@ -1,126 +1,195 @@
 package uk.nhs.fhir.render.data;
 
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
-import junit.framework.Assert;
-import uk.nhs.fhir.render.format.structdef.UnchangedSliceInfoRemover;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.TreeNode;
+import uk.nhs.fhir.render.tree.tidy.HasBackupNode;
+import uk.nhs.fhir.render.tree.tidy.HasSlicingInfo;
+import uk.nhs.fhir.render.tree.tidy.UnchangedSliceInfoRemover;
 
 public class TestUnchangedSliceInfoRemover {
 	@Test
 	public void testHideOne() {
-		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
-		root.addChild(TestFhirTreeNode.testNode("CHILD", "Test.child"));
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
+		TestSnapshotNode root = new TestSnapshotNode("ROOT", "Test");
+		root.addChild(new TestSnapshotNode("CHILD", "Test.child"));
+		FhirTreeData<TestSnapshotData, TestSnapshotNode> data = new FhirTreeData<>(root);
 		
-		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(2, Iterators.size(data.iterator()));
 		
-		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
-		diffRoot.setBackupNode(root);
+		TestDifferentialNode diffRoot = new TestDifferentialNode("ROOT", "Test", root);
+		 
+		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
-		remover.process(data);
-		
-		Assert.assertEquals(1, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(1, Iterators.size(data.iterator()));
 	}
 	
 	@Test
 	public void testKeepOne() {
-		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
-		FhirTreeNode child = TestFhirTreeNode.testNode("CHILD", "Test.child");
+		TestSnapshotNode root = new TestSnapshotNode("ROOT", "Test");
+		TestSnapshotNode child = new TestSnapshotNode("CHILD", "Test.child");
 		root.addChild(child);
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
+		FhirTreeData<TestSnapshotData, TestSnapshotNode> data = new FhirTreeData<>(root);
 		
-		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(2, Iterators.size(data.iterator()));
 		
-		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
-		diffRoot.setBackupNode(root);
-		FhirTreeNode diffChild = TestFhirTreeNode.testNode("CHILD", "Test.child");
-		diffChild.setBackupNode(child);
+		TestDifferentialNode diffRoot = new TestDifferentialNode("ROOT", "Test", root);
+		TestDifferentialNode diffChild = new TestDifferentialNode("CHILD", "Test.child", child);
 		diffRoot.addChild(diffChild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
-		remover.process(data);
+		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
 		
-		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(2, Iterators.size(data.iterator()));
 	}
 	
 	@Test
 	public void testHideGrandchild() {
-		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
-		FhirTreeNode child = TestFhirTreeNode.testNode("CHILD", "Test.child");
+		TestSnapshotNode root = new TestSnapshotNode("ROOT", "Test", Sets.newHashSet());
+		TestSnapshotNode child = new TestSnapshotNode("CHILD", "Test.child");
 		root.addChild(child);
-		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
+		TestSnapshotNode grandchild = new TestSnapshotNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
+		FhirTreeData<TestSnapshotData, TestSnapshotNode> data = new FhirTreeData<>(root);
 		
-		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(3, Iterators.size(data.iterator()));
 		
-		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
-		diffRoot.setBackupNode(root);
-		FhirTreeNode diffChild = TestFhirTreeNode.testNode("CHILD", "Test.child");
-		diffChild.setBackupNode(child);
+		TestDifferentialNode diffRoot = new TestDifferentialNode("ROOT", "Test", root);
+		TestDifferentialNode diffChild = new TestDifferentialNode("CHILD", "Test.child", child);
 		diffRoot.addChild(diffChild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
-		remover.process(data);
+		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
 		
-		Assert.assertEquals(2, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(2, Iterators.size(data.iterator()));
 	}
 	
 	@Test
 	public void testKeepGrandchild() {
-		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
-		FhirTreeNode child = TestFhirTreeNode.testNode("CHILD", "Test.child");
+		TestSnapshotNode root = new TestSnapshotNode("ROOT", "Test", Sets.newHashSet());
+		TestSnapshotNode child = new TestSnapshotNode("CHILD", "Test.child");
 		root.addChild(child);
-		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
+		TestSnapshotNode grandchild = new TestSnapshotNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
+		FhirTreeData<TestSnapshotData, TestSnapshotNode> data = new FhirTreeData<>(root);
 		
-		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(3, Iterators.size(data.iterator()));
 		
-		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
-		diffRoot.setBackupNode(root);
-		FhirTreeNode diffChild = TestFhirTreeNode.testNode("CHILD", "Test.child");
-		diffChild.setBackupNode(child);
+		TestDifferentialNode diffRoot = new TestDifferentialNode("ROOT", "Test", root);
+		TestDifferentialNode diffChild = new TestDifferentialNode("CHILD", "Test.child", child);
 		diffRoot.addChild(diffChild);
-		FhirTreeNode diffGrandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
-		diffGrandchild.setBackupNode(grandchild);
+		TestDifferentialNode diffGrandchild = new TestDifferentialNode("GRANDCHILD", "Test.child.grandchild", grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
-		remover.process(data);
+		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
 		
-		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(3, Iterators.size(data.iterator()));
 	}
 	
 	@Test
 	public void testKeepGrandchildsParent() {
-		FhirTreeNode root = TestFhirTreeNode.testSlicingNode("ROOT", "Test", Sets.newHashSet());
-		FhirTreeNode child = TestFhirTreeNode.testNode("CHILD", "Test.child");
+		TestSnapshotNode root = new TestSnapshotNode("ROOT", "Test", Sets.newHashSet());
+		TestSnapshotNode child = new TestSnapshotNode("CHILD", "Test.child");
 		root.addChild(child);
-		FhirTreeNode grandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
+		TestSnapshotNode grandchild = new TestSnapshotNode("GRANDCHILD", "Test.child.grandchild");
 		child.addChild(grandchild);
-		FhirTreeData<AbstractFhirTreeTableContent> data = new FhirTreeData<>(root);
+		FhirTreeData<TestSnapshotData, TestSnapshotNode> data = new FhirTreeData<>(root);
 		
-		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(3, Iterators.size(data.iterator()));
 		
-		FhirTreeNode diffRoot = TestFhirTreeNode.testNode("ROOT", "Test");
-		diffRoot.setBackupNode(root);
-		FhirTreeNode diffChild = TestFhirTreeNode.testNode("CHILD", "Test.child");
-		diffChild.setBackupNode(child);
+		TestDifferentialNode diffRoot = new TestDifferentialNode("ROOT", "Test", root);
+		TestDifferentialNode diffChild = new TestDifferentialNode("CHILD", "Test.child", child);
 		diffRoot.addChild(diffChild);
-		FhirTreeNode diffGrandchild = TestFhirTreeNode.testNode("GRANDCHILD", "Test.child.grandchild");
-		diffGrandchild.setBackupNode(grandchild);
+		TestDifferentialNode diffGrandchild = new TestDifferentialNode("GRANDCHILD", "Test.child.grandchild", grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		UnchangedSliceInfoRemover remover = new UnchangedSliceInfoRemover(new FhirTreeData<>(diffRoot));
-		remover.process(data);
+		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
 		
-		Assert.assertEquals(3, TestFhirTreeData.nodesCount(data));
+		Assert.assertEquals(3, Iterators.size(data.iterator()));
+	}
+}
+
+class TestSnapshotData implements HasSlicingInfo {
+
+	private Optional<SlicingInfo> slicingInfo;
+	
+	public TestSnapshotData(Set<String> discriminators) {
+		this.slicingInfo = Optional.of(new SlicingInfo("Test desc", discriminators, Boolean.FALSE, "Test rules"));
+	}
+	
+	@Override
+	public boolean hasSlicingInfo() {
+		return slicingInfo.isPresent();
+	}
+
+	@Override
+	public Optional<SlicingInfo> getSlicingInfo() {
+		return slicingInfo;
+	}
+}
+
+class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> {
+
+	private final String id;
+	private final String path;
+
+	public TestSnapshotNode(String id, String path) {
+		this(id, path, Sets.newHashSet());
+	}
+	
+	public TestSnapshotNode(String id, String path, Set<String> discriminators) {
+		super(new TestSnapshotData(discriminators));
+		this.id = id;
+		this.path = path;
+	}
+
+	@Override
+	public String getPath() {
+		return path;
+	}
+	
+	public String getId() {
+		return id;
+	}
+}
+
+class TestDifferentialData implements HasBackupNode<TestSnapshotData, TestSnapshotNode>{
+
+	private final TestSnapshotNode backupNode;
+	
+	public TestDifferentialData(TestSnapshotNode backupNode) {
+		this.backupNode = backupNode;
+	}
+
+	@Override
+	public TestSnapshotNode getBackupNode() {
+		return backupNode;
+	}
+}
+
+class TestDifferentialNode extends TreeNode<TestDifferentialData, TestDifferentialNode> {
+
+	private final String id;
+	private final String path;
+
+	public TestDifferentialNode(String id, String path, TestSnapshotNode backupNode) {
+		super(new TestDifferentialData(backupNode));
+		this.id = id;
+		this.path = path;
+	}
+	
+	@Override
+	public String getPath() {
+		return path;
+	}
+	
+	public String getId() {
+		return id;
 	}
 }

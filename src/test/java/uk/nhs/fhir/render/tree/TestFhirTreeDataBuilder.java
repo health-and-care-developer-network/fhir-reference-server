@@ -1,8 +1,7 @@
 package uk.nhs.fhir.render.tree;
 
 import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestFhirTreeDataBuilder {
 	@Test

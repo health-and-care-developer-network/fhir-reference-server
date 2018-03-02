@@ -40,12 +40,12 @@
 		    <artifactId>flexmark</artifactId>
 		    <version>0.15.1</version>
 		</dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
+	    <dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>4.12</version>
+	      <scope>test</scope>
+	    </dependency>
         <dependency>
         	<groupId>org.jdom</groupId>
         	<artifactId>jdom2</artifactId>

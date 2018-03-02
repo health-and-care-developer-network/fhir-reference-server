@@ -128,13 +128,6 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 		return allTypes.stream().allMatch(type -> containedTypes.contains(type));
 	}
 
-	public Set<FhirURL> getExtensionUrlDiscriminators() {
-		return getTypeLinks().links().stream().filter(typeLink -> typeLink.getKey().getText().equals("Extension"))
-				.flatMap(typeLink -> typeLink.getValue().isEmpty() ? Lists.newArrayList(typeLink.getKey()).stream()
-						: typeLink.getValue().stream())
-				.map(link -> link.getURL()).collect(Collectors.toSet());
-	}
-
 	@Override
 	public String getInformation() {
 		return information;
@@ -326,6 +319,10 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 		this.linkedNodeId = linkedNodeId;
 	}
 
+	public void setLinkedNode(SnapshotTreeNode linkedNode) {
+		this.linkedNode = Optional.of(linkedNode);
+	}
+	
 	public Optional<SnapshotTreeNode> getLinkedNode() {
 		if ((linkedNodeName.isPresent() || linkedNodeId.isPresent())
 		  && !linkedNode.isPresent()) {

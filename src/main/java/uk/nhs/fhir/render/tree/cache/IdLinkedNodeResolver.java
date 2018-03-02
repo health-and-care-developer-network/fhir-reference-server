@@ -9,31 +9,42 @@ import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
+import uk.nhs.fhir.render.tree.DifferentialTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 
-public class IdLinkedNodeResolver extends LinkedNodeResolver {
+public class IdLinkedNodeResolver<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> extends LinkedNodeResolver<T, U> {
 	
-	public IdLinkedNodeResolver(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
+	public IdLinkedNodeResolver(FhirTreeData<T, U> treeData) {
 		super(treeData);
 	}
 	
 	public void resolve() {
-		Map<String, List<AbstractFhirTreeTableContent>> expectedIds = Maps.newHashMap();
-		Map<String, AbstractFhirTreeTableContent> nodesWithId = Maps.newHashMap();
+		Map<String, List<U>> expectedIds = Maps.newHashMap();
+		Map<String, SnapshotTreeNode> nodesWithId = Maps.newHashMap();
 		
-		for (AbstractFhirTreeTableContent node : treeData) {
+		for (U node : treeData.nodes()) {
+			T nodeData = node.getData();
 			
-			Optional<String> id = node.getId();
+			Optional<String> id = nodeData.getId();
 			boolean hasId = id.isPresent();
 			if (hasId) {
-				nodesWithId.put(id.get(), node);
+				if (node instanceof SnapshotTreeNode) {
+					nodesWithId.put(id.get(), (SnapshotTreeNode)node);
+				} else if (node instanceof DifferentialTreeNode) {
+					// resolve backup node
+					nodesWithId.put(id.get(), ((DifferentialTreeNode) node).getBackupNode());
+				} else {
+					throw new IllegalStateException("Unexpected node type: " + node.getClass().getSimpleName());
+				}
 			}
 			
-			Optional<String> linkedNodeId = node.getLinkedNodeId();
+			Optional<String> linkedNodeId = nodeData.getLinkedNodeId();
 			boolean hasIdLinkedNode = linkedNodeId.isPresent();
 			if (hasIdLinkedNode) {
-				List<AbstractFhirTreeTableContent> nodesLinkingToThisId;
+				List<U> nodesLinkingToThisId;
 				if (expectedIds.containsKey(linkedNodeId.get())) {
 					nodesLinkingToThisId = expectedIds.get(linkedNodeId.get());
 				} else {
@@ -45,15 +56,15 @@ public class IdLinkedNodeResolver extends LinkedNodeResolver {
 			}
 			
 			if (hasId && hasIdLinkedNode) {
-				if (node.getId().get().equals(node.getLinkedNodeId().get())) {
-					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + node.getId().get() + ")");
+				if (nodeData.getId().get().equals(nodeData.getLinkedNodeId().get())) {
+					EventHandlerContext.forThread().event(RendererEventType.LINK_REFERENCES_ITSELF, "Link " + node.getPath() + " references itself (" + nodeData.getId().get() + ")");
 				}
 			}
 			
-			if (hasIdLinkedNode && node.getFixedValue().isPresent()) {
+			if (hasIdLinkedNode && nodeData.getFixedValue().isPresent()) {
 				EventHandlerContext.forThread().event(RendererEventType.FIXEDVALUE_WITH_LINKED_NODE, 
-				  "Node " + node.getPath() + " has a fixed value (" + node.getFixedValue().get() + ") and a linked node"
-				  + " (" + node.getLinkedNodeId().get() + ")");
+				  "Node " + node.getPath() + " has a fixed value (" + nodeData.getFixedValue().get() + ") and a linked node"
+				  + " (" + nodeData.getLinkedNodeId().get() + ")");
 			}
 		}
 		

@@ -30,12 +30,15 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
 import uk.nhs.fhir.render.html.style.FhirFont;
 import uk.nhs.fhir.render.html.table.Table;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.DifferentialData;
+import uk.nhs.fhir.render.tree.DifferentialTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.FhirTreeNode;
+import uk.nhs.fhir.render.tree.SnapshotData;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
 import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.RedundantValueNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
 import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 
@@ -63,47 +66,48 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 
 	private Element getDetailsPanel() {
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
-		FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData = dataProvider.getSnapshotTreeData();
-		FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
+		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = dataProvider.getSnapshotTreeData();
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
 		
-		new RemovedElementStripper(differentialTreeData).process();
-		new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
-		new ExtensionsSlicingNodesRemover(snapshotTreeData).process();
-		new ChildlessDummyNodeRemover(snapshotTreeData).process();
-		new UnwantedConstraintRemover(snapshotTreeData).process();
-		new ComplexExtensionChildrenStripper(snapshotTreeData).process();
+		new RemovedElementStripper<>(differentialTreeData).process();
+		new ChildlessDummyNodeRemover<>(differentialTreeData).process();
+		new RedundantValueNodeRemover<>(differentialTreeData).process(snapshotTreeData);
+		new ExtensionsSlicingNodesRemover<>(snapshotTreeData).process();
+		new UnwantedConstraintRemover<>(snapshotTreeData).process();
+		new ComplexExtensionChildrenStripper<>(snapshotTreeData).process();
 		
 		LinkedHashMap<String, StructureDefinitionDetails> details = Maps.newLinkedHashMap();
 		
-		for (AbstractFhirTreeTableContent node : snapshotTreeData) {
-			FhirTreeNode fhirTreeNode = (FhirTreeNode)node;
+		for (SnapshotTreeNode node : snapshotTreeData.nodes()) {
 			
-			String pathName = fhirTreeNode.getPathName();
-			String key = fhirTreeNode.getNodeKey();
-			Optional<String> definition = fhirTreeNode.getDefinition();
-			String cardinality = fhirTreeNode.getCardinality().toString();
-			Optional<BindingInfo> binding = fhirTreeNode.getBinding();
-			LinkDatas typeLinks = fhirTreeNode.getTypeLinks();
-			Optional<String> requirements = fhirTreeNode.getRequirements();
-			List<String> aliases = fhirTreeNode.getAliases();
-			ResourceFlags resourceFlags = fhirTreeNode.getResourceFlags();
-			Optional<String> comments = fhirTreeNode.getComments();
-			Optional<String> linkedNodeKey = fhirTreeNode.getLinkedNode().isPresent() ? 
-				Optional.of(fhirTreeNode.getLinkedNode().get().getPath()) : 
+			SnapshotData nodeData = node.getData();
+			
+			String pathName = nodeData.getPathName();
+			String key = node.getNodeKey();
+			Optional<String> definition = nodeData.getDefinition();
+			String cardinality = nodeData.getCardinality().toString();
+			Optional<BindingInfo> binding = nodeData.getBinding();
+			LinkDatas typeLinks = nodeData.getTypeLinks();
+			Optional<String> requirements = nodeData.getRequirements();
+			List<String> aliases = nodeData.getAliases();
+			ResourceFlags resourceFlags = nodeData.getResourceFlags();
+			Optional<String> comments = nodeData.getComments();
+			Optional<String> linkedNodeKey = nodeData.getLinkedNode().isPresent() ? 
+				Optional.of(nodeData.getLinkedNode().get().getPath()) : 
 				Optional.empty();
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
-			splitConstraints((FhirTreeNode)node, differentialTreeData, inheritedConstraints, profileConstraints);
+			splitConstraints(node, differentialTreeData, inheritedConstraints, profileConstraints);
 			
 			if (typeLinks.isEmpty()
-			  && !node.isRoot()) {
+			  && !nodeData.isRoot()) {
 				throw new IllegalStateException("No typeLinks or linked Node present for non root node " + pathName);
 			}
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
-				requirements, aliases, resourceFlags, comments, node.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, fhirTreeNode.getMappings(), wrappedResource.getImplicitFhirVersion());
+				requirements, aliases, resourceFlags, comments, nodeData.getSlicingInfo(), inheritedConstraints, profileConstraints,
+				linkedNodeKey, nodeData.getMappings(), wrappedResource.getImplicitFhirVersion());
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);
@@ -128,17 +132,17 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		return panel.makePanel();
 	}
 
-	private void splitConstraints(FhirTreeNode node, FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData,
+	private void splitConstraints(SnapshotTreeNode node, FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData,
 			List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
 		
-		Optional<AbstractFhirTreeTableContent> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
-			.filter(differentialNode -> differentialNode.getBackupNode().get().equals(node))
+		Optional<DifferentialData> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
+			.filter(differentialNode -> differentialNode.getBackupNode().equals(node))
 			.findFirst();
 		
 		if (matchingDifferentialNode.isPresent()) {
 			List<ConstraintInfo> differentialConstraints = matchingDifferentialNode.get().getConstraints();
 			
-			for (ConstraintInfo constraint : node.getConstraints()) {
+			for (ConstraintInfo constraint : node.getData().getConstraints()) {
 				if (differentialConstraints.stream()
 						.anyMatch(diffConstraint -> diffConstraint.getKey().equals(constraint.getKey()))) {
 					profileConstraints.add(constraint);
@@ -148,7 +152,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			}
 		} else {
 			// If not in the differential, it hasn't changed. Any constraints must be inherited.
-			inheritedConstraints.addAll(node.getConstraints());
+			inheritedConstraints.addAll(node.getData().getConstraints());
 		}
 	}
 	

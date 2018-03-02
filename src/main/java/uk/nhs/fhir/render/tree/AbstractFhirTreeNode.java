@@ -3,19 +3,17 @@ package uk.nhs.fhir.render.tree;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import uk.nhs.fhir.util.ListUtils;
 
 public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> extends TreeNode<T, U> {
 
 	public abstract String getNodeKey();
 	
-	public AbstractFhirTreeNode() {
+	public AbstractFhirTreeNode(T data) {
+		super(data);
 	}
 	
-	public AbstractFhirTreeNode(U parent) {
-		super(parent);
+	public AbstractFhirTreeNode(T data, U parent) {
+		super(data, parent);
 	}
 
 	public U getSlicingSibling() {
@@ -28,18 +26,6 @@ public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U
 		}
 
 		return slicingSiblings.get(0);
-	}
-	
-	public Optional<U> findUniqueDescendantMatchingPath(String relativePath) {
-		String fullPath = getPath() + "." + relativePath;
-		
-		List<U> descendantsMatchingDiscriminatorPath = 
-			StreamSupport.stream(descendants().spliterator(), false)
-				.filter(descendant -> descendant.getPath().equals(fullPath))
-				.collect(Collectors.toList());
-		
-		return ListUtils.uniqueIfPresent(descendantsMatchingDiscriminatorPath, 
-			"descendants matching discriminator " + fullPath + " for element at " + getPath());
 	}
 
 	private boolean isDirectlyRemovedByProfile() {
@@ -54,14 +40,6 @@ public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U
 		} else {
 			return false;
 		}
-	}
-
-	public boolean hasSlicingSibling() {
-		return getParent() != null 
-		  && getParent()
-		  		.getChildren()
-		  		.stream()
-				.anyMatch(child -> child != this && child.getPath().equals(getPath()) && child.getData().hasSlicingInfo());
 	}
 
 }

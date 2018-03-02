@@ -17,28 +17,35 @@ import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.SlicingResolver;
 
-public class SlicingDiscriminatorCacher<U extends AbstractFhirTreeNode<AbstractFhirTreeNodeData, U>> {
+public class SlicingDiscriminatorCacher<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 	
-	private final FhirTreeData<AbstractFhirTreeNodeData, U> treeData;
+	private final FhirTreeData<T, U> treeData;
 	
-	public SlicingDiscriminatorCacher(FhirTreeData<AbstractFhirTreeNodeData, U> treeData) {
+	public SlicingDiscriminatorCacher(FhirTreeData<T, U> treeData) {
 		this.treeData = treeData;
 	}
 	
 	public void resolve() {
 		for (U node : treeData.nodes()) {
-			if (node.hasSlicingSibling()) {
+			if (SlicingResolver.getSlicingSibling(node).isPresent()) {
 				cacheSlicingDiscriminator(node);
 			}
 		}
 	}
 	
 	private void cacheSlicingDiscriminator(U node) {
-		Set<String> discriminatorPaths = node.getSlicingSibling().getData().getSlicingInfo().get().getDiscriminatorPaths();
+		Set<String> discriminatorPaths = 
+			SlicingResolver
+				.getSlicingSibling(node).get()
+				.getData()
+				.getSlicingInfo().get()
+				.getDiscriminatorPaths();
 		
 		if (discriminatorPaths.size() > 1) {
-			throw new IllegalStateException("Don't yet handle multiple discriminators. Return a map? Consider ordering for node key?");
+			//  Return a map? Consider ordering for node key?
+			throw new IllegalStateException("Need to implement handling multiple discriminators");
 		}
 		
 		String discriminatorPath = discriminatorPaths.iterator().next();

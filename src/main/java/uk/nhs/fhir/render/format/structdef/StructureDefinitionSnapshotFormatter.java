@@ -10,12 +10,17 @@ import uk.nhs.fhir.render.format.TreeTableFormatter;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.DifferentialData;
+import uk.nhs.fhir.render.tree.DifferentialTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.SnapshotData;
+import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
 import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.render.tree.tidy.RedundantValueNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.render.tree.tidy.UnchangedSliceInfoRemover;
 import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 
 public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<WrappedStructureDefinition> {
@@ -30,22 +35,22 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 		HTMLDocSection section = new HTMLDocSection();
 		
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
-		FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData = dataProvider.getSnapshotTreeData();
+		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = dataProvider.getSnapshotTreeData();
 
 		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
-			FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
-			new UnchangedSliceInfoRemover(differentialTreeData).process(snapshotTreeData);
-			new RedundantValueNodeRemover(differentialTreeData).process(snapshotTreeData);
+			FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
+			new UnchangedSliceInfoRemover<>(differentialTreeData).process(snapshotTreeData);
+			new RedundantValueNodeRemover<>(differentialTreeData).process(snapshotTreeData);
+			new ChildlessDummyNodeRemover<>(differentialTreeData).process();
 		}
 
-		new RemovedElementStripper(snapshotTreeData).process();
-		new ExtensionsSlicingNodesRemover(snapshotTreeData).process();
-		new ChildlessDummyNodeRemover(snapshotTreeData).process();
-		new UnwantedConstraintRemover(snapshotTreeData).process();
-		new ComplexExtensionChildrenStripper(snapshotTreeData).process();
+		new RemovedElementStripper<>(snapshotTreeData).process();
+		new ExtensionsSlicingNodesRemover<>(snapshotTreeData).process();
+		new UnwantedConstraintRemover<>(snapshotTreeData).process();
+		new ComplexExtensionChildrenStripper<>(snapshotTreeData).process();
 		
-		FhirTreeTable snapshotTree = new FhirTreeTable(snapshotTreeData, getResourceVersion());
+		FhirTreeTable<SnapshotData, SnapshotTreeNode> snapshotTree = new FhirTreeTable<>(snapshotTreeData, getResourceVersion());
 		
 		Table snapshotTable = snapshotTree.asTable();
 		Element snapshotHtmlTable = snapshotTable.makeTable();

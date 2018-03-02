@@ -5,12 +5,8 @@ public class StubTreeContent extends TreeNode<Object, StubTreeContent> {
 	private final String path;
 
 	public StubTreeContent(String path) {
+		super(new Object());
 		this.path = path;
-	}
-
-	@Override
-	public Object getData() {
-		return null;
 	}
 	
 	@Override

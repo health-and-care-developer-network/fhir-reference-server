@@ -6,8 +6,8 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
+import org.junit.Assert;
 
-import junit.framework.Assert;
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.render.html.panel.FhirPanel;

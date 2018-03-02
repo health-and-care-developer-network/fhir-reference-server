@@ -3,14 +3,15 @@ package uk.nhs.fhir.render.tree.tidy;
 import java.util.List;
 
 import uk.nhs.fhir.data.structdef.ExtensionType;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 
-public class ComplexExtensionChildrenStripper {
+public class ComplexExtensionChildrenStripper<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 	
-	private final FhirTreeData<AbstractFhirTreeTableContent> treeData;
+	private final FhirTreeData<T, U> treeData;
 
-	public ComplexExtensionChildrenStripper(FhirTreeData<AbstractFhirTreeTableContent> treeData) {
+	public ComplexExtensionChildrenStripper(FhirTreeData<T, U> treeData) {
 		this.treeData = treeData;
 	}
 
@@ -19,17 +20,17 @@ public class ComplexExtensionChildrenStripper {
 	}
 	
 	// Remove inlined child nodes of complex extensions
-	private void stripComplexExtensionChildren(AbstractFhirTreeTableContent node) {
-		boolean isComplexExtension = node.getExtensionType().isPresent() 
-		  && node.getExtensionType().get().equals(ExtensionType.COMPLEX)
+	private void stripComplexExtensionChildren(U node) {
+		boolean isComplexExtension = node.getData().getExtensionType().isPresent() 
+		  && node.getData().getExtensionType().get().equals(ExtensionType.COMPLEX)
 		  // exclude root node
 		  && node.getPath().contains(".");
 		
-		List<? extends AbstractFhirTreeTableContent> children = node.getChildren();
+		List<U> children = node.getChildren();
 		
 		for (int i=children.size()-1; i>=0; i--) {
 			
-			AbstractFhirTreeTableContent child = children.get(i);
+			U child = children.get(i);
 			if (isComplexExtension) {
 				children.remove(i);
 			} else {

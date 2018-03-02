@@ -9,15 +9,14 @@ import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
-import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.render.tree.tidy.HasPath;
+import uk.nhs.fhir.render.tree.tidy.HasSlicingInfo;
 import uk.nhs.fhir.util.FhirVersion;
 
-public interface AbstractFhirTreeTableContent extends HasMappings {
+public interface AbstractFhirTreeTableContent extends HasMappings, HasSlicingInfo, HasPath, MaybePrimitive {
 
 	public boolean isRoot();
-
-	public String getPathName();
 
 	public boolean useBackupTypeLinks();
 	public LinkDatas getTypeLinks();
@@ -26,7 +25,6 @@ public interface AbstractFhirTreeTableContent extends HasMappings {
 
 	public ResourceFlags getResourceFlags();
 
-	
 	public Optional<Integer> getMin();
 	public Optional<String> getMax();
 	/**
@@ -36,9 +34,6 @@ public interface AbstractFhirTreeTableContent extends HasMappings {
 	public FhirCardinality getCardinality();
 
 	public String getInformation();
-
-	public boolean hasSlicingInfo();
-	public Optional<SlicingInfo> getSlicingInfo();
 	
 	public boolean isFixedValue();
 	public Optional<String> getFixedValue();
@@ -63,8 +58,6 @@ public interface AbstractFhirTreeTableContent extends HasMappings {
 	public Optional<String> getLinkedNodeId();
 	
 	public Optional<ExtensionType> getExtensionType();
-
-	public boolean isPrimitive();
 
 	public FhirElementDataType getDataType();
 

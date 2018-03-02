@@ -4,13 +4,11 @@ import uk.nhs.fhir.FhirTreeDatas;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
 import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.DifferentialData;
 import uk.nhs.fhir.render.tree.DifferentialTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.SnapshotData;
 import uk.nhs.fhir.render.tree.SnapshotTreeNode;
-import uk.nhs.fhir.render.tree.cache.BackupNodeLocator;
 import uk.nhs.fhir.render.tree.cache.IdLinkedNodeResolver;
 import uk.nhs.fhir.render.tree.cache.NameLinkedNodeResolver;
 import uk.nhs.fhir.render.tree.cache.SlicingDiscriminatorCacher;
@@ -36,9 +34,7 @@ public class StructureDefinitionTreeDataProvider {
 	}
 	
 	public FhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTreeData(FhirTreeData<SnapshotData, SnapshotTreeNode> backupTreeData) {
-		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTree = FhirTreeDatas.getDifferentialTree(source);
-		
-		new BackupNodeLocator(differentialTree, backupTreeData).resolve();
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTree = FhirTreeDatas.getDifferentialTree(source, backupTreeData);
 		
 		cacheTreeData(differentialTree);
 		
@@ -51,6 +47,6 @@ public class StructureDefinitionTreeDataProvider {
 	private <T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> void cacheTreeData(FhirTreeData<T, U> treeData) {
 		new NameLinkedNodeResolver<>(treeData).resolve();
 		new IdLinkedNodeResolver<>(treeData).resolve();
-		new SlicingDiscriminatorCacher<U>(treeData).resolve();
+		new SlicingDiscriminatorCacher<>(treeData).resolve();
 	}
 }

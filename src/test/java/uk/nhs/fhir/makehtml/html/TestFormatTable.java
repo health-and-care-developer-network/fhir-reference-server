@@ -6,11 +6,11 @@ import java.util.List;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
+import org.junit.Assert;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import junit.framework.Assert;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;

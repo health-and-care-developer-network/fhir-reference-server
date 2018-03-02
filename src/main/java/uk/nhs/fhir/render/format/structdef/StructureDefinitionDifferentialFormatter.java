@@ -10,7 +10,8 @@ import uk.nhs.fhir.render.format.TreeTableFormatter;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.DifferentialData;
+import uk.nhs.fhir.render.tree.DifferentialTreeNode;
 import uk.nhs.fhir.render.tree.FhirTreeData;
 import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
 import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
@@ -29,14 +30,14 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 
 		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 		
-		FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData = dataProvider.getDifferentialTreeData();
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = dataProvider.getDifferentialTreeData();
 		
-		new ExtensionsSlicingNodesRemover(differentialTreeData).process();
-		new ChildlessDummyNodeRemover(differentialTreeData).process();
-		new UnwantedConstraintRemover(differentialTreeData).process();
-		new ComplexExtensionChildrenStripper(differentialTreeData).process();
+		new ExtensionsSlicingNodesRemover<>(differentialTreeData).process();
+		new ChildlessDummyNodeRemover<>(differentialTreeData).process();
+		new UnwantedConstraintRemover<>(differentialTreeData).process();
+		new ComplexExtensionChildrenStripper<>(differentialTreeData).process();
 		
-		FhirTreeTable differentialTreeTable = new FhirTreeTable(differentialTreeData, getResourceVersion());
+		FhirTreeTable<DifferentialData, DifferentialTreeNode> differentialTreeTable = new FhirTreeTable<>(differentialTreeData, getResourceVersion());
 
 		Table differentialTable = differentialTreeTable.asTable();
 		

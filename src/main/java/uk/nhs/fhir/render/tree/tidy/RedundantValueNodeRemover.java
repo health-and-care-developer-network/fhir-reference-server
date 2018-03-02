@@ -1,19 +1,22 @@
-package uk.nhs.fhir.render.format.structdef;
+package uk.nhs.fhir.render.tree.tidy;
 
 import java.util.stream.StreamSupport;
 
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
 import uk.nhs.fhir.render.tree.FhirTreeData;
+import uk.nhs.fhir.render.tree.MaybePrimitive;
+import uk.nhs.fhir.render.tree.TreeNode;
 
-public class RedundantValueNodeRemover {
+public class RedundantValueNodeRemover<
+	T extends HasPath & MaybePrimitive, U extends TreeNode<T, U>, 
+	V extends HasBackupNode<T, U>, W extends TreeNode<V, W>> {
+	
+	private final FhirTreeData<V, W> differentialTreeData;
 
-	private final FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData;
-
-	public RedundantValueNodeRemover(FhirTreeData<AbstractFhirTreeTableContent> differentialTreeData) {
+	public RedundantValueNodeRemover(FhirTreeData<V, W> differentialTreeData) {
 		this.differentialTreeData = differentialTreeData;
 	}
 
-	public void process(FhirTreeData<AbstractFhirTreeTableContent> snapshotTreeData) {
+	public void process(FhirTreeData<T, U> snapshotTreeData) {
 		stripExpandedPrimitiveValueNodes(snapshotTreeData.getRoot());
 	}
 
@@ -28,14 +31,14 @@ public class RedundantValueNodeRemover {
 	 * We should remove these nodes since the information is redundant (should probably appear as a constraint on the element if anything?)
 	 * and there isn't a sensible 'type' to assign to them, so they look peculiar in the tree. Simplifier seems not to display them.
 	 */
-	private void stripExpandedPrimitiveValueNodes(AbstractFhirTreeTableContent node) {
+	private void stripExpandedPrimitiveValueNodes(U node) {
 		for (int i=node.getChildren().size()-1; i>=0; i--) {
-			AbstractFhirTreeTableContent child = node.getChildren().get(i);
+			U child = node.getChildren().get(i);
 
-			if (child.getPathName().equals("value")
+			if (child.getData().getPathName().equals("value")
 			  && child.getParent() != null
 			  && child.getParent().getChildren().size() > 1
-			  && child.getParent().isPrimitive()
+			  && child.getParent().getData().isPrimitive()
 			  && !isDifferentialBackupNode(child)) {
 				node.getChildren().remove(i);
 			} else {
@@ -44,8 +47,8 @@ public class RedundantValueNodeRemover {
 		}
 	}
 
-	private boolean isDifferentialBackupNode(AbstractFhirTreeTableContent candidateForRemoval) {
+	private boolean isDifferentialBackupNode(U candidateForRemoval) {
 		return StreamSupport.stream(differentialTreeData.spliterator(), false)
-			.anyMatch(differentialNode -> differentialNode.getBackupNode().get().equals(candidateForRemoval));
+			.anyMatch(differentialNode -> differentialNode.getBackupNode().equals(candidateForRemoval));
 	}
 }

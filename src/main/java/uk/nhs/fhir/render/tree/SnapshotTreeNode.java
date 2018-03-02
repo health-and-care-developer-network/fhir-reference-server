@@ -2,23 +2,16 @@ package uk.nhs.fhir.render.tree;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, SnapshotTreeNode> {
 
-	private SnapshotData data;
-
 	public SnapshotTreeNode(SnapshotData data) {
-		this.data = data;
+		super(data);
 	}
 
 	public SnapshotTreeNode(SnapshotTreeNode parent, SnapshotData data) {
-		super(parent);
-		this.data = data;
-	}
-
-	@Override
-	public SnapshotData getData() {
-		return data;
+		super(data, parent);
 	}
 	
 	@Override
@@ -58,6 +51,16 @@ public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, Snapsho
 		}
 		
 		return nodeKey;
+	}
+	
+	@Override
+	public String toString() {
+		Optional<String> sliceName = getData().getSliceName();
+		if (sliceName.isPresent()) {
+			return getPath() + ":" + sliceName.get();
+		} else {
+			return getPath();
+		}
 	}
 
 }

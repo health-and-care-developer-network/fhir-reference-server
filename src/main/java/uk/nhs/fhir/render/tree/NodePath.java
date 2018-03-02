@@ -55,4 +55,8 @@ class NodePath {
 	public String toPathString() {
 		return String.join(".", pathParts);
 	}
+	
+	public String toString() {
+		return toPathString();
+	}
 }

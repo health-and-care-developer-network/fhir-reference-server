@@ -2,15 +2,16 @@ package uk.nhs.fhir.render.tree.tidy;
 
 import java.util.List;
 
-import uk.nhs.fhir.render.tree.AbstractFhirTreeTableContent;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.TreeNode;
 
 /**
  * In some cases (e.g. details view) we don't want to show elements which have a maximum cardinality of 0, since they can
  * no longer appear in the resource.
  */
-public class RemovedElementStripper<T extends AbstractFhirTreeTableContent, U extends TreeNode<T, U>> {
+public class RemovedElementStripper<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
+	
 	private final FhirTreeData<T, U> treeData;
 
 	public RemovedElementStripper(FhirTreeData<T, U> treeData) {
@@ -31,7 +32,7 @@ public class RemovedElementStripper<T extends AbstractFhirTreeTableContent, U ex
 			
 			U child = children.get(i);
 			
-			if (child.getData().isRemovedByProfile()) {
+			if (child.isRemovedByProfile()) {
 				children.remove(i);
 			} else {
 				stripRemovedElements(child);
