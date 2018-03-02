@@ -107,4 +107,9 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 			}
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return getPath();
+	}
 }

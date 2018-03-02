@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.Assert;
 
 import com.google.common.collect.Lists;
 
@@ -14,7 +15,6 @@ import ca.uhn.fhir.model.dstu2.valueset.ConformanceResourceStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ExtensionContextEnum;
 import ca.uhn.fhir.model.dstu2.valueset.StructureDefinitionKindEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import junit.framework.Assert;
 import uk.nhs.fhir.data.structdef.FhirContact;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
