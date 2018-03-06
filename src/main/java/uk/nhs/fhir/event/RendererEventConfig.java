@@ -14,11 +14,11 @@ public class RendererEventConfig {
 
 	static {
 		// Forge bug
-		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.IGNORE); // should ideally be a warning so we chase Forge, but out of our control
+		responses.put(RendererEventType.DIFFERENTIAL_NODE_MISSING_ID, RendererEventResponse.IGNORE); // should be a warning so we chase Forge, but too many & maybe out of our control
 		
 		// Error in profile
-		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.LOG_WARNING);
-
+		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.IGNORE); // should be a warning, but too many
 		
 		// Perhaps valid?
 		responses.put(RendererEventType.MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
@@ -34,8 +34,7 @@ public class RendererEventConfig {
 
 		// special case workarounds (unlikely to go away)
 		responses.put(RendererEventType.IGNORABLE_MAPPING_ID, RendererEventResponse.IGNORE);
-		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.LOG_WARNING);
-		responses.put(RendererEventType.DIFFERENTIAL_NODE_MISSING_ID, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.IGNORE); // should be a warning, but too many
 		responses.put(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME, RendererEventResponse.LOG_WARNING);
 
 		// Currently not hit
@@ -55,6 +54,7 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, RendererEventResponse.THROW);
 		responses.put(RendererEventType.LINK_REFERENCES_ITSELF, RendererEventResponse.THROW);
 		responses.put(RendererEventType.MISSING_REFERENCED_NODE, RendererEventResponse.THROW);
+		responses.put(RendererEventType.USER_TYPE_WITHOUT_CONSTRAINED_TYPE, RendererEventResponse.THROW);
 	}
 	
 	public static RendererEventResponse getResponse(RendererEventType error) {

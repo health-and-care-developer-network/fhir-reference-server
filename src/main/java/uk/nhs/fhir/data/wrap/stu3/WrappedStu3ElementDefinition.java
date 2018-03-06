@@ -32,6 +32,7 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
+import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
@@ -59,7 +60,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public LinkDatas getTypeLinks() {
+	public LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions) {
 		LinkDatas typeLinks = new LinkDatas();
 		
 		List<TypeRefComponent> knownTypes = FhirElementDataTypeStu3.knownTypes(definition.getType());
@@ -75,9 +76,17 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 					  || code.equals("Reference")) {
 						LinkData codeLink = typeLinkFactory.forDataTypeName(type.getCode());
 						typeLinks.addNestedUri(codeLink, profile, FhirVersion.STU3);
+					} else if (structureDefinitions.isPresent()) {
+						Optional<WrappedStructureDefinition> structureDefinition = structureDefinitions.get().getUserDefinedType(code, profile, FhirVersion.STU3);
+						if (structureDefinition.isPresent()) {
+							typeLinks.addSimpleLink(new LinkData(FhirURL.buildOrThrow(profile, FhirVersion.STU3), structureDefinition.get().getName()));
+						} else {
+							throw new IllegalStateException("Found StructureDefinition for profile (" + profile + ") but wasn't a recognised data type (" + code + ") " + getPath());
+						}
 					} else {
 						throw new IllegalStateException("should we be incorporating profile (" + profile + ") into type links? " + getPath());
 					}
+					
 				} else if (type.hasTargetProfile()) {
 					if (type.getCode().equals("Reference")) {
 						LinkData referenceLink = typeLinkFactory.forDataTypeName(type.getCode());

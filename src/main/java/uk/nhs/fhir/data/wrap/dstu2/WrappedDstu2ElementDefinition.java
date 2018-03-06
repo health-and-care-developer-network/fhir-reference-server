@@ -59,7 +59,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public LinkDatas getTypeLinks() {
+	public LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions) {
 		LinkDatas typeLinks = new LinkDatas();
 		
 		List<Type> knownTypes = FhirElementDataTypeDstu2.knownTypes(definition.getType());

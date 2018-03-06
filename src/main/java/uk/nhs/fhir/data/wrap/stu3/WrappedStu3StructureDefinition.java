@@ -60,6 +60,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public String getKind() {
+		return definition.getKind().toCode();
+	}
+
+	@Override
+	public String getKindDisplay() {
 		return definition.getKind().getDisplay();
 	}
 

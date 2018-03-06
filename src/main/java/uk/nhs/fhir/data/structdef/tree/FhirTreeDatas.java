@@ -106,7 +106,7 @@ public class FhirTreeDatas {
 		
 		FhirTreeDataBuilder<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> fhirSkeletonTreeDataBuilder = new FhirTreeDataBuilder<>();
 		for (ElementDefinitionDt element : structureDefinition.getDifferential().getElement()) {
-			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element));
+			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
 			FhirDifferentialSkeletonNode node = new FhirDifferentialSkeletonNode(data);
 			fhirSkeletonTreeDataBuilder.addFhirTreeNode(node);
 		}
@@ -122,7 +122,7 @@ public class FhirTreeDatas {
 		FhirTreeDataBuilder<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> fhirSkeletonTreeDataBuilder = 
 				new FhirTreeDataBuilder<>(new FhirSkeletonEmptyNodeFactory());
 		for (ElementDefinition element : structureDefinition.getDifferential().getElement()) {
-			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element));
+			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
 			FhirDifferentialSkeletonNode node = new FhirDifferentialSkeletonNode(data);
 			fhirSkeletonTreeDataBuilder.addFhirTreeNode(node);
 		}

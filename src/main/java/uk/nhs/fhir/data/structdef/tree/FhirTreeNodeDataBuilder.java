@@ -23,18 +23,24 @@ import uk.nhs.fhir.util.StructureDefinitionRepository;
 public class FhirTreeNodeDataBuilder {
 	
 	public static SnapshotData buildSnapshotNode(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
-		return fromElementDefinition(elementDefinition).withDefinitionDetails(elementDefinition, structureDefinitions).toSnapshotData();
+		return fromElementDefinition(elementDefinition, structureDefinitions)
+			.withDefinitionDetails(elementDefinition, structureDefinitions)
+			.toSnapshotData();
 	}
 	
 	public static DifferentialData buildDifferentialNode(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode, Optional<StructureDefinitionRepository> structureDefinitions) {
-		return fromElementDefinition(elementDefinition).withDefinitionDetails(elementDefinition, structureDefinitions).toDifferentialData(backupNode);
+		return fromElementDefinition(elementDefinition, structureDefinitions)
+			.withDefinitionDetails(elementDefinition, structureDefinitions)
+			.toDifferentialData(backupNode);
 	}
 	
-	public static FhirDifferentialSkeletonData buildDifferentialSkeletonNode(WrappedElementDefinition elementDefinition) {
-		return fromElementDefinition(elementDefinition).withSkeletonDetails(elementDefinition).toDifferentialSkeletonData();
+	public static FhirDifferentialSkeletonData buildDifferentialSkeletonNode(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
+		return fromElementDefinition(elementDefinition, structureDefinitions)
+			.withSkeletonDetails(elementDefinition)
+			.toDifferentialSkeletonData();
 	}
 
-	private static FhirTreeNodeDataBuilder fromElementDefinition(WrappedElementDefinition elementDefinition) {
+	private static FhirTreeNodeDataBuilder fromElementDefinition(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
 		
 		Optional<String> name = Optional.ofNullable(elementDefinition.getName());
 
@@ -47,7 +53,7 @@ public class FhirTreeNodeDataBuilder {
 					"Profile"));*/
 			typeLinks = new LinkDatas();
 		} else {
-			typeLinks = elementDefinition.getTypeLinks();
+			typeLinks = elementDefinition.getTypeLinks(structureDefinitions);
 		}
 		
 		Set<FhirElementDataType> dataTypes = elementDefinition.getDataTypes();

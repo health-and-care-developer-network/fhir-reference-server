@@ -30,7 +30,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	
 	public abstract String getName();
 	public abstract String getPath();
-	public abstract LinkDatas getTypeLinks();
+	public abstract LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions);
 	public abstract Set<FhirElementDataType> getDataTypes();
 	public abstract ResourceFlags getResourceFlags();
 	public abstract Integer getCardinalityMin();

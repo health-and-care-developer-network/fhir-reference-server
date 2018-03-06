@@ -64,6 +64,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 	}
 
 	@Override
+	public String getKindDisplay() {
+		return definition.getKind();
+	}
+
+	@Override
 	public String getStatus() {
 		return definition.getStatus();
 	}

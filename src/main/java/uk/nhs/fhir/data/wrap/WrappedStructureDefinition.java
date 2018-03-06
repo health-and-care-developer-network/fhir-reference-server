@@ -28,6 +28,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 
 	public abstract String getName();
 	public abstract String getKind();
+	public abstract String getKindDisplay();
 	public abstract String getStatus();
 	public abstract Boolean getAbstract();
 

@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
@@ -43,6 +44,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	
 	private final Map<File, WrappedResource<?>> resourcesByFile = Maps.newHashMap();
 	private final Map<String, WrappedResource<?>> resourcesByUrl = Maps.newHashMap();
+	private final Map<FhirVersion, Map<String, Map<String, WrappedStructureDefinition>>> userDefinedDatatypes = Maps.newHashMap();
 	
 	private final Map<File, IBaseResource> exampleFhirResources = Maps.newHashMap();
 	
@@ -208,8 +210,26 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 					throw new IllegalStateException("Found multiple resources with URL " + extractedUrl
 						+ " (need to add support for multiple versions of same resource)");
 				}
+				
+				if (wrappedResource.getResourceType().equals(ResourceType.STRUCTUREDEFINITION)) {
+					WrappedStructureDefinition structureDefinition = (WrappedStructureDefinition)wrappedResource;
+					if (structureDefinition.getKind().equals("complex-type") 
+					  || structureDefinition.getKind().equals("primitive-type")) {
+						if (structureDefinition.getConstrainedType().isPresent()) {
+							Map<String, Map<String, WrappedStructureDefinition>> mapForVersion = userDefinedDatatypes.computeIfAbsent(wrappedResource.getImplicitFhirVersion(), v -> Maps.newHashMap());
+							Map<String, WrappedStructureDefinition> mapForType = mapForVersion.computeIfAbsent(structureDefinition.getConstrainedType().get(), s -> Maps.newHashMap());
+							// should never get duplicates because URL collisions already blow up above
+							mapForType.put(structureDefinition.getUrl().get(), structureDefinition);
+						} else {
+							EventHandlerContext.forThread().event(RendererEventType.USER_TYPE_WITHOUT_CONSTRAINED_TYPE, 
+								"StructureDefinition " + wrappedResource.getUrl().get() + " has kind " + structureDefinition.getKind() + " but no constrained type");
+						}
+					}
+				}
+				
 				return;
 			}
+			// else continue
 		}
 		
 		if (parsedFile.getMeta() != null
@@ -308,5 +328,15 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	
 	private boolean conceptMapUrlMatches(WrappedConceptMap map, String match) {
 		return map.getSource().equals(match);
+	}
+	
+	public Optional<WrappedStructureDefinition> getUserDefinedType(String constrainedType, String url, FhirVersion version) {
+		if (userDefinedDatatypes.containsKey(version)
+		  && userDefinedDatatypes.get(version).containsKey(constrainedType)
+		  && userDefinedDatatypes.get(version).get(constrainedType).containsKey(url)) {
+			return Optional.of(userDefinedDatatypes.get(version).get(constrainedType).get(url));
+		} else {
+			return Optional.empty();
+		}
 	}
 }
