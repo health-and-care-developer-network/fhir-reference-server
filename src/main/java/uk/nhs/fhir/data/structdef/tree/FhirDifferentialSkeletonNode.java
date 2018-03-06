@@ -138,7 +138,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 			confirmedSnapshotPath = currentSearchRoot.getPath();
 		}
 		
-		EventHandlerContext.forThread().event(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, 
+		EventHandlerContext.forThread().event(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE,
 			"Differential node " + differentialPath + " matched snapshot node " + confirmedSnapshotPath);
 		
 		return Lists.newArrayList(currentSearchRoot);

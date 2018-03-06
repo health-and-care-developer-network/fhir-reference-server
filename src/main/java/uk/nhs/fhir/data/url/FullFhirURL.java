@@ -68,8 +68,14 @@ public class FullFhirURL extends FhirURL {
 			hostAndPath = fixHL7URL(hostAndPath);
 		}
 		
-		// restore the scheme
-		String linkUrl = scheme + hostAndPath;
+		String linkUrl;
+		if (FhirURLConstants.startsWithNhsDomain(hostAndPath)) {
+			// make it local
+			linkUrl = FhirURLConstants.trimNhsResourcePrefix(hostAndPath);
+		} else {
+			// restore the scheme
+			linkUrl = scheme + hostAndPath;
+		}
 		
 		if (isLogicalUrl(linkUrl)) {
 			EventHandlerContext.forThread().event(RendererEventType.LINK_WITH_LOGICAL_URL, "Using logical url " + linkUrl + " as a link href");
