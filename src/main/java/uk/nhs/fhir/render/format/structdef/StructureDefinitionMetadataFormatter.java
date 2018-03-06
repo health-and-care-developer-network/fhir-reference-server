@@ -49,7 +49,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		
 		String name = structureDefinition.getName();
 		String url = structureDefinition.getUrl().get();
-		String kind = structureDefinition.getKind();
+		String kind = structureDefinition.getKindDisplay();
 		
 		String status = structureDefinition.getStatus();
 		Boolean isAbstract = structureDefinition.getAbstract();
