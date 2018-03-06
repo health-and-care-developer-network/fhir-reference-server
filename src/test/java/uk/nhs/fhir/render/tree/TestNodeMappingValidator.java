@@ -16,13 +16,15 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.TestEventHandlerContext;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.data.structdef.tree.HasMappings;
+import uk.nhs.fhir.data.structdef.tree.validate.IgnorableMappingValues;
+import uk.nhs.fhir.data.structdef.tree.validate.NodeMappingValidator;
 import uk.nhs.fhir.event.EventHandler;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
-import uk.nhs.fhir.render.format.structdef.StructureDefinitionDetails;
 
 public class TestNodeMappingValidator {
-	private static final String AN_IGNORABLE_VALUE = StructureDefinitionDetails.IGNORABLE_MAPPING_VALUES.iterator().next();
+	private static final String AN_IGNORABLE_VALUE = IgnorableMappingValues.VALUES.iterator().next();
 	
 	private TestEventHandlerContext thisEventHandler;
 	private EventHandler eventHandlerBefore = null;

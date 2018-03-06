@@ -15,9 +15,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
+import uk.nhs.fhir.data.structdef.tree.SnapshotData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.ValuesetLinkFix;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.render.RendererContext;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.ResourceFormatter;
 import uk.nhs.fhir.render.html.Elements;
@@ -28,8 +31,6 @@ import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirIcon;
-import uk.nhs.fhir.render.tree.SnapshotData;
-import uk.nhs.fhir.render.tree.SnapshotTreeNode;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.StringUtil;
 
@@ -82,9 +83,8 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                         labelledValueCell("Type",BLANK,  1, null),
                         labelledValueCell("Reference",BLANK, 1, null)
                 ));
-        StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
 
-        for (SnapshotTreeNode content : dataProvider.getSnapshotTreeData().nodes()) {
+        for (SnapshotTreeNode content : wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry())).nodes()) {
             processNode(content);
         }
 

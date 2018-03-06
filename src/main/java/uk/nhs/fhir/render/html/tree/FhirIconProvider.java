@@ -2,8 +2,8 @@ package uk.nhs.fhir.render.html.tree;
 
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeNode;
-import uk.nhs.fhir.render.tree.AbstractFhirTreeNodeData;
+import uk.nhs.fhir.data.structdef.tree.AbstractFhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.AbstractFhirTreeNodeData;
 
 public class FhirIconProvider<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 

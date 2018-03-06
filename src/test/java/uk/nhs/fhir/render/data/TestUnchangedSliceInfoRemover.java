@@ -10,11 +10,11 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.SlicingInfo;
-import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.TreeNode;
-import uk.nhs.fhir.render.tree.tidy.HasBackupNode;
-import uk.nhs.fhir.render.tree.tidy.HasSlicingInfo;
-import uk.nhs.fhir.render.tree.tidy.UnchangedSliceInfoRemover;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.TreeNode;
+import uk.nhs.fhir.data.structdef.tree.tidy.HasBackupNode;
+import uk.nhs.fhir.data.structdef.tree.tidy.HasSlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.tidy.UnchangedSliceInfoRemover;
 
 public class TestUnchangedSliceInfoRemover {
 	@Test

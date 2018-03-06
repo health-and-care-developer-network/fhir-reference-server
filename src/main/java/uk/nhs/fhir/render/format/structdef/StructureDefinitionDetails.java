@@ -2,7 +2,6 @@ package uk.nhs.fhir.render.format.structdef;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
@@ -10,7 +9,6 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -19,6 +17,7 @@ import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.validate.IgnorableMappingValues;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.render.html.Elements;
@@ -33,8 +32,6 @@ import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionDetails {
-	
-	public static final Set<String> IGNORABLE_MAPPING_VALUES = ImmutableSet.<String>builder().add("n/a", "N/A").build();
 	
 	private final String pathName;
 	private final String key;
@@ -319,7 +316,7 @@ public class StructureDefinitionDetails {
 			
 			String value = mapping.getMap();
 			
-			if (IGNORABLE_MAPPING_VALUES.contains(value)) {
+			if (IgnorableMappingValues.VALUES.contains(value)) {
 				continue;
 			}
 			

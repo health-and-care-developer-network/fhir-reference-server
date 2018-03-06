@@ -1,5 +1,7 @@
 package uk.nhs.fhir.render.tree;
 
+import uk.nhs.fhir.data.structdef.tree.TreeNode;
+
 public class StubTreeContent extends TreeNode<Object, StubTreeContent> {
 
 	private final String path;

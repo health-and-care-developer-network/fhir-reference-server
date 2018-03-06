@@ -16,8 +16,20 @@ import com.google.common.collect.Maps;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.tree.DifferentialData;
+import uk.nhs.fhir.data.structdef.tree.DifferentialTreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
+import uk.nhs.fhir.data.structdef.tree.tidy.ChildlessDummyNodeRemover;
+import uk.nhs.fhir.data.structdef.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.data.structdef.tree.tidy.RedundantValueNodeRemover;
+import uk.nhs.fhir.data.structdef.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.render.RendererContext;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.ResourceFormatter;
 import uk.nhs.fhir.render.html.Elements;
@@ -30,17 +42,6 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
 import uk.nhs.fhir.render.html.style.FhirFont;
 import uk.nhs.fhir.render.html.table.Table;
-import uk.nhs.fhir.render.tree.DifferentialData;
-import uk.nhs.fhir.render.tree.DifferentialTreeNode;
-import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.SnapshotData;
-import uk.nhs.fhir.render.tree.SnapshotTreeNode;
-import uk.nhs.fhir.render.tree.tidy.ChildlessDummyNodeRemover;
-import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
-import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
-import uk.nhs.fhir.render.tree.tidy.RedundantValueNodeRemover;
-import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
-import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
@@ -65,9 +66,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	}
 
 	private Element getDetailsPanel() {
-		StructureDefinitionTreeDataProvider dataProvider = new StructureDefinitionTreeDataProvider(wrappedResource);
-		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = dataProvider.getSnapshotTreeData();
-		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = dataProvider.getDifferentialTreeData(snapshotTreeData);
+		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
 		
 		new RemovedElementStripper<>(differentialTreeData).process();
 		new ChildlessDummyNodeRemover<>(differentialTreeData).process();

@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Iterators;
 
-import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.TreeNode;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.TreeNode;
 
 public class TestFhirTreeData {
 	

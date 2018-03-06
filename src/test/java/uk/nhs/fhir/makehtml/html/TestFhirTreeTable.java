@@ -10,25 +10,26 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
+import uk.nhs.fhir.data.structdef.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.data.structdef.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.tree.FhirTreeTable;
-import uk.nhs.fhir.render.tree.FhirTreeData;
-import uk.nhs.fhir.render.tree.SnapshotData;
-import uk.nhs.fhir.render.tree.SnapshotTreeNode;
-import uk.nhs.fhir.render.tree.tidy.ComplexExtensionChildrenStripper;
-import uk.nhs.fhir.render.tree.tidy.ExtensionsSlicingNodesRemover;
-import uk.nhs.fhir.render.tree.tidy.RemovedElementStripper;
-import uk.nhs.fhir.render.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
 		SnapshotData node = new SnapshotData(
+			Optional.empty(),
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,

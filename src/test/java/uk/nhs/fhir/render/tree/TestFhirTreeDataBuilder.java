@@ -1,6 +1,12 @@
 package uk.nhs.fhir.render.tree;
 
 import org.junit.Test;
+
+import uk.nhs.fhir.data.structdef.tree.EmptyNodeFactory;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.FhirTreeDataBuilder;
+import uk.nhs.fhir.data.structdef.tree.NodePath;
+
 import org.junit.Assert;
 
 public class TestFhirTreeDataBuilder {
