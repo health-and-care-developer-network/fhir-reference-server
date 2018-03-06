@@ -3,6 +3,7 @@ package uk.nhs.fhir.data.structdef.tree;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
@@ -56,34 +57,40 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		
 		if (backupNodesWithMatchingPaths.size() == 1) {
 			return backupNodesWithMatchingPaths.get(0);
-		} else if (backupNodesWithMatchingPaths.size() > 0 
-		  && backupNodesWithMatchingPaths.get(0).getData().hasSlicingInfo()) {
-			SnapshotTreeNode backup = resolveSlicedBackupNode(backupNodesWithMatchingPaths);
-			return backup;
-		} else if (getData().getPathName().equals("extension")) {
-			SnapshotTreeNode backup = resolveExtensionBackupNode(backupNodesWithMatchingPaths);
-			return backup;
 		} else if (backupNodesWithMatchingPaths.size() == 0) {
 			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> getPath().endsWith(suffix)).findFirst();
 			// handle this if it comes up
 			throw new IllegalStateException("No nodes matched for differential element path " + getPath() + " choice suffix = " + choiceSuffix.toString());
+		} else if (backupNodesWithMatchingPaths.size() > 0 
+		  && backupNodesWithMatchingPaths.get(0).getData().hasSlicingInfo()) {
+			SnapshotTreeNode backup = resolveSlicedBackupNode(backupNodesWithMatchingPaths);
+			return backup;
 		} else {
-			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + getPath() + ", but first wasn't a slicing node");
-		}
-	}
+			// didn't have slicing, try matching on slice name anyway
+			backupNodesWithMatchingPaths = filterOnNameIfPresent(backupNodesWithMatchingPaths);
+			
+			if (backupNodesWithMatchingPaths.size() == 1) {
+				return backupNodesWithMatchingPaths.get(0);
+			} else if (backupNodesWithMatchingPaths.isEmpty()) {
+				throw new IllegalStateException("No " + getPath() + " nodes matched for sliceName "
+				  + getData().getSliceName().get() + ".");
+			}
+			
+			// no slice name to filter on
+			EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME,
+				"No slice name available to identify node to match to a backup: " + (getData().getId().isPresent() ? getData().getId().get() : getPath()));
+			
+			backupNodesWithMatchingPaths = filterOnIdIfPresent(backupNodesWithMatchingPaths);
 
-	private SnapshotTreeNode resolveExtensionBackupNode(List<SnapshotTreeNode> pathMatches) {
-		// didn't have slicing, try matching on slice name anyway
-		List<SnapshotTreeNode> nameAndPathMatches = filterOnNameIfPresent(pathMatches);
-		
-		if (nameAndPathMatches.size() == 1) {
-			return nameAndPathMatches.get(0);
-		} else if (nameAndPathMatches.size() > 1) {
-			throw new IllegalStateException("Couldn't differentiate " + getPath() + " nodes on name fields (" + getData().getSliceName() + "). "
-			  + nameAndPathMatches.size() + " matches.");
-		} else {
-			throw new IllegalStateException("No " + getPath() + " nodes matched for name "
-			  + getData().getSliceName().get() + ".");
+			if (backupNodesWithMatchingPaths.size() == 1) {
+				return backupNodesWithMatchingPaths.get(0);
+			} else if (backupNodesWithMatchingPaths.isEmpty()) {
+				throw new IllegalStateException("No " + getPath() + " nodes matched for sliceName "
+				  + getData().getSliceName().get() + ".");
+			}
+			
+			throw new IllegalStateException("Multiple snapshot nodes matched differential element path " + getPath()
+			  + ", but first wasn't a slicing node, even after filtering on sliceName and id");
 		}
 	}
 
@@ -139,7 +146,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 
 	private SnapshotTreeNode findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(String differentialPath, SnapshotTreeNode searchRoot,
 			String possibleSnapshotElementPath) {
-		List<SnapshotTreeNode> possibleAncestorNodes = searchRoot.childrenWithPath(possibleSnapshotElementPath);
+		List<SnapshotTreeNode> possibleAncestorNodes = searchRoot.selfOrChildrenWithPath(possibleSnapshotElementPath);
 		if (possibleAncestorNodes.size() == 1) {
 			searchRoot = possibleAncestorNodes.get(0);
 		} else if (possibleAncestorNodes.isEmpty()) {
@@ -187,46 +194,32 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 			}
 		}
 	}
-
+	
 	private List<SnapshotTreeNode> filterOnNameIfPresent(List<SnapshotTreeNode> toFilter) {
-		Optional<String> sliceName = getData().getSliceName();
-		
-		if (sliceName.isPresent()
-		  && !sliceName.get().isEmpty()) {
+		return filterIfPresent(getData().getSliceName(), toFilter, node -> node.getData().getSliceName());
+	}
+
+	private List<SnapshotTreeNode> filterOnIdIfPresent(List<SnapshotTreeNode> toFilter) {
+		return filterIfPresent(getData().getId(), toFilter, node -> node.getData().getId());
+	}
+
+	private List<SnapshotTreeNode> filterIfPresent(Optional<String> toMatch, List<SnapshotTreeNode> toFilter, Function<SnapshotTreeNode, Optional<String>> getMatch) {
+		if (toMatch.isPresent()
+		  && !toMatch.get().isEmpty()) {
 			
-			String name = sliceName.get();
+			String matchData = toMatch.get();
 			
-			List<SnapshotTreeNode> nameMatches = Lists.newArrayList();
+			List<SnapshotTreeNode> filteredNodes = Lists.newArrayList();
 			
 			for (SnapshotTreeNode node : toFilter) {
-				if (node.getData().getSliceName().isPresent()
-				  && node.getData().getSliceName().get().equals(name)) {
-					nameMatches.add(node);
+				Optional<String> match = getMatch.apply(node);
+				if (match.isPresent()
+				  && match.get().equals(matchData)) {
+					filteredNodes.add(node);
 				}
 			}
 			
-			return Lists.newArrayList(ListUtils.expectUnique(nameMatches, "snapshot nodes matching path " + getPath() + " and name " + name));
-		} else if (toFilter.size() > 1) {
-			// no slice name to filter on
-			EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME,
-				"No slice name available to identify node to match to a backup: " + (getData().getId().isPresent() ? getData().getId().get() : getPath()));
-			
-			if (getData().getId().isPresent()) {
-				String id = getData().getId().get();
-				List<SnapshotTreeNode> idMatches = Lists.newArrayList();
-				
-				for (SnapshotTreeNode node : toFilter) {
-					if (node.getData().getId().isPresent()
-					  && node.getData().getId().get().equals(id)) {
-						idMatches.add(node);
-					}
-				}
-				
-				return idMatches;
-				
-			} else {
-				return toFilter;
-			}
+			return filteredNodes;
 		} else {
 			return toFilter;
 		}

@@ -43,7 +43,7 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 		return !children.isEmpty();
 	}
 
-	public void setParent(U parent) {
+	void setParent(U parent) {
 		this.parent = parent;
 	}
 	
@@ -66,7 +66,11 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 		return nodesWithPath(descendants(), absolutePath);
 	}
 	
-	public List<U> childrenWithPath(String absolutePath) {
+	@SuppressWarnings("unchecked")
+	public List<U> selfOrChildrenWithPath(String absolutePath) {
+		if (getPath().equals(absolutePath)) {
+			return Lists.newArrayList((U)this);
+		}
 		return nodesWithPath(getChildren(), absolutePath);
 	}
 	
