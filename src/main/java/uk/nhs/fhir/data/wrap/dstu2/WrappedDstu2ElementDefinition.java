@@ -293,7 +293,7 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public Optional<ExtensionType> getExtensionType(StructureDefinitionRepository structureDefinitions) {
+	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		}

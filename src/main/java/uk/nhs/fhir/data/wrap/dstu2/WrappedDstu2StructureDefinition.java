@@ -250,8 +250,8 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 			definition
 				.getSnapshot()
 				.getElement()
-				.stream()
-				.anyMatch(element -> element.getPath().equals("Extension"));
+				.get(0)
+				.getPath().equals("Extension");
 		
 		boolean isExtensionFromConstrainedType = isExtension();
 		

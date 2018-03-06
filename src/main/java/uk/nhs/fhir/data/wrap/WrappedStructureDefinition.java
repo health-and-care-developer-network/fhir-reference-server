@@ -14,6 +14,13 @@ import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
+import uk.nhs.fhir.data.structdef.tree.CloneableFhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.DifferentialData;
+import uk.nhs.fhir.data.structdef.tree.DifferentialTreeNode;
+import uk.nhs.fhir.data.structdef.tree.SnapshotData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
+import uk.nhs.fhir.data.structdef.tree.StructureDefinitionTreeDataProvider;
+import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedStructureDefinition extends WrappedResource<WrappedStructureDefinition> {
 	
@@ -106,5 +113,28 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	@Override
 	public ResourceType getResourceType() {
 		return ResourceType.STRUCTUREDEFINITION;
+	}
+	
+	/* Build once and copy as required */
+	
+	private Optional<CloneableFhirTreeData<SnapshotData, SnapshotTreeNode>> snapshotTree = Optional.empty();
+	public CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTree(Optional<StructureDefinitionRepository> structureDefinitions) {
+		if (!snapshotTree.isPresent()) {
+			StructureDefinitionTreeDataProvider snapshotProvider = new StructureDefinitionTreeDataProvider(this);
+			snapshotTree = Optional.of(snapshotProvider.getSnapshotTreeData(structureDefinitions));
+		}
+		
+		return snapshotTree.get().shallowCopy();
+	}
+
+	private Optional<CloneableFhirTreeData<DifferentialData, DifferentialTreeNode>> differentialTree = Optional.empty();
+	public CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTree(Optional<StructureDefinitionRepository> structureDefinitions) {
+		if (!differentialTree.isPresent()) {
+			CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTree = getSnapshotTree(structureDefinitions);
+			StructureDefinitionTreeDataProvider differentialProvider = new StructureDefinitionTreeDataProvider(this);
+			differentialTree = Optional.of(differentialProvider.getDifferentialTreeData(snapshotTree, structureDefinitions));
+		}
+		
+		return differentialTree.get().shallowCopy();
 	}
 }

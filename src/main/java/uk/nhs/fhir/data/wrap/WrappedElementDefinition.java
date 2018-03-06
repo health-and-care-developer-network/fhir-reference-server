@@ -47,7 +47,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	public abstract Optional<String> getRequirements();
 	public abstract Optional<String> getComments();
 	public abstract List<String> getAliases();
-	public abstract Optional<ExtensionType> getExtensionType(StructureDefinitionRepository structureDefinitions);
+	public abstract Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions);
 	public abstract Optional<String> getLinkedNodeName();
 	public abstract Optional<String> getLinkedNodePath();
 	public abstract List<FhirElementMapping> getMappings();
@@ -79,16 +79,21 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 		return getPathParts().length == 1;
 	}
 
-	protected ExtensionType lookupExtensionType(String typeProfile, StructureDefinitionRepository structureDefinitions) {
+	protected ExtensionType lookupExtensionType(String typeProfile, Optional<StructureDefinitionRepository> structureDefinitions) {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
-		} else if (structureDefinitions.isCachedPermittedMissingExtension(typeProfile)) {
+		} else if (structureDefinitions.isPresent() 
+				&& structureDefinitions.get().isCachedPermittedMissingExtension(typeProfile)) {
 			return ExtensionType.SIMPLE;
 		} else {
 			WrappedStructureDefinition extensionDefinition;
 			try {
-				extensionDefinition = structureDefinitions.getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
-				return extensionDefinition.getExtensionType();
+				if (structureDefinitions.isPresent()) {
+					extensionDefinition = structureDefinitions.get().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
+					return extensionDefinition.getExtensionType();
+				} else {
+					throw new IllegalStateException("Cannot find extension type for " + typeProfile + " because there is no StructureDefinitionRepository available");
+				}
 			} catch (Exception e) {
 				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
 				
@@ -98,7 +103,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 					EventHandlerContext.forThread().event(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, 
 						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot + "\"");
 					
-					structureDefinitions.addCachedPermittedMissingExtension(typeProfile);
+					structureDefinitions.get().addCachedPermittedMissingExtension(typeProfile);
 					
 					return ExtensionType.SIMPLE;
 				} else {
