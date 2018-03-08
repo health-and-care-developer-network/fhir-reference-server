@@ -107,7 +107,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, nodeData.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, nodeData.getMappings(), wrappedResource.getImplicitFhirVersion());
+				linkedNodeKey, nodeData.getMappings(), getResourceVersion());
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

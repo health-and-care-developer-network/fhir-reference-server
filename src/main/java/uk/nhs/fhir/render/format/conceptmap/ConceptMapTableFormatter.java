@@ -65,7 +65,7 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 				Optional<String> comments = target.getComments();
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
 				
-				FhirVersion implicitFhirVersion = wrappedResource.getImplicitFhirVersion();
+				FhirVersion implicitFhirVersion = getResourceVersion();
 				tableContent.add(
 					Elements.withChildren("tr",
 						labelledValueCell(BLANK, element.getCode(), 1, true, true),

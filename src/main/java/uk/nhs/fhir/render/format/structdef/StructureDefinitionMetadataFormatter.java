@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.format.structdef;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,6 +13,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
@@ -22,7 +24,6 @@ import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
-import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.StringUtil;
 
 public class StructureDefinitionMetadataFormatter extends TableFormatter<WrappedStructureDefinition> {
@@ -45,6 +46,11 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		return section;
 	}
 	
+	private static final Map<String, String> HL7_LOGICAL_URL_TO_TRUE_URL = Maps.newHashMap();
+	static {
+		HL7_LOGICAL_URL_TO_TRUE_URL.put("http://hl7.org/fhir/StructureDefinition/Period", "http://hl7.org/fhir/datatypes.html#period");
+	}
+	
 	public Element getMetadataTable(WrappedStructureDefinition structureDefinition) {
 		
 		String name = structureDefinition.getName();
@@ -57,15 +63,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		
 		Optional<String> constrainedType = structureDefinition.getConstrainedType();
 		
-		Optional<String> displayBaseUrl = Optional.empty();
-		String origBaseUrl = structureDefinition.getBase();
-		if (origBaseUrl != null) {
-			if (origBaseUrl.equals("http://hl7.org/fhir/StructureDefinition/Extension")) {
-				displayBaseUrl = Optional.of("http://hl7.org/fhir/extensibility.html#extension");
-			} else {
-				displayBaseUrl = Optional.of(FhirURLConstants.HTTP_HL7_FHIR + origBaseUrl.substring(origBaseUrl.lastIndexOf('/')) + ".html");
-			}
-		}
+		Optional<String> baseUrl = Optional.ofNullable(structureDefinition.getBase());
 		
 		Optional<String> version = structureDefinition.getVersion();
 		Optional<String> display = structureDefinition.getDisplay();
@@ -141,7 +139,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 			Elements.withChildren("tr",
 				labelledValueCell("Version", StringUtil.firstPresent(structureDefinition.getVersionId(), version), 1),
 				labelledValueCell("Constrained type", constrainedType, 1),
-				labelledValueCell("Constrained URL", displayBaseUrl, 1),
+				labelledValueCell("Constrained URL", baseUrl, 1),
 				labelledValueCell("Status", status, 1)));
 		
 		if (description.isPresent()) {

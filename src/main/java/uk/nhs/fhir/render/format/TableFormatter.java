@@ -1,6 +1,8 @@
 package uk.nhs.fhir.render.format;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jdom2.Attribute;
@@ -8,7 +10,9 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedResource;
@@ -18,6 +22,8 @@ import uk.nhs.fhir.render.html.style.CSSStyleBlock;
 import uk.nhs.fhir.render.html.style.CSSTag;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
+import uk.nhs.fhir.util.FhirSimpleTypes;
+import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.StringUtil;
 
 public abstract class TableFormatter<T extends WrappedResource<T>> extends ResourceFormatter<T> {
@@ -98,6 +104,40 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 			label);
 	}
 	
+	private static final Map<String, String> HL7_LOGICAL_URL_TO_WEB_URL;
+	static {
+		Map<String, String> hl7LogicalUrlToWebUrl = Maps.newHashMap();
+		
+		for (String type : FhirSimpleTypes.URL_CORRECTION_TYPES) {
+			String logical = "http://hl7.org/fhir/StructureDefinition/" + type;
+			String web = "http://hl7.org/fhir/datatypes.html#" + type.toLowerCase(Locale.UK);
+			hl7LogicalUrlToWebUrl.put(logical, web);
+		}
+		
+		for (String type : FhirSimpleTypes.METADATA_URL_CORRECTION_TYPES) {
+			String logical = "http://hl7.org/fhir/StructureDefinition/" + type;
+			String web = "http://hl7.org/fhir/metadatatypes.html#" + type;
+			hl7LogicalUrlToWebUrl.put(logical, web);
+		}
+		
+		hl7LogicalUrlToWebUrl.put("http://hl7.org/fhir/StructureDefinition/Extension", "http://hl7.org/fhir/extensibility.html#extension");
+		
+		HL7_LOGICAL_URL_TO_WEB_URL = ImmutableMap.copyOf(hl7LogicalUrlToWebUrl);
+	}
+	
+	private String getLinkUrl(String displayUrl) {
+		if (displayUrl == null) {
+			return null;
+		} else if (HL7_LOGICAL_URL_TO_WEB_URL.containsKey(displayUrl)) {
+			return HL7_LOGICAL_URL_TO_WEB_URL.get(displayUrl);
+		} else if (displayUrl.startsWith("http://hl7.org/fhir/StructureDefinition")
+		  && !displayUrl.endsWith(".html")){
+			return FhirURLConstants.HTTP_HL7_FHIR + displayUrl.substring(displayUrl.lastIndexOf('/')) + ".html";
+		}
+		
+		return displayUrl;
+	}
+	
 	protected Element valueSpan(String value, boolean alwaysLargeText) {
 		boolean url = StringUtil.looksLikeUrl(value);
 		boolean largeText = alwaysLargeText || value.length() < 25;
@@ -110,7 +150,7 @@ public abstract class TableFormatter<T extends WrappedResource<T>> extends Resou
 				Elements.withAttributesAndText("a", 
 					Lists.newArrayList(
 						new Attribute("class", FhirCSS.LINK), 
-						new Attribute("href", FhirURL.buildOrThrow(value, getResourceVersion()).toLinkString())), 
+						new Attribute("href", FhirURL.buildOrThrow(getLinkUrl(value), getResourceVersion()).toLinkString())), 
 					value));
 		} else {
 			return Elements.withAttributeAndText("span", 

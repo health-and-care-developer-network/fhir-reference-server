@@ -133,7 +133,7 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                     Elements.withChildren("tr",
                         labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
-                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.versionBase(wrappedResource.getImplicitFhirVersion()) + "/terminologies.html#" + anchorStrength),
+                        labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.versionBase(getResourceVersion()) + "/terminologies.html#" + anchorStrength),
                         valueSetCell
                     ));
                 done.add(path);
@@ -143,7 +143,6 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     }
     
     private Element labelledValueCell(String label, FhirURL url, int colspan) {
-    	
     	return labelledValueCell(label, url.toFullString(), colspan, url.isLogicalUrl() ? null : url.toLinkString());
     }
 
@@ -152,7 +151,8 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
     	Optional<String> uriToDisplay = Optional.empty();
     	if (!Strings.isNullOrEmpty(uriOverride)) {
     		uriToDisplay = Optional.of(uriOverride);
-    	} else if (StringUtil.looksLikeUrl(value)) {
+    	} else if (StringUtil.looksLikeUrl(value)
+    	  && !FhirURL.isLogicalUrl(value)) {
     		uriToDisplay = Optional.of(value);
     	}
     	
