@@ -56,14 +56,29 @@ public class RendererEventDisplayDialog extends JDialog {
 	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
-			JOptionPane.showMessageDialog(RendererEventDisplayDialog.this,
-			    "Rendering failed for some files - please review errors",
-			    "Rendering error",
-			    JOptionPane.ERROR_MESSAGE);
+			boolean includesErrors = withErrors.getChildCount() > 0;
+			boolean includesWarnings = justWarnings.getChildCount() > 0;
+			
+			if (includesErrors) {
+				JOptionPane.showMessageDialog(RendererEventDisplayDialog.this,
+					"Rendering failed for some files - please review errors",
+					"Rendering error",
+				    JOptionPane.ERROR_MESSAGE);
+			} else if (includesWarnings) {
+				JOptionPane.showMessageDialog(RendererEventDisplayDialog.this,
+					"Rendering succeeded with some warnings",
+					"Renderer warnings",
+				    JOptionPane.WARNING_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(RendererEventDisplayDialog.this,
+					"Rendering succeeded",
+					"Success",
+				    JOptionPane.INFORMATION_MESSAGE);
+			}
+			
+			int levelsToExpand = 2;
+			expandTreeRecursive(root, levelsToExpand);
 		}
-		
-		int levelsToExpand = 2;
-		expandTreeRecursive(root, levelsToExpand);
 		
 		super.setVisible(visible);
 	}
