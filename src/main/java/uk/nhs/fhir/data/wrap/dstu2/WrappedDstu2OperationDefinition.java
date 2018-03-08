@@ -133,7 +133,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 			.filter(param -> param.getUseElement().getValueAsEnum().equals(type))
 			.map(param -> 
 				new FhirOperationParameter(param.getName(), param.getMin(), param.getMax(), 
-						linkFactory.forDataType(param.getTypeElement()), param.getDocumentation(), getResourceInfos(param)))
+					Optional.ofNullable(param.getTypeElement()).map(typeElement -> linkFactory.forDataType(typeElement)), param.getDocumentation(), getResourceInfos(param)))
 			.collect(Collectors.toList());
 	}
 

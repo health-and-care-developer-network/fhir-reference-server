@@ -48,6 +48,9 @@ public class DifferentialData extends AbstractFhirTreeNodeData implements HasBac
 			if (!id.isPresent()) {
 				// Forge workaround - not a renderer bug
 				EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_NODE_MISSING_ID, "No id found for differential, but found " + backupNode.getData().getId().get() + " on backup node");
+			} else if (backupNode.getData().getId().get().contains("[x]")) {
+				EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_CHOICE_NODE_WRONG_ID,
+					"Id with choice on backup node (" + backupNode.getData().getId() + ") didn't match Id on differential node (" + id.get() + ")");
 			} else {
 				throw new IllegalStateException("id (" + id + ") doesn't match backup node id (" + backupNode.getData().getId() + ")");
 			}

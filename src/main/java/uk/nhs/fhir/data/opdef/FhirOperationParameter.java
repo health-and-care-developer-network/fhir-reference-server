@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.opdef;
 
 import java.util.List;
+import java.util.Optional;
 
 import uk.nhs.fhir.data.ResourceInfo;
 import uk.nhs.fhir.data.url.LinkData;
@@ -10,11 +11,11 @@ public class FhirOperationParameter {
 	private final String name;
 	private final Integer min;
 	private final String max;
-	private final LinkData typeLink;
+	private final Optional<LinkData> typeLink;
 	private final String documentation;
 	private final List<ResourceInfo> resourceInfos;
 	
-	public FhirOperationParameter(String name, Integer min, String max, LinkData typeLink, String documentation, List<ResourceInfo> resourceInfos) {
+	public FhirOperationParameter(String name, Integer min, String max, Optional<LinkData> typeLink, String documentation, List<ResourceInfo> resourceInfos) {
 		this.name = name;
 		this.min = min;
 		this.max = max;
@@ -35,7 +36,7 @@ public class FhirOperationParameter {
 		return max;
 	}
 
-	public LinkData getTypeLink() {
+	public Optional<LinkData> getTypeLink() {
 		return typeLink;
 	}
 

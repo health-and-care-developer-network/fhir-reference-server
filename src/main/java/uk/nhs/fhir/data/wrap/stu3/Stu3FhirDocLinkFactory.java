@@ -17,6 +17,10 @@ import uk.nhs.fhir.util.StringUtil;
 public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 	
 	public LinkData forDataType(PrimitiveType<?> fhirData) {
+		if (fhirData.isEmpty()) {
+			throw new IllegalStateException("Called FhirDocLinkFactory.forDataType(fhirData), but fhirData was empty");
+		}
+		
 		String dataTypeName;
 		String typeURL;
 		if (fhirData instanceof CodeType) {

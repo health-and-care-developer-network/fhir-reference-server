@@ -134,8 +134,13 @@ private final OperationDefinition definition;
 			.stream()
 			.filter(param -> param.getUseElement().getValue().equals(type))
 			.map(param -> 
-				new FhirOperationParameter(param.getName(), param.getMin(), param.getMax(), 
-						linkFactory.forDataType(param.getTypeElement()), param.getDocumentation(), getResourceInfos(param)))
+				new FhirOperationParameter(
+					param.getName(),
+					param.getMin(),
+					param.getMax(),
+					param.hasTypeElement() ? Optional.of(linkFactory.forDataType(param.getTypeElement())) : Optional.empty(),
+					param.getDocumentation(),
+					getResourceInfos(param)))
 			.collect(Collectors.toList());
 	}
 

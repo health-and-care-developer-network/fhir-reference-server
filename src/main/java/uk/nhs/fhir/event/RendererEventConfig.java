@@ -36,6 +36,7 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.IGNORABLE_MAPPING_ID, RendererEventResponse.IGNORE);
 		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.IGNORE); // should be a warning, but too many
 		responses.put(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.DIFFERENTIAL_CHOICE_NODE_WRONG_ID, RendererEventResponse.LOG_WARNING);
 
 		// Currently not hit
 		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.THROW);
