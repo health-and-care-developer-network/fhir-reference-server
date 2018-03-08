@@ -121,7 +121,7 @@ public class FileCache {
     }
 
 	static List<ResourceEntityWithMultipleVersions> cacheResources(FhirVersion fhirVersion) {
-		List<ResourceEntityWithMultipleVersions> newList = Lists.newCopyOnWriteArrayList();
+		List<ResourceEntityWithMultipleVersions> newList = Lists.newArrayList();
         for (ResourceType resourceType : ResourceType.typesForFhirVersion(fhirVersion)) {
         	newList.addAll(cacheFHIRResources(fhirVersion, resourceType));
         }

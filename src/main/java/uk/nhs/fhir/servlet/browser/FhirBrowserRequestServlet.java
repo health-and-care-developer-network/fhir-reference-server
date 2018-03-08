@@ -144,6 +144,12 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 	private void serviceBrowserRequest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String fullUri = request.getRequestURI();
+		
+		// trim trailing slash to avoid failure to handle e.g. .../StructureDefinition/
+		if (fullUri.endsWith("/") && !fullUri.equals("/")) {
+			fullUri = fullUri.substring(0, fullUri.length()-1);
+		}
+		
 		if (fullUri.equals("/dataLoadStatusReport")) {
         	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
 			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);

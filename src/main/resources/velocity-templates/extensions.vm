@@ -19,7 +19,7 @@
 			<td>$!extension.getBaseType()</td>
 			<td>
 				#foreach( $extensionContext in $extension.getExtensionContexts() )
-					<p>$extensionContext</p>
+					<div>$extensionContext</div>
 				#end
 			</td>
 		</tr>
