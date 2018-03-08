@@ -7,13 +7,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
+import uk.nhs.fhir.util.FhirSimpleTypes;
 import uk.nhs.fhir.util.ListUtils;
 
 /*
@@ -22,10 +22,6 @@ import uk.nhs.fhir.util.ListUtils;
  * element should use as a backup.
  */
 public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode>{
-	
-	private static final Set<String> choiceSuffixes = Sets.newHashSet("Integer", "Decimal", "DateTime", "Date", "Instant", "String", "Uri", "Boolean", "Code",
-		"Markdown", "Base64Binary", "Coding", "CodeableConcept", "Attachment", "Identifier", "Quantity", "Range", "Period", "Ratio", "HumanName",
-		"Address", "ContactPoint", "Timing", "Signature", "Reference");
 	
 	private Optional<SnapshotTreeNode> backupNode = Optional.empty();
 	
@@ -58,7 +54,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		if (backupNodesWithMatchingPaths.size() == 1) {
 			return backupNodesWithMatchingPaths.get(0);
 		} else if (backupNodesWithMatchingPaths.size() == 0) {
-			Optional<String> choiceSuffix = choiceSuffixes.stream().filter(suffix -> getPath().endsWith(suffix)).findFirst();
+			Optional<String> choiceSuffix = FhirSimpleTypes.CHOICE_SUFFIXES.stream().filter(suffix -> getPath().endsWith(suffix)).findFirst();
 			// handle this if it comes up
 			throw new IllegalStateException("No nodes matched for differential element path " + getPath() + " choice suffix = " + choiceSuffix.toString());
 		} else if (backupNodesWithMatchingPaths.size() > 0 
@@ -180,7 +176,8 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 	}
 
 	private Optional<String> matchSuffix(String possibleSnapshotElementPath) {
-		return choiceSuffixes
+		return FhirSimpleTypes
+			.CHOICE_SUFFIXES
 			.stream()
 			.filter(eachSuffix -> possibleSnapshotElementPath.endsWith(eachSuffix))
 			.findFirst();

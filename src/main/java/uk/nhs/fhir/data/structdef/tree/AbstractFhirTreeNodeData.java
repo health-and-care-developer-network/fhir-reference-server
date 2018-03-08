@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
@@ -23,6 +22,7 @@ import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
+import uk.nhs.fhir.util.FhirSimpleTypes;
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -125,14 +125,8 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	}
 	
 	private boolean hasAllTypes() {
-		Set<String> allTypes = Sets.newHashSet("Boolean", "Integer", "Decimal", "base64Binary", "Instant", 
-				"String", "Uri", "Date", "dateTime", "Time", "Code", "Oid", "Id", "unsignedInt", "positiveInt",
-				"Markdown", "Annotation", "Attachment", "Identifier", "CodeableConcept", "Coding", "Quantity",
-				"Range", "Period", "Ratio", "SampledData", "Signature", "HumanName", "Address", "ContactPoint",
-				"Timing", "Reference", "Meta");
-		
 		Set<String> containedTypes = typeLinks.links().stream().map(typeLink -> typeLink.getKey().getText()).collect(Collectors.toSet());
-		return allTypes.stream().allMatch(type -> containedTypes.contains(type));
+		return FhirSimpleTypes.CHOICE_SUFFIXES.stream().allMatch(type -> containedTypes.contains(type));
 	}
 
 	@Override

@@ -86,7 +86,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		if (isExtension) {
 			// Extra metadata for extensions
 			extensionCardinality = getRootCardinality().toString();
-			extensionContexts = getUseContexts();
+			extensionContexts = getUseLocationContexts();
     		
 			extensionDescription = getDifferentialRootDescription().orElse(getDifferentialRootDefinition());
     		
