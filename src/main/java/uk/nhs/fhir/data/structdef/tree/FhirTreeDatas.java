@@ -39,7 +39,7 @@ public class FhirTreeDatas {
 			WrappedElementDefinition wrappedElement = WrappedElementDefinition.fromDefinition(element);
 			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotNode(wrappedElement, structureDefinitions);
 			SnapshotTreeNode snapshotNode = new SnapshotTreeNode(snapshotData);
-			
+
 			fhirTreeDataBuilder.addFhirTreeNode(snapshotNode);
 		}
 		
@@ -82,9 +82,9 @@ public class FhirTreeDatas {
 		}
 		
 		FhirTreeDataBuilder<DifferentialData, DifferentialTreeNode> fhirDifferentialTreeDataBuilder = new FhirTreeDataBuilder<>(new EmptyDifferentialNodeFactory(backupTreeData));
-		
+
 		for (FhirDifferentialSkeletonNode skeletonNode : backupNodeResolvingTree.nodes()) {
-			
+
 			SnapshotTreeNode backupNode = skeletonNode.getBackupNode(backupTreeData);
 			WrappedElementDefinition elementDefinition = skeletonNode.getData().getElement();
 
@@ -121,6 +121,7 @@ public class FhirTreeDatas {
 
 		FhirTreeDataBuilder<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> fhirSkeletonTreeDataBuilder = 
 				new FhirTreeDataBuilder<>(new FhirSkeletonEmptyNodeFactory());
+
 		for (ElementDefinition element : structureDefinition.getDifferential().getElement()) {
 			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
 			FhirDifferentialSkeletonNode node = new FhirDifferentialSkeletonNode(data);

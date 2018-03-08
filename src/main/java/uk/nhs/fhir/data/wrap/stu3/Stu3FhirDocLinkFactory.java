@@ -70,7 +70,7 @@ public class Stu3FhirDocLinkFactory extends FhirDocLinkFactory {
 			case REFERENCE:
 				return FhirURLConstants.HTTP_HL7_STU3 + "/references.html";
 			case METADATA:
-				return FhirURLConstants.HTTP_HL7_STU3 + "metadatatypes.html#" + dataTypeName;
+				return FhirURLConstants.HTTP_HL7_STU3 + "/metadatatypes.html#" + dataTypeName;
 			default:
 				throw new IllegalStateException("Couldn't get type for [" + dataTypeName + "]");
 		}

@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.google.common.base.Strings;
+
 public class StringUtil {
 	public static boolean hasUpperCaseChars(String value) {
 		for (char c : value.toCharArray()) {
@@ -164,7 +166,7 @@ public class StringUtil {
 	}
 	
 	public static boolean looksLikeUrl(String s) {
-		return s.startsWith("https://")
-		  || s.startsWith("http://");
+		return !Strings.isNullOrEmpty(s)
+		  && (s.startsWith("https://") || s.startsWith("http://"));
 	}
 }

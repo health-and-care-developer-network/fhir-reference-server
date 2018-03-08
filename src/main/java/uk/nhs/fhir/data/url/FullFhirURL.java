@@ -44,11 +44,12 @@ public class FullFhirURL extends FhirURL {
 	public String toLinkString() {
 		String fullUrl = url.toString();
 		
+		// This conversion now performed below, after splitting off the scheme
 		// convert https://fhir.hl7.org.uk links to relative links so they work in dev environments
-		if (FHIR_HL7_ORG_LINKS_LOCAL
-		  && fullUrl.startsWith(FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK)) {	
-			return fullUrl.substring(FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK.length());
-		}
+		//if (FHIR_HL7_ORG_LINKS_LOCAL
+		//  && fullUrl.startsWith(FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK)) {	
+		//	return fullUrl.substring(FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK.length());
+		//}
 		
 		// split scheme off the front, if present	
 		String scheme;
