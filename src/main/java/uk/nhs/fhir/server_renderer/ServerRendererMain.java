@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.datalayer.FileCache;
+import uk.nhs.fhir.servlet.SharedServletContext;
 import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
 import uk.nhs.fhir.util.FhirFileUtils;
 import uk.nhs.fhir.util.SimpleFhirFileLocator;
@@ -37,15 +38,24 @@ public class ServerRendererMain
 		if (!importedFileDir.toFile().mkdir()) {
 			throw new IllegalStateException("Failed to create temp directory at " + tmpDir.toString());
 		}
+    	
+    	Server server = makeServer();
+    	startServer(server);
+    	
+    	while (!SharedServletContext.initialised()) {
+    		try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    	}
+
+		startWindow(renderedFileDir, importedFileDir);
 		
 		// FileCache will look in rendered dir and output to imported dir when it runs an import
     	SimpleFhirFileLocator serverFilePreprocessingLocator = new SimpleFhirFileLocator(renderedFileDir, importedFileDir);
 		FileCache.setVersionedFileLocator(serverFilePreprocessingLocator);
     	
-		startWindow(renderedFileDir, importedFileDir);
-		
-    	Server server = makeServer();
-    	startServer(server);
     	waitForServer(server);
     }
 
