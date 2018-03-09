@@ -3,9 +3,11 @@ package uk.nhs.fhir.servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import uk.nhs.fhir.util.FhirServerProperties;
 
+@WebListener
 public class SharedServletContext implements ServletContextListener {
 	private static ServletContext sharedContext = null; 
 	
