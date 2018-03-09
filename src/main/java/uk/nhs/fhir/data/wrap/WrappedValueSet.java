@@ -93,4 +93,9 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public ResourceType getResourceType() {
 		return ResourceType.VALUESET;
 	}
+
+	@Override
+	public String getCrawlerDescription() {
+		return getDescription().orElse("FHIR Server: ValueSet " + getName());
+	}
 }

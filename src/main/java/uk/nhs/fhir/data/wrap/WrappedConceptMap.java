@@ -56,4 +56,9 @@ public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMa
 	public ResourceType getResourceType() {
 		return ResourceType.CONCEPTMAP;
 	}
+	
+	@Override
+	public String getCrawlerDescription() {
+		return getDescription().orElse(getName());
+	}
 }

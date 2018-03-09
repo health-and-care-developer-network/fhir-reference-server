@@ -16,7 +16,7 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
 	public abstract LinkData getNameTypeLink();
 	public abstract String getKind();
 	public abstract LinkData getKindTypeLink();
-	public abstract String getDescription();
+	public abstract Optional<String> getDescription();
 	public abstract LinkData getDescriptionTypeLink();
 	public abstract String getCode();
 	public abstract LinkData getCodeTypeLink();
@@ -46,5 +46,10 @@ public abstract class WrappedOperationDefinition extends WrappedResource<Wrapped
 	@Override
 	public ResourceType getResourceType() {
 		return ResourceType.OPERATIONDEFINITION;
+	}
+	
+	@Override
+	public String getCrawlerDescription() {
+		return getDescription().orElse(getName());
 	}
 }

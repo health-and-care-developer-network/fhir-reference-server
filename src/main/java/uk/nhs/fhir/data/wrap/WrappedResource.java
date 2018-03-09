@@ -42,6 +42,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	public abstract FhirVersion getImplicitFhirVersion();
 	public abstract Optional<String> getUrl();
 	public abstract void setUrl(String url);
+	public abstract String getCrawlerDescription();
 	
 	public abstract Optional<String> getVersion();
 	

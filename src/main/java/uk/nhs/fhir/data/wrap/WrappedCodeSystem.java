@@ -65,4 +65,9 @@ public abstract class WrappedCodeSystem extends WrappedResource<WrappedCodeSyste
 	public ResourceType getResourceType() {
 		return ResourceType.CODESYSTEM;
 	}
+	
+	@Override
+	public String getCrawlerDescription() {
+		return getDescription().orElse(getDisplay().orElse(getName()));
+	}
 }

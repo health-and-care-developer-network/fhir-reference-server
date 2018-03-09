@@ -138,4 +138,9 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		
 		return differentialTree.get().shallowCopy();
 	}
+
+	@Override
+	public String getCrawlerDescription() {
+		return getDescription().orElse("FHIR Server: StructureDefinition " + getName());
+	}
 }

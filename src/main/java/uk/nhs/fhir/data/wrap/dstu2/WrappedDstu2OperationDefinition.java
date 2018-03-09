@@ -78,8 +78,8 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	}
 
 	@Override
-	public String getDescription() {
-		return definition.getDescription();
+	public Optional<String> getDescription() {
+		return Optional.ofNullable(definition.getDescription());
 	}
 
 	@Override
