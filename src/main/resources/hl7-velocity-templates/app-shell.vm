@@ -41,7 +41,7 @@
 		    </div>
 
 			<div class="main">
-				<div class="wrapper cf container">$page-content</div><!--end main_content-->
+				<div class="wrapper cf container">#parse($contentTemplateName)</div><!--end main_content-->
 			</div><!-- end main -->
 	
 			<footer>

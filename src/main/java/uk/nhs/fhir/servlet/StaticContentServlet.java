@@ -24,7 +24,7 @@ public class StaticContentServlet extends HttpServlet {
 
         LOG.info("Requested URI: " + request.getRequestURI() + " handled by Static content Servlet");
         
-        String requestedPath = request.getRequestURI().substring(5);
+        String requestedPath = request.getRequestURI();
         String stu3Prefix = "/STU3/";
 		if (requestedPath.startsWith(stu3Prefix)) {
 			requestedPath = requestedPath.substring(stu3Prefix.length());
