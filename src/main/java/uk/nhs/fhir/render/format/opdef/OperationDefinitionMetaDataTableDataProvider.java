@@ -31,7 +31,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 		return Lists.newArrayList(
 			new OperationDefinitionMetaDataRowData("Name", source.getNameTypeLink(), StringUtil.capitaliseLowerCase(source.getName())),
 			new OperationDefinitionMetaDataRowData("Kind", source.getKindTypeLink(), StringUtil.capitaliseLowerCase(source.getKind())),
-			new OperationDefinitionMetaDataRowData("Description", source.getDescriptionTypeLink(), StringUtil.capitaliseLowerCase(source.getDescription())),
+			new OperationDefinitionMetaDataRowData("Description", source.getDescriptionTypeLink(), source.getDescription().map(desc -> StringUtil.capitaliseLowerCase(desc)).orElse("")),
 			new OperationDefinitionMetaDataRowData("Code", source.getCodeTypeLink(), source.getCode()),
 			new OperationDefinitionMetaDataRowData("System", source.getSystemTypeLink(), StringUtil.capitaliseLowerCase(source.getIsSystem())),
 			new OperationDefinitionMetaDataRowData("Instance", source.getInstanceTypeLink(), StringUtil.capitaliseLowerCase(source.getIsInstance()))

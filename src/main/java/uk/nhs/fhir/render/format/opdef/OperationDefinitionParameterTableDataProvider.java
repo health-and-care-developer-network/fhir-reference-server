@@ -36,7 +36,9 @@ public class OperationDefinitionParameterTableDataProvider {
 		for (FhirOperationParameter parameter : parameters) {
 			String rowTitle = parameter.getName();
 			String cardinality = parameter.getMin() + ".." + parameter.getMax(); 
-			LinkDatas typeLink = new LinkDatas(parameter.getTypeLink());
+			LinkDatas typeLink = parameter.getTypeLink().isPresent() ? 
+				new LinkDatas(parameter.getTypeLink().get()) : 
+				new LinkDatas();
 			String documentation = parameter.getDocumentation();
 			List<ResourceInfo> flags = parameter.getResourceInfos();
 
