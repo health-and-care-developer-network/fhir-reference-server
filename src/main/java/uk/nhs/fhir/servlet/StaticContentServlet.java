@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.util.FhirServerProperties;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = {"/favicon.ico", "/images/*", "/js/*", "/style/*"}, displayName = "Static content Servlet", loadOnStartup = 1)
@@ -36,7 +35,7 @@ public class StaticContentServlet extends HttpServlet {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         } else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", SharedServletContext.getProperties().getFaviconPath());
         } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());

@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.servlet.SharedServletContext;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
@@ -19,24 +19,26 @@ public class PropertiesFhirFileLocator extends AbstractFhirFileLocator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PropertiesFhirFileLocator.class);
 	
-	private static final String PROP_ROOT_PATH = "defaultResourceRootPath";
-	private static final String DSTU2_DIRECTORY = "NHSDigital";
-	private static final String STU3_DIRECTORY = "NHSDigitalSTU3";
+	private static final String DSTU2_DIRECTORY_SUFFIX = "";
+	private static final String STU3_DIRECTORY_SUFFIX = "STU3";
 	
 	private final Path rootDirFromProperties;
+	private final String resourceFolderPrefixFromProperties;
 	public PropertiesFhirFileLocator() {
-		String property = FhirServerProperties.getProperty(PROP_ROOT_PATH);
-		LOG.debug("Root path: " + property);
-		rootDirFromProperties = Paths.get(property);
+		rootDirFromProperties = Paths.get(SharedServletContext.getProperties().getResourceRootPath());
+		resourceFolderPrefixFromProperties = SharedServletContext.getProperties().getResourceFolderPrefix();
+
+		LOG.debug("Root path: " + rootDirFromProperties.toString());
+		LOG.debug("Folder prefix: " + resourceFolderPrefixFromProperties);
 	}
 	
 	@Override
 	public Path getSourceRoot(FhirVersion fhirVersion) {
 		switch(fhirVersion) {
 		case DSTU2:
-			return rootDirFromProperties.resolve(DSTU2_DIRECTORY);
+			return rootDirFromProperties.resolve(resourceFolderPrefixFromProperties + DSTU2_DIRECTORY_SUFFIX);
 		case STU3:
-			return rootDirFromProperties.resolve(STU3_DIRECTORY);
+			return rootDirFromProperties.resolve(resourceFolderPrefixFromProperties + STU3_DIRECTORY_SUFFIX);
 		default:
 			throw new IllegalStateException("No default file path for FHIR version " + fhirVersion.toString());
 		}

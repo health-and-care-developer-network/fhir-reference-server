@@ -7,7 +7,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
-import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.servlet.SharedServletContext;
 
 public class AppShellTemplate { 
 
@@ -15,7 +15,7 @@ public class AppShellTemplate {
 	private static final Template template;
 	
 	static {
-		templateDirectory = FhirServerProperties.getProperty("templateDirectory");
+		templateDirectory = SharedServletContext.getProperties().getVelocityTemplatePath();
 		String templateName = "app-shell.vm";
 		
     	try {

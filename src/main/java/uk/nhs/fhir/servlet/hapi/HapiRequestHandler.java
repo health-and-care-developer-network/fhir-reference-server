@@ -26,9 +26,9 @@ import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.interceptor.ConformanceInterceptor;
 import uk.nhs.fhir.resourcehandlers.ResourceProvider;
 import uk.nhs.fhir.servlet.IndexServlet;
+import uk.nhs.fhir.servlet.SharedServletContext;
 import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
 import uk.nhs.fhir.util.FhirContexts;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 
 @SuppressWarnings("serial")
@@ -88,8 +88,8 @@ public abstract class HapiRequestHandler extends RestfulServer {
 
 	private void addPagingProvider() {
         FifoMemoryPagingProvider pp = new FifoMemoryPagingProvider(10);
-        pp.setDefaultPageSize(Integer.parseInt(FhirServerProperties.getProperty("defaultPageSize")));
-        pp.setMaximumPageSize(Integer.parseInt(FhirServerProperties.getProperty("maximumPageSize")));
+        pp.setDefaultPageSize(SharedServletContext.getProperties().getDefaultPageSize());
+        pp.setMaximumPageSize(SharedServletContext.getProperties().getMaxPageSize());
         setPagingProvider(pp);
 	}
 

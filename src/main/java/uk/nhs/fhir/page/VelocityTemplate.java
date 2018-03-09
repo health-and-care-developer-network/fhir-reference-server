@@ -11,7 +11,7 @@ public abstract class VelocityTemplate {
 	
 	static {
 		// As good a place as any to initialise velocity
-		Velocity.init(FhirServerProperties.getProperties());
+		Velocity.init(FhirServerProperties.parseProperties("velocity.properties"));
 	}
 
 	private static final AppShellTemplate sharedShellTemplate = new AppShellTemplate();

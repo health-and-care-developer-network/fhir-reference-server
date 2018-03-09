@@ -40,12 +40,12 @@ import uk.nhs.fhir.page.list.ResourceListTemplate;
 import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
 import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.servlet.SharedServletContext;
 import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FhirContexts;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
@@ -108,7 +108,7 @@ public class FhirBrowserRequestServlet extends HttpServlet {
         	return;
         } else if (request.getRequestURI().endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", SharedServletContext.getProperties().getFaviconPath());
         	return;
         } else if (request.getRequestURI().startsWith("/images/") 
           || request.getRequestURI().startsWith("/js/")) {
