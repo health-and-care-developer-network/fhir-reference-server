@@ -31,6 +31,8 @@ import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ExtensionsListRenderer {
+
+	private static final String EXTENSIONS_CRAWLER_DESCRIPTION = "FHIR Server Extensions Registry";
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ExtensionsListRenderer.class.getName());
 	
@@ -42,7 +44,7 @@ public class ExtensionsListRenderer {
 		String baseUrl = req.getContextPath();
 		List<ResourceMetadata> extensions = extensionsListProvider.getExtensions();
 		ExtensionsListPageTemplate extensionsPage = new ExtensionsListPageTemplate(baseUrl, extensions);
-		String renderedExtensionsPage = extensionsPage.getHtml();
+		String renderedExtensionsPage = extensionsPage.getHtml(EXTENSIONS_CRAWLER_DESCRIPTION);
 		
 		ServletUtils.setResponseContentForSuccess(resp, "text/html", renderedExtensionsPage);
 	}

@@ -25,12 +25,13 @@ public class AppShellTemplate {
     	}
 	}
 	
-	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName) {
+	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName, String crawlerDescription) {
 		VelocityContext context = new VelocityContext();
 
     	context.put( "contentTemplateName", templateDirectory + contentTemplateName );
     	context.put( "resourceType", resourceType.orElse(null) );
     	context.put( "resourceName", resourceName.orElse(null) );
+    	context.put( "crawlerDescription", crawlerDescription);
     	
     	return context;
 	}

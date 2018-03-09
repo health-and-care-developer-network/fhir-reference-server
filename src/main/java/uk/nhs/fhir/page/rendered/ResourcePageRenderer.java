@@ -13,6 +13,7 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
 import uk.nhs.fhir.util.FhirVersion;
@@ -63,8 +64,10 @@ public class ResourcePageRenderer {
     	
     	String firstTabName = getFirstTabName(resourceType);
     	
+    	String crawlerDescription = WrappedResource.fromBaseResource(resource).getCrawlerDescription();
+    	
     	return new ResourceWithMetadataTemplate(resourceType.toString(), resourceName, baseURL, resource, firstTabName,
-    		versionsList, resourceMetadata, metadataArtefact, textSection, examples, fhirVersion).getHtml();
+    		versionsList, resourceMetadata, metadataArtefact, textSection, examples, fhirVersion).getHtml(crawlerDescription);
     }
 
 	private String getFirstTabName(ResourceType resourceType) {

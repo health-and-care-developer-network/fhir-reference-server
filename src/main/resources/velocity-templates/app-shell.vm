@@ -35,6 +35,8 @@
 <meta property="og:site_name" content="Health Developer Network" />
 <!-- / Yoast SEO plugin. -->
 
+<meta id="page-description" name="description" content="$crawlerDescription" />
+
 <link rel='dns-prefetch' href='https://s.w.org/' />
 		<script type="text/javascript">
 			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/developer.nhs.uk\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8"}};

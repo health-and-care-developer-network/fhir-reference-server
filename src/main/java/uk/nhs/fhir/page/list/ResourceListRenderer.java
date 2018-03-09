@@ -26,6 +26,6 @@ public class ResourceListRenderer {
     	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
     	HashMap<String, List<ResourceMetadata>> groupedResources = groupedResourcesProvider.getAGroupedListOfResources(resourceType);
     	
-    	return new ResourceListTemplate(resourceType, groupedResources).getHtml();
+    	return new ResourceListTemplate(resourceType, groupedResources).getHtml("FHIR Server full " + resourceType.getDisplayName() + " list");
 	}
 }

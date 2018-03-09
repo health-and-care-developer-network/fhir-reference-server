@@ -36,6 +36,8 @@ import uk.nhs.fhir.util.ServletUtils;
 @WebServlet(urlPatterns = {"/index.html"}, displayName = "FHIR Server Home Page", loadOnStartup = 4)
 public class IndexServlet extends HttpServlet {
 	
+	private static final String INDEX_CRAWLER_DESCRIPTION = "FHIR Server Home Page";
+	
 	private static final long serialVersionUID = -7060628622645267225L;
 	private static final Logger LOG = LoggerFactory.getLogger(IndexServlet.class.getName());
 	private static final ResourceCountsProvider resourceCountsProvider = new ResourceWebHandler(SharedDataSource.get());
@@ -47,7 +49,7 @@ public class IndexServlet extends HttpServlet {
 		// Render the home page
 		String baseUrl = request.getContextPath();
     	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
-		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml();
+		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml(INDEX_CRAWLER_DESCRIPTION);
     	
 		ServletUtils.setResponseContentForSuccess(response, "text/html", content);
 	}

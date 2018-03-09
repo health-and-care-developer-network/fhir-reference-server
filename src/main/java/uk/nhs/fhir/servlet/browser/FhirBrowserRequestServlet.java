@@ -282,14 +282,14 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		// We are showing a list of matching resources for the specified name query
 		if (params.containsKey("name")) {
 			List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name")[0]);
-			content = new SearchResultsTemplate(resourceType, list).getHtml();
+			content = new SearchResultsTemplate(resourceType, list).getHtml("FHIR Server: " + resourceType.getDisplayName() + " search results");
         } else if (params.containsKey("name:contains")) {
         	List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name:contains")[0]);
-        	content = new SearchResultsTemplate(resourceType, list).getHtml();
+        	content = new SearchResultsTemplate(resourceType, list).getHtml("FHIR Server: " + resourceType.getDisplayName() + " search results");
         } else {
         	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
         	HashMap<String, List<ResourceMetadata>> groupedResources = data.getAGroupedListOfResources(resourceType);
-        	content = new ResourceListTemplate(resourceType, groupedResources).getHtml();
+        	content = new ResourceListTemplate(resourceType, groupedResources).getHtml("FHIR Server: Full " + resourceType.getDisplayName() + " list");
         }
 		
 		ServletUtils.setResponseContentForSuccess(response, "text/html", content);

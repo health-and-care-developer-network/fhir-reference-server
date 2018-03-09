@@ -27,8 +27,8 @@ public abstract class VelocityTemplate {
 		this.resourceName = resourceName;
 	}
 	
-	public String getHtml() {
-		VelocityContext context = sharedShellTemplate.getContext(contentTemplateName, resourceType, resourceName);
+	public String getHtml(String crawlerDescription) {
+		VelocityContext context = sharedShellTemplate.getContext(contentTemplateName, resourceType, resourceName, crawlerDescription);
 		updateContext(context);
 		return sharedShellTemplate.merge(context);
 	}
