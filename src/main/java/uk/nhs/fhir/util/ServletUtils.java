@@ -1,9 +1,12 @@
 package uk.nhs.fhir.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -13,7 +16,13 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ServletUtils {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ServletUtils.class.getName());
 	
     /**
      * Simple XML syntax highlight
@@ -43,5 +52,57 @@ public class ServletUtils {
     	String xmlString = result.getWriter().toString();
     	return xmlString;
     }
+    
+    public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, String contentString) {
+    	setResponseContentForSuccess(response, contentType, new StringResponseContentWriter(contentString));
+    }
 
+	public static void setResponseContentForSuccess(HttpServletResponse response, String contentType, File contentFile) {
+		setResponseContentForSuccess(response, contentType, new FileResponseContentWriter(contentFile));
+	}
+	
+	private static void setResponseContentForSuccess(HttpServletResponse response, String contentType, ResponseContentWriter<?> contentWriter) {
+		try {
+			response.setStatus(200);
+			response.setContentType(contentType);
+			contentWriter.write(response);
+    	} catch (IOException e) {
+    		LOG.error(e.getMessage());
+		}
+	}
+
+}
+
+abstract class ResponseContentWriter<T> {
+	protected final T content;
+	
+	public ResponseContentWriter(T content) {
+		this.content = content;
+	}
+	
+	abstract void write(HttpServletResponse response) throws IOException;
+}
+
+class StringResponseContentWriter extends ResponseContentWriter<String> {
+	
+	public StringResponseContentWriter(String content) {
+		super(content);
+	}
+
+	@Override
+	void write(HttpServletResponse response) throws IOException {
+		response.getWriter().append(content);
+	}
+}
+
+class FileResponseContentWriter extends ResponseContentWriter<File> {
+	
+	public FileResponseContentWriter(File content) {
+		super(content);
+	}
+
+	@Override
+	void write(HttpServletResponse response) throws IOException {
+		FileUtils.copyFile(content, response.getOutputStream());
+	}
 }

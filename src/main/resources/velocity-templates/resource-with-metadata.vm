@@ -3,7 +3,7 @@
 	#if( $hasGeneratedMetadataFromRenderer )
 		#parse( "/velocity-templates/resource-metadata-from-renderer.vm" )
 	#else
-		#if( $type == "ValueSet" || $type == "OperationDefinition" )
+		#if( $resourceType == "ValueSet" || $resourceType == "OperationDefinition" )
 			#parse( "/velocity-templates/minimal-metadata.vm" )
 		#else
 			#parse( "/velocity-templates/resource-metadata.vm" )
@@ -17,7 +17,7 @@
 			    #if( $artefact.getArtefactType().getWeight() >= 0 )
 					#set ($tabname = $artefact.getArtefactType().getFilenameWithoutExtension())
 					<li><a $first href="#tabs-$tabname" onclick="loadTab('#tabs-$tabname', '$metadata.getResourceID()', '$metadata.getVersionNo()', 
-									'$artefact.getArtefactType().name()', '$baseURL');">$artefact.getArtefactType().getDisplayName()</a></li>
+									'$artefact.getArtefactType().name()', '$baseURL', '$metadata.getResourceType()');">$artefact.getArtefactType().getDisplayName()</a></li>
 					#set ($first = '')
 				#end
 			#end
@@ -40,7 +40,7 @@
 					<p>
 						<ul id="exampleBullets">
 						#foreach( $example in $examples )
-							<li><a href="/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
+							<li><a href="$baseURL/Examples/$example.getResourceName()">$example.getResourceName()</a></li>
 						#end
 						</ul>
 					</p>

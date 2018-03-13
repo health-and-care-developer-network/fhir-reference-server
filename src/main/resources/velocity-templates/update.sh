@@ -19,7 +19,7 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
 
 
   # Add custom styles
-  sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet"><link rel="stylesheet" href="\/style.css"\/>' devnet.html
+  sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet"><link rel="stylesheet" href="\/style\/style.css"\/>' devnet.html
 
   # Update breadcrumbs
   NEW_CRUMBS="#parse( \"\/velocity-templates\/breadcrumbs.vm\" )"

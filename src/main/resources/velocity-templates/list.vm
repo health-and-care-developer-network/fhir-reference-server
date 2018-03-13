@@ -15,8 +15,8 @@
 						<ul>
 							#foreach( $resource in $list )
 								<li class="resource-status-$resource.getStatus()">
-									<a href="$resource.getFhirVersion().getUrlPrefix()$resourceType/$resource.getResourceID()">$resource.getResourceName()</a> 
-										$resource.getFhirVersion().getLabel()
+									<a href="/$resource.getFhirVersion().getUrlPrefix()$resourceType/$resource.getResourceID()">$resource.getResourceName()</a> 
+										$resource.getFhirVersionLabel()
 										$resource.getStatus().getStatusLabel()
 								</li>
 							#end
