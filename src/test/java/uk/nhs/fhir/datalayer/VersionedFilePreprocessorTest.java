@@ -8,7 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
+
+import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.util.AbstractFhirFileLocator;
+import uk.nhs.fhir.util.FhirVersion;
 
 public class VersionedFilePreprocessorTest {
 
@@ -25,7 +30,17 @@ public class VersionedFilePreprocessorTest {
 	
 	@Test
 	public void testCopyOtherResources() throws IOException {
-		new VersionedFilePreprocessor(new PropertiesFhirFileLocator()).copyOtherResources(incomingFile.toPath(), outgoingFile.toPath());
+		new VersionedFilePreprocessor(new AbstractFhirFileLocator() {
+			@Override
+			public Path getSourceRoot(FhirVersion fhirVersion) {
+				throw new NotImplementedException();
+			}
+			
+			@Override
+			public Path getDestinationPathForResourceType(ResourceType type, FhirVersion version) {
+				throw new NotImplementedException();
+			}
+		}).copyOtherResources(incomingFile.toPath(), outgoingFile.toPath());
 		
 		// Check the supporting resources have been copied properly
 		assertTrue(expectedFile1.exists());
