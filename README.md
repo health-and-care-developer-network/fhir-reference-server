@@ -61,6 +61,14 @@ The server uses a temporary folder to hold imported artefacts. This should be de
 
 ## Release Notes
 
+> ### v1.1.0 (09/11/2017)
+> - Improve event dialog layout
+> - Remove superfluous file separator
+> - Update package organisation
+
+> ### v1.0.2 (14/12/2017)
+> - Minor refactoring around cached file storage
+
 > ### v1.0.1 (09/11/2017)
 > - Minor code tidying only
 

@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 
@@ -118,21 +119,34 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 
 	@Override
 	public void startRender() {
-		runRendererButton.setEnabled(false);
-		runRendererButton.setText("Running");
 
-		chooseRootDirectoryButton.setEnabled(false);
-		clearCacheButton.setEnabled(false);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				runRendererButton.setEnabled(false);
+				runRendererButton.setText("Running");
+
+				chooseRootDirectoryButton.setEnabled(false);
+				clearCacheButton.setEnabled(false);
+			}});
 	}
 
 	@Override
 	public void finishRender() {
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				runRendererButton.setText("Loading resources");
+				chooseRootDirectoryButton.setEnabled(true);
+			}});
+		
 		FilesystemIF.invalidateCache();
-		
-		runRendererButton.setEnabled(true);
-		runRendererButton.setText("Run renderer");
-		
-		chooseRootDirectoryButton.setEnabled(true);
-		clearCacheButton.setEnabled(true);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				runRendererButton.setEnabled(true);
+				runRendererButton.setText("Run renderer");
+				
+				clearCacheButton.setEnabled(true);
+			}});
 	}
 }
