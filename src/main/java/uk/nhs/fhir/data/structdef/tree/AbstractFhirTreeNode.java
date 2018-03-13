@@ -1,7 +1,6 @@
 package uk.nhs.fhir.data.structdef.tree;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> extends CloneableTreeNode<T, U> {
@@ -29,7 +28,7 @@ public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U
 	}
 
 	private boolean isDirectlyRemovedByProfile() {
-		return getData().getMax().equals(Optional.of("0"));
+		return getData().getMax().equals("0");
 	}
 
 	public boolean isRemovedByProfile() {

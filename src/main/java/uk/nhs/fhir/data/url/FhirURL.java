@@ -58,7 +58,8 @@ public abstract class FhirURL {
 	public static boolean isLogicalUrl(String url) {
 		return url.startsWith(FhirURLConstants.NHS_ID)
 		  || url.startsWith(FhirURLConstants.NHS_LOGICAL_URL_PREFIX)
-		  || url.equals(FhirURLConstants.SNOMED_ID);
+		  || url.equals(FhirURLConstants.SNOMED_ID)
+		  || url.startsWith("http://fhir.nhs.net/Id");
 	}
 	
 	public boolean isLogicalUrl() {

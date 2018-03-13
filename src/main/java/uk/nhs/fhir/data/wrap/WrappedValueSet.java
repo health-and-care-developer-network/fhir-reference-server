@@ -39,6 +39,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public abstract Optional<Boolean> getImmutable();
 	
 	public abstract boolean isSNOMED();
+	protected abstract void checkForUnexpectedFeatures();
 	
 	public void fixHtmlEntities() {
 		Optional<String> copyRight = getCopyright();

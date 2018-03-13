@@ -1,13 +1,11 @@
 package uk.nhs.fhir.data.wrap.stu3;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.dstu3.model.ConceptMap;
 import org.hl7.fhir.dstu3.model.Factory;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -42,9 +40,8 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 	private final ValueSet definition;
 
 	public WrappedStu3ValueSet(ValueSet definition) {
-		checkForUnexpectedFeatures(definition);
-		
 		this.definition = definition;
+		checkForUnexpectedFeatures();
 	}
 	
 	@Override
@@ -263,7 +260,7 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 		return include;
 	}
 	
-	public static void checkForUnexpectedFeatures(ValueSet definition) {
+	protected void checkForUnexpectedFeatures() {
 		// accessible features
 		// definition.getUrl();
 		// definition.getVersion();
@@ -325,22 +322,6 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 			checkNoInfoPresent(identifier.getType());
 			checkNoInfoPresent(identifier.getPeriod());
 			checkNoInfoPresent(identifier.getAssigner());
-		}
-	}
-
-	private static void checkNoInfoPresent(Object o) {
-		if (o instanceof Collection<?>) {
-			if (!((Collection<?>) o).isEmpty()) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
-		} else if (o instanceof Base) {
-			if (!((Base) o).isEmpty()) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
-		} else {
-			if (o != null) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
 		}
 	}
 

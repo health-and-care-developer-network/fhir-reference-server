@@ -10,17 +10,22 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.collect.Lists;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.ContactPointDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystem;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConceptDesignation;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.Compose;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeConcept;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeIncludeFilter;
+import ca.uhn.fhir.model.dstu2.resource.ValueSet.Contact;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
+import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcept;
 import uk.nhs.fhir.data.codesystem.FhirCodeSystemConcepts;
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
@@ -39,6 +44,7 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 	
 	public WrappedDstu2ValueSet(ValueSet definition) {
 		this.definition = definition;
+		checkForUnexpectedFeatures();
 	}
 
 	@Override
@@ -282,4 +288,69 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
 			.anyMatch(include -> FhirURLConstants.SNOMED_ID.equals(include.getSystem()));
 	}
 
+	@Override
+	protected void checkForUnexpectedFeatures() {
+		definition.getUrl();
+		definition.getIdentifier();
+		definition.getVersion();
+		definition.getNameElement();
+		definition.getStatusElement();
+		definition.getExperimental();
+		definition.getPublisherElement();
+		for (Contact contact : definition.getContact()) {
+			contact.getNameElement();
+			for (@SuppressWarnings("unused") ContactPointDt telecom : contact.getTelecom()) {
+				
+			}
+		}
+		definition.getDateElement();
+		definition.getLockedDateElement();
+		definition.getDescriptionElement();
+		for (@SuppressWarnings("unused") CodeableConceptDt useContext : definition.getUseContext()) {
+			
+		}
+		definition.getImmutableElement();
+		definition.getRequirementsElement();
+		definition.getCopyrightElement();
+		definition.getExtensibleElement();
+		
+		CodeSystem codeSystem = definition.getCodeSystem();
+		if (!codeSystem.isEmpty()) {
+			codeSystem.getSystemElement();
+			codeSystem.getVersionElement();
+			codeSystem.getCaseSensitiveElement();
+			for (CodeSystemConcept concept : codeSystem.getConcept()) {
+				concept.getCodeElement();
+				concept.getAbstractElement();
+				concept.getDisplayElement();
+				concept.getDefinitionElement();
+				for (CodeSystemConceptDesignation designation : concept.getDesignation()) {
+					designation.getLanguageElement();
+					designation.getUse();
+					designation.getValueElement();
+				}
+				for (@SuppressWarnings("unused") CodeSystemConcept linkedConcept : concept.getConcept()) {
+					
+				}
+			}
+		}
+		
+		Compose compose = definition.getCompose();
+		if (!compose.isEmpty()) {
+			for (@SuppressWarnings("unused") UriDt uri : compose.getImport()) {
+				
+			}
+			for (ComposeInclude include : compose.getInclude()) {
+				include.getSystemElement();
+				include.getVersionElement();
+				for (ComposeIncludeConcept concept : include.getConcept()) {
+					concept.getCodeElement();
+					concept.getDisplayElement();
+					for (@SuppressWarnings("unused") CodeSystemConceptDesignation designation : concept.getDesignation()) {
+						
+					}
+				}
+			}
+		}
+	}
 }

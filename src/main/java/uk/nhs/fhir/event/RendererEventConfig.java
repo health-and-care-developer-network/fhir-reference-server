@@ -38,21 +38,24 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.DIFFERENTIAL_CHOICE_NODE_WRONG_ID, RendererEventResponse.LOG_WARNING);
 
+		// hit by DSTU2 (GPConnect)
+		responses.put(RendererEventType.VERSION_NOT_AVAILABLE, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.METADATA_NOT_AVAILABLE, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.MISSING_CARDINALITY, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.NO_DISCRIMINATORS_FOUND, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.SLICING_WITHOUT_DISCRIMINATOR, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.DSTU2_PARSE_VERSION_NUMBER_FAILURE, RendererEventResponse.LOG_WARNING);
+		
 		// Currently not hit
 		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.THROW);
-		responses.put(RendererEventType.METADATA_NOT_AVAILABLE, RendererEventResponse.THROW);
-		responses.put(RendererEventType.VERSION_NOT_AVAILABLE, RendererEventResponse.THROW);
-		responses.put(RendererEventType.NO_DISCRIMINATORS_FOUND, RendererEventResponse.THROW);
 		responses.put(RendererEventType.FIX_MISSING_TYPE_LINK, RendererEventResponse.THROW);
 		responses.put(RendererEventType.RESOURCE_WITHOUT_SNAPSHOT, RendererEventResponse.THROW);
-		responses.put(RendererEventType.SLICING_WITHOUT_DISCRIMINATOR, RendererEventResponse.THROW);
 		responses.put(RendererEventType.UNRESOLVED_DISCRIMINATOR, RendererEventResponse.THROW);
-		responses.put(RendererEventType.MISSING_CARDINALITY, RendererEventResponse.THROW);
 		responses.put(RendererEventType.HL7_URL_WITHOUT_DSTU2, RendererEventResponse.THROW);
 		responses.put(RendererEventType.EMPTY_TYPE_LINKS, RendererEventResponse.THROW);
 		responses.put(RendererEventType.LINK_WITH_LOGICAL_URL, RendererEventResponse.THROW);
 		responses.put(RendererEventType.EXTENSION_FILE_NOT_FOUND, RendererEventResponse.THROW);
-		responses.put(RendererEventType.STAND_IN_BINDING_DESCRIPTION_NOT_REMOVED, RendererEventResponse.THROW);
 		responses.put(RendererEventType.LINK_REFERENCES_ITSELF, RendererEventResponse.THROW);
 		responses.put(RendererEventType.MISSING_REFERENCED_NODE, RendererEventResponse.THROW);
 		responses.put(RendererEventType.USER_TYPE_WITHOUT_CONSTRAINED_TYPE, RendererEventResponse.THROW);

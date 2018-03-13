@@ -103,6 +103,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
         String resourceID = getIdFromUrl().orElse(name);
         String displayGroup = baseType;
         VersionNumber versionNo = parseVersionNumber();
+        
         String status = getStatus();
         
         return new ResourceMetadata(name, source, ResourceType.STRUCTUREDEFINITION,

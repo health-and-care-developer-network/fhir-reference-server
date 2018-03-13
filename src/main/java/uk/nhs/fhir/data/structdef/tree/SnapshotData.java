@@ -6,10 +6,11 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
-import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.url.LinkDatas;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class SnapshotData extends AbstractFhirTreeNodeData {
@@ -21,6 +22,16 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 			String information, List<ConstraintInfo> constraints, String path, FhirElementDataType dataType,
 			FhirVersion version) {
 		super(id, name, flags, typeLinks, information, constraints, path, dataType, version);
+
+		if (min == null) {
+			EventHandlerContext.forThread().event(RendererEventType.MISSING_CARDINALITY, "min missing for node " + path);
+			min = 0;
+		}
+		if (max == null) {
+			EventHandlerContext.forThread().event(RendererEventType.MISSING_CARDINALITY, "max missing for node " + path);
+			max = "*";
+		}
+		
 		this.min = Preconditions.checkNotNull(min);
 		this.max = Preconditions.checkNotNull(max);
 	}
@@ -35,25 +46,12 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 	}
 	
 	@Override
-	public FhirCardinality getCardinality() {
-		return new FhirCardinality(min, max);
-	}
-	
-	@Override
-	public Optional<Integer> getMin() {
-		return Optional.of(min);
-	}
-	
-	public Integer expectMin() {
+	public Integer getMin() {
 		return min;
 	}
 	
 	@Override
-	public Optional<String> getMax() {
-		return Optional.of(max);
-	}
-	
-	public String expectMax() {
+	public String getMax() {
 		return max;
 	}
 

@@ -25,8 +25,8 @@ public interface AbstractFhirTreeTableContent extends HasMappings, HasSlicingInf
 
 	public ResourceFlags getResourceFlags();
 
-	public Optional<Integer> getMin();
-	public Optional<String> getMax();
+	public Integer getMin();
+	public String getMax();
 	/**
 	 * True if a node doesn't contain ANY cardinality information
 	 */

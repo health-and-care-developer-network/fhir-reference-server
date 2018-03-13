@@ -1,11 +1,13 @@
 package uk.nhs.fhir.data.wrap;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
@@ -28,6 +30,8 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
@@ -200,10 +204,33 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	}
 
 	protected VersionNumber parseVersionNumber() {
+		if (!getVersion().isPresent()
+		  && getImplicitFhirVersion().equals(FhirVersion.DSTU2)) {
+			EventHandlerContext.forThread().event(RendererEventType.DSTU2_PARSE_VERSION_NUMBER_FAILURE, "No version number present for " + getName());
+    		return new VersionNumber("1.0.0");
+		}
+		
     	try {
     		return new VersionNumber(getVersion().get());
     	} catch (Exception e) {
-    		throw new IllegalStateException("Failed to load " + getResourceType().getDisplayName() + " version number", e);
+        	throw new IllegalStateException("Failed to load " + getResourceType().getDisplayName() + " version number", e);
     	}
+	}
+
+
+	protected void checkNoInfoPresent(Object o) {
+		if (o instanceof Collection<?>) {
+			if (!((Collection<?>) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		} else if (o instanceof Base) {
+			if (!((Base) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		} else {
+			if (o != null) {
+				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		}
 	}
 }

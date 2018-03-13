@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
-import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
@@ -91,29 +90,6 @@ public class DifferentialData extends AbstractFhirTreeNodeData implements HasBac
 	public boolean useBackupCardinality() {
 		return !min.isPresent() && !max.isPresent();
 	}
-
-	public FhirCardinality getCardinality() {
-		if (min.isPresent() && max.isPresent()) {
-			return new FhirCardinality(min.get(), max.get());
-		} else {
-			/*try {
-				Integer resolvedMin = min.orElse(backupNode.getData().getMin().get());
-				String resolvedMax = max.orElse(backupNode.getData().getMax().get());
-				return new FhirCardinality(resolvedMin, resolvedMax);
-			} catch (NullPointerException | NoSuchElementException e) {
-				if (!backupNode.getData().getMin().isPresent()
-				  || !backupNode.getData().getMax().isPresent()) {
-					EventHandlerContext.forThread().event(RendererEventType.MISSING_CARDINALITY, "Missing cardinality for " + getPath() + ": " + min + ".." + max, Optional.of(e));
-					return new FhirCardinality(0, "*");
-				} else {
-					throw e;
-				}
-			}*/
-			Integer resolvedMin = min.orElse(backupNode.getData().expectMin());
-			String resolvedMax = max.orElse(backupNode.getData().expectMax());
-			return new FhirCardinality(resolvedMin, resolvedMax);
-		}
-	}
 	
 	@Override
 	public boolean useBackupTypeLinks() {
@@ -139,12 +115,12 @@ public class DifferentialData extends AbstractFhirTreeNodeData implements HasBac
 		}
 	}
 	
-	public Optional<Integer> getMin() {
-		return min;
+	public Integer getMin() {
+		return min.orElse(backupNode.getData().getMin());
 	}
 	
-	public Optional<String> getMax() {
-		return max;
+	public String getMax() {
+		return max.orElse(backupNode.getData().getMax());
 	}
 
 	@Override

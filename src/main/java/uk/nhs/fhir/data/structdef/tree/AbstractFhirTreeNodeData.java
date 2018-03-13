@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
 import uk.nhs.fhir.data.structdef.ExtensionType;
+import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
@@ -365,5 +366,10 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	@Override
 	public String toString() {
 		return getPath();
+	}
+	
+	@Override
+	public FhirCardinality getCardinality() {
+		return new FhirCardinality(getMin(), getMax());
 	}
 }

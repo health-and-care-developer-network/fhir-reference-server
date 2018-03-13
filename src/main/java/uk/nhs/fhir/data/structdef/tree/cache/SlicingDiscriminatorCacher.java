@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.structdef.tree.cache;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -47,8 +48,16 @@ public class SlicingDiscriminatorCacher<T extends AbstractFhirTreeNodeData, U ex
 			//  Return a map? Consider ordering for node key?
 			throw new IllegalStateException("Need to implement handling multiple discriminators");
 		}
-		
-		String discriminatorPath = discriminatorPaths.iterator().next();
+
+		String discriminatorPath;
+		try {
+			discriminatorPath = discriminatorPaths.iterator().next();
+		} catch (NoSuchElementException ex) {
+			String warning = "Didn't find any discriminators to identify " + node.getPath() + " (likely caused by previous error)";
+			EventHandlerContext.forThread().event(RendererEventType.NO_DISCRIMINATORS_FOUND, warning);
+			node.getData().setDiscriminatorValue("<missing>");
+			return;
+		}
 
 		List<String> discriminators = findDiscriminators(node, discriminatorPath);
 		

@@ -1,12 +1,10 @@
 package uk.nhs.fhir.data.wrap.stu3;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.dstu3.model.CodeSystem;
 import org.hl7.fhir.dstu3.model.CodeSystem.CodeSystemFilterComponent;
 import org.hl7.fhir.dstu3.model.CodeSystem.CodeSystemHierarchyMeaning;
@@ -38,9 +36,8 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	private final CodeSystem definition;
 	
 	public WrappedStu3CodeSystem(CodeSystem source) {
-		checkForUnexpectedFeatures(source);
-		
 		this.definition = source;
+		checkForUnexpectedFeatures();
 	}
 	
 	public String getNameUnsafe() {
@@ -235,7 +232,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		return Optional.ofNullable(definition.getContent().getDisplay());
 	}
 	
-	public static void checkForUnexpectedFeatures(CodeSystem definition) {
+	public void checkForUnexpectedFeatures() {
 		// accessible features
 		// source.getUrl();
 		// source.getVersion();
@@ -284,21 +281,5 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		// can eyeball with real data rather than test data.
 		checkNoInfoPresent(definition.getFilter());
 		
-	}
-
-	private static void checkNoInfoPresent(Object o) {
-		if (o instanceof Collection<?>) {
-			if (!((Collection<?>) o).isEmpty()) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
-		} else if (o instanceof Base) {
-			if (!((Base) o).isEmpty()) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
-		} else {
-			if (o != null) {
-				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
-			}
-		}
 	}
 }
