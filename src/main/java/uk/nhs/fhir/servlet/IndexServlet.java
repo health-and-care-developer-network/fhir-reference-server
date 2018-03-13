@@ -48,9 +48,14 @@ public class IndexServlet extends HttpServlet {
     	
 		// Render the home page
 		String baseUrl = request.getContextPath();
-    	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
-		String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml(INDEX_CRAWLER_DESCRIPTION);
-    	
-		ServletUtils.setResponseContentForSuccess(response, "text/html", content);
+		
+		try {
+	    	HashMap<String, Integer> resourceCounts = resourceCountsProvider.getResourceTypeCounts();
+			String content = new HomePageTemplate(baseUrl, resourceCounts).getHtml(INDEX_CRAWLER_DESCRIPTION);
+	    	
+			ServletUtils.setResponseContentForSuccess(response, "text/html", content);
+		} catch (Exception e) {
+			SharedServletContext.getErrorHandler().handleError(e, request, response);
+		}
 	}
 }

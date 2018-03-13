@@ -56,22 +56,26 @@ public abstract class HapiRequestHandler extends RestfulServer {
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
 		
-		if ((requestURI.equals("") || requestURI.equals("/"))
-		  && Strings.isNullOrEmpty(request.getQueryString())) {
-    		// delegate to index page servlet
-			RequestDispatcher rd = getServletContext().getNamedDispatcher(IndexServlet.class.getName());
-			try {
-				rd.forward(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
+		try {
+			if ((requestURI.equals("") || requestURI.equals("/"))
+			  && Strings.isNullOrEmpty(request.getQueryString())) {
+	    		// delegate to index page servlet
+				RequestDispatcher rd = getServletContext().getNamedDispatcher(IndexServlet.class.getName());
+				try {
+					rd.forward(request, response);
+				} catch (ServletException | IOException e) {
+					e.printStackTrace();
+				}
+				return;
+	    	} else if (ClientType.getTypeFromHeaders(request).equals(ClientType.BROWSER)
+			  && !browserRequestsHandledByHapi.contains(requestURI)) {
+				
+				getServletContext().getNamedDispatcher(FhirBrowserRequestServlet.BROWSER_SERVLET_NAME).forward(request, response);;
+			} else {
+				super.service(request, response);
 			}
-			return;
-    	} else if (ClientType.getTypeFromHeaders(request).equals(ClientType.BROWSER)
-		  && !browserRequestsHandledByHapi.contains(requestURI)) {
-			
-			getServletContext().getNamedDispatcher(FhirBrowserRequestServlet.BROWSER_SERVLET_NAME).forward(request, response);;
-		} else {
-			super.service(request, response);
+		} catch (Exception e) {
+			SharedServletContext.getErrorHandler().handleError(e, request, response);
 		}
 	}
 	

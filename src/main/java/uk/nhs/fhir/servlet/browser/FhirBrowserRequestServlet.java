@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -40,7 +42,11 @@ import uk.nhs.fhir.page.list.ResourceListTemplate;
 import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
 import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.servlet.FhirResourceNotFoundException;
+import uk.nhs.fhir.servlet.RequestIdMissingException;
 import uk.nhs.fhir.servlet.SharedServletContext;
+import uk.nhs.fhir.servlet.UnhandledFhirOperationException;
+import uk.nhs.fhir.servlet.UnrecognisedFhirOperationException;
 import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
@@ -97,8 +103,15 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-    	LOG.debug("Received request for {}", request.getRequestURI());
+		try {
+			serviceMaybeThrow(request, response);
+		} catch (Exception e) {
+			SharedServletContext.getErrorHandler().handleError(e, request, response);
+		}
+	}
+	
+	protected void serviceMaybeThrow(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		LOG.debug("Received request for {}", request.getRequestURI());
     	
     	addCORSResponseHeaders(response);
 
@@ -235,13 +248,17 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		
         LOG.info("Request received - operation: " + requestOperation.orElse("[None]") + ", type: " + resourceType.toString());
         
+        if (!requestId.isPresent()) {
+        	throw new RequestIdMissingException();
+        }
+        
         String content;
 		if (!requestOperation.isPresent()) {
+			// request to view 
     		ResourceMetadata resourceEntityByID = data.getResourceEntityByID(requestVersion, requestId.get());
     		
     		if (resourceEntityByID == null) {
-    			// TODO: show a proper error page rather than stacktrace
-                throw new IllegalStateException("Couldn't find " + requestVersion.toString() + " resource " + requestId.get());
+                throw new FhirResourceNotFoundException(requestVersion, typeInRequest, requestId.get().getIdPart());
     		}
     		
     		String resourceName = resourceEntityByID.getResourceName();
@@ -267,14 +284,22 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 	                content = myResourcePageRenderer.renderSingleResource(requestVersion, serverBase, requestId.get(), resourceName, resourceType);
             }
         } else {
-        	// TODO: show a proper error page rather than stacktrace
-            throw new IllegalStateException("Don't know what to do for operation " + requestOperation.toString() 
-        		+ " from URL [" + request.getRequestURL() + "]"
-            	+ " with query string [" + request.getQueryString() + "]");
+        	String operation = requestOperation.get();
+			if (KNOWN_OPERATIONS.contains(operation)) {
+        		throw new UnhandledFhirOperationException(operation);
+        	} else {
+        		throw new UnrecognisedFhirOperationException(operation);
+        	}
         }
 
         ServletUtils.setResponseContentForSuccess(response, "text/html", content);
 	}
+	
+	private static final Set<String> KNOWN_OPERATIONS = ImmutableSet.copyOf(Lists.newArrayList("$validate", "$meta", "$meta-add", "$meta-delete", "$document", "$translate", "$closure",
+			"$everything", "$find", "$process-message", "$populate", "$questionnaire", "$expand", "$lookup", "$validate-code",
+			// STU3 additions
+			"$apply", "$data-requirements", "$data-requirements", "$subset", "$implements", "$conforms", "$subsumes", "$compose", "$evaluate-measure", "$stats", "$lastn", "$match", 
+			"$populatehtml", "$populatelink", "$transform"));
 
 	private void showListPage(FhirVersion version, HttpServletRequest request, HttpServletResponse response, ResourceType resourceType,
 			Map<String, String[]> params) {

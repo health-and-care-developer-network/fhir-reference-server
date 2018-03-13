@@ -80,6 +80,7 @@ public class FileCache {
     
     public static void invalidateCache() {
     	cacheNeedsUpdating = true;
+    	updateCache();
     }
     
     public static synchronized void clearCache() {
@@ -103,8 +104,9 @@ public class FileCache {
     
     private synchronized static void updateCache() {
         if(updateRequired()) {
-        	updateCacheForSpecificFhirVersion(FhirVersion.DSTU2);
-        	updateCacheForSpecificFhirVersion(FhirVersion.STU3);
+        	for (FhirVersion version : FhirVersion.getSupportedVersions()) {
+	        	updateCacheForSpecificFhirVersion(version);
+        	}
         	cacheNeedsUpdating = false;
         }
     }

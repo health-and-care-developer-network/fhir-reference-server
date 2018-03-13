@@ -14,6 +14,10 @@ public class SharedServletContext implements ServletContextListener {
 	public static FhirServerProperties getProperties() {
 		return (FhirServerProperties) sharedContext.getAttribute(FhirServerProperties.SERVLET_CONTEXT_PROPERTY_PROPERTIES);
 	}
+	
+	public static RequestErrorHandler getErrorHandler() {
+		return (RequestErrorHandler) sharedContext.getAttribute(RequestErrorHandler.SERVLET_CONTEXT_KEY);
+	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent destroyedEvent) {}

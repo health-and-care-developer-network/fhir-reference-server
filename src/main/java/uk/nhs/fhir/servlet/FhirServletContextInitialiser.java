@@ -16,5 +16,7 @@ public class FhirServletContextInitialiser {
 		ConfigPathSupplier configPathSupplier = new EnvironmentPropertyConfigPathSupplier();
 		FhirServerProperties sharedProperties = new FhirServerProperties(configPathSupplier.get());
 		context.setAttribute(FhirServerProperties.SERVLET_CONTEXT_PROPERTY_PROPERTIES, sharedProperties);
+		
+		context.setAttribute(RequestErrorHandler.SERVLET_CONTEXT_KEY, new RequestErrorHandler());
 	}
 }
