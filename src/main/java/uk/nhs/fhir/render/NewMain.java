@@ -191,7 +191,8 @@ public class NewMain {
         		copyGeneratedArtefacts();
         	} 
         	
-        	if (!succeeded || eventHandler.foundWarnings()) {
+        	if (eventHandler.isDeferred() 
+        	  && (!succeeded || eventHandler.foundWarnings())) {
         		LOG.info("Displaying event messages");
         		
         		eventHandler.displayOutstandingEvents();

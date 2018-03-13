@@ -6,6 +6,7 @@ import uk.nhs.fhir.event.AbstractEventHandler;
 
 public abstract class AbstractRendererEventHandler extends AbstractEventHandler {
 	
+	public abstract boolean isDeferred();
 	public abstract void displayOutstandingEvents();
 	protected abstract void logImpl(String info, Optional<Exception> throwable);
 	protected abstract void errorImpl(Optional<String> info, Optional<Exception> error);

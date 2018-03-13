@@ -103,4 +103,9 @@ public abstract class RendererEventAccumulator extends AbstractRendererEventHand
 		
 		return String.join("\n", combinedInfo);
 	}
+	
+	@Override
+	public boolean isDeferred() {
+		return true;
+	}
 }

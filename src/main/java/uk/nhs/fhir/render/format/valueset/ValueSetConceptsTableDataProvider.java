@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.format.valueset;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
@@ -70,7 +71,8 @@ public class ValueSetConceptsTableDataProvider {
 	                	if (mapElement.getTargets().isEmpty()) {
 	                		throw new IllegalStateException("Concept map includes matching code " + code + " but didn't include any targets");
 	                	} else if (mapElement.getTargets().size() > 1) {
-                			throw new IllegalStateException("Concept map contains multiple targets for code " + code + ". How should this be displayed?");
+	                		String targetsDesc = mapElement.getTargets().stream().map(target -> target.getCode()).collect(Collectors.joining(", "));
+                			throw new IllegalStateException("Concept map contains multiple targets for code " + code + " (" + targetsDesc + "). How should this be displayed?");
                 		} 
 	                		
                 		String newMappedCode = "~" + mapElement.getTargets().get(0).getCode();
