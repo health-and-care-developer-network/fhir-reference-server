@@ -20,14 +20,14 @@ import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
-import uk.nhs.fhir.makehtml.DefaultRendererFileLocator;
-import uk.nhs.fhir.makehtml.FormattedOutputSpec;
-import uk.nhs.fhir.makehtml.RendererFileLocator;
-import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.render.HTMLDocSection;
-import uk.nhs.fhir.makehtml.render.ResourceFormatter;
-import uk.nhs.fhir.makehtml.render.ResourceFormatterFactory;
-import uk.nhs.fhir.makehtml.render.SectionedHTMLDoc;
+import uk.nhs.fhir.render.DefaultRendererFileLocator;
+import uk.nhs.fhir.render.FormattedOutputSpec;
+import uk.nhs.fhir.render.RendererFileLocator;
+import uk.nhs.fhir.render.format.HTMLDocSection;
+import uk.nhs.fhir.render.format.ResourceFormatter;
+import uk.nhs.fhir.render.format.ResourceFormatterFactory;
+import uk.nhs.fhir.render.format.SectionedHTMLDoc;
+import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -57,7 +57,7 @@ public class TestStructureDefinition {
 			Path dummyPath = Paths.get("this/path/isnt/used");
 			RendererFileLocator renderingFileLocator = new DefaultRendererFileLocator(dummyPath, dummyPath, dummyPath);
 			
-			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, renderingFileLocator, null)) {
+			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, renderingFileLocator)) {
 				ResourceFormatter<?> formatter = formatSpec.getFormatter();
 				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {
