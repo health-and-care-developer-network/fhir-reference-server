@@ -15,6 +15,7 @@ public interface FhirCSS {
 	public static final String RESOURCE_FLAG = "fhir-resource-flag";
 	public static final String LIST = "fhir-list";
 
+	public static final String TREE = "fhir-tree-table";
 	public static final String TREE_CELL = "fhir-tree-cell";
 	public static final String TREE_ICON = "fhir-tree-icon";
 	public static final String TREE_ICONS = "fhir-tree-icons";

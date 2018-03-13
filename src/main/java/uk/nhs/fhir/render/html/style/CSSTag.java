@@ -57,4 +57,5 @@ public interface CSSTag {
 	public static final String CLEAR = "clear";
 	public static final String DISPLAY = "display";
 	
+	public static final String TABLE_LAYOUT = "table-layout";
 }

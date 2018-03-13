@@ -59,7 +59,7 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 	}
 
 	public Table asTable() {
-		return new Table(getColumns(), getRows());
+		return new Table(getColumns(), getRows(), Lists.newArrayList(FhirCSS.TREE));
 	}
 	
 	private List<TableTitle> getColumns() {

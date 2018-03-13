@@ -18,14 +18,20 @@ import uk.nhs.fhir.render.html.style.FhirFont;
 public class Table {
 	private final List<TableTitle> cols = Lists.newArrayList();
 	private final List<TableRow> rows = Lists.newArrayList();
+	private final List<String> additionalClasses = Lists.newArrayList();
 	
 	public Table(List<TableTitle> cols) {
 		this(cols, Lists.newArrayList());
 	}
 	
 	public Table(List<TableTitle> cols, List<TableRow> rows) {
+		this(cols, rows, Lists.newArrayList());
+	}
+	
+	public Table(List<TableTitle> cols, List<TableRow> rows, List<String> additionalClasses) {
 		this.cols.addAll(cols);
 		this.rows.addAll(rows);
+		this.additionalClasses.addAll(additionalClasses);
 	}
 	
 	public void addRow(TableRow row) {
@@ -41,8 +47,11 @@ public class Table {
 		rows.forEach((TableRow row) -> rowElements.add(row.makeRow()));
 		//rows.forEach((TableRow row) -> rowElements.add(applyMaxWidths(row.makeRow())));
 		
+		List<String> classes = Lists.newArrayList(FhirCSS.TABLE);
+		classes.addAll(additionalClasses);
+		
 		return Elements.withAttributeAndChildren("table",
-			new Attribute("class", FhirCSS.TABLE),
+			new Attribute("class", String.join(" ", classes)),
 			Lists.newArrayList(
 				Elements.withChild("thead",
 					Elements.withAttributeAndChildren("tr", 
@@ -159,12 +168,18 @@ public class Table {
 		
 		// Styling hack to add space between thead and tbody
 		styles.add(new CSSStyleBlock(
-			Lists.newArrayList("." + FhirCSS.TABLE + " tbody:before"),
+			Lists.newArrayList("." + FhirCSS.TABLE + "." + FhirCSS.TREE + " tbody:before"),
 			Lists.newArrayList(
 				new CSSRule(CSSTag.CONTENT, "'-'"),
 				new CSSRule(CSSTag.DISPLAY, "block"),
 				new CSSRule(CSSTag.LINE_HEIGHT, "1em"),
 				new CSSRule(CSSTag.COLOR, "transparent"))));
+
+		styles.add(new CSSStyleBlock(
+			Lists.newArrayList("." + FhirCSS.TREE),
+			Lists.newArrayList(
+				new CSSRule(CSSTag.TABLE_LAYOUT, "fixed"),
+				new CSSRule(CSSTag.WIDTH, "100%"))));
 		
 		return styles;
 	}

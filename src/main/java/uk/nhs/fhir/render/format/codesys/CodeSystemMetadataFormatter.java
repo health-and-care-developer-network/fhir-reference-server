@@ -121,9 +121,12 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 				labelledValueCell("Content", content, 1, true),
 				labelledValueCell("Experimental", experimentalDesc, 1, true),
 				labelledValueCell("Case Sensitive", caseSensitiveDesc, 1, true)));
-		tableContent.add(
-			Elements.withChildren("tr",
-				labelledValueCell("Hierarchy Meaning", hierarchyMeaning, 4, true)));
+		
+		if (!hierarchyMeaning.isEmpty()) {
+			tableContent.add(
+				Elements.withChildren("tr",
+					labelledValueCell("Hierarchy Meaning", hierarchyMeaning, 4, true)));
+		}
 		
 		if (!publishingOrgContacts.isEmpty()) {
 			List<Content> renderedPublishingOrgContacts = new FhirContactRenderer().getPublishingOrgContactsContents(publishingOrgContacts);
