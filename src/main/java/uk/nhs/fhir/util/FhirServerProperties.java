@@ -13,6 +13,8 @@
 */
 package uk.nhs.fhir.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -46,11 +48,22 @@ public class FhirServerProperties {
     	Properties properties = new Properties();
     	
     	//Load the property values into a local object from the property file.
-        try (InputStream in = FhirServerProperties.class.getClassLoader().getResourceAsStream(propertiesFile)){
-        	properties.load(in);
-        } catch (Exception ex) {
-        	throw new IllegalStateException("Error loading properties from file " + propertiesFile, ex);
-        }
+    	boolean absolute = (propertiesFile.startsWith("/") || 
+    	  (propertiesFile.length() > 1 && propertiesFile.charAt(1) == ':'));
+    	
+    	if (absolute) {
+    		try (FileInputStream in = new FileInputStream(new File(propertiesFile))) {
+	        	properties.load(in);
+	        } catch (Exception ex) {
+	        	throw new IllegalStateException("Error loading properties from file " + propertiesFile, ex);
+	        }
+    	} else {
+	        try (InputStream in = FhirServerProperties.class.getClassLoader().getResourceAsStream(propertiesFile)){
+	        	properties.load(in);
+	        } catch (Exception ex) {
+	        	throw new IllegalStateException("Error loading properties from file " + propertiesFile, ex);
+	        }
+    	}
         
         return properties;
     }
