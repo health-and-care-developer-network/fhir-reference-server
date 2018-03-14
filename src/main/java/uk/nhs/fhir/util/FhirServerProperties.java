@@ -13,62 +13,59 @@
 */
 package uk.nhs.fhir.util;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.base.Strings;
 
 /**
  * Convenience class to read configuration from a property file
  * @author Adam Hatherly
  */
 public class FhirServerProperties {
-	
-	private static final String PROPERTY_FILE = "fhirserver.config.properties";
-	private static final Logger LOG = LoggerFactory.getLogger(FhirServerProperties.class.getName());
-	
-    private static Properties defaultProperties;
+	public static final String SERVLET_CONTEXT_PROPERTY_PROPERTIES = "uk.nhs.fhir.servlet.properties-file";
 
-    // When this class is loaded by the JVM, immediately read the property file
-    static {
-    	defaultProperties = new Properties();
-    	
-    	String configFile = System.getenv("CONFIG_FILE");
-    	if (configFile == null) {
-    		
-    		initialise(defaultProperties, PROPERTY_FILE);
-    	} else if (configFile.length() == 0) {
-    		initialise(defaultProperties, PROPERTY_FILE);
-    	} else {
-    		System.out.println("Using custom configuration from: " + configFile);
-    		initialise(defaultProperties, configFile);
+	private static final String PROP_FAVICON_FILE_NAME = "faviconFile";
+	private static final String PROP_DEFAULT_PAGE_SIZE = "defaultPageSize";
+	private static final String PROP_MAX_PAGE_SIZE = "maximumPageSize";
+	private static final String PROP_RESOURCE_ROOT_PATH = "defaultResourceRootPath";
+	private static final String PROP_RESOURCE_FOLDER_PREFIX = "resourceFolderPrefix";
+	private static final String PROP_VELOCITY_TEMPLATE_PATH = "velocityTemplateDirectory";
+
+	private final Properties properties;
+	
+	public FhirServerProperties(String propertiesFile) {
+		this.properties = parseProperties(propertiesFile);
+	}
+	
+    public static Properties parseProperties(String propertiesFile) {
+    	if (Strings.isNullOrEmpty(propertiesFile)) {
+    		throw new IllegalArgumentException("Null properties File path");
     	}
-    }
-
-    /**
-     * Load the property values into a local object from the property file.
-     */
-    private static void initialise(Properties props, String filename) {
-        InputStream in = null;
+    	
+    	Properties properties = new Properties();
+    	
+    	//Load the property values into a local object from the property file.
+    	boolean absolute = (propertiesFile.startsWith("/") || 
+    	  (propertiesFile.length() > 1 && propertiesFile.charAt(1) == ':'));
+    	
+    	if (absolute) {
+    		try (FileInputStream in = new FileInputStream(new File(propertiesFile))) {
+	        	properties.load(in);
+	        } catch (Exception ex) {
+	        	throw new IllegalStateException("Error loading properties from file " + propertiesFile, ex);
+	        }
+    	} else {
+	        try (InputStream in = FhirServerProperties.class.getClassLoader().getResourceAsStream(propertiesFile)){
+	        	properties.load(in);
+	        } catch (Exception ex) {
+	        	throw new IllegalStateException("Error loading properties from file " + propertiesFile, ex);
+	        }
+    	}
         
-        try {
-        	in = FhirServerProperties.class.getClassLoader().getResourceAsStream(filename);
-            if (in != null) {
-            	props.load(in);
-            	in.close();
-            }
-        } catch (Exception ex) {
-        	LOG.error("Config file not found: " + filename);
-        } finally {
-            try {
-                if (in != null) {
-                	in.close();
-                }
-            } catch (IOException ex) {
-            }
-        }
+        return properties;
     }
 
     /**
@@ -76,16 +73,32 @@ public class FhirServerProperties {
      * @param propertyName Name of property to retrieve
      * @return Value of property
      */
-    public static String getProperty(String propertyName) {
-		String val =  defaultProperties.getProperty(propertyName);
-		if (val != null)
-			return val;
-		else
-			return null;
+    private Object getProperty(String propertyName) {
+		return properties.get(propertyName);
     }
 
-	public static Properties getProperties() {
-		return defaultProperties;
+    // Should only get called once on Velocity init, so okay to parse on request, rather than adding to ServletContext
+	public String getVelocityTemplatePath() {
+		return (String)getProperty(PROP_VELOCITY_TEMPLATE_PATH);
 	}
-
+    
+    public String getFaviconPath() {
+    	return (String)getProperty(PROP_FAVICON_FILE_NAME);
+    }
+    
+    public int getDefaultPageSize() {
+    	return Integer.parseInt((String)getProperty(PROP_DEFAULT_PAGE_SIZE));
+    }
+    
+    public int getMaxPageSize() {
+    	return Integer.parseInt((String)getProperty(PROP_MAX_PAGE_SIZE));
+    }
+    
+    public String getResourceRootPath() {
+    	return (String)getProperty(PROP_RESOURCE_ROOT_PATH);
+    }
+    
+    public String getResourceFolderPrefix() {
+    	return (String)getProperty(PROP_RESOURCE_FOLDER_PREFIX);
+    }
 }

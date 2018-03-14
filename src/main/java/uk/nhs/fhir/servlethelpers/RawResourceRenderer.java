@@ -11,24 +11,21 @@ import ca.uhn.fhir.context.FhirContext;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
-import uk.nhs.fhir.resourcehandlers.IResourceHelper;
-import uk.nhs.fhir.resourcehandlers.ResourceHelperFactory;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.text.FhirTextSectionHelpers;
 
 public class RawResourceRenderer {
 
     public String renderSingleWrappedRAWResourceWithoutText(IBaseResource resource, FhirVersion fhirVersion, String resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
-    	// Clear out the generated text
-    	IResourceHelper helper = ResourceHelperFactory.getResourceHelper(fhirVersion, resourceType);
-        resource = helper.removeTextSection(resource);
+        resource = FhirTextSectionHelpers.forVersion(fhirVersion).removeTextSection(resource);
         
         return renderSingleWrappedRAWResource(resource, fhirVersion, Optional.of(resourceName), resourceType, baseURL, mimeType);
     }
     
     public String renderSingleWrappedRAWResource(IBaseResource resource, FhirVersion fhirVersion, Optional<String> resourceName, ResourceType resourceType, String baseURL, MimeType mimeType) {
     	String rawResource = getRawResource(resource, mimeType, fhirVersion);
-        return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, rawResource, mimeType).getHtml();
+        return new RawResourceTemplate(Optional.of(resourceType.toString()), resourceName, rawResource, mimeType).getHtml("FHIR Server: Raw resource (" + resourceName.orElse(resource.getIdElement().getValueAsString()) + ")");
     }
     
     public String getRawResource(IBaseResource resource, MimeType mimeType, FhirVersion fhirVersion) {

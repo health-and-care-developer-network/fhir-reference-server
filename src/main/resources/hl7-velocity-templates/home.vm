@@ -99,3 +99,5 @@
 		<li><a href="/metadata">Download conformance resource for this FHIR server</a></li>
 	</ul>
 	-->
+	<p>&nbsp;</p>
+	<p><small>Download conformance resource for this FHIR server: <a href="/metadata">DSTU2</a> | <a href="/STU3/metadata">STU3</a></small></p>

@@ -4,6 +4,7 @@ import static uk.nhs.fhir.util.ServletUtils.syntaxHighlight;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,9 +16,9 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.enums.MimeType;
+import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.page.raw.RawResourceTemplate;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 import uk.nhs.fhir.util.ServletUtils;
 
 public class ServletStreamExample {
@@ -45,7 +46,7 @@ public class ServletStreamExample {
 			MimeType mimeType = null;
 			
 			// Indent XML
-			if (srcFile.getName().toLowerCase().endsWith("xml")) {
+			if (srcFile.getName().toLowerCase(Locale.UK).endsWith("xml")) {
 				mimeType = MimeType.XML;
 				try {
 					String prettyPrinted = ServletUtils.prettyPrintXML(fileContent);
@@ -56,14 +57,14 @@ public class ServletStreamExample {
 				}
 				// Pretty print XML
 				fileContent = syntaxHighlight(fileContent);
-			} else if (srcFile.getName().toLowerCase().endsWith("json")) {
+			} else if (srcFile.getName().toLowerCase(Locale.UK).endsWith("json")) {
 				mimeType = MimeType.JSON;
 			} else {
 				mimeType = MimeType.UNKNOWN_MIME;
 			}
 			
 			String resourceType = ResourceType.EXAMPLES.toString();
-			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), fileContent, mimeType).getHtml();
+			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), fileContent, mimeType).getHtml("FHIR Server: Example resource (" + exampleEntity.getResourceName() + ")" );
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {

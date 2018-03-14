@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.nhs.fhir.datalayer;
+package uk.nhs.fhir.unused;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.resource.ValueSet;
 import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
@@ -29,18 +30,15 @@ import ca.uhn.fhir.model.dstu2.resource.ValueSet.CodeSystemConcept;
  * @author Adam Hatherly
  */
 public class ValueSetCodesCache {
-    private static List<cacheObject> _cache;
-    private static ValueSetCodesCache _instance = null;
+    private static List<CacheObject> _cache = Lists.newArrayList();
+    private static final ValueSetCodesCache _instance = new ValueSetCodesCache();
 
     /**
      * Method to get our one instance of this object.
      * 
      * @return the singleton instance of our cache.
      */
-    public static ValueSetCodesCache getInstance() {
-        if(_instance == null) {
-            _instance = new ValueSetCodesCache();
-        }
+    public static synchronized ValueSetCodesCache getInstance() {
         return _instance;
     }
     
@@ -52,25 +50,23 @@ public class ValueSetCodesCache {
     public void cacheValueSet(ValueSet theSet) {
         
         // First we should remove any items previously added from this ValueSet
-        for(cacheObject cacheItem : _cache) {
-            if(cacheItem._valueSetID.equals(theSet.getId().getIdPart())) {
-                _cache.remove(cacheItem);
+        for(CacheObject cacheItem : _cache) {
+        	if (cacheItem._valueSetID.equals(theSet.getId().getIdPart())) {
+        		_cache.remove(cacheItem);
             }
         }
         
         // Now we simply iterate through the ValueSet, adding each code we come across.
         List<CodeSystemConcept> codes = theSet.getCodeSystem().getConcept();
         for(CodeSystemConcept code : codes) {
-            _cache.add(new cacheObject(code.getCode(), theSet.getId().getIdPart()));
+            _cache.add(new CacheObject(code.getCode(), theSet.getId().getIdPart()));
         }
     }
     
     /**
-     * Constructor which is never directly called, instead, getInstance should be called.
+     * Constructor which is never called (use getInstance()).
      */
-    private ValueSetCodesCache() {
-        _cache = new ArrayList<>();
-    }   
+    private ValueSetCodesCache() {}
     
     /**
      * Method to return a list of the ValueSets which contain a definition of the
@@ -88,9 +84,9 @@ public class ValueSetCodesCache {
      * @return A List of ValueSet IDs, where this code was found.
      */
     public static List<String> findCode(String code) {
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = Lists.newArrayList();
         
-        for(cacheObject cacheItem : _cache) {
+        for(CacheObject cacheItem : _cache) {
             if(cacheItem._code.equals(code)) {
                 matches.add(cacheItem._valueSetID);
             }
@@ -103,9 +99,9 @@ public class ValueSetCodesCache {
      * code, and the ValueSet ID.
      * 
      */
-    private class cacheObject {
-        protected String _code;
-        protected String _valueSetID;
+    private static class CacheObject {
+    	protected String _code;
+    	protected String _valueSetID;
 
         /**
          * Constructor.
@@ -113,9 +109,9 @@ public class ValueSetCodesCache {
          * @param newCode
          * @param newValueSetID
          */
-        public cacheObject(String newCode, String newValueSetID) {
-            this._code = newCode;
-            this._valueSetID = newValueSetID;
+        public CacheObject(String newCode, String newValueSetID) {
+        	this._code = newCode;
+        	this._valueSetID = newValueSetID;
         }
     }
 }

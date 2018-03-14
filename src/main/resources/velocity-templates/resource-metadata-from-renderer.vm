@@ -1,5 +1,6 @@
 	<div class='metadataSection'>
-		<div id='metadataFromGenerator' resourceID='$metadata.getResourceID()'
+		<div id='metadataFromGenerator' resourceType='$metadata.getResourceType()', 
+				resourceID='$metadata.getResourceID()'
 				version='$metadata.getVersionNo()' metadataType='$!metadataType'
 				baseURL='$baseURL'></div>
 

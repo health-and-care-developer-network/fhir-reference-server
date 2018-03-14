@@ -11,22 +11,24 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.datalayer.collections.ResourceFileFinder;
-import uk.nhs.fhir.makehtml.FhirFileParser;
+import uk.nhs.fhir.load.FhirFileParser;
+import uk.nhs.fhir.load.FileLoader;
+import uk.nhs.fhir.load.XmlFileFinder;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.DateUtils;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFilePreprocessor {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(VersionedFilePreprocessor.class.getName());
 
-	private static final ResourceFileFinder resourceFileFinder = new ResourceFileFinder();
+	private static final XmlFileFinder resourceFileFinder = new XmlFileFinder();
 	private static final FhirFileParser parser = new FhirFileParser();
 
 	private AbstractFhirFileLocator fhirFileLocator;  
@@ -65,9 +67,6 @@ public class VersionedFilePreprocessor {
                 }
                 
                 if (versionNo == null) {
-                	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
-                	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
-                } else if (!versionNo.isValid()) {
                 	addMessage("[!] FAILED to load: " + thisFile.getName() + " (" + resourceType + ") - Version number was missing or invalid");
                 	LOG.error("Unable to process file as it is has an invalid version: " + thisFile.getName());
                 } else if (resourceID == null) {
@@ -111,8 +110,10 @@ public class VersionedFilePreprocessor {
 	 * 
 	 * @param source Original filename
 	 * @param dest New filename of resource
+	 * @throws IOException 
 	 */
-	protected void copyOtherResources(Path source, Path dest) {
+	protected void copyOtherResources(Path source, Path dest) throws IOException {
+		source = Preconditions.checkNotNull(source);
 		
 		Path oldDir = source.getParent();
 		String oldName = FileLoader.removeFileExtension(source.getFileName().toString());
@@ -121,25 +122,18 @@ public class VersionedFilePreprocessor {
 		Path newDir = dest.getParent();
 		String newName = FileLoader.removeFileExtension(dest.getFileName().toString());
 		File targetDir = newDir.resolve(newName).toFile();
-		//System.out.println(targetDir.getAbsolutePath());
 		
-		if(sourceDir.exists()
-		  && sourceDir.isDirectory()) { 
-			try {
-				// Create target dir
-				FileUtils.forceMkdir(sourceDir);
-				
-				// Now, loop through and copy any files into the target directory
-	            File[] fileList = sourceDir.listFiles();
-	            if (fileList != null) {
-	    	        for (File thisFile : fileList) {
-	    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);
-	    	        }
-	            }
-			} catch (IOException e) {
-				LOG.error("Unable to copy supporting resources!");
-				e.printStackTrace();
-			}
+		if (sourceDir.isDirectory()) { 
+			// Create target dir
+			FileUtils.forceMkdir(sourceDir);
+			
+			// Now, loop through and copy any files into the target directory
+            File[] fileList = sourceDir.listFiles();
+            if (fileList != null) {
+    	        for (File thisFile : fileList) {
+    	        	FileUtils.copyFileToDirectory(thisFile, targetDir);
+    	        }
+            }
 		}
 	}
 

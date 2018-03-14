@@ -16,16 +16,16 @@ import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirVersion;
 
-public abstract class AbstractResourceProvider implements IResourceProvider, IResourceHelper {
+public class ResourceProvider implements IResourceProvider {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractResourceProvider.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ResourceProvider.class.getName());
 
     protected final FilesystemIF dataSource;
     protected final ResourceType resourceType;
     protected final FhirVersion fhirVersion;
     protected final Class<? extends IBaseResource> fhirClass;
 
-    public AbstractResourceProvider(FilesystemIF dataSource, ResourceType resourceType, FhirVersion fhirVersion, Class<? extends IBaseResource> fhirClass) {
+    public ResourceProvider(FilesystemIF dataSource, ResourceType resourceType, FhirVersion fhirVersion, Class<? extends IBaseResource> fhirClass) {
     	this.dataSource = dataSource;
         this.resourceType = resourceType;
         this.fhirVersion = fhirVersion;

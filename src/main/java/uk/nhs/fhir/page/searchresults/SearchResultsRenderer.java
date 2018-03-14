@@ -31,6 +31,6 @@ public class SearchResultsRenderer {
         	throw new IllegalStateException("Expected name or name:contains to be present in params");
         }
 
-		return new SearchResultsTemplate(resourceType, list).getHtml();
+		return new SearchResultsTemplate(resourceType, list).getHtml("FHIR Server " + resourceType + " Search Results");
 	}
 }

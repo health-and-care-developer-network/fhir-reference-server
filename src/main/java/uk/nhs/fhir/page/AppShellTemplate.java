@@ -7,7 +7,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
-import uk.nhs.fhir.util.FhirServerProperties;
+import uk.nhs.fhir.servlet.SharedServletContext;
 
 public class AppShellTemplate { 
 
@@ -15,7 +15,7 @@ public class AppShellTemplate {
 	private static final Template template;
 	
 	static {
-		templateDirectory = FhirServerProperties.getProperty("templateDirectory");
+		templateDirectory = SharedServletContext.getProperties().getVelocityTemplatePath();
 		String templateName = "app-shell.vm";
 		
     	try {
@@ -25,12 +25,13 @@ public class AppShellTemplate {
     	}
 	}
 	
-	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName) {
+	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName, String crawlerDescription) {
 		VelocityContext context = new VelocityContext();
 
     	context.put( "contentTemplateName", templateDirectory + contentTemplateName );
     	context.put( "resourceType", resourceType.orElse(null) );
     	context.put( "resourceName", resourceName.orElse(null) );
+    	context.put( "crawlerDescription", crawlerDescription);
     	
     	return context;
 	}

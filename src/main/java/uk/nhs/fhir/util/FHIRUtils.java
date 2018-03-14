@@ -16,20 +16,16 @@
 package uk.nhs.fhir.util;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-import org.hl7.fhir.dstu3.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Conformance;
-import ca.uhn.fhir.model.dstu2.resource.OperationDefinition;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.resource.ValueSet.ComposeInclude;
-import uk.nhs.fhir.FhirURLConstants;
+import ca.uhn.fhir.parser.IParser;
+import uk.nhs.fhir.load.FileLoader;
 
 public class FHIRUtils {
 
@@ -40,10 +36,6 @@ public class FHIRUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(FHIRUtils.class.getName());
 
-    private static FhirContext ctxDSTU2 = FhirContexts.forVersion(FhirVersion.DSTU2);
-    private static FhirContext ctxSTU3 = FhirContexts.forVersion(FhirVersion.STU3);
-
-
     /**
      * Method to load a fhir resource from a file.
      * 
@@ -51,41 +43,20 @@ public class FHIRUtils {
      * @return A resource object
      */
     public static IBaseResource loadResourceFromFile(FhirVersion fhirVersion, final File file) {
-        IBaseResource resource = null;
-        try {
-        	FileReader fr = new FileReader(file);
-        	
-        	if (fhirVersion.equals(FhirVersion.DSTU2)) {
-        		resource = ctxDSTU2.newXmlParser().parseResource(fr);
-        	} else if (fhirVersion.equals(FhirVersion.STU3)) {
-        		resource = ctxSTU3.newXmlParser().parseResource(fr);
-        	}
-            String url = null;
+    	
+    	// ensure that we throw for unhandled FHIR Version by calling this before the try/catch
+    	IParser xmlParser = FhirContexts.xmlParser(fhirVersion);
+    	
+    	IBaseResource resource = null;
+        LOG.debug("Loading resource from file: " + file.getName());
+        try (InputStreamReader fr = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
+			resource = xmlParser.parseResource(fr);
             
-            LOG.debug("Parsed resource and identified it's class as: " + resource.getClass().getName());
-
-            // To get the URL we need to cast this to a concrete type
-            if (resource instanceof StructureDefinition) {
-            	url = ((StructureDefinition)resource).getUrl();
-            } else if (resource instanceof ca.uhn.fhir.model.dstu2.resource.ValueSet) {
-            	url = ((ca.uhn.fhir.model.dstu2.resource.ValueSet)resource).getUrl();
-            } else if (resource instanceof OperationDefinition) {
-            	url = ((OperationDefinition)resource).getUrl();
-            } else if (resource instanceof Conformance) {
-            	url = ((Conformance)resource).getUrl();
-            } 
+            LOG.debug("Parsed resource and identified its class as: " + resource.getClass().getName());
             
-            else if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
-            	url = ((org.hl7.fhir.dstu3.model.StructureDefinition)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.ValueSet) {
-            	url = ((org.hl7.fhir.dstu3.model.ValueSet)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.OperationDefinition) {
-            	url = ((org.hl7.fhir.dstu3.model.OperationDefinition)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.CodeSystem) {
-            	url = ((org.hl7.fhir.dstu3.model.CodeSystem)resource).getUrl();
-            } else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
-            	url = ((org.hl7.fhir.dstu3.model.ConceptMap)resource).getUrl();
-            }
+            // getUrl() is declared on each class individually.
+            // Avoids a big if/else block
+            String url = FhirReflectionUtils.expectUrlByReflection(resource);
             
             // If we can't get the ID from the URL for some reason, fall back on using the filename as the ID
             String id = FileLoader.removeFileExtension(file.getName());
@@ -93,66 +64,15 @@ public class FHIRUtils {
             	id = getResourceIDFromURL(url, id);
             }
             resource.setId(id);
-            
-        } catch (Exception e) {
+
+        } catch (IOException | RuntimeException e) {
             e.printStackTrace();
         }
-        LOG.debug("Resource loaded from file: " + file.getName());
+        
         return resource;
     }
     
-    public static boolean isValueSetSNOMED(ca.uhn.fhir.model.dstu2.resource.ValueSet vs) {
-    	if (vs.getCompose() != null
-    	  && vs.getCompose().getInclude() != null) {
-    		
-			List<ComposeInclude> includeList = vs.getCompose().getInclude();
-			
-			for (ComposeInclude includeEntry : includeList) {
-				
-				if (includeEntry.getSystem() != null
-				  && includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-			
-					return true;
-				}
-			}
-    	}
-    	
-    	return false;
-    }
-    
-    public static boolean isSTU3ValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
-				for (ConceptSetComponent includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-							return true;
-						}
-					}
-				}
-    		}
-    	}
-    	return false;
-    }
-    
-    public static boolean isValueSetSNOMED(org.hl7.fhir.dstu3.model.ValueSet vs) {
-    	if (vs.getCompose() != null) {
-    		if (vs.getCompose().getInclude() != null) {
-    			List<ConceptSetComponent> includeList = vs.getCompose().getInclude();
-				for (ConceptSetComponent includeEntry : includeList) {
-					if (includeEntry.getSystem() != null) {
-						if (includeEntry.getSystem().equals(FhirURLConstants.SNOMED_ID)) {
-							return true;
-						}
-					}
-				}
-    		}
-    	}
-    	return false;
-    }
-    
-    public static String getResourceIDFromURL(String url, String def) {
+    private static String getResourceIDFromURL(String url, String def) {
     	// Find the actual name of the resource from the URL
         int idx = url.lastIndexOf('/');
         if (idx > -1) {

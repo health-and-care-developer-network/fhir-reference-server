@@ -16,7 +16,6 @@
 package uk.nhs.fhir.datalayer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,11 +26,12 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import ca.uhn.fhir.model.primitive.IdDt;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.util.FHIRUtils;
 import uk.nhs.fhir.util.FhirVersion;
@@ -61,7 +61,7 @@ public class FilesystemIF {
      * @return 
      */
     public IBaseResource getResourceByID(FhirVersion fhirVersion, IIdType theId) {
-    	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    	ResourceMetadata entry = FileCache.getSingleResourceByID(fhirVersion, theId);
     	if (entry != null) {
 	    	File path = entry.getResourceFile();
 	    	LOG.debug("Getting Resource with id=" + theId.getIdPart() + " looking for file: " + path.getAbsolutePath());
@@ -75,20 +75,24 @@ public class FilesystemIF {
     
     public ResourceMetadata getResourceEntityByID(FhirVersion fhirVersion, IIdType theId) {
     	String idPart = theId.getIdPart();
-		String versionIdPart = theId.getVersionIdPart();
-		ResourceEntityWithMultipleVersions getversionsByID = FileCache.getversionsByID(fhirVersion, idPart, versionIdPart);
+		ResourceType resourceType = ResourceType.getTypeFromHAPIName(theId.getResourceType());
+		ResourceEntityWithMultipleVersions versionsByID = FileCache.getversionsByID(fhirVersion, idPart, resourceType);
+		
+		if (versionsByID == null) {
+			return null;
+		}
 		
 		if (theId.hasVersionIdPart()) {
-    		VersionNumber version = new VersionNumber(versionIdPart);
-    		return getversionsByID.getSpecificVersion(version);
+    		VersionNumber version = new VersionNumber(theId.getVersionIdPart());
+    		return versionsByID.getSpecificVersion(version);
     	} else {
-    		return getversionsByID.getLatest();
+    		return versionsByID.getLatest();
     	}
     	
     }
     
     public ResourceEntityWithMultipleVersions getVersionsByID(FhirVersion fhirVersion, IIdType theId) {
-    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), theId.getVersionIdPart());
+    	return FileCache.getversionsByID(fhirVersion, theId.getIdPart(), ResourceType.getTypeFromHAPIName(theId.getResourceType()));
     }
 
     /**
@@ -111,7 +115,7 @@ public class FilesystemIF {
     				String theNamePart, int theFromIndex, int theToIndex) {
         LOG.info("Getting " + resourceType.name() + " resources with name containing: " + theNamePart);
         
-        List<IBaseResource> list = new ArrayList<IBaseResource>();
+        List<IBaseResource> list = Lists.newArrayList();
         List<ResourceMetadata> matchingIDs = getAllResourceIDforResourcesMatchingNamePattern(fhirVersion, resourceType, theNamePart);
 
         int counter = 0;
@@ -140,7 +144,7 @@ public class FilesystemIF {
 	public List<IBaseResource> getResourceMatchByURL(FhirVersion fhirVersion, ResourceType resourceType, String theURL,
 															int theFromIndex, int theToIndex) {
 		List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
-        ArrayList<IBaseResource> matches = new ArrayList<IBaseResource>();
+        List<IBaseResource> matches = Lists.newArrayList();
         int counter = 0;
         for (ResourceMetadata entry : resourceList) {
         	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
@@ -192,7 +196,7 @@ public class FilesystemIF {
     public List<ResourceMetadata> getExtensions()  {
     	LOG.info("Getting all Extensions");
         
-    	List<ResourceMetadata> result = new ArrayList<ResourceMetadata>();
+    	List<ResourceMetadata> result = Lists.newArrayList();
     	
     	for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
     		result.addAll(FileCache.getExtensions(fhirVersion));
@@ -235,7 +239,7 @@ public class FilesystemIF {
         List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
         
         // Now filter the list to those matching our criteria
-        ArrayList<ResourceMetadata> matches = new ArrayList<ResourceMetadata>();
+        List<ResourceMetadata> matches = Lists.newArrayList();
         
         String pattern = "(.*)" + theNamePart + "(.*)";
         
@@ -255,7 +259,7 @@ public class FilesystemIF {
         return matches;
     }
     
-	public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
+	public List<ResourceMetadata> getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
 		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	
@@ -276,7 +280,7 @@ public class FilesystemIF {
 					Integer i = results.get(type);
 					results.put(type, i + 1);
 				} else {
-					results.put(type, new Integer(1));
+					results.put(type, 1);
 				}
 			}
 		}

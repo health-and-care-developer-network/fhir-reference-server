@@ -5,7 +5,7 @@ FROM jetty:9.3.12-jre8-alpine
 ENV CONFIG_FILE ""
 
 # Adds war into the image
-ADD ./target/fhir-1.0.1-SNAPSHOT.war /var/lib/jetty/webapps/ROOT.war
+ADD ./target/fhir-1.1.0-SNAPSHOT.war /var/lib/jetty/webapps/ROOT.war
 
 # Create a non-root user for our FHIR server to run as
 RUN adduser -D -u 1000 fhir

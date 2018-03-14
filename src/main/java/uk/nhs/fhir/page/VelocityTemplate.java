@@ -11,7 +11,7 @@ public abstract class VelocityTemplate {
 	
 	static {
 		// As good a place as any to initialise velocity
-		Velocity.init(FhirServerProperties.getProperties());
+		Velocity.init(FhirServerProperties.parseProperties("velocity.properties"));
 	}
 
 	private static final AppShellTemplate sharedShellTemplate = new AppShellTemplate();
@@ -27,8 +27,8 @@ public abstract class VelocityTemplate {
 		this.resourceName = resourceName;
 	}
 	
-	public String getHtml() {
-		VelocityContext context = sharedShellTemplate.getContext(contentTemplateName, resourceType, resourceName);
+	public String getHtml(String crawlerDescription) {
+		VelocityContext context = sharedShellTemplate.getContext(contentTemplateName, resourceType, resourceName, crawlerDescription);
 		updateContext(context);
 		return sharedShellTemplate.merge(context);
 	}

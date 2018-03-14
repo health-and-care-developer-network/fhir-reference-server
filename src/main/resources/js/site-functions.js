@@ -34,19 +34,20 @@ function setupLinkInterceptsInTabs() {
 }
 
 // http://localhost:8080/artefact?resourceID=gpconnect-appointment-1&artefactType=DIFFERENTIAL
-function loadTab(tabID, resourceID, resourceVersion, artefactType, baseURL) {
-	$( tabID ).load( fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
+function loadTab(tabID, resourceID, resourceVersion, artefactType, baseURL, resourceType) {
+	$( tabID ).load( fixBaseURL(baseURL)+"/artefact?resourceType="+resourceType+"&resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+artefactType,
 			setupLinkInterceptsInTabs);
 }
 
 function loadMetadata() {
 	baseURL = $('#metadataFromGenerator').attr('baseURL');
+	resourceType = $('#metadataFromGenerator').attr('resourceType');
 	resourceID = $('#metadataFromGenerator').attr('resourceID');
 	resourceVersion = $('#metadataFromGenerator').attr('version');
 	metadataType = $('#metadataFromGenerator').attr('metadataType');
 	if (typeof metadataType !== typeof undefined && metadataType !== false) {
 		$('#metadataFromGenerator').load(
-				fixBaseURL(baseURL)+"/artefact?resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+metadataType,
+				fixBaseURL(baseURL)+"/artefact?resourceType="+resourceType+"&resourceID="+resourceID+"&resourceVersion="+resourceVersion+"&artefactType="+metadataType,
 				addExpandCollapseForMetadata);
 	}
 }

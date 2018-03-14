@@ -1,4 +1,4 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.servlet;
 
 import java.io.IOException;
 
@@ -12,10 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
-import uk.nhs.fhir.util.FhirServerProperties;
 
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = {"*.css", "*.ico", "*.png", "*.gif", "*.js"}, displayName = "Static content Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/favicon.ico", "/images/*", "/js/*", "/style/*"}, displayName = "Static content Servlet", loadOnStartup = 1)
 public class StaticContentServlet extends HttpServlet {
 	private static Logger LOG = LoggerFactory.getLogger(StaticContentServlet.class.getName());
 	
@@ -25,7 +24,7 @@ public class StaticContentServlet extends HttpServlet {
 
         LOG.info("Requested URI: " + request.getRequestURI() + " handled by Static content Servlet");
         
-        String requestedPath = request.getRequestURI().substring(5);
+        String requestedPath = request.getRequestURI();
         String stu3Prefix = "/STU3/";
 		if (requestedPath.startsWith(stu3Prefix)) {
 			requestedPath = requestedPath.substring(stu3Prefix.length());
@@ -36,7 +35,7 @@ public class StaticContentServlet extends HttpServlet {
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         } else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", SharedServletContext.getProperties().getFaviconPath());
         } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());

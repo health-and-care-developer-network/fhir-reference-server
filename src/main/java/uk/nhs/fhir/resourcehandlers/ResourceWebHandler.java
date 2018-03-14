@@ -18,21 +18,19 @@ package uk.nhs.fhir.resourcehandlers;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.nhs.fhir.FhirRequestServlet;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
-import uk.nhs.fhir.datalayer.collections.ExampleResources;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
+import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
 import uk.nhs.fhir.util.FhirVersion;
 
 /**
@@ -54,7 +52,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
         LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
         
-        if (ArrayUtils.contains(FhirRequestServlet.getIndexedTypes(), resourceType)) {
+        if (FhirBrowserRequestServlet.isIndexedType(resourceType)) {
             if (resourceType == ResourceType.STRUCTUREDEFINITION) {
             	return myDataSource.getAllResourceNamesByBaseResource(resourceType);
             } else {
@@ -99,10 +97,10 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         return resource;
     }
 
-    public ExampleResources getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
+    public List<ResourceMetadata> getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
         LOG.debug("Called: ResourceWebHandler.getExamples(String resourceTypeAndID)");
         
-        ExampleResources examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);
+        List<ResourceMetadata> examples = myDataSource.getExamples(fhirVersion, resourceTypeAndID);
         return examples;
     }
     

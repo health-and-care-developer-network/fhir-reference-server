@@ -54,6 +54,23 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 
 ## Release Notes
 
+> ### v1.0.3 (13/03/2018)
+> - improve error handling when servicing a request
+> - add web crawler descriptions
+> - refactor properties provider into an object held on shared servlet context
+> - fix unclosed InputStream resource leak
+> - fix bug identifying latest active resource
+> - depend on abstraction of event handler so that server/renderer can supply alternatives
+> - various minor bug fixes prompted by FindBugs
+> - refactor file finding code (remove duplication)
+> - remove some unused code
+
+> ### v1.0.2 (14/12/2017)
+> - fix incorrect content type
+> - prevent name clashes between resources with different types
+> - refactor back into multiple servlets
+> - move css resources into a dedicated directory
+
 > ### v1.0.1 (09/11/2017)
 > - Include ConceptMaps and CodeSystems on the index page
 > - Handle most queries via a single servlet, delegating to HAPI FHIR for non-browser queries

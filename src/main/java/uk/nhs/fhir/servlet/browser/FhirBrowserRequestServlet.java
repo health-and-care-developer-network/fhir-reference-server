@@ -1,13 +1,15 @@
-package uk.nhs.fhir;
+package uk.nhs.fhir.servlet.browser;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.rest.api.Constants;
@@ -38,28 +42,37 @@ import uk.nhs.fhir.page.list.ResourceListTemplate;
 import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
 import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
 import uk.nhs.fhir.resourcehandlers.ResourceWebHandler;
+import uk.nhs.fhir.servlet.FhirResourceNotFoundException;
+import uk.nhs.fhir.servlet.RequestIdMissingException;
+import uk.nhs.fhir.servlet.SharedServletContext;
+import uk.nhs.fhir.servlet.UnhandledFhirOperationException;
+import uk.nhs.fhir.servlet.UnrecognisedFhirOperationException;
 import uk.nhs.fhir.servlethelpers.RawResourceRenderer;
 import uk.nhs.fhir.servlethelpers.ServletStreamArtefact;
 import uk.nhs.fhir.servlethelpers.ServletStreamExample;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 import uk.nhs.fhir.util.FhirContexts;
-import uk.nhs.fhir.util.FhirServerProperties;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ServletUtils;
 
 @SuppressWarnings("serial")
 @WebServlet(
-	urlPatterns = {
-		//"/CodeSystem/*", "/ConceptMap/*", "/StructureDefinition/*", "/OperationDefinition/*", "/Extensions/*", "/ValueSets/*",	// index pages
-		"/*", 						//DSTU2 delegated paths + index pages
-		"/3.0.1/*", "/STU3/*"		//STU3 delegated paths
-		}, 
+	urlPatterns = {"/browser"},
+	name = "BROWSER",
 	displayName = "FHIR Servlet", 
-	loadOnStartup = 1)
-public class FhirRequestServlet extends HttpServlet {
-	private static final Logger LOG = LoggerFactory.getLogger(FhirRequestServlet.class);
+	loadOnStartup = 3)
+public class FhirBrowserRequestServlet extends HttpServlet {
+	private static final Logger LOG = LoggerFactory.getLogger(FhirBrowserRequestServlet.class);
+
+	public static final String BROWSER_SERVLET_NAME = "BROWSER";
+	public static final String DSTU2_SERVLET_NAME = "DSTU2";
+	public static final String STU3_SERVLET_NAME = "STU3";
 	
-	private final Map<FhirVersion, FhirRequestHandler> delegateHandlers = new ConcurrentHashMap<>();
+	private static final Map<FhirVersion, String> delegateServletNames = Maps.newConcurrentMap();
+	static {
+		delegateServletNames.put(FhirVersion.DSTU2, DSTU2_SERVLET_NAME);
+		delegateServletNames.put(FhirVersion.STU3, STU3_SERVLET_NAME);
+	}
 	
 	private final ResourceWebHandler data;
 	private final RawResourceRenderer myRawResourceRenderer;
@@ -67,7 +80,7 @@ public class FhirRequestServlet extends HttpServlet {
 	private final ServletStreamArtefact myArtefactStreamer;
 	private final ServletStreamExample exampleStreamer;
 	
-	public FhirRequestServlet() {
+	public FhirBrowserRequestServlet() {
 		FilesystemIF dataSource = SharedDataSource.get();
 		
 		data = new ResourceWebHandler(dataSource);
@@ -75,23 +88,14 @@ public class FhirRequestServlet extends HttpServlet {
 		myResourcePageRenderer = new ResourcePageRenderer(data);
 		myArtefactStreamer = new ServletStreamArtefact(dataSource);
 		exampleStreamer = new ServletStreamExample(dataSource);
-		
 	}
 	
-	public void init() throws ServletException {
-		for (FhirVersion version : FhirVersion.getSupportedVersions()) {
-			FhirRequestHandler requestHandler = new FhirRequestHandler(version);
-			try {
-				// sharing config for now. Could use servlet holders at this level if necessary to give each its own context.
-				LOG.info("adding requestHandler for " + version.toString());
-				requestHandler.init(getServletConfig());
-				delegateHandlers.put(version, requestHandler);
-			} catch (ServletException se) {
-				LOG.error("Error initialising FHIR request handler for {} requests", version.toString(), se);
-			}
-		}
-    }
-	
+	private RequestDispatcher getDelegateDispatcher(FhirVersion fhirVersion) {
+		String delegateName = delegateServletNames.get(fhirVersion);
+		RequestDispatcher dispatcher = getServletContext().getNamedDispatcher(delegateName);
+		return dispatcher;
+	}
+
 	protected void addCORSResponseHeaders(HttpServletResponse response) {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Expose-Headers", "Content-Location,Location");
@@ -99,30 +103,25 @@ public class FhirRequestServlet extends HttpServlet {
 	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-    	LOG.debug("Received request for {}", request.getRequestURI());
-    	
-    	// TODO: turn into an interceptor
-    	if (request.getRequestURI().equals("/InvalidateCache")) {
-    		if (request.getRemoteHost().equals("127.0.0.1")
-    		  || request.getRemoteHost().equals("0:0:0:0:0:0:0:1")
-    		  || request.getRemoteHost().equals("localhost")) {
-    			FilesystemIF.invalidateCache();
-    		} else {
-    			response.sendError(403, "Only available on local machine");
-    		}
-    		return;
-    	}
+		try {
+			serviceMaybeThrow(request, response);
+		} catch (Exception e) {
+			SharedServletContext.getErrorHandler().handleError(e, request, response);
+		}
+	}
+	
+	protected void serviceMaybeThrow(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		LOG.debug("Received request for {}", request.getRequestURI());
     	
     	addCORSResponseHeaders(response);
-    	
-    	if(request.getRequestURI().endsWith(".css")) {
+
+    	if (request.getRequestURI().endsWith(".css")) {
             // Stylesheets
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
         	return;
         } else if (request.getRequestURI().endsWith("favicon.ico")) {
         	// favicon.ico
-        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", FhirServerProperties.getProperty("faviconFile"));
+        	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", SharedServletContext.getProperties().getFaviconPath());
         	return;
         } else if (request.getRequestURI().startsWith("/images/") 
           || request.getRequestURI().startsWith("/js/")) {
@@ -144,20 +143,26 @@ public class FhirRequestServlet extends HttpServlet {
 
 	// Types for which index pages exist
 	// TODO: can we include Extensions here?
-	private static final ResourceType[] INDEXED_TYPES = new ResourceType[] {
+	private static final List<ResourceType> INDEXED_TYPES = Lists.newArrayList(
 		ResourceType.STRUCTUREDEFINITION,
 		ResourceType.VALUESET,
 		ResourceType.OPERATIONDEFINITION,
 		ResourceType.CONCEPTMAP,
-		ResourceType.CODESYSTEM};
+		ResourceType.CODESYSTEM);
 	
-	public static ResourceType[] getIndexedTypes() {
-		return INDEXED_TYPES;
+	public static boolean isIndexedType(ResourceType type) {
+		return INDEXED_TYPES.contains(type);
 	}
 
 	private void serviceBrowserRequest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String fullUri = request.getRequestURI();
+		
+		// trim trailing slash to avoid failure to handle e.g. .../StructureDefinition/
+		if (fullUri.endsWith("/") && !fullUri.equals("/")) {
+			fullUri = fullUri.substring(0, fullUri.length()-1);
+		}
+		
 		if (fullUri.equals("/dataLoadStatusReport")) {
         	String profileLoadMessages = DataLoaderMessages.getProfileLoadMessages();
 			ServletUtils.setResponseContentForSuccess(response, "text/plain", profileLoadMessages);
@@ -189,17 +194,6 @@ public class FhirRequestServlet extends HttpServlet {
 			}
 		}
 		
-		if (uriAfterBase.equals("/metadata")) {
-			try {
-				LOG.info("Delegating metadata request to delegate Handler for version " + requestVersion.toString());
-				FhirRequestHandler fhirRequestHandler = delegateHandlers.get(requestVersion);
-				fhirRequestHandler.service(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
-			}
-			return;
-		}
-		
 		if (uriAfterBase.startsWith("/artefact")) {
         	try {
 				myArtefactStreamer.streamArtefact(request, response, requestVersion);
@@ -221,7 +215,7 @@ public class FhirRequestServlet extends HttpServlet {
 		Map<String, String[]> params = getSafeParameterMap(request);
 		
 		// Pages that display a list of resources, whether as an index or the results of a search
-		for (ResourceType type : getIndexedTypes()) {
+		for (ResourceType type : INDEXED_TYPES) {
 			if (uriAfterBase.equals("/" + type.getHAPIName())) {
 				if (uriAfterBase.equals(fullUri)) {
 					showListPage(requestVersion, request, response, type, params);
@@ -252,11 +246,21 @@ public class FhirRequestServlet extends HttpServlet {
     	
 		ResourceType resourceType = ResourceType.getTypeFromHAPIName(typeInRequest);
 		
-        LOG.info("Request received - operation: " + requestOperation.toString() + ", type: " + resourceType.toString());
+        LOG.info("Request received - operation: " + requestOperation.orElse("[None]") + ", type: " + resourceType.toString());
+        
+        if (!requestId.isPresent()) {
+        	throw new RequestIdMissingException();
+        }
         
         String content;
 		if (!requestOperation.isPresent()) {
+			// request to view 
     		ResourceMetadata resourceEntityByID = data.getResourceEntityByID(requestVersion, requestId.get());
+    		
+    		if (resourceEntityByID == null) {
+                throw new FhirResourceNotFoundException(requestVersion, typeInRequest, requestId.get().getIdPart());
+    		}
+    		
     		String resourceName = resourceEntityByID.getResourceName();
 
         	String[] formatParams = params.get("_format");
@@ -280,14 +284,22 @@ public class FhirRequestServlet extends HttpServlet {
 	                content = myResourcePageRenderer.renderSingleResource(requestVersion, serverBase, requestId.get(), resourceName, resourceType);
             }
         } else {
-        	// TODO: show a proper error page rather than stacktrace
-            throw new IllegalStateException("Don't know what to do for operation " + requestOperation.toString() 
-        		+ " from URL [" + request.getRequestURL() + "]"
-            	+ " with query string [" + request.getQueryString() + "]");
+        	String operation = requestOperation.get();
+			if (KNOWN_OPERATIONS.contains(operation)) {
+        		throw new UnhandledFhirOperationException(operation);
+        	} else {
+        		throw new UnrecognisedFhirOperationException(operation);
+        	}
         }
 
         ServletUtils.setResponseContentForSuccess(response, "text/html", content);
 	}
+	
+	private static final Set<String> KNOWN_OPERATIONS = ImmutableSet.copyOf(Lists.newArrayList("$validate", "$meta", "$meta-add", "$meta-delete", "$document", "$translate", "$closure",
+			"$everything", "$find", "$process-message", "$populate", "$questionnaire", "$expand", "$lookup", "$validate-code",
+			// STU3 additions
+			"$apply", "$data-requirements", "$data-requirements", "$subset", "$implements", "$conforms", "$subsumes", "$compose", "$evaluate-measure", "$stats", "$lastn", "$match", 
+			"$populatehtml", "$populatelink", "$transform"));
 
 	private void showListPage(FhirVersion version, HttpServletRequest request, HttpServletResponse response, ResourceType resourceType,
 			Map<String, String[]> params) {
@@ -295,14 +307,14 @@ public class FhirRequestServlet extends HttpServlet {
 		// We are showing a list of matching resources for the specified name query
 		if (params.containsKey("name")) {
 			List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name")[0]);
-			content = new SearchResultsTemplate(resourceType, list).getHtml();
+			content = new SearchResultsTemplate(resourceType, list).getHtml("FHIR Server: " + resourceType.getDisplayName() + " search results");
         } else if (params.containsKey("name:contains")) {
         	List<ResourceMetadata> list = data.getAllNames(version, resourceType, params.get("name:contains")[0]);
-        	content = new SearchResultsTemplate(resourceType, list).getHtml();
+        	content = new SearchResultsTemplate(resourceType, list).getHtml("FHIR Server: " + resourceType.getDisplayName() + " search results");
         } else {
         	// We want to show a grouped list of resources of a specific type (e.g. StructureDefinitions)
         	HashMap<String, List<ResourceMetadata>> groupedResources = data.getAGroupedListOfResources(resourceType);
-        	content = new ResourceListTemplate(resourceType, groupedResources).getHtml();
+        	content = new ResourceListTemplate(resourceType, groupedResources).getHtml("FHIR Server: Full " + resourceType.getDisplayName() + " list");
         }
 		
 		ServletUtils.setResponseContentForSuccess(response, "text/html", content);
@@ -324,7 +336,7 @@ public class FhirRequestServlet extends HttpServlet {
 		}
 		
 		try {
-			delegateHandlers.get(requestVersion).service(request, response);
+			getDelegateDispatcher(requestVersion).forward(request, response);
 		} catch (ServletException | IOException e) {
 			e.printStackTrace();
 		}
@@ -432,13 +444,13 @@ public class FhirRequestServlet extends HttpServlet {
 		if (Strings.isNullOrEmpty(queryString)) {
 			return Maps.newHashMap();
 		}
-		/*else if  (request.getMethod().toLowerCase().equals("post") 
+		/*else if  (request.getMethod().toLowerCase(Locale.UK).equals("post") 
 		  && isNotBlank(contentType)
 		  && contentType.startsWith(Constants.CT_X_FORM_URLENCODED)) {
 			String requestBody = new String(requestDetails.loadRequestContents(), Constants.CHARSET_UTF8);
 			params = UrlUtil.parseQueryStrings(theRequest.getQueryString(), requestBody);
 		}*/
-		else if (request.getMethod().toLowerCase().equals("get")) {
+		else if (request.getMethod().toLowerCase(Locale.UK).equals("get")) {
 			return UrlUtil.parseQueryString(queryString);
 		} else {
 			return Maps.newHashMap();

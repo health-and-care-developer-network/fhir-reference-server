@@ -12,9 +12,9 @@ import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.util.AbstractFhirFileLocator;
 import uk.nhs.fhir.util.FhirVersion;
-import uk.nhs.fhir.util.FileLoader;
 
 public class VersionedFolderImportWriter implements ImportListener {
 
@@ -31,8 +31,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 		Path outputDirectory = ensureVersionedFolderExists(resource);
 		ResourceMetadata metadata = resource.getMetadata(sourceFile);
 		VersionNumber versionNo = metadata.getVersionNo();
-		if (versionNo != null 
-		  && versionNo.isValid()) {
+		if (versionNo != null) {
 			File newFile = outputDirectory.resolve(metadata.getVersionedFileName()).toFile();
         	
 			try {
@@ -43,7 +42,7 @@ public class VersionedFolderImportWriter implements ImportListener {
 				LOG.error("Failed to copy files to versioned folder", e);
 			}
 		} else {
-			LOG.error("Failed to import file " + sourceFile.getPath() + " due to invalid version " + versionNo);
+			LOG.error("Failed to import file " + sourceFile.getPath() + " due to null version");
 		}
 	}
 

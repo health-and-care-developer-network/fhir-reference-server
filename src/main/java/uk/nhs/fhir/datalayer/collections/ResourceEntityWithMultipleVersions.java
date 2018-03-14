@@ -6,9 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceStatus;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 
-public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEntityWithMultipleVersions> {
+public class ResourceEntityWithMultipleVersions {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
@@ -18,20 +20,25 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	VersionNumber latestDraft = null;
 	String resourceID = null;
 	String resourceName = null;
+	ResourceType resourceType = null;
 	
 	public ResourceEntityWithMultipleVersions(ResourceMetadata entity) {
 		this.resourceID = entity.getResourceID();
 		this.resourceName = entity.getResourceName();
+		this.resourceType = entity.getResourceType();
+		
 		add(entity);
 	}
 	
 	public void add(ResourceMetadata entity) {
 		latest = largestVersion(latest, entity.getVersionNo());
-		if (entity.getStatus().equals("active")) {
+		
+		if (entity.getStatus().equals(ResourceStatus.active)) {
 			latestActive = largestVersion(latestActive, entity.getVersionNo());
-		} else if (entity.getStatus().equals("draft")) {
+		} else if (entity.getStatus().equals(ResourceStatus.draft)) {
 			latestDraft = largestVersion(latestDraft, entity.getVersionNo());
 		}
+		
 		metadataByVersion.put(entity.getVersionNo(), entity);
 	}
 	
@@ -44,9 +51,9 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 			LOG.debug("Found requested version - returning");
 			return metadataByVersion.get(version);
 		} else {
-			LOG.warn("Could not find requested version - asked for version:"+version+" - versions we have are:");
+			LOG.warn("Could not find requested version - asked for version:" + version + " - versions we have are:");
 			for (VersionNumber v : metadataByVersion.keySet()) {
-				LOG.warn(" - version:"+v.toString());
+				LOG.warn(" - version:" + v.toString());
 			}
 			return null;
 		}
@@ -56,22 +63,14 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 		if (previousLatest == null) {
 			return newVersion;
 		}
-		if (newVersion.isValid()) {
-			if (newVersion.compareTo(previousLatest) > 0) {
-				// New version is bigger
-				return newVersion;
-			}
+		
+		boolean newVersionIsBigger = newVersion.compareTo(previousLatest) > 0; 
+		
+		if (newVersionIsBigger) {
+			return newVersion;
+		} else {
+			return previousLatest;
 		}
-		return previousLatest;
-	}
-	
-	/**
-	 * Allow resources to be sorted by name
-	 */
-	@Override
-	public int compareTo(ResourceEntityWithMultipleVersions arg0) {
-		ResourceEntityWithMultipleVersions other = (ResourceEntityWithMultipleVersions)arg0;
-		return ResourceMetadata.BY_RESOURCE_NAME.compare(this.getLatest(), other.getLatest());
 	}
 
 	public String getResourceID() {
@@ -81,14 +80,20 @@ public class ResourceEntityWithMultipleVersions implements Comparable<ResourceEn
 	public String getResourceName() {
 		return resourceName;
 	}
+
+	public ResourceType getResourceType() {
+		return resourceType;
+	}
 	
 	@Override
 	public String toString() {
-		String result = "  - ResourceEntityWithMultipleVersions [ID=" + resourceID + ", latestVersion=" + latest + "] - Versions:";
-		for (VersionNumber version : metadataByVersion.keySet()) {
-			result = result + "\n" + metadataByVersion.get(version).toString();
+		StringBuilder result = new StringBuilder("  - ResourceEntityWithMultipleVersions [ID=" + resourceID + ", latestVersion=" + latest + "] - Versions:");
+		
+		for (ResourceMetadata metadata : metadataByVersion.values()) {
+			result.append("\n").append(metadata.toString());
 		}
-		return result;
+		
+		return result.toString();
 	}
 
 	public HashMap<VersionNumber, ResourceMetadata> getVersionList() {

@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Map.Entry;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.makehtml.FhirResourceCollector;
 
 public class FhirResourceImporter {
 	private final Path root;
