@@ -59,6 +59,18 @@ No guarantee of correctness is provided. You may get benefit from the use of thi
 
 ## Release Notes
 
+> ### v1.0.3 (14/12/2017)
+> - Fix empty row between table title and table body for non-tree tables
+> - Support links to HL7 primitive types without changing logical URL displayed
+> - Overhaul of tree building (code now migrated to fhir-model-utils).
+> - Use threadlocal context for event handling
+> - Restructure packages
+> - Various minor improvements prompted by FindBugs
+
+> ### v1.0.2 (14/12/2017)
+> - new Jenkins script to refresh the server cache
+> - restore STU3 slice names in rendered tree
+
 > ### v1.0.1 (09/11/2017)
 > - Hide cardinality and type of StructureDefinition root node
 > - Perform empty links check earlier

@@ -1,13 +1,13 @@
 package uk.nhs.fhir.makehtml;
 
 import org.junit.Test;
+import org.junit.Assert;
 
 import com.google.common.collect.Lists;
 
-import junit.framework.Assert;
-import uk.nhs.fhir.makehtml.html.style.CSSRule;
-import uk.nhs.fhir.makehtml.html.style.CSSStyleBlock;
-import uk.nhs.fhir.makehtml.html.style.CSSStyleSection;
+import uk.nhs.fhir.render.html.style.CSSRule;
+import uk.nhs.fhir.render.html.style.CSSStyleBlock;
+import uk.nhs.fhir.render.html.style.CSSStyleSection;
 
 public class TestCSSStyleSection {
 

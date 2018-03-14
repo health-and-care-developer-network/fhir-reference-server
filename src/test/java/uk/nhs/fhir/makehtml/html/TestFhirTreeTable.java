@@ -11,19 +11,25 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
-import uk.nhs.fhir.data.structdef.tree.FhirTreeNode;
+import uk.nhs.fhir.data.structdef.tree.SnapshotData;
+import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
+import uk.nhs.fhir.data.structdef.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.ExtensionsSlicingNodesRemover;
+import uk.nhs.fhir.data.structdef.tree.tidy.RemovedElementStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.UnwantedConstraintRemover;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
-import uk.nhs.fhir.makehtml.html.jdom2.HTMLUtil;
-import uk.nhs.fhir.makehtml.html.table.Table;
-import uk.nhs.fhir.makehtml.html.tree.FhirTreeTable;
+import uk.nhs.fhir.render.html.HTMLUtil;
+import uk.nhs.fhir.render.html.table.Table;
+import uk.nhs.fhir.render.html.tree.FhirTreeTable;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class TestFhirTreeTable {
 	@Test
 	public void testAsTable() throws IOException {
-		FhirTreeNode node = new FhirTreeNode(
+		SnapshotData node = new SnapshotData(
+			Optional.empty(),
 			Optional.of("test"),
 			new ResourceFlags(),
 			0,
@@ -34,10 +40,16 @@ public class TestFhirTreeTable {
 			"path.to.resource",
 			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
-		FhirTreeData data = new FhirTreeData(node);
 		
-		FhirTreeTable fhirTreeTable = new FhirTreeTable(data, FhirVersion.DSTU2);
-		fhirTreeTable.stripRemovedElements();
+		FhirTreeData<SnapshotData, SnapshotTreeNode> data = new FhirTreeData<>(new SnapshotTreeNode(node));
+		
+		FhirTreeTable<SnapshotData, SnapshotTreeNode> fhirTreeTable = new FhirTreeTable<>(data, FhirVersion.DSTU2);
+
+		new RemovedElementStripper<>(data).process();
+		new ExtensionsSlicingNodesRemover<>(data).process();
+		new UnwantedConstraintRemover<>(data).process();
+		new ComplexExtensionChildrenStripper<>(data).process();
+		
 		Table table = fhirTreeTable.asTable();
 		
 		String output = HTMLUtil.docToString(new Document(table.makeTable()), true, false);
