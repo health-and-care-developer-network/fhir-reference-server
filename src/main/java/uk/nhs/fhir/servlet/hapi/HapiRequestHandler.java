@@ -50,7 +50,7 @@ public abstract class HapiRequestHandler extends RestfulServer {
 		this.dataSource = dataSource;
 	}
 	
-	private final Set<String> browserRequestsHandledByHapi = ImmutableSet.of("/metadata");
+	private final Set<String> browserRequestsHandledByHapi = ImmutableSet.of("/metadata", "/STU3/metadata");
 	
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
