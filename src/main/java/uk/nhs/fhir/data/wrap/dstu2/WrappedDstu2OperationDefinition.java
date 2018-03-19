@@ -32,7 +32,7 @@ import uk.nhs.fhir.util.StringUtil;
 public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition {
 
 	private final OperationDefinition definition;
-	private final Dstu2FhirDocLinkFactory linkFactory = new Dstu2FhirDocLinkFactory();
+	private static final Dstu2FhirDocLinkFactory linkFactory = new Dstu2FhirDocLinkFactory();
 	
 	public WrappedDstu2OperationDefinition(OperationDefinition definition) {
 		this.definition = definition;
@@ -48,11 +48,11 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 		return FhirVersion.DSTU2;
 	}
 	
-	private ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
+	private static ResourceInfo buildBindingResourceInfo(ParameterBinding binding) {
 		String choice = FhirElementDataTypeDstu2.resolveDstu2DatatypeValue(binding.getValueSet());
 		String strength = binding.getStrength();
 		
-		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, getImplicitFhirVersion())), strength);
+		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, FhirVersion.DSTU2)), strength);
 	}
 
 	@Override
@@ -132,12 +132,35 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 			.stream()
 			.filter(param -> param.getUseElement().getValueAsEnum().equals(type))
 			.map(param -> 
-				new FhirOperationParameter(param.getName(), param.getMin(), param.getMax(), 
-					Optional.ofNullable(param.getTypeElement()).map(typeElement -> linkFactory.forDataType(typeElement)), param.getDocumentation(), getResourceInfos(param)))
+				buildParameter("", param))
 			.collect(Collectors.toList());
 	}
 
-	private List<ResourceInfo> getResourceInfos(Parameter parameter) {
+	private static List<FhirOperationParameter> getParts(String namePrefix, OperationDefinition.Parameter param) {
+		return 
+			param
+				.getPart()
+				.stream()
+				.map(part -> 
+					buildParameter(namePrefix, part))
+				.collect(Collectors.toList());
+	}
+	
+	private static FhirOperationParameter buildParameter(String namePrefix, OperationDefinition.Parameter param) {
+		String paramLocalName = param.getName();
+		String paramFullName = namePrefix.isEmpty() ? paramLocalName : namePrefix + "." + paramLocalName; 
+		
+		return new FhirOperationParameter(
+				param.getName(), 
+				param.getMin(), 
+				param.getMax(), 
+				param.getTypeElement().isEmpty() ? Optional.empty() : Optional.of(linkFactory.forDataType(param.getTypeElement())),
+				param.getDocumentation(),
+				getResourceInfos(param),
+				getParts(paramFullName, param));
+	}
+
+	private static List<ResourceInfo> getResourceInfos(Parameter parameter) {
 		
 		List<ResourceInfo> resourceFlags = Lists.newArrayList();
 		
@@ -152,7 +175,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 			resourceFlags.add(
 				new ResourceInfo(
 					"Profile", 
-					FhirURL.buildOrThrow(profile.getReferenceElement().getValue(), getImplicitFhirVersion()), 
+					FhirURL.buildOrThrow(profile.getReferenceElement().getValue(), FhirVersion.DSTU2), 
 					ResourceInfoType.PROFILE));
 		}
 		

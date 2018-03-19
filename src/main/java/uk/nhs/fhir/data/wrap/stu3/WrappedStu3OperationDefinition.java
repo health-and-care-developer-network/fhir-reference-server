@@ -34,7 +34,7 @@ public class WrappedStu3OperationDefinition extends WrappedOperationDefinition {
 
 private final OperationDefinition definition;
 
-	private final Stu3FhirDocLinkFactory linkFactory = new Stu3FhirDocLinkFactory();
+	private static final Stu3FhirDocLinkFactory linkFactory = new Stu3FhirDocLinkFactory();
 	
 	public WrappedStu3OperationDefinition(OperationDefinition definition) {
 		this.definition = definition;
@@ -50,11 +50,11 @@ private final OperationDefinition definition;
 		return FhirVersion.STU3;
 	}
 	
-	private ResourceInfo buildBindingResourceInfo(OperationDefinitionParameterBindingComponent binding) {
+	private static ResourceInfo buildBindingResourceInfo(OperationDefinitionParameterBindingComponent binding) {
 		String choice = FhirElementDataTypeStu3.resolveValue(binding.getValueSet());
 		String strength = binding.getStrength().getDisplay();
 		
-		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, getImplicitFhirVersion())), strength);
+		return new BindingResourceInfo(Optional.empty(), Optional.of(FhirURL.buildOrThrow(choice, FhirVersion.STU3)), strength);
 	}
 
 	@Override
@@ -134,17 +134,11 @@ private final OperationDefinition definition;
 			.stream()
 			.filter(param -> param.getUseElement().getValue().equals(type))
 			.map(param -> 
-				new FhirOperationParameter(
-					param.getName(),
-					param.getMin(),
-					param.getMax(),
-					param.hasTypeElement() ? Optional.of(linkFactory.forDataType(param.getTypeElement())) : Optional.empty(),
-					param.getDocumentation(),
-					getResourceInfos(param)))
+				buildParameter("", param))
 			.collect(Collectors.toList());
 	}
 
-	private List<ResourceInfo> getResourceInfos(OperationDefinitionParameterComponent parameter) {
+	private static List<ResourceInfo> getResourceInfos(OperationDefinitionParameterComponent parameter) {
 		
 		List<ResourceInfo> resourceFlags = Lists.newArrayList();
 		
@@ -159,12 +153,37 @@ private final OperationDefinition definition;
 			resourceFlags.add(
 				new ResourceInfo(
 					"Profile", 
-					FhirURL.buildOrThrow(profile.getReferenceElement().getValue(), getImplicitFhirVersion()), 
+					FhirURL.buildOrThrow(profile.getReferenceElement().getValue(), FhirVersion.STU3), 
 					ResourceInfoType.PROFILE));
 		}
 		
 		return resourceFlags;
 	}
+
+	private static List<FhirOperationParameter> getParts(String namePrefix, OperationDefinitionParameterComponent param) {
+		return 
+			param
+				.getPart()
+				.stream()
+				.map(part -> 
+					buildParameter(namePrefix, part))
+				.collect(Collectors.toList());
+	}
+	
+	private static FhirOperationParameter buildParameter(String namePrefix, OperationDefinitionParameterComponent param) {
+		String paramLocalName = param.getName();
+		String paramFullName = namePrefix.isEmpty() ? paramLocalName : namePrefix + "." + paramLocalName; 
+		
+		return new FhirOperationParameter(
+				paramFullName, 
+				param.getMin(), 
+				param.getMax(), 
+				param.getTypeElement().isEmpty() ? Optional.empty() : Optional.of(linkFactory.forDataType(param.getTypeElement())),
+				param.getDocumentation(),
+				getResourceInfos(param),
+				getParts(paramFullName, param));
+	}
+
 
 	@Override
 	public IBaseResource getWrappedResource() {

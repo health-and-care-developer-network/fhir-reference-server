@@ -14,14 +14,16 @@ public class FhirOperationParameter {
 	private final Optional<LinkData> typeLink;
 	private final String documentation;
 	private final List<ResourceInfo> resourceInfos;
+	private final List<FhirOperationParameter> parts;
 	
-	public FhirOperationParameter(String name, Integer min, String max, Optional<LinkData> typeLink, String documentation, List<ResourceInfo> resourceInfos) {
+	public FhirOperationParameter(String name, Integer min, String max, Optional<LinkData> typeLink, String documentation, List<ResourceInfo> resourceInfos, List<FhirOperationParameter> parts) {
 		this.name = name;
 		this.min = min;
 		this.max = max;
 		this.typeLink = typeLink;
 		this.documentation = documentation;
 		this.resourceInfos = resourceInfos;
+		this.parts = parts;
 	}
 	
 	public String getName() {
@@ -48,4 +50,7 @@ public class FhirOperationParameter {
 		return resourceInfos;
 	}
 
+	public List<FhirOperationParameter> getParts() {
+		return parts;
+	}
 }
