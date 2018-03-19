@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.TestEventHandlerContext;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.tree.HasMappings;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.validate.IgnorableMappingValues;
 import uk.nhs.fhir.data.structdef.tree.validate.NodeMappingValidator;
 import uk.nhs.fhir.event.EventHandler;
@@ -133,6 +134,8 @@ public class TestNodeMappingValidator {
 
 class TestHasMappings implements HasMappings {
 
+	private static final ImmutableNodePath SHARED_NODE_PATH = new ImmutableNodePath("test.node");
+	
 	private final List<FhirElementMapping> mappings;
 
 	public TestHasMappings(FhirElementMapping... mappings) {
@@ -140,8 +143,8 @@ class TestHasMappings implements HasMappings {
 	}
 
 	@Override
-	public String getPath() {
-		return "test.node";
+	public ImmutableNodePath getPath() {
+		return SHARED_NODE_PATH;
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.TreeNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.HasBackupNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.HasSlicingInfo;
@@ -137,21 +138,14 @@ class TestSnapshotData implements HasSlicingInfo {
 class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> {
 
 	private final String id;
-	private final String path;
 
 	public TestSnapshotNode(String id, String path) {
 		this(id, path, Sets.newHashSet());
 	}
 	
 	public TestSnapshotNode(String id, String path, Set<String> discriminators) {
-		super(new TestSnapshotData(discriminators));
+		super(new TestSnapshotData(discriminators), new ImmutableNodePath(path));
 		this.id = id;
-		this.path = path;
-	}
-
-	@Override
-	public String getPath() {
-		return path;
 	}
 	
 	public String getId() {
@@ -176,17 +170,10 @@ class TestDifferentialData implements HasBackupNode<TestSnapshotData, TestSnapsh
 class TestDifferentialNode extends TreeNode<TestDifferentialData, TestDifferentialNode> {
 
 	private final String id;
-	private final String path;
 
 	public TestDifferentialNode(String id, String path, TestSnapshotNode backupNode) {
-		super(new TestDifferentialData(backupNode));
+		super(new TestDifferentialData(backupNode), new ImmutableNodePath(path));
 		this.id = id;
-		this.path = path;
-	}
-	
-	@Override
-	public String getPath() {
-		return path;
 	}
 	
 	public String getId() {

@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.SnapshotData;
 import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.ComplexExtensionChildrenStripper;
@@ -37,7 +38,7 @@ public class TestFhirTreeTable {
 			new LinkDatas(new LinkData(FhirURL.buildOrThrow("http://www.example.com", FhirVersion.DSTU2), "testlink")),
 			"root info",
 			Lists.newArrayList(),
-			"path.to.resource",
+			new ImmutableNodePath("path.to.resource"),
 			FhirElementDataType.ELEMENT,
 			FhirVersion.DSTU2);
 		

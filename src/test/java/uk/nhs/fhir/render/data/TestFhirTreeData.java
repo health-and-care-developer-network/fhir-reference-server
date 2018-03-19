@@ -7,6 +7,7 @@ import org.junit.Test;
 import com.google.common.collect.Iterators;
 
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.TreeNode;
 
 public class TestFhirTreeData {
@@ -155,17 +156,10 @@ public class TestFhirTreeData {
 class TestFhirTreeNode extends TreeNode<Object, TestFhirTreeNode> {
 	
 	private final String id;
-	private final String path;
 	
 	public TestFhirTreeNode(String id, String path) {
-		super(new Object());
+		super(new Object(), new ImmutableNodePath(path));
 		this.id = id;
-		this.path = path;
-	}
-
-	@Override
-	public String getPath() {
-		return path;
 	}
 	
 	public String getId() {

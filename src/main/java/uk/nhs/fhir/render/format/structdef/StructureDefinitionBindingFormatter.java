@@ -131,11 +131,10 @@ public class StructureDefinitionBindingFormatter extends ResourceFormatter<Wrapp
                 foundBinding = true;
                 tableContent.add(
                     Elements.withChildren("tr",
-                        labelledValueCell(BLANK, node.getPath(), 1, "details.html#" + node.getNodeKey()),
+                        labelledValueCell(BLANK, node.getPathString(), 1, "details.html#" + node.getNodeKey()),
                         labelledValueCell(BLANK, displayDescription, 1, null),
                         labelledValueCell(BLANK, bindingStrength, 1, FhirURLConstants.versionBase(getResourceVersion()) + "/terminologies.html#" + anchorStrength),
-                        valueSetCell
-                    ));
+                        valueSetCell));
                 done.add(path);
             }
 

@@ -82,7 +82,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			SnapshotData nodeData = node.getData();
 			
-			String pathName = nodeData.getPathName();
+			String pathName = nodeData.getPath().getPathName();
 			String key = node.getNodeKey();
 			Optional<String> definition = nodeData.getDefinition();
 			String cardinality = nodeData.getCardinality().toString();
@@ -93,7 +93,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			ResourceFlags resourceFlags = nodeData.getResourceFlags();
 			Optional<String> comments = nodeData.getComments();
 			Optional<String> linkedNodeKey = nodeData.getLinkedNode().isPresent() ? 
-				Optional.of(nodeData.getLinkedNode().get().getPath()) : 
+				Optional.of(nodeData.getLinkedNode().get().getPath().toPathString()) : 
 				Optional.empty();
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
