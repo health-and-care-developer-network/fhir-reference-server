@@ -38,6 +38,7 @@ private final OperationDefinition definition;
 	
 	public WrappedStu3OperationDefinition(OperationDefinition definition) {
 		this.definition = definition;
+		checkForUnexpectedFeatures();
 	}
 	
 	@Override
@@ -223,5 +224,94 @@ private final OperationDefinition definition;
 	@Override
 	public Optional<String> getVersion() {
 		return Optional.ofNullable(definition.getVersion());
+	}
+
+	@Override
+	public void checkForUnexpectedFeatures() {
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getUrlElement();
+		
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getVersionElement();
+		
+		//definition.getNameElement();
+		//definition.getStatusElement();
+		//definition.getKindElement();
+		
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getExperimentalElement();
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getDateElement();
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getPublisherElement();
+		
+		// TODO Not included, but should be. Include when refactoring
+		/*for (ContactDetail contact : definition.getContact()) {
+			
+		}*/
+		
+		//definition.getDescriptionElement();
+		/*for (UsageContext useContext : definition.getUseContext()) {
+			
+		}*/
+		
+		checkNoInfoPresent(definition.getJurisdiction());
+		/*for (CodeableConcept jurisdiction : definition.getJurisdiction()) {
+			
+		}*/
+		checkNoInfoPresent(definition.getPurposeElement());
+		checkNoInfoPresent(definition.getIdempotentElement());
+		//definition.getCodeElement();
+		checkNoInfoPresent(definition.getCommentElement());
+		checkNoInfoPresent(definition.getBase());
+		
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getResource();
+		
+		/*for (CodeType resource : definition.getResource()) {
+			
+		}*/
+		//definition.getSystemElement();
+		
+		// TODO Not included, but should be. Include when refactoring
+		//definition.getTypeElement();
+		
+		//definition.getInstanceElement();
+		for (OperationDefinitionParameterComponent param : definition.getParameter()) {
+			checkForUnexpectedFeaturesParam(param);
+		}
+		checkNoInfoPresent(definition.getOverload());
+		/*for (OperationDefinitionOverloadComponent overload : definition.getOverload()) {
+			for (StringType paramName : overload.getParameterName()) {
+				
+			}
+			overload.getCommentElement();
+		}*/
+	}
+	
+	public void checkForUnexpectedFeaturesParam(OperationDefinitionParameterComponent param) {
+		//param.getNameElement();
+		
+		// TODO Not included, but should be. Include when refactoring
+		//checkNoInfoPresent(param.getUseElement());
+		
+		//param.getMinElement();
+		//param.getMaxElement();
+		//param.getDocumentationElement();
+		//param.getTypeElement();
+		checkNoInfoPresent(param.getSearchTypeElement());
+		
+		// TODO Not included, but should be. Include when refactoring
+		//param.getProfile();
+
+		// TODO Not included, but should be. Include when refactoring, with both subelements
+		/*OperationDefinitionParameterBindingComponent binding = param.getBinding();
+		if (!binding.isEmpty()) {
+			binding.getStrengthElement();
+			binding.getValueSet();
+		}*/
+		for (OperationDefinitionParameterComponent part : param.getPart()) {
+			checkForUnexpectedFeaturesParam(part);
+		}
 	}
 }

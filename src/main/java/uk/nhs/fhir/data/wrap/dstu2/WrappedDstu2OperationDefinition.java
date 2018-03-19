@@ -36,6 +36,7 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	
 	public WrappedDstu2OperationDefinition(OperationDefinition definition) {
 		this.definition = definition;
+		checkForUnexpectedFeatures();
 	}
 	
 	@Override
@@ -224,5 +225,78 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	@Override
 	public Optional<String> getVersion() {
 		return Optional.ofNullable(definition.getVersion());
+	}
+
+	@Override
+	public void checkForUnexpectedFeatures() {
+		// TODO
+		//definition.getUrlElement();
+		
+		// TODO
+		//definition.getVersionElement();
+		
+		//definition.getNameElement();
+		//definition.getStatusElement();
+		//definition.getKindElement();
+		
+		// TODO
+		//definition.getExperimentalElement();
+		
+		// TODO
+		//definition.getPublisherElement();
+		
+		// TODO
+		//definition.getContact();
+		
+		// TODO
+		//definition.getDateElement();
+		
+		//definition.getDescriptionElement();
+		
+		// TODO
+		//definition.getRequirementsElement();
+
+		// TODO
+		//definition.getIdempotentElement();
+		
+		//defintion.getCodeElement();
+		
+		// TODO
+		//definition.getNotesElement();
+		
+		// TODO
+		//definition.getBase();
+		
+		//definition.getSystemElement();
+		
+		// TODO
+		//definition.getType();
+		
+		//definition.getInstanceElement();
+		
+		for (Parameter param : definition.getParameter()) {
+			checkForUnexpectedFeaturesParam(param);
+		}
+	}
+	
+	public void checkForUnexpectedFeaturesParam(Parameter param) {
+		//param.getNameElement();
+		
+		// TODO
+		//param.getUseElement();
+		
+		//param.getMinElement();
+		//param.getMaxElement();
+		//param.getDocumentationElement();
+		//param.getTypeElement();
+		
+		// TODO
+		//param.getProfile();
+		// TODO
+		//param.getBinding();
+		
+		for (Parameter part : param.getPart()) {
+			checkForUnexpectedFeaturesParam(part);
+		}
 	}
 }
