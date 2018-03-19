@@ -179,6 +179,13 @@ public class NewMain {
 	        }
 
     		boolean succeeded = !eventHandler.foundErrors();
+        	
+        	if (eventHandler.isDeferred() 
+        	  && (!succeeded || eventHandler.foundWarnings())) {
+        		LOG.info("Displaying event messages");
+        		
+        		eventHandler.displayOutstandingEvents();
+        	}
     		
         	if (succeeded || allowCopyOnError) {
         		if (succeeded) {
@@ -187,19 +194,8 @@ public class NewMain {
         			LOG.info("Rendering failed for some files - copying rendered artefacts anyway since allowCopyOnError set");
         		}
         		
-        		new Runnable() {
-        			public void run() {
-                		copyExamples(fhirFileRegistry);
-                		copyGeneratedArtefacts();
-        			}
-        		}.run();
-        	} 
-        	
-        	if (eventHandler.isDeferred() 
-        	  && (!succeeded || eventHandler.foundWarnings())) {
-        		LOG.info("Displaying event messages");
-        		
-        		eventHandler.displayOutstandingEvents();
+        		copyExamples(fhirFileRegistry);
+        		copyGeneratedArtefacts();
         	}
         	
         	// if there is an error while copying the files, this gets skipped so they can be recovered if necessary
