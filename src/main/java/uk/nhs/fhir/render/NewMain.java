@@ -187,8 +187,12 @@ public class NewMain {
         			LOG.info("Rendering failed for some files - copying rendered artefacts anyway since allowCopyOnError set");
         		}
         		
-        		copyExamples(fhirFileRegistry);
-        		copyGeneratedArtefacts();
+        		new Runnable() {
+        			public void run() {
+                		copyExamples(fhirFileRegistry);
+                		copyGeneratedArtefacts();
+        			}
+        		}.run();
         	} 
         	
         	if (eventHandler.isDeferred() 

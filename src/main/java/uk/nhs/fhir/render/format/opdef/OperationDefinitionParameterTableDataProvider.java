@@ -20,8 +20,6 @@ public class OperationDefinitionParameterTableDataProvider {
 	}
 
 	public List<TableTitle> getColumns() {
-
-		// KGM 8/May/2017 Altered meta table column to % widths
 		return Lists.newArrayList(
 			new TableTitle("Name", "The logical name of the element", "20%"),
 			new TableTitle("Card.", "Minimum and maximum # of times the element can appear in the instance", "10%"),
@@ -32,19 +30,26 @@ public class OperationDefinitionParameterTableDataProvider {
 
 	public List<OperationDefinitionParameterTableData> getRows() {
 		List<OperationDefinitionParameterTableData> data = Lists.newArrayList();
-		
 		for (FhirOperationParameter parameter : parameters) {
-			String rowTitle = parameter.getName();
-			String cardinality = parameter.getMin() + ".." + parameter.getMax(); 
-			LinkDatas typeLink = parameter.getTypeLink().isPresent() ? 
-				new LinkDatas(parameter.getTypeLink().get()) : 
-				new LinkDatas();
-			String documentation = parameter.getDocumentation();
-			List<ResourceInfo> flags = parameter.getResourceInfos();
-
-			data.add(new OperationDefinitionParameterTableData(rowTitle, cardinality, typeLink, documentation, flags));
+			addParameter(parameter, data);
 		}
 		
 		return data;
+	}
+
+	private void addParameter(FhirOperationParameter parameter, List<OperationDefinitionParameterTableData> data) {
+		String rowTitle = parameter.getName();
+		String cardinality = parameter.getMin() + ".." + parameter.getMax(); 
+		LinkDatas typeLink = parameter.getTypeLink().isPresent() ? 
+			new LinkDatas(parameter.getTypeLink().get()) : 
+			new LinkDatas();
+		String documentation = parameter.getDocumentation();
+		List<ResourceInfo> flags = parameter.getResourceInfos();
+
+		data.add(new OperationDefinitionParameterTableData(rowTitle, cardinality, typeLink, documentation, flags));
+		
+		for (FhirOperationParameter part : parameter.getParts()) {
+			addParameter(part, data);
+		}
 	}
 }
