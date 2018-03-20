@@ -21,7 +21,7 @@ public class SimpleFhirFileLocator extends AbstractFhirFileLocator {
 
 	@Override
 	public Path getDestinationPathForResourceType(ResourceType type, FhirVersion version) {
-		return destinationRoot.resolve(version.toString()).resolve(type.getDisplayName());
+		return destinationRoot.resolve(version.toString()).resolve(type.getFolderName());
 	}
 	
 	public Path getSourceRoot() {
