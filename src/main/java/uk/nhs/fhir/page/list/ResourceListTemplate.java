@@ -15,7 +15,7 @@ public class ResourceListTemplate extends VelocityTemplate {
 	private final HashMap<String, List<ResourceMetadata>> groupedResources;
 	
 	public ResourceListTemplate(ResourceType resourceType, HashMap<String, List<ResourceMetadata>> groupedResources) {
-		super("list.vm", Optional.of(resourceType.toString()), Optional.empty());
+		super("list.vm", Optional.of(resourceType.toString() + "s"), Optional.empty());
 		this.groupedResources = groupedResources;
 	}
 
