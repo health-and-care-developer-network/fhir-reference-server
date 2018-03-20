@@ -26,12 +26,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 	private Optional<SnapshotTreeNode> backupNode = Optional.empty();
 	
 	public FhirDifferentialSkeletonNode(FhirDifferentialSkeletonData data) {
-		super(data);
-	}
-
-	@Override
-	public String getPath() {
-		return getData().getPath();
+		super(data, data.getPath());
 	}
 
 	// Lazily evaluate/cache the backup node
@@ -54,7 +49,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		if (backupNodesWithMatchingPaths.size() == 1) {
 			return backupNodesWithMatchingPaths.get(0);
 		} else if (backupNodesWithMatchingPaths.size() == 0) {
-			Optional<String> choiceSuffix = FhirSimpleTypes.CHOICE_SUFFIXES.stream().filter(suffix -> getPath().endsWith(suffix)).findFirst();
+			Optional<String> choiceSuffix = FhirSimpleTypes.CHOICE_SUFFIXES.stream().filter(suffix -> getPathName().endsWith(suffix)).findFirst();
 			// handle this if it comes up
 			throw new IllegalStateException("No nodes matched for differential element path " + getPath() + " choice suffix = " + choiceSuffix.toString());
 		} else if (backupNodesWithMatchingPaths.size() > 0 
@@ -117,17 +112,14 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		}
 	}
 	
-	private List<SnapshotTreeNode> handleForgeRenamingDifferentialChoiceButNotSnapshot(String differentialPath, SnapshotTreeNode searchRoot) {
+	private List<SnapshotTreeNode> handleForgeRenamingDifferentialChoiceButNotSnapshot(ImmutableNodePath differentialPath, SnapshotTreeNode searchRoot) {
 		
 		SnapshotTreeNode currentSearchRoot = searchRoot;
-		String confirmedSnapshotPath = "";
+		ImmutableNodePath confirmedSnapshotPath = new ImmutableNodePath(Lists.newArrayList());
 		
-		for (String differentialPathElement : differentialPath.split("\\.")) {
-			
-			String possibleSnapshotElementPath = 
-				confirmedSnapshotPath.isEmpty()	?
-					differentialPathElement	:
-					confirmedSnapshotPath + "." + differentialPathElement;
+		for (String differentialPathElement : differentialPath) {
+			MutableNodePath possibleSnapshotElementPath = confirmedSnapshotPath.mutableCopy();
+			possibleSnapshotElementPath.stepInto(differentialPathElement);
 			
 			currentSearchRoot = findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(differentialPath, currentSearchRoot, possibleSnapshotElementPath);
 			
@@ -140,13 +132,13 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		return Lists.newArrayList(currentSearchRoot);
 	}
 
-	private SnapshotTreeNode findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(String differentialPath, SnapshotTreeNode searchRoot,
-			String possibleSnapshotElementPath) {
+	private SnapshotTreeNode findMatchingSnapshotNodeReinstateChoiceSuffixIfNecessary(ImmutableNodePath differentialPath, SnapshotTreeNode searchRoot,
+			AbstractNodePath possibleSnapshotElementPath) {
 		List<SnapshotTreeNode> possibleAncestorNodes = searchRoot.selfOrChildrenWithPath(possibleSnapshotElementPath);
 		if (possibleAncestorNodes.size() == 1) {
 			searchRoot = possibleAncestorNodes.get(0);
 		} else if (possibleAncestorNodes.isEmpty()) {
-			String restoredGenericChoicePath = reinstateChoiceSuffix(possibleSnapshotElementPath)
+			ImmutableNodePath restoredGenericChoicePath = reinstateChoiceSuffix(possibleSnapshotElementPath.toString())
 				.orElseThrow(() -> new IllegalStateException("No matching paths found, and not a resolved choice node: " + differentialPath));
 			List<SnapshotTreeNode> possibleChoiceAncestorNodes = searchRoot.descendantsWithPath(restoredGenericChoicePath);
 			
@@ -166,13 +158,17 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		return searchRoot;
 	}
 
-	private Optional<String> reinstateChoiceSuffix(String possibleSnapshotElementPath) {
-		return matchSuffix(possibleSnapshotElementPath)
-			.map(suffix -> 
-				possibleSnapshotElementPath.substring(
-					0, 
-					possibleSnapshotElementPath.length() - suffix.length()) 
-				+ "[x]");
+	private Optional<ImmutableNodePath> reinstateChoiceSuffix(String possibleSnapshotElementPath) {
+		Optional<ImmutableNodePath> reinstated = 
+			matchSuffix(possibleSnapshotElementPath)
+				.map(suffix -> 
+					possibleSnapshotElementPath.substring(
+						0, 
+						possibleSnapshotElementPath.length() - suffix.length()) 
+					+ "[x]")
+				.map(reinstatedPath -> new ImmutableNodePath(reinstatedPath));
+		
+		return reinstated;
 	}
 
 	private Optional<String> matchSuffix(String possibleSnapshotElementPath) {
@@ -280,5 +276,10 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 	@Override
 	public FhirDifferentialSkeletonNode cloneShallow(FhirDifferentialSkeletonNode parent) {
 		return new FhirDifferentialSkeletonNode(getData());
+	}
+
+	@Override
+	public String getNodeKey() {
+		return getData().getPathString();
 	}
 }

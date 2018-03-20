@@ -35,7 +35,7 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	protected final LinkDatas typeLinks;
 	protected final String information;
 	protected final List<ConstraintInfo> constraints;
-	protected final String path;
+	protected final ImmutableNodePath path;
 	protected final FhirElementDataType dataType;
 	protected final FhirVersion version;
 	
@@ -46,7 +46,7 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 			LinkDatas typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
-			String path,
+			ImmutableNodePath path,
 			FhirElementDataType dataType,
 			FhirVersion version) {
 		this.id = id;
@@ -74,7 +74,7 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 
 	public String getDisplayName() {
 		boolean hasSliceName = sliceName.isPresent() && !sliceName.get().isEmpty();
-		String pathName = getPathName();
+		String pathName = getPath().getPathName();
 		boolean hasPath = !pathName.isEmpty();
 
 		String displayName;
@@ -138,22 +138,6 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	@Override
 	public List<ConstraintInfo> getConstraints() {
 		return constraints;
-	}
-
-	@Override
-	public String getPath() {
-		return path;
-	}
-
-	@Override
-	public String getPathName() {
-		String[] pathTokens = path.split("\\.");
-		return pathTokens[pathTokens.length - 1];
-	}
-
-	@Override
-	public boolean isRoot() {
-		return !path.contains(".");
 	}
 
 	@Override
@@ -365,7 +349,27 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 
 	@Override
 	public String toString() {
-		return getPath();
+		return getPathString();
+	}
+	
+	@Override
+	public ImmutableNodePath getPath() {
+		return path;
+	}
+	
+	@Override
+	public boolean isRoot() {
+		return path.isRoot();
+	}
+	
+	@Override
+	public String getPathName() {
+		return path.getPathName();
+	}
+	
+	@Override
+	public String getPathString() {
+		return path.toString();
 	}
 	
 	@Override

@@ -16,18 +16,18 @@ import uk.nhs.fhir.util.ListUtils;
 public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 	
 	private final T data;
-	
-	public abstract String getPath();
 
 	private final List<U> children = Lists.newArrayList();
+	private final ImmutableNodePath path;
 	private U parent;
 
-	public TreeNode(T data) {
-		this(data, null);
+	public TreeNode(T data, ImmutableNodePath path) {
+		this(data, path, null);
 	}
 	
-	public TreeNode(T data, U parent) {
+	public TreeNode(T data, ImmutableNodePath path, U parent) {
 		this.data = data;
+		this.path = path;
 		this.parent = parent;
 	}
 	
@@ -41,6 +41,22 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 
 	public boolean hasChildren() {
 		return !children.isEmpty();
+	}
+	
+	public ImmutableNodePath getPath() {
+		return path;
+	}
+	
+	public String getPathString() {
+		return path.toString();
+	}
+
+	public String getPathName() {
+		return path.getPathName();
+	}
+
+	public boolean isRoot() {
+		return path.isRoot();
 	}
 
 	void setParent(U parent) {
@@ -62,19 +78,19 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 		return new FhirTreeData<T, U>((U)this).nodes();
 	}
 
-	public List<U> descendantsWithPath(String absolutePath) {
+	public List<U> descendantsWithPath(AbstractNodePath absolutePath) {
 		return nodesWithPath(descendants(), absolutePath);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<U> selfOrChildrenWithPath(String absolutePath) {
+	public List<U> selfOrChildrenWithPath(AbstractNodePath absolutePath) {
 		if (getPath().equals(absolutePath)) {
 			return Lists.newArrayList((U)this);
 		}
 		return nodesWithPath(getChildren(), absolutePath);
 	}
 	
-	private List<U> nodesWithPath(Iterable<U> nodeIterable, String absolutePath) {
+	private List<U> nodesWithPath(Iterable<U> nodeIterable, AbstractNodePath absolutePath) {
 		List<U> withPath = Lists.newArrayList();
 		
 		for (U child : nodeIterable) {
@@ -91,7 +107,7 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 		
 		List<U> descendantsMatchingDiscriminatorPath = 
 			StreamSupport.stream(descendants().spliterator(), false)
-				.filter(descendant -> descendant.getPath().equals(fullPath))
+				.filter(descendant -> descendant.getPathString().equals(fullPath))
 				.collect(Collectors.toList());
 		
 		return ListUtils.uniqueIfPresent(descendantsMatchingDiscriminatorPath, 
@@ -114,7 +130,7 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 	
 	@Override
 	public String toString() {
-		return getPath();
+		return getPath().toString();
 	}
 	
 	public boolean isDescendantOf(U possibleAncestor) {

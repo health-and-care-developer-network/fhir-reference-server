@@ -2,6 +2,6 @@ package uk.nhs.fhir.data.structdef.tree;
 
 public interface EmptyNodeFactory<T, U extends TreeNode<T, U>> {
 
-	U create(U currentNode, NodePath path);
+	U create(U currentNode, ImmutableNodePath path);
 
 }

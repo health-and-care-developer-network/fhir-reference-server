@@ -4,7 +4,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Optional;
 
-public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, SnapshotTreeNode> {
+public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, SnapshotTreeNode> implements HasNodeKey {
 
 	public SnapshotTreeNode(SnapshotData data) {
 		super(data);
@@ -13,12 +13,8 @@ public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, Snapsho
 	public SnapshotTreeNode(SnapshotTreeNode parent, SnapshotData data) {
 		super(data, parent);
 	}
-	
-	@Override
-	public String getPath() {
-		return getData().getPath();
-	}
 
+	@Override
 	public String getNodeKey() {
 		Deque<String> ancestorKeys = new LinkedList<>();
 		
@@ -59,7 +55,7 @@ public class SnapshotTreeNode extends AbstractFhirTreeNode<SnapshotData, Snapsho
 		if (sliceName.isPresent()) {
 			return getPath() + ":" + sliceName.get();
 		} else {
-			return getPath();
+			return getPath().toString();
 		}
 	}
 

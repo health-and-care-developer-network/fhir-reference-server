@@ -22,19 +22,19 @@ import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public class FhirTreeNodeDataBuilder {
 	
-	public static SnapshotData buildSnapshotNode(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
+	public static SnapshotData buildSnapshotData(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
 		return fromElementDefinition(elementDefinition, structureDefinitions)
 			.withDefinitionDetails(elementDefinition, structureDefinitions)
 			.toSnapshotData();
 	}
 	
-	public static DifferentialData buildDifferentialNode(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode, Optional<StructureDefinitionRepository> structureDefinitions) {
+	public static DifferentialData buildDifferentialData(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode, Optional<StructureDefinitionRepository> structureDefinitions) {
 		return fromElementDefinition(elementDefinition, structureDefinitions)
 			.withDefinitionDetails(elementDefinition, structureDefinitions)
 			.toDifferentialData(backupNode);
 	}
 	
-	public static FhirDifferentialSkeletonData buildDifferentialSkeletonNode(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
+	public static FhirDifferentialSkeletonData buildDifferentialSkeletonData(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
 		return fromElementDefinition(elementDefinition, structureDefinitions)
 			.withSkeletonDetails(elementDefinition)
 			.toDifferentialSkeletonData();
@@ -63,7 +63,7 @@ public class FhirTreeNodeDataBuilder {
 		} else if (dataTypes.size() == 1) {
 			dataType = dataTypes.iterator().next();
 		} else if (dataTypes.size() > 1
-		  && elementDefinition.getPath().endsWith("[x]")) {
+		  && elementDefinition.getPath().getPathName().endsWith("[x]")) {
 			dataType = FhirElementDataType.CHOICE;
 		} else {
 			throw new IllegalStateException("Found " + dataTypes.size() + " data types for node " + elementDefinition.getPath());
@@ -80,7 +80,7 @@ public class FhirTreeNodeDataBuilder {
 		new ConstraintsValidator(elementDefinition).validate();
 		
 		Optional<String> id = elementDefinition.getId();
-		String path = elementDefinition.getPath();
+		ImmutableNodePath path = elementDefinition.getPath();
 		FhirVersion version = elementDefinition.getVersion();
 
 		FhirTreeNodeDataBuilder nodeBuilder = new FhirTreeNodeDataBuilder(
@@ -172,7 +172,7 @@ public class FhirTreeNodeDataBuilder {
 	protected final LinkDatas typeLinks;
 	protected final String information;
 	protected final List<ConstraintInfo> constraints;
-	protected final String path;
+	protected final ImmutableNodePath path;
 	protected final FhirElementDataType dataType;
 	protected final FhirVersion version;
 	
@@ -184,7 +184,7 @@ public class FhirTreeNodeDataBuilder {
 			LinkDatas typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
-			String path,
+			ImmutableNodePath path,
 			FhirElementDataType dataType,
 			FhirVersion version) {
 		this.element = element;

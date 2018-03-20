@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.structdef.tree.tidy;
 
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
+
 public interface HasPath {
-	public String getPath();
-	public String getPathName();
+	public ImmutableNodePath getPath();
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -16,6 +17,7 @@ import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ElementDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
@@ -29,7 +31,6 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 	
 	public abstract String getName();
-	public abstract String getPath();
 	public abstract LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions);
 	public abstract Set<FhirElementDataType> getDataTypes();
 	public abstract ResourceFlags getResourceFlags();
@@ -67,16 +68,22 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 		}
 	}
 	
-	public String getIdentifierString() {
-		return getId().orElse(getPath());
+	private final ImmutableNodePath path;
+	
+	public ImmutableNodePath getPath() {
+		return path;
 	}
 	
-	public String[] getPathParts() {
-		return getPath().split("\\.");
+	public WrappedElementDefinition(String path) {
+		this.path = new ImmutableNodePath(Preconditions.checkNotNull(path, "path cannot be null"));
+	}
+	
+	public String getIdentifierString() {
+		return getId().orElse(getPath().toString());
 	}
 	
 	public boolean isRootElement() {
-		return getPathParts().length == 1;
+		return getPath().isRoot();
 	}
 
 	protected ExtensionType lookupExtensionType(String typeProfile, Optional<StructureDefinitionRepository> structureDefinitions) {
@@ -115,6 +122,6 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	
 	@Override
 	public String toString() {
-		return getPath();
+		return getPath().toString();
 	}
 }

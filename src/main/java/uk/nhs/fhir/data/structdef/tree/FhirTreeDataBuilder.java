@@ -7,7 +7,7 @@ import java.util.Optional;
  */
 public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 	
-	private final NodePath path = new NodePath();
+	private final MutableNodePath path = new MutableNodePath();
 	private final Optional<EmptyNodeFactory<T, U>> emptyNodeFactory;
 	
 	private U rootNode = null;
@@ -26,7 +26,7 @@ public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 	}
 	
 	public void addFhirTreeNode(U node) {
-		NodePath nodeParentPathParts = new NodePath(node.getPath());
+		MutableNodePath nodeParentPathParts = node.getPath().mutableCopy();
 		
 		// pop the last part of the path (node name) off the end, leaving the parent path 
 		String nodeName = nodeParentPathParts.stepOut();
@@ -48,7 +48,7 @@ public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 		}
 	}
 	
-	private void stepTo(NodePath targetPath) {
+	private void stepTo(MutableNodePath targetPath) {
 		if (path.isSubpath(targetPath)) {
 			stepOutToAncestorPath(targetPath);
 		} else {
@@ -58,7 +58,7 @@ public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 		sanityCheck();
 	}
 	
-	private void stepToNonAncestorPath(NodePath targetPath) {
+	private void stepToNonAncestorPath(MutableNodePath targetPath) {
 		if (emptyNodeFactory.isPresent()) {
 			// trim path back until it only has nodes in common with the target path
 			while (!targetPath.isSubpath(path)) {
@@ -70,14 +70,14 @@ public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 			for (int i=path.size(); i<targetPath.size(); i++) {
 				path.stepInto(targetPath.getPart(i));
 	
-				appendNode(emptyNodefactory.create(currentNode, path));
+				appendNode(emptyNodefactory.create(currentNode, path.immutableCopy()));
 			}
 		} else {
-			throw new IllegalArgumentException("Cannot step to " + targetPath.toPathString() + " from " + path.toPathString() + " (no dummy node factory)");
+			throw new IllegalArgumentException("Cannot step to " + targetPath + " from " + path + " (no dummy node factory)");
 		}
 	}
 
-	private void stepOutToAncestorPath(NodePath ancestorPath) {
+	private void stepOutToAncestorPath(MutableNodePath ancestorPath) {
 		while (path.size() > ancestorPath.size()) {
 			stepOut();
 		}
@@ -90,8 +90,8 @@ public class FhirTreeDataBuilder<T, U extends TreeNode<T, U>> {
 
 	private void sanityCheck() {
 		if (currentNode != null
-		  && currentNode.getPath().split("\\.").length != path.size()) {
-			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + path.toPathString());
+		  && currentNode.getPathString().split("\\.").length != path.size()) {
+			throw new IllegalStateException("Failed sanity check: current node path = " + currentNode.getPath() + ", current path = " + path.toString());
 		}
 	}
 	

@@ -37,7 +37,7 @@ public class FhirTreeDatas {
 		Snapshot snapshot = ((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		for (ElementDefinitionDt element : snapshot.getElement()) {
 			WrappedElementDefinition wrappedElement = WrappedElementDefinition.fromDefinition(element);
-			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotNode(wrappedElement, structureDefinitions);
+			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions);
 			SnapshotTreeNode snapshotNode = new SnapshotTreeNode(snapshotData);
 
 			fhirTreeDataBuilder.addFhirTreeNode(snapshotNode);
@@ -55,7 +55,7 @@ public class FhirTreeDatas {
 		
 		for (ElementDefinition element : snapshot.getElement()) {
 			WrappedElementDefinition wrappedElement = WrappedElementDefinition.fromDefinition(element);
-			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotNode(wrappedElement, structureDefinitions);
+			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions);
 			SnapshotTreeNode node = new SnapshotTreeNode(snapshotData);
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
@@ -90,7 +90,7 @@ public class FhirTreeDatas {
 
 			if (elementDefinition != null) {
 				// i.e. not a dummy node - dummy nodes will be inserted automatically by the EmptyDifferentialNodeFactory
-				DifferentialData differentialNodeData = FhirTreeNodeDataBuilder.buildDifferentialNode(elementDefinition, backupNode, structureDefinitions);
+				DifferentialData differentialNodeData = FhirTreeNodeDataBuilder.buildDifferentialData(elementDefinition, backupNode, structureDefinitions);
 				DifferentialTreeNode differentialNode = new DifferentialTreeNode(differentialNodeData);
 				fhirDifferentialTreeDataBuilder.addFhirTreeNode(differentialNode);
 			}
@@ -107,7 +107,7 @@ public class FhirTreeDatas {
 		FhirTreeDataBuilder<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> fhirSkeletonTreeDataBuilder = 
 			new FhirTreeDataBuilder<>(new FhirSkeletonEmptyNodeFactory());
 		for (ElementDefinitionDt element : structureDefinition.getDifferential().getElement()) {
-			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
+			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonData(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
 			FhirDifferentialSkeletonNode node = new FhirDifferentialSkeletonNode(data);
 			fhirSkeletonTreeDataBuilder.addFhirTreeNode(node);
 		}
@@ -124,7 +124,7 @@ public class FhirTreeDatas {
 			new FhirTreeDataBuilder<>(new FhirSkeletonEmptyNodeFactory());
 
 		for (ElementDefinition element : structureDefinition.getDifferential().getElement()) {
-			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonNode(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
+			FhirDifferentialSkeletonData data = FhirTreeNodeDataBuilder.buildDifferentialSkeletonData(WrappedElementDefinition.fromDefinition(element), structureDefinitions);
 			FhirDifferentialSkeletonNode node = new FhirDifferentialSkeletonNode(data);
 			fhirSkeletonTreeDataBuilder.addFhirTreeNode(node);
 		}
@@ -136,8 +136,8 @@ public class FhirTreeDatas {
 class FhirSkeletonEmptyNodeFactory implements EmptyNodeFactory<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> {
 
 	@Override
-	public FhirDifferentialSkeletonNode create(FhirDifferentialSkeletonNode currentNode, NodePath path) {
-		FhirDifferentialSkeletonData data = new FhirDifferentialSkeletonData(Optional.empty(), path.toPathString(), Optional.empty(), Optional.empty(), new LinkDatas(), Optional.empty(), null);
+	public FhirDifferentialSkeletonNode create(FhirDifferentialSkeletonNode currentNode, ImmutableNodePath path) {
+		FhirDifferentialSkeletonData data = new FhirDifferentialSkeletonData(Optional.empty(), path, Optional.empty(), Optional.empty(), new LinkDatas(), Optional.empty(), null);
 
 		return new FhirDifferentialSkeletonNode(data);
 	}

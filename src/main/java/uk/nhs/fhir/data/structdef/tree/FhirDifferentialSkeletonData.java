@@ -10,7 +10,7 @@ import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 public class FhirDifferentialSkeletonData implements HasSlicingInfo, HasId {
 
 	private final Optional<String> id;
-	private final String path;
+	private final ImmutableNodePath path;
 	private final Optional<String> sliceName;
 	private final Optional<SlicingInfo> slicingInfo;
 	private final LinkDatas typeLinks;
@@ -20,7 +20,7 @@ public class FhirDifferentialSkeletonData implements HasSlicingInfo, HasId {
 	
 	public FhirDifferentialSkeletonData(
 			Optional<String> id,
-			String path, 
+			ImmutableNodePath path, 
 			Optional<SlicingInfo> slicingInfo, 
 			Optional<String> sliceName, 
 			LinkDatas typeLinks,
@@ -35,13 +35,16 @@ public class FhirDifferentialSkeletonData implements HasSlicingInfo, HasId {
 		this.elementDefinition = elementDefinition;
 	}
 	
-	public String getPath() {
+	public ImmutableNodePath getPath() {
 		return path;
 	}
 	
 	public String getPathName() {
-		String[] pathTokens = path.split("\\.");
-		return pathTokens[pathTokens.length - 1];
+		return path.getPathName();
+	}
+	
+	public String getPathString() {
+		return path.toString();
 	}
 
 	public WrappedElementDefinition getElement() {

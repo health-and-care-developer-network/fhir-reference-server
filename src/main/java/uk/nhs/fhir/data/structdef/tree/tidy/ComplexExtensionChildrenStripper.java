@@ -23,8 +23,7 @@ public class ComplexExtensionChildrenStripper<T extends AbstractFhirTreeNodeData
 	private void stripComplexExtensionChildren(U node) {
 		boolean isComplexExtension = node.getData().getExtensionType().isPresent() 
 		  && node.getData().getExtensionType().get().equals(ExtensionType.COMPLEX)
-		  // exclude root node
-		  && node.getPath().contains(".");
+		  && !node.isRoot();
 		
 		List<U> children = node.getChildren();
 		

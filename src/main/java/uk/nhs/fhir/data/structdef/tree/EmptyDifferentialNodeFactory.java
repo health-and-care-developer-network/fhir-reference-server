@@ -12,16 +12,18 @@ import uk.nhs.fhir.util.ListUtils;
 
 public class EmptyDifferentialNodeFactory implements EmptyNodeFactory<DifferentialData, DifferentialTreeNode> {
 	private final FhirTreeData<SnapshotData, SnapshotTreeNode> backupTreeData;
-	private final FhirTreeContentsLookup<SnapshotData, SnapshotTreeNode> treeLookup;
+	private final FhirTreePathLookup<SnapshotData, SnapshotTreeNode> treeLookup;
 	
 	public EmptyDifferentialNodeFactory(FhirTreeData<SnapshotData, SnapshotTreeNode> backupTreeData) {
 		this.backupTreeData = backupTreeData;
-		this.treeLookup = new FhirTreeContentsLookup<>(backupTreeData);
+		this.treeLookup = new FhirTreePathLookup<>(backupTreeData);
 	}
 
-	public DifferentialTreeNode create(DifferentialTreeNode parentNode, NodePath nodePath) {
+	public DifferentialTreeNode create(DifferentialTreeNode parentNode, ImmutableNodePath mutablePath) {
 		
-		SnapshotTreeNode backupNode = findBackup(parentNode, nodePath);
+		ImmutableNodePath path = mutablePath.immutableCopy();
+		
+		SnapshotTreeNode backupNode = findBackup(parentNode, path);
 		
 		DifferentialData data = new DifferentialData(
 			backupNode.getData().getId(),
@@ -32,7 +34,7 @@ public class EmptyDifferentialNodeFactory implements EmptyNodeFactory<Differenti
 			new LinkDatas(),
 			"",
 			Lists.newArrayList(),
-			nodePath.toPathString(),
+			path,
 			FhirElementDataType.DELEGATED_TYPE,
 			backupTreeData.getRoot().getData().getVersion(),
 			backupNode);
@@ -40,21 +42,19 @@ public class EmptyDifferentialNodeFactory implements EmptyNodeFactory<Differenti
 		return new DifferentialTreeNode(data, parentNode, true);
 	}
 
-	private SnapshotTreeNode findBackup(DifferentialTreeNode parentNode, NodePath nodePath) {
+	private SnapshotTreeNode findBackup(DifferentialTreeNode parentNode, ImmutableNodePath nodePath) {
 		if (parentNode == null) {
 			return backupTreeData.getRoot();
 		} else {
-			String backupNodePath = nodePath.toPathString();
-			
 			return 
 				ListUtils.expectUnique(
 					parentNode
 						.getBackupNode()
 						.getChildren()
 						.stream()
-						.filter(child -> treeLookup.nodesForPath(backupNodePath).contains(child))
+						.filter(child -> treeLookup.nodesForPath(nodePath).contains(child))
 						.collect(Collectors.toList()), 
-						"immediate descendants matching path " + backupNodePath);
+						"immediate descendants matching path " + nodePath);
 		}	
 	}
 }

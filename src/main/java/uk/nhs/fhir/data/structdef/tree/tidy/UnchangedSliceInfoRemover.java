@@ -1,9 +1,7 @@
 package uk.nhs.fhir.data.structdef.tree.tidy;
 
-import java.util.List;
-import java.util.stream.StreamSupport;
-
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.HasNodeKey;
 import uk.nhs.fhir.data.structdef.tree.TreeNode;
 
 /**
@@ -15,43 +13,19 @@ import uk.nhs.fhir.data.structdef.tree.TreeNode;
  */
 public class UnchangedSliceInfoRemover<
 		T extends HasBackupNode<V, W>, U extends TreeNode<T, U>, 
-		V extends HasSlicingInfo, W extends TreeNode<V, W>> {
-	
-	private final FhirTreeData<T, U> differentialTree;
+		V extends HasSlicingInfo, W extends TreeNode<V, W> & HasNodeKey>  extends AbstractUnchangedElementRemover<T,U,V,W>{
 
 	public UnchangedSliceInfoRemover(FhirTreeData<T, U> differentialTree) {
-		this.differentialTree = differentialTree;
-	}
-	
-	public void process(FhirTreeData<V, W> treeToModify) {
-		removeNonDifferentialSlicingChildren(treeToModify.getRoot());
-	}
-	
-	private void removeNonDifferentialSlicingChildren(W currentNode) {
-		if (currentNode.getData().hasSlicingInfo()) {
-			removeNonDifferentialDescendants(currentNode);
-		} else {
-			for (W child : currentNode.getChildren()) {
-				removeNonDifferentialSlicingChildren(child);
-			}
-		}
-	}
-	
-	private void removeNonDifferentialDescendants(W node) {
-		List<W> children = node.getChildren();
-		
-		for (int i=children.size()-1; i>=0; i--) {
-			W child = children.get(i);
-			if (!isDifferentialBackupNode(child)) {
-				children.remove(i);
-			} else {
-				removeNonDifferentialDescendants(child);
-			}
-		}
+		super(differentialTree);
 	}
 
-	private boolean isDifferentialBackupNode(W candidateForRemoval) {
-		return StreamSupport.stream(differentialTree.spliterator(), false)
-			.anyMatch(differentialNode -> differentialNode.getBackupNode().equals(candidateForRemoval));
+	@Override
+	protected boolean parentMatches(W parentOfRemovalCandidate) {
+		return parentOfRemovalCandidate.getData().hasSlicingInfo();
+	}
+
+	@Override
+	protected boolean childMatches(W child) {
+		return true;
 	}
 }

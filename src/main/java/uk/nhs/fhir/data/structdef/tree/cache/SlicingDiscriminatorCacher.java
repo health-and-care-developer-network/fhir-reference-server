@@ -85,7 +85,7 @@ public class SlicingDiscriminatorCacher<T extends AbstractFhirTreeNodeData, U ex
 		}
 
 		// Check for an extension type link first. Otherwise we default to an actual child node 'url' as normal
-		if (node.getData().getPathName().equals("extension") 
+		if (node.getData().getPath().getPathName().equals("extension") 
 		  && discriminatorPath.equals("url")) {
 			
 			Optional<String> extensionUrlDiscriminator = findExtensionUrlDiscriminator(node);

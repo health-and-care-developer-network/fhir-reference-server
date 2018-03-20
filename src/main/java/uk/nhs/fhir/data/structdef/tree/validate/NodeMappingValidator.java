@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
+import uk.nhs.fhir.data.structdef.tree.AbstractNodePath;
 import uk.nhs.fhir.data.structdef.tree.HasMappings;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
@@ -15,7 +16,7 @@ import uk.nhs.fhir.event.RendererEventType;
 public class NodeMappingValidator {
 
 	private final List<FhirElementMapping> mappings;
-	private final String path;
+	private final AbstractNodePath path;
 	private final Map<String, List<String>> mappingsByIdentity = Maps.newHashMap();
 	private final Map<String, List<String>> mappingsByIdentityStripIgnorable = Maps.newHashMap();
 	
@@ -23,7 +24,7 @@ public class NodeMappingValidator {
 		this(hasMappings.getMappings(), hasMappings.getPath());
 	}
 	
-	public NodeMappingValidator(List<FhirElementMapping> mappings, String path) {
+	public NodeMappingValidator(List<FhirElementMapping> mappings, AbstractNodePath path) {
 		this.mappings = mappings;
 		this.path = path;
 	}

@@ -80,7 +80,7 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 
 	@Override
 	public Optional<String> getConstrainedType() {
-		return Optional.of(definition.getConstrainedType());
+		return Optional.ofNullable(definition.getConstrainedType());
 	}
 
 	@Override

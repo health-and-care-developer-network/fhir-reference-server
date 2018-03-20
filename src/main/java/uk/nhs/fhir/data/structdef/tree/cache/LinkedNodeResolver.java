@@ -32,7 +32,7 @@ public abstract class LinkedNodeResolver<T extends AbstractFhirTreeNodeData, U e
 				String nodesWithMissingLinkTarget = String.join(", ", 
 					nodesWithLink
 						.stream()
-						.map(node -> node.getPath())
+						.map(node -> node.getPathString())
 						.collect(Collectors.toList()));
 				
 				EventHandlerContext.forThread().event(RendererEventType.MISSING_REFERENCED_NODE, 

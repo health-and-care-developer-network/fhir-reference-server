@@ -27,6 +27,7 @@ import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
 import uk.nhs.fhir.data.structdef.ResourceFlags;
 import uk.nhs.fhir.data.structdef.SlicingInfo;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
@@ -46,6 +47,7 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	private final ElementDefinition definition;
 
 	public WrappedStu3ElementDefinition(ElementDefinition definition) {
+		super(definition.getPath());
 		this.definition = definition;
 	}
 
@@ -55,8 +57,8 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public String getPath() {
-		return definition.getPath();
+	public ImmutableNodePath getPath() {
+		return new ImmutableNodePath(definition.getPath());
 	}
 
 	@Override

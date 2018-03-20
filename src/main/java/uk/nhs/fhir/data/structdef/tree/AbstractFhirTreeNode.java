@@ -8,11 +8,11 @@ public abstract class AbstractFhirTreeNode<T extends AbstractFhirTreeNodeData, U
 	public abstract String getNodeKey();
 	
 	public AbstractFhirTreeNode(T data) {
-		super(data);
+		super(data, data.getPath());
 	}
 	
 	public AbstractFhirTreeNode(T data, U parent) {
-		super(data, parent);
+		super(data, data.getPath(), parent);
 	}
 
 	public U getSlicingSibling() {

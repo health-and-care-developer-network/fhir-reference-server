@@ -34,7 +34,7 @@ public class DifferentialData extends AbstractFhirTreeNodeData implements HasBac
 			LinkDatas typeLinks,
 			String information,
 			List<ConstraintInfo> constraints,
-			String path,
+			ImmutableNodePath path,
 			FhirElementDataType dataType,
 			FhirVersion version,
 			SnapshotTreeNode backupNode) {
@@ -59,6 +59,10 @@ public class DifferentialData extends AbstractFhirTreeNodeData implements HasBac
 	@Override
 	public SnapshotTreeNode getBackupNode() {
 		return backupNode;
+	}
+	
+	public SnapshotTreeNode getBackupNode(FhirTreeKeyLookup<SnapshotData, SnapshotTreeNode> lookup) {
+		return lookup.nodeForKey(backupNode.getNodeKey());
 	}
 	
 	public Optional<String> getDefinition() {

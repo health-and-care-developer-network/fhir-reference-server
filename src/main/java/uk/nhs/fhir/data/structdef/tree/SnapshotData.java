@@ -19,7 +19,7 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 	protected final String max;
 	
 	public SnapshotData(Optional<String> id, Optional<String> name, ResourceFlags flags, Integer min, String max, LinkDatas typeLinks,
-			String information, List<ConstraintInfo> constraints, String path, FhirElementDataType dataType,
+			String information, List<ConstraintInfo> constraints, ImmutableNodePath path, FhirElementDataType dataType,
 			FhirVersion version) {
 		super(id, name, flags, typeLinks, information, constraints, path, dataType, version);
 

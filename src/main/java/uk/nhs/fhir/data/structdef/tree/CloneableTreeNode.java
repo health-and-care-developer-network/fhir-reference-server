@@ -2,14 +2,15 @@ package uk.nhs.fhir.data.structdef.tree;
 
 public abstract class CloneableTreeNode<T, U extends CloneableTreeNode<T, U>> extends TreeNode<T, U> {
 
+	public abstract String getNodeKey();
 	protected abstract U cloneShallow(U newParent);
 	
-	public CloneableTreeNode(T data) {
-		super(data);
+	public CloneableTreeNode(T data, ImmutableNodePath path) {
+		super(data, path);
 	}
 	
-	public CloneableTreeNode(T data, U parent) {
-		super(data, parent);
+	public CloneableTreeNode(T data, ImmutableNodePath path, U parent) {
+		super(data, path, parent);
 	}
 	
 	public U cloneSubtreeShallow(U newParent) {

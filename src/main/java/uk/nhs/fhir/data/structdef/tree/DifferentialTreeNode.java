@@ -20,11 +20,6 @@ public class DifferentialTreeNode extends AbstractFhirTreeNode<DifferentialData,
 	public SnapshotTreeNode getBackupNode() {
 		return getData().getBackupNode();
 	}
-	
-	@Override
-	public String getPath() {
-		return getData().getPath();
-	}
 
 	@Override
 	public String getNodeKey() {
