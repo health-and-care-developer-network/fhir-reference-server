@@ -67,7 +67,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	}
 
 	public String getOutputFolderName() {
-		return getResourceType().getDisplayName();
+		return getResourceType().getFolderName();
 	}
 	
 	protected abstract ResourceMetadata getMetadataImpl(File source);

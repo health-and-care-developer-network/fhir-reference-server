@@ -5,25 +5,21 @@ import java.util.List;
 
 import uk.nhs.fhir.util.FhirVersion;
 
-/**
- * This is an enum to hold whether the request is from a browser or not. It can be initialised using
- * getTypeFromHeaders to detect and return whether it is a browser or not.
- * @author Adam Hatherly
- */
 public enum ResourceType {
 	
-	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition"),
-	VALUESET("ValueSet", "ValueSet"),
-	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition"),
-	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide"),
-	CONFORMANCE("Conformance", "Conformance"),
+	STRUCTUREDEFINITION("StructureDefinition", "StructureDefinition", "StructureDefinition", "StructureDefinitions", "StructureDefinition"),
+	VALUESET("ValueSet", "ValueSet", "ValueSet", "ValueSets", "ValueSet"),
+	OPERATIONDEFINITION("OperationDefinition", "OperationDefinition", "OperationDefinition", "OperationDefinitions", "OperationDefinition"),
+	IMPLEMENTATIONGUIDE("ImplementationGuide", "ImplementationGuide", "ImplementationGuide", "ImplementationGuides", "ImplementationGuide"),
+	CONFORMANCE("Conformance", "Conformance", "Conformance", "Conformance Statements", "Conformance"),
 	
 	// Added for STU3
-	CONCEPTMAP("ConceptMap", "ConceptMap"),
-	CODESYSTEM("CodeSystem", "CodeSystem"),
+	CONCEPTMAP("ConceptMap", "ConceptMap", "ConceptMap", "ConceptMaps", "ConceptMap"),
+	CODESYSTEM("CodeSystem", "CodeSystem", "CodeSystem", "CodeSystems", "CodeSystem"),
 	
-	EXAMPLES("Examples", "Examples"),
-	OTHER("Other", "Other");
+	EXTENSION("Extension", null, "Extensions", "Extension Registry", "Extensions"),
+	EXAMPLES("Example", "Examples", "Examples", "Examples", "Examples"),
+	OTHER("Other", "Other", "Other", null, null);
 
 	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
 	private static final ResourceType[] STU3_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM};
@@ -39,17 +35,23 @@ public enum ResourceType {
 		}
 	}
 	
-	private ResourceType(String displayName, String hapiName) {
+	private ResourceType(String displayName, String hapiName, String folderName, String breadcrumbName, String requestPath) {
 		this.displayName = displayName;
 		this.hapiName = hapiName;
+		this.folderName = folderName;
+		this.breadcrumbName = breadcrumbName;
+		this.requestPath = requestPath;
 	}
 	
-	private String displayName = null;
-	private String hapiName = null;
+	private final String displayName;
+	private final String hapiName;
+	private final String folderName;
+	private final String breadcrumbName;
+	private final String requestPath;
 	
 	@Override
 	public String toString() {
-		return this.displayName;
+		return displayName;
 	}
 	
 	public String getDisplayName() {
@@ -57,7 +59,19 @@ public enum ResourceType {
 	}
 	
 	public String getHAPIName() {
-		return this.hapiName;
+		return hapiName;
+	}
+	
+	public String getBreadcrumbName() {
+		return breadcrumbName;
+	}
+	
+	public String getFolderName() {
+		return folderName;
+	}
+	
+	public String getRequestPath() {
+		return requestPath;
 	}
     
     public static ResourceType getTypeFromHAPIName(String hapiName) {
