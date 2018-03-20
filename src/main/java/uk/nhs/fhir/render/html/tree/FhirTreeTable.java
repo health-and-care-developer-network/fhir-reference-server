@@ -177,7 +177,7 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 				Set<String> discriminatorPaths = ancestor.getData().getSlicingInfo().get().getDiscriminatorPaths();
 				String discriminatorPathRoot = ancestor.getPath() + ".";
 				for (String discriminatorPath : discriminatorPaths) {
-					if ((discriminatorPathRoot + discriminatorPath).equals(node.getPath().toPathString())) {
+					if ((discriminatorPathRoot + discriminatorPath).equals(node.getPathString())) {
 						resourceInfos.add(new ResourceInfo("Slice discriminator", discriminatorPath, ResourceInfoType.SLICING_DISCRIMINATOR));
 					}
 				}

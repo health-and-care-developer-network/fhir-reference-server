@@ -114,7 +114,7 @@ class DummyStubTreeContentFactory implements EmptyNodeFactory<Object, StubTreeCo
 
 	@Override
 	public StubTreeContent create(StubTreeContent parent, ImmutableNodePath path) {
-		return new DummyStubTreeContent(path.toPathString());
+		return new DummyStubTreeContent(path.toString());
 	}
 	
 }

@@ -69,8 +69,9 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
 		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
 		
-		new RemovedElementStripper<>(differentialTreeData).process();
 		new ChildlessDummyNodeRemover<>(differentialTreeData).process();
+
+		new RemovedElementStripper<>(snapshotTreeData).process();
 		new RedundantValueNodeRemover<>(differentialTreeData).process(snapshotTreeData);
 		new ExtensionsSlicingNodesRemover<>(snapshotTreeData).process();
 		new UnwantedConstraintRemover<>(snapshotTreeData).process();
@@ -93,7 +94,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			ResourceFlags resourceFlags = nodeData.getResourceFlags();
 			Optional<String> comments = nodeData.getComments();
 			Optional<String> linkedNodeKey = nodeData.getLinkedNode().isPresent() ? 
-				Optional.of(nodeData.getLinkedNode().get().getPath().toPathString()) : 
+				Optional.of(nodeData.getLinkedNode().get().getPathString()) : 
 				Optional.empty();
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
@@ -136,7 +137,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			List<ConstraintInfo> inheritedConstraints, List<ConstraintInfo> profileConstraints) {
 		
 		Optional<DifferentialData> matchingDifferentialNode = StreamSupport.stream(differentialTreeData.spliterator(), false)
-			.filter(differentialNode -> differentialNode.getBackupNode().equals(node))
+			.filter(differentialNode -> differentialNode.getBackupNode().getNodeKey().equals(node.getNodeKey()))
 			.findFirst();
 		
 		if (matchingDifferentialNode.isPresent()) {

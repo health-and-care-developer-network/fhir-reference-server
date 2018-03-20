@@ -13,6 +13,7 @@ import uk.nhs.fhir.data.structdef.tree.SnapshotData;
 import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.ChildlessDummyNodeRemover;
 import uk.nhs.fhir.data.structdef.tree.tidy.ComplexExtensionChildrenStripper;
+import uk.nhs.fhir.data.structdef.tree.tidy.DefaultElementStripper;
 import uk.nhs.fhir.data.structdef.tree.tidy.ExtensionsSlicingNodesRemover;
 import uk.nhs.fhir.data.structdef.tree.tidy.RedundantValueNodeRemover;
 import uk.nhs.fhir.data.structdef.tree.tidy.RemovedElementStripper;
@@ -42,6 +43,7 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
 			FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
+			new DefaultElementStripper<>(differentialTreeData).process(snapshotTreeData);
 			new UnchangedSliceInfoRemover<>(differentialTreeData).process(snapshotTreeData);
 			new RedundantValueNodeRemover<>(differentialTreeData).process(snapshotTreeData);
 			new ChildlessDummyNodeRemover<>(differentialTreeData).process();

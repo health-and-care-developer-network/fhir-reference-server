@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.HasNodeKey;
 import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.TreeNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.HasBackupNode;
@@ -110,7 +111,7 @@ public class TestUnchangedSliceInfoRemover {
 		TestDifferentialNode diffGrandchild = new TestDifferentialNode("GRANDCHILD", "Test.child.grandchild", grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
+		
 		
 		Assert.assertEquals(3, Iterators.size(data.iterator()));
 	}
@@ -135,7 +136,7 @@ class TestSnapshotData implements HasSlicingInfo {
 	}
 }
 
-class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> {
+class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> implements HasNodeKey {
 
 	private final String id;
 
@@ -150,6 +151,11 @@ class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> {
 	
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public String getNodeKey() {
+		return getPathString();
 	}
 }
 
