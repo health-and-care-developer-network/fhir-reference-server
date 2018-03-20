@@ -7,6 +7,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.servlet.SharedServletContext;
 
 public class AppShellTemplate { 
@@ -25,7 +26,7 @@ public class AppShellTemplate {
     	}
 	}
 	
-	public VelocityContext getContext(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName, String crawlerDescription) {
+	public VelocityContext getContext(String contentTemplateName, Optional<ResourceType> resourceType, Optional<String> resourceName, String crawlerDescription) {
 		VelocityContext context = new VelocityContext();
 
     	context.put( "contentTemplateName", templateDirectory + contentTemplateName );

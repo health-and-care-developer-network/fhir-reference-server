@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.velocity.VelocityContext;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.page.VelocityTemplate;
 
 public class ExtensionsListPageTemplate extends VelocityTemplate {
@@ -13,7 +14,7 @@ public class ExtensionsListPageTemplate extends VelocityTemplate {
 	private final List<ResourceMetadata> extensions;
 	
 	public ExtensionsListPageTemplate(String baseUrl, List<ResourceMetadata> extensions) {
-		super("extensions.vm", Optional.of("Extension Registry"), Optional.empty());
+		super("extensions.vm", Optional.of(ResourceType.EXTENSION), Optional.empty());
 		this.extensions = extensions;
 	}
 

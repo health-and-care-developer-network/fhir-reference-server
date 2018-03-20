@@ -8,6 +8,7 @@ import org.apache.velocity.VelocityContext;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.SupportingArtefact;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.page.VelocityTemplate;
@@ -25,7 +26,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	private final String baseURL;
 	private final FhirVersion fhirVersion;
 
-	public ResourceWithMetadataTemplate(String resourceType, String resourceName, String baseURL, IBaseResource resource,
+	public ResourceWithMetadataTemplate(ResourceType resourceType, String resourceName, String baseURL, IBaseResource resource,
 			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
 			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<List<ResourceMetadata>> examples,
 			FhirVersion fhirVersion) {

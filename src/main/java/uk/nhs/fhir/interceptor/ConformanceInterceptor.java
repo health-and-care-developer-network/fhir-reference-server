@@ -65,6 +65,6 @@ public class ConformanceInterceptor extends InterceptorAdapter {
     	LOG.debug("Attempting to render conformance statement");
     	String resourceContent = myRawResourceRenderer.getRawResource(conformance, mimeType, fhirVersion);
     	
-    	return new RawResourceTemplate(Optional.of(CONFORMANCE.toString()), Optional.empty(), resourceContent, mimeType).getHtml(CONFORMANCE_CRAWLER_DESCRIPTION);
+    	return new RawResourceTemplate(Optional.of(CONFORMANCE), Optional.empty(), resourceContent, mimeType).getHtml(CONFORMANCE_CRAWLER_DESCRIPTION);
     }
 }
