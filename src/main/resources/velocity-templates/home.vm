@@ -160,4 +160,4 @@
 		</div>
 	</ul>
 </div>
-<p><a href="/metadata">Download conformance resource for this FHIR server</a></p>
+<p>Download conformance resource for this FHIR server: <a href="/metadata">DSTU2</a> | <a href="/STU3/metadata">STU3</a></p>
