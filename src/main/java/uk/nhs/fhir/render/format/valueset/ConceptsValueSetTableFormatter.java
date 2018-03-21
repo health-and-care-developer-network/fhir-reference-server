@@ -1,6 +1,7 @@
 package uk.nhs.fhir.render.format.valueset;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,35 +38,9 @@ public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueS
 		ValueSetConceptsTableDataProvider tableData = new ValueSetConceptsTableDataProvider(wrappedResource);
 		List<ValueSetConceptsTableDataCodeSystem> codeSystems = tableData.getCodeSystems();
 
-		boolean needsDisplayColumn = false;
-		for (ValueSetConceptsTableDataCodeSystem codeSystem : codeSystems) {
-			for (ValueSetConceptsTableData concept : codeSystem.getConcepts()) {
-				if (concept.getDisplay().isPresent()) {
-					needsDisplayColumn = true;
-					break;
-				}
-			}
-		}
-		
-		boolean needsDefinitionColumn = false;
-		for (ValueSetConceptsTableDataCodeSystem codeSystem : codeSystems) {
-			for (ValueSetConceptsTableData concept : codeSystem.getConcepts()) {
-				if (concept.getDefinition().isPresent()) {
-					needsDefinitionColumn = true;
-					break;
-				}
-			}
-		}
-	
-		boolean needsMappingColumn = false;
-		for (ValueSetConceptsTableDataCodeSystem codeSystem : codeSystems) {
-			for (ValueSetConceptsTableData concept : codeSystem.getConcepts()) {
-				if (concept.getMapping().isPresent()) {
-					needsMappingColumn = true;
-					break;
-				}
-			}
-		}
+		boolean needsDisplayColumn = findConceptFeature(codeSystems, concept -> concept.getDisplay().isPresent());
+		boolean needsDefinitionColumn = findConceptFeature(codeSystems, concept -> concept.getDefinition().isPresent());
+		boolean needsMappingColumn = findConceptFeature(codeSystems, concept -> concept.getMapping().isPresent());
 
 		List<TableRow> tableRows = Lists.newArrayList();
 		
@@ -77,6 +52,17 @@ public class ConceptsValueSetTableFormatter extends TableFormatter<WrappedValueS
 		
 		Element filteredCodeSystemTable = new Table(tableData.getColumns(needsDisplayColumn, needsDefinitionColumn, needsMappingColumn), tableRows).makeTable();
 		return new FhirPanel("Value set concepts", filteredCodeSystemTable).makePanel();
+	}
+	
+	private boolean findConceptFeature(List<ValueSetConceptsTableDataCodeSystem> codeSystems, Predicate<? super ValueSetConceptsTableData> predicate) {
+		return 
+			codeSystems
+				.stream()
+				.flatMap(codeSystem -> 
+					codeSystem
+						.getConcepts()
+						.stream())
+				.anyMatch(predicate);
 	}
 
 	private void addStyles(HTMLDocSection section) {

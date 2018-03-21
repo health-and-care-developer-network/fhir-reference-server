@@ -12,7 +12,6 @@ import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
-import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
@@ -45,7 +44,7 @@ public class ValueSetConceptsTableDataProvider {
 					addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
 				} else {
 					EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
-						"Empty include and url [" + include.getSystem() + "] doesn't start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK);
+						"Empty include and url [" + include.getSystem() + "] wasn't found locally (does it start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK + "?)");
 					// ensure that we still display the code system
 					addConcepts(rows, include.getSystem(), Lists.newArrayList());
 				}
@@ -63,34 +62,39 @@ public class ValueSetConceptsTableDataProvider {
 		for (FhirCodeSystemConcept concept : concepts) {
 			String code = concept.getCode();
 			
-			String mappedCode = null;
+			List<String> mappedCodes = 
+				valueSet
+					.getConceptMaps(RendererContext.forThread().getFhirFileRegistry()).stream()
+					.flatMap(conceptMap -> 
+						conceptMap
+							.getElements()
+							.stream())
+					.filter(mapElement -> 
+						code.equals(mapElement.getCode()))
+					.filter(mapElement ->
+						assertHasTargets(mapElement, code))
+					.flatMap(mapElement -> 
+						mapElement.getTargets().stream())
+					.map(target -> "~" + target.getCode())
+					.collect(Collectors.toList());
 			
-			for (WrappedConceptMap conceptMap : valueSet.getConceptMaps(RendererContext.forThread().getFhirFileRegistry())) {
-				for (FhirConceptMapElement mapElement : conceptMap.getElements()) {
-	                if (code.equals(mapElement.getCode())) {
-	                	if (mapElement.getTargets().isEmpty()) {
-	                		throw new IllegalStateException("Concept map includes matching code " + code + " but didn't include any targets");
-	                	} else if (mapElement.getTargets().size() > 1) {
-	                		String targetsDesc = mapElement.getTargets().stream().map(target -> target.getCode()).collect(Collectors.joining(", "));
-                			throw new IllegalStateException("Concept map contains multiple targets for code " + code + " (" + targetsDesc + "). How should this be displayed?");
-                		} 
-	                		
-                		String newMappedCode = "~" + mapElement.getTargets().get(0).getCode();
-                		
-                		if (mappedCode != null
-                		  && !mappedCode.equals(newMappedCode)) {
-                			throw new IllegalStateException("Code " + code + " is mapped to 2 or more other codes: " + mappedCode + " & " + newMappedCode);
-                		}
-                		
-                		mappedCode = newMappedCode;
-	                }
-	            }
+			if (mappedCodes.isEmpty()) {
+				// no map elements found which match this code
+				codeSystemWithConcepts.addConcept(code, concept.getDescription(), concept.getDefinition(), Optional.empty());
+			} else {
+				for (String mappedCode : mappedCodes) {
+					codeSystemWithConcepts.addConcept(code, concept.getDescription(), concept.getDefinition(), Optional.of(mappedCode));
+				}
 			}
-			
-			Optional<String> mappingString = Optional.ofNullable(mappedCode);
-			
-			codeSystemWithConcepts.addConcept(code, concept.getDescription(), concept.getDefinition(), mappingString);
 		}
+	}
+
+	private boolean assertHasTargets(FhirConceptMapElement mapElement, String code) {
+		if (mapElement.getTargets().isEmpty()) {
+    		throw new IllegalStateException("Concept map includes matching code " + code + " but didn't include any targets");
+    	}
+		
+		return true;
 	}
 
 	private ValueSetConceptsTableDataCodeSystem findOrAddSystem(List<ValueSetConceptsTableDataCodeSystem> conceptsHeaders, String system) {
