@@ -96,23 +96,33 @@ public class VersionNumber implements Comparable<VersionNumber> {
 		return result;
 	}
 
+	// Used by velocity templates to work out which version history link to bolden
+	public boolean equals(String s) {
+		if (s == null) {
+			return false;
+		}
+		
+		return equals(new VersionNumber(s));
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		
+		if (!(obj instanceof VersionNumber)) {
 			return false;
-		VersionNumber other = (VersionNumber) obj;
-		if (major != other.major)
-			return false;
-		if (minor != other.minor)
-			return false;
-		if (patch != other.patch)
-			return false;
-		if (valid != other.valid)
-			return false;
-		return true;
+		}
+
+		VersionNumber other = (VersionNumber)obj;
+		
+		return (
+			major == other.major
+		  && minor == other.minor
+		  && patch == other.patch
+		  && valid == other.valid);
 	}
 }
