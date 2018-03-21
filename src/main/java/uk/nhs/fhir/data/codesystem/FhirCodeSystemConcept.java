@@ -28,4 +28,8 @@ public class FhirCodeSystemConcept {
 		return definition;
 	}
 	
+	public String toString() {
+		return getClass().getSimpleName() + "[" + code + "]";
+	}
+	
 }
