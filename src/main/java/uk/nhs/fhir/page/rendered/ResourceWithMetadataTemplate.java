@@ -1,7 +1,7 @@
 package uk.nhs.fhir.page.rendered;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
@@ -18,7 +18,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 
 	private final IBaseResource resource;
 	private final String firstTabName;
-	private final HashMap<VersionNumber, ResourceMetadata> versionsList;
+	private final Map<VersionNumber, ResourceMetadata> versionsList;
 	private final ResourceMetadata resourceMetadata;
 	private final Optional<SupportingArtefact> metadataArtefact;
 	private final String textSection;
@@ -27,7 +27,7 @@ public class ResourceWithMetadataTemplate extends VelocityTemplate {
 	private final FhirVersion fhirVersion;
 
 	public ResourceWithMetadataTemplate(ResourceType resourceType, String resourceName, String baseURL, IBaseResource resource,
-			String firstTabName, HashMap<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
+			String firstTabName, Map<VersionNumber, ResourceMetadata> versionsList, ResourceMetadata resourceMetadata,
 			Optional<SupportingArtefact> metadataArtefact, String textSection, Optional<List<ResourceMetadata>> examples,
 			FhirVersion fhirVersion) {
 		super("resource-with-metadata.vm", Optional.of(resourceType), Optional.of(resourceName));

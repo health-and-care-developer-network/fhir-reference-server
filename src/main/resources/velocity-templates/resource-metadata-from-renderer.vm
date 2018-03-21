@@ -27,11 +27,12 @@
 					<ul>
 						#foreach( $version_no in $versions.keySet() )
 						    #set( $version_entry = $versions.get($version_no) )
-							#if( $version_entry.getVersionNo() == $resource.getVersion() )
+						    #set( $is_selected_version = $version_entry.getVersionNo().equals($resource.getVersion()) )
+							#if( $is_selected_version )
 							  <b>
 							#end
 						    <li><a href="$version_entry.getVersionedUrl($baseURL)">Version: $version_no</a> <span class='versionStatusLabel'>$version_entry.getStatus()</span></li>
-						    #if( $version_entry.getVersionNo() == $resource.getVersion() )
+						    #if( $is_selected_version )
 							  </b>
 							#end
 						#end

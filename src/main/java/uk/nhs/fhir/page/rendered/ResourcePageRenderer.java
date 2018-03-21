@@ -1,7 +1,7 @@
 package uk.nhs.fhir.page.rendered;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -45,7 +45,7 @@ public class ResourcePageRenderer {
 
     	// List of versions
     	ResourceEntityWithMultipleVersions entity = resourceWebHandler.getVersionsForID(fhirVersion, resourceID);
-    	HashMap<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
+    	Map<VersionNumber, ResourceMetadata> versionsList = entity.getVersionList();
 
     	// Resource metadata
     	ResourceMetadata resourceMetadata = resourceWebHandler.getResourceEntityByID(fhirVersion, resourceID);
