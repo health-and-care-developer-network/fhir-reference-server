@@ -54,7 +54,13 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 
 ## Release Notes
 
-> ### v1.0.3 (13/03/2018)
+> ### v1.2.0 (13/03/2018)
+> - make pluralisation of resource list title consistent
+> - add link to STU3 conformance document
+> - resource name in page titles
+> - sort resource lists by name
+
+> ### v1.1.0 (13/03/2018)
 > - improve error handling when servicing a request
 > - add web crawler descriptions
 > - refactor properties provider into an object held on shared servlet context
