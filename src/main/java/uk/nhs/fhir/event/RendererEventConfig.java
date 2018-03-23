@@ -16,6 +16,7 @@ public class RendererEventConfig {
 		// Forge bug
 		responses.put(RendererEventType.MISNAMED_SNAPSHOT_CHOICE_NODE, RendererEventResponse.IGNORE); // should ideally be a warning so we chase Forge, but out of our control
 		responses.put(RendererEventType.DIFFERENTIAL_NODE_MISSING_ID, RendererEventResponse.IGNORE); // should be a warning so we chase Forge, but too many & maybe out of our control
+		responses.put(RendererEventType.DIFFERENTIAL_CHOICE_NODE_WRONG_ID, RendererEventResponse.IGNORE); // should be a warning so we chase Forge
 		
 		// Error in profile
 		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.IGNORE); // should be a warning, but too many
@@ -36,7 +37,6 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.IGNORABLE_MAPPING_ID, RendererEventResponse.IGNORE);
 		responses.put(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, RendererEventResponse.IGNORE); // should be a warning, but too many
 		responses.put(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME, RendererEventResponse.LOG_WARNING);
-		responses.put(RendererEventType.DIFFERENTIAL_CHOICE_NODE_WRONG_ID, RendererEventResponse.LOG_WARNING);
 
 		// hit by DSTU2 (GPConnect)
 		responses.put(RendererEventType.VERSION_NOT_AVAILABLE, RendererEventResponse.LOG_WARNING);
