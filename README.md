@@ -59,7 +59,13 @@ No guarantee of correctness is provided. You may get benefit from the use of thi
 
 ## Release Notes
 
-> ### v1.0.3 (14/12/2017)
+> ### v1.2.0 (23/03/2018)
+> - Render OperationDefinition parameter parts
+> - Allow viewing event messages while file copying is carried out
+> - Support multiple target codes for a single source in a ConceptMap
+> - Remove linked ValueSet from CodeSystem metadata
+
+> ### v1.1.0 (13/03/2018)
 > - Fix empty row between table title and table body for non-tree tables
 > - Support links to HL7 primitive types without changing logical URL displayed
 > - Overhaul of tree building (code now migrated to fhir-model-utils).
