@@ -25,7 +25,13 @@ A set of utilities to support rendering and serving FHIR specification resources
 
 ## Release Notes
 
-> ### v1.0.3 (13/03/2018)
+> ### v1.2.0 (23/03/2018)
+> - make OperationDefinition parameter parts accessible through WrappedOperationDefinition
+> - add unexpected features checks for OperationDefinitions
+> - fixed bug where node removers wouldn't respect that a node appeared in the differential tree
+> - use NodePath consistently where a '.'-separated path is used. Explicitly mutable or immutable.
+
+> ### v1.1.0 (13/03/2018)
 > - Tree building improvements: support shallow cloning of FhirTree by reusing data objects on new tree of nodes; lazily create these trees and cache a template tree on each wrapped resource, to reduce work for each renderer
 > - support references to user-defined data types
 > - construct a minimal "skeleton" backup tree to permit backup node resolution before differential node creation
