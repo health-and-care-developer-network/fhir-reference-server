@@ -4,7 +4,7 @@
 
   <groupId>uk.nhs</groupId>
   <artifactId>fhir-server-renderer</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.2.0-SNAPSHOT</version>
 
   <name>server-renderer</name>
   <url>http://maven.apache.org</url>
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>uk.nhs</groupId>
       <artifactId>fhir</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>1.2.0-SNAPSHOT</version>
       <classifier>classes</classifier>
     </dependency>
     <!-- marked as provided in fhir server - legacy setup for java ee web archetype <=v6. Just include as normal here -->
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>uk.nhs.fhir</groupId>
       <artifactId>MakeHTML</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>1.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

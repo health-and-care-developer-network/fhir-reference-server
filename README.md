@@ -61,7 +61,10 @@ The server uses a temporary folder to hold imported artefacts. This should be de
 
 ## Release Notes
 
-> ### v1.1.0 (09/11/2017)
+> ### v1.2.0 (23/03/2018)
+> - minor changes to allow use of reference server and profile renderer version 1.2.0
+
+> ### v1.1.0 (13/03/2018)
 > - Improve event dialog layout
 > - Remove superfluous file separator
 > - Update package organisation
