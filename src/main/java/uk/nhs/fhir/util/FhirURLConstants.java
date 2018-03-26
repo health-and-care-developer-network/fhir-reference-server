@@ -36,6 +36,8 @@ public class FhirURLConstants {
 	public static final String HTTPS_FHIR_HL7_ORG_UK = "https://" + FHIR_HL7_ORG_UK;
 
 	public static final String FHIR_NHS_UK = "https://fhir.nhs.uk";
+	public static final String FHIR_TEST_NHS_UK = "https://fhir-test.nhs.uk";
+	public static final String FHIR_TEST_HL7_NHS_UK = "https://fhir-test.hl7.org.uk";
 	public static final String NHS_LOGICAL_URL_PREFIX = "/Id";
 	public static final String NHS_ID = FHIR_NHS_UK + NHS_LOGICAL_URL_PREFIX;
 	public static final String NHS_FHIR_IMAGES_DIR = FHIR_NHS_UK + "/images";
@@ -53,14 +55,14 @@ public class FhirURLConstants {
 		}
 	}
 	
-	private static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK};
+	private static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK, FHIR_TEST_NHS_UK, FHIR_TEST_HL7_NHS_UK};
 	public static boolean isNhsResourceUrl(String url) {
 		return StreamSupport
 			.stream(Arrays.spliterator(NHS_PROFILE_PREFIXES), false)
 			.anyMatch(prefix -> url.startsWith(prefix));
 	}
 	
-	private static final String[] NHS_PROFILE_DOMAINS = new String[] {"fhir.nhs.net", "fhir.nhs.uk", "fhir.hl7.org.uk"};
+	private static final String[] NHS_PROFILE_DOMAINS = new String[] {"fhir.nhs.net", "fhir.nhs.uk", "fhir.hl7.org.uk", "fhir-test.hl7.org.uk", "fhir-test.nhs.uk"};
 	public static boolean startsWithNhsDomain(String url) {
 		return StreamSupport
 				.stream(Arrays.spliterator(NHS_PROFILE_DOMAINS), false)
