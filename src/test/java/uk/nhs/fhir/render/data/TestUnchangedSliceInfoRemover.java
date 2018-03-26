@@ -11,6 +11,8 @@ import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.structdef.SlicingInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
+import uk.nhs.fhir.data.structdef.tree.HasNodeKey;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 import uk.nhs.fhir.data.structdef.tree.TreeNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.HasBackupNode;
 import uk.nhs.fhir.data.structdef.tree.tidy.HasSlicingInfo;
@@ -109,7 +111,7 @@ public class TestUnchangedSliceInfoRemover {
 		TestDifferentialNode diffGrandchild = new TestDifferentialNode("GRANDCHILD", "Test.child.grandchild", grandchild);
 		diffChild.addChild(diffGrandchild);
 		
-		new UnchangedSliceInfoRemover<>(new FhirTreeData<>(diffRoot)).process(data);
+		
 		
 		Assert.assertEquals(3, Iterators.size(data.iterator()));
 	}
@@ -134,28 +136,26 @@ class TestSnapshotData implements HasSlicingInfo {
 	}
 }
 
-class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> {
+class TestSnapshotNode extends TreeNode<TestSnapshotData, TestSnapshotNode> implements HasNodeKey {
 
 	private final String id;
-	private final String path;
 
 	public TestSnapshotNode(String id, String path) {
 		this(id, path, Sets.newHashSet());
 	}
 	
 	public TestSnapshotNode(String id, String path, Set<String> discriminators) {
-		super(new TestSnapshotData(discriminators));
+		super(new TestSnapshotData(discriminators), new ImmutableNodePath(path));
 		this.id = id;
-		this.path = path;
-	}
-
-	@Override
-	public String getPath() {
-		return path;
 	}
 	
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public String getNodeKey() {
+		return getPathString();
 	}
 }
 
@@ -176,17 +176,10 @@ class TestDifferentialData implements HasBackupNode<TestSnapshotData, TestSnapsh
 class TestDifferentialNode extends TreeNode<TestDifferentialData, TestDifferentialNode> {
 
 	private final String id;
-	private final String path;
 
 	public TestDifferentialNode(String id, String path, TestSnapshotNode backupNode) {
-		super(new TestDifferentialData(backupNode));
+		super(new TestDifferentialData(backupNode), new ImmutableNodePath(path));
 		this.id = id;
-		this.path = path;
-	}
-	
-	@Override
-	public String getPath() {
-		return path;
 	}
 	
 	public String getId() {

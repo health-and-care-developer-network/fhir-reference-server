@@ -1,13 +1,12 @@
 package uk.nhs.fhir.render.tree;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import uk.nhs.fhir.data.structdef.tree.EmptyNodeFactory;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeDataBuilder;
-import uk.nhs.fhir.data.structdef.tree.NodePath;
-
-import org.junit.Assert;
+import uk.nhs.fhir.data.structdef.tree.ImmutableNodePath;
 
 public class TestFhirTreeDataBuilder {
 	@Test
@@ -114,8 +113,8 @@ class DummyStubTreeContent extends StubTreeContent {
 class DummyStubTreeContentFactory implements EmptyNodeFactory<Object, StubTreeContent> {
 
 	@Override
-	public StubTreeContent create(StubTreeContent parent, NodePath path) {
-		return new DummyStubTreeContent(path.toPathString());
+	public StubTreeContent create(StubTreeContent parent, ImmutableNodePath path) {
+		return new DummyStubTreeContent(path.toString());
 	}
 	
 }

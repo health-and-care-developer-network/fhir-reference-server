@@ -28,7 +28,7 @@ public class DefaultRendererFileLocator implements RendererFileLocator {
 
 	@Override
 	public Path getRenderingTempOutputDirectory(WrappedResource<?> resource) {
-		return tempOutputDirectory.resolve(resource.getImplicitFhirVersion().toString()).resolve(resource.getResourceType().getDisplayName());
+		return tempOutputDirectory.resolve(resource.getImplicitFhirVersion().toString()).resolve(resource.getResourceType().getFolderName());
 	}
 
 	@Override

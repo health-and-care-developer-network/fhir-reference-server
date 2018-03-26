@@ -179,6 +179,13 @@ public class NewMain {
 	        }
 
     		boolean succeeded = !eventHandler.foundErrors();
+        	
+        	if (eventHandler.isDeferred() 
+        	  && (!succeeded || eventHandler.foundWarnings())) {
+        		LOG.info("Displaying event messages");
+        		
+        		eventHandler.displayOutstandingEvents();
+        	}
     		
         	if (succeeded || allowCopyOnError) {
         		if (succeeded) {
@@ -189,13 +196,6 @@ public class NewMain {
         		
         		copyExamples(fhirFileRegistry);
         		copyGeneratedArtefacts();
-        	} 
-        	
-        	if (eventHandler.isDeferred() 
-        	  && (!succeeded || eventHandler.foundWarnings())) {
-        		LOG.info("Displaying event messages");
-        		
-        		eventHandler.displayOutstandingEvents();
         	}
         	
         	// if there is an error while copying the files, this gets skipped so they can be recovered if necessary

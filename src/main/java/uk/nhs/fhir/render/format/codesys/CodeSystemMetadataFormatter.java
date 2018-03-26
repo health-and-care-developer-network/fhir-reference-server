@@ -53,7 +53,6 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 		Optional<String> title = codeSystem.getTitle();
 		
 		String version = codeSystem.getVersion().orElse(BLANK);
-		String valueSet = codeSystem.getValueSet().orElse(BLANK);
 		String status = codeSystem.getStatus();
 		Optional<Boolean> experimental = codeSystem.getExperimental();
 		String experimentalDesc = experimental.map(bool -> boolDesc(bool)).orElse(BLANK);
@@ -104,11 +103,10 @@ public class CodeSystemMetadataFormatter extends TableFormatter<WrappedCodeSyste
 			Elements.withChildren("tr",
 				labelledValueCell("Version", version, 1, true),
 				labelledValueCell("Status", status, 1, true),
-				labelledValueCell("Associated ValueSet", valueSet, 2, true)));
+				labelledValueCell("Purpose", purpose, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Description", description, 2, true),
-				labelledValueCell("Purpose", purpose, 2, true)));
+				labelledValueCell("Description", description, 4, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
 				labelledValueCell("Last updated", lastUpdated, 1, true),

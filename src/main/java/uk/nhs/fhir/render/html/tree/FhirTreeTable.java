@@ -177,7 +177,7 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 				Set<String> discriminatorPaths = ancestor.getData().getSlicingInfo().get().getDiscriminatorPaths();
 				String discriminatorPathRoot = ancestor.getPath() + ".";
 				for (String discriminatorPath : discriminatorPaths) {
-					if ((discriminatorPathRoot + discriminatorPath).equals(node.getPath())) {
+					if ((discriminatorPathRoot + discriminatorPath).equals(node.getPathString())) {
 						resourceInfos.add(new ResourceInfo("Slice discriminator", discriminatorPath, ResourceInfoType.SLICING_DISCRIMINATOR));
 					}
 				}
@@ -188,8 +188,8 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 		// FixedValue
 		if (nodeData.isFixedValue()) {
 			String description = nodeData.getFixedValue().get();
-			boolean maybeLogicalUrl = node.getPath().endsWith("coding.system")
-			  || node.getPath().endsWith("identifier.system");
+			boolean maybeLogicalUrl = node.getPathString().endsWith("coding.system")
+			  || node.getPathString().endsWith("identifier.system");
 			
 			if (maybeLogicalUrl
 			  && looksLikeUrl(description)
