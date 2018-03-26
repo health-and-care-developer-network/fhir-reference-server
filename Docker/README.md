@@ -8,6 +8,12 @@ First, you need to have compiled the code in maven - from the project root type:
 mvn clean install
 ```
 
+Now, we need to run a script to find the name of the JAR file we've just built do the docker scripts can find it and use the right one:
+
+```bash
+./writeJarName.sh
+```
+
 Then, from the Docker directory, build the docker image:
 
 ```bash
