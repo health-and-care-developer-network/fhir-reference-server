@@ -30,8 +30,10 @@ then
   cp /source/files/$REPO_PATH/* /generated/$OUT_PATH
 else
   cd /usr/makehtml
-  echo "Running command: java $ARGUMENTS -jar ./target/MakeHTML-1.1.0-SNAPSHOT.jar /source/files/$REPO_PATH /generated/$OUT_PATH"
+  jarName=`cat ./target/jarName.txt`
+  echo "Using Jar name: $jarName"
+  echo "Running command: java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH"
   ls ./target
-  java $ARGUMENTS -jar ./target/MakeHTML-1.1.0-SNAPSHOT.jar /source/files/$REPO_PATH /generated/$OUT_PATH
+  java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH
 fi
 
