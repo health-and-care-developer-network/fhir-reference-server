@@ -9,6 +9,6 @@ public abstract class AbstractFhirFileLocator {
 	public abstract Path getDestinationPathForResourceType(ResourceType type, FhirVersion version);
 
 	public Path getSourcePathForResourceType(ResourceType type, FhirVersion version) {
-		return getSourceRoot(version).resolve(type.getDisplayName());
+		return getSourceRoot(version).resolve(type.getFolderName());
 	}
 }

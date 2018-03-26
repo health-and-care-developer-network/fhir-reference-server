@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 public abstract class VelocityTemplate {
@@ -18,10 +19,10 @@ public abstract class VelocityTemplate {
 	protected abstract void updateContext(VelocityContext context);
 
 	private final String contentTemplateName;
-	protected final Optional<String> resourceType;
+	protected final Optional<ResourceType> resourceType;
 	private final Optional<String> resourceName;
 	
-	public VelocityTemplate(String contentTemplateName, Optional<String> resourceType, Optional<String> resourceName) {
+	public VelocityTemplate(String contentTemplateName, Optional<ResourceType> resourceType, Optional<String> resourceName) {
 		this.contentTemplateName = contentTemplateName;
 		this.resourceType = resourceType;
 		this.resourceName = resourceName;

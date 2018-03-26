@@ -258,7 +258,7 @@ public class FhirBrowserRequestServlet extends HttpServlet {
     		ResourceMetadata resourceEntityByID = data.getResourceEntityByID(requestVersion, requestId.get());
     		
     		if (resourceEntityByID == null) {
-                throw new FhirResourceNotFoundException(requestVersion, typeInRequest, requestId.get().getIdPart());
+                throw new FhirResourceNotFoundException(requestVersion, typeInRequest, requestId.get().getIdPart(), Optional.ofNullable(requestId.get().getVersionIdPart()));
     		}
     		
     		String resourceName = resourceEntityByID.getResourceName();

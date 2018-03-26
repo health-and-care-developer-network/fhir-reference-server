@@ -1,6 +1,7 @@
 package uk.nhs.fhir.datalayer.collections;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class ResourceEntityWithMultipleVersions {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
-	HashMap<VersionNumber,ResourceMetadata> metadataByVersion = new HashMap<VersionNumber,ResourceMetadata>();
+	Map<VersionNumber,ResourceMetadata> metadataByVersion = new TreeMap<VersionNumber,ResourceMetadata>();
 	VersionNumber latest = null;
 	VersionNumber latestActive = null;
 	VersionNumber latestDraft = null;
@@ -96,7 +97,7 @@ public class ResourceEntityWithMultipleVersions {
 		return result.toString();
 	}
 
-	public HashMap<VersionNumber, ResourceMetadata> getVersionList() {
+	public Map<VersionNumber, ResourceMetadata> getVersionList() {
 		return metadataByVersion;
 	}
 }

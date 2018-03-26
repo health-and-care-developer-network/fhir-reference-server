@@ -63,8 +63,7 @@ public class ServletStreamExample {
 				mimeType = MimeType.UNKNOWN_MIME;
 			}
 			
-			String resourceType = ResourceType.EXAMPLES.toString();
-			String wrappedContent = new RawResourceTemplate(Optional.of(resourceType), Optional.of(exampleName), fileContent, mimeType).getHtml("FHIR Server: Example resource (" + exampleEntity.getResourceName() + ")" );
+			String wrappedContent = new RawResourceTemplate(Optional.of(ResourceType.EXAMPLES), Optional.of(exampleName), fileContent, mimeType).getHtml("FHIR Server: Example resource (" + exampleEntity.getResourceName() + ")" );
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {

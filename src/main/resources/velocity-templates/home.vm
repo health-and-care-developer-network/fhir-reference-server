@@ -7,7 +7,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>StructureDefinition</h3>
+						<h3>StructureDefinitions</h3>
 						<ul>
 							<li><a href="/StructureDefinition">List all StructureDefinitions
 								#set( $count = $counts.get("StructureDefinition") )
@@ -26,7 +26,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>ValueSet</h3>
+						<h3>ValueSets</h3>
 						<ul>
 							<li><a href="/ValueSet">List all ValueSets
 								#set( $countVS = $counts.get("ValueSet") )
@@ -45,7 +45,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>OperationDefinition</h3>
+						<h3>OperationDefinitions</h3>
 						<ul>
 							<li><a href="/OperationDefinition">List all OperationDefinitions
 								#set( $countOD = $counts.get("OperationDefinition") )
@@ -64,7 +64,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>CodeSystem</h3>
+						<h3>CodeSystems</h3>
 						<ul>
 							<li><a href="/CodeSystem">List all CodeSystems
 								#set( $countCS = $counts.get("CodeSystem") )
@@ -83,7 +83,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>ConceptMap</h3>
+						<h3>ConceptMaps</h3>
 						<ul>
 							<li><a href="/ConceptMap">List all ConceptMaps
 								#set( $countCM = $counts.get("ConceptMap") )
@@ -122,7 +122,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>ImplementationGuide</h3>
+						<h3>ImplementationGuides</h3>
 						<ul>
 							<li><a href="/ImplementationGuide">List all ImplementationGuides
 								#set( $countIG = $counts.get("ImplementationGuide") )
@@ -141,7 +141,7 @@
 				<div class="box">
 					<div class="line aquaBlue_line"></div>
 					<section class="nav_box aquablue">
-						<h3>Conformance</h3>
+						<h3>Conformance Statements</h3>
 						<ul>
 							<li><a href="/Conformance">List all Conformance resources
 								#set( $countC = $counts.get("Conformance") )

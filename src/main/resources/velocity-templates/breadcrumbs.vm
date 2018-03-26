@@ -20,7 +20,7 @@
 				<li>
 					<span xmlns:v="http://rdf\.data-vocabulary\.org/#">
 						<span typeof="v:Breadcrumb">
-							<a href="/$resourceType" rel="v:url" property="v:title">$resourceType</a>
+							<a href="/$resourceType.getRequestPath()" rel="v:url" property="v:title">$resourceType.getBreadcrumbName()</a>
 							<span class="bc_arrow" aria-hidden="true" data-icon="&#x2a;"></span>
 				</li>
 				<li>
@@ -28,7 +28,7 @@
 				</li>
 			#else
 				<li>
-					<strong class="breadcrumb_last">$resourceType</strong>
+					<strong class="breadcrumb_last">$resourceType.getBreadcrumbName()</strong>
 				</li>
 			#end
 		#else

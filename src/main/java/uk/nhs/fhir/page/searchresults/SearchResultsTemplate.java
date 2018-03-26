@@ -14,7 +14,7 @@ public class SearchResultsTemplate extends VelocityTemplate {
 	private final List<ResourceMetadata> resources;
 	
 	public SearchResultsTemplate(ResourceType resourceType, List<ResourceMetadata> resources) {
-		super("search-results.vm", Optional.of(resourceType.toString()), Optional.empty());
+		super("search-results.vm", Optional.of(resourceType), Optional.empty());
 		this.resources = resources;
 	}
 

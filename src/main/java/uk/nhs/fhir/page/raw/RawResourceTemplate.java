@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.apache.velocity.VelocityContext;
 
+import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.VelocityTemplate;
 
@@ -12,7 +13,7 @@ public class RawResourceTemplate extends VelocityTemplate {
 	private final String rawResource;
 	private final MimeType mimeType;
 	
-	public RawResourceTemplate(Optional<String> resourceType, Optional<String> resourceName, String rawResource, MimeType mimeType) {
+	public RawResourceTemplate(Optional<ResourceType> resourceType, Optional<String> resourceName, String rawResource, MimeType mimeType) {
 		super("raw-resource.vm", resourceType, resourceName);
 		
 		this.rawResource = rawResource;
