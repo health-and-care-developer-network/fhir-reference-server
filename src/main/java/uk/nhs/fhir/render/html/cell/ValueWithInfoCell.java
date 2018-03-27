@@ -48,8 +48,6 @@ public class ValueWithInfoCell extends TableCell {
 					valueForDisplay));
 		}
 		
-		
-		
 		for (ResourceInfo resourceInfo : resourceInfos) {
 			List<Content> resourceInfoContent = Lists.newArrayList();
 			resourceInfoContent.add(new Text(getDisplayName(resourceInfo)));

@@ -193,6 +193,7 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 			
 			if (maybeLogicalUrl
 			  && looksLikeUrl(description)
+			  && !FhirURL.isLogicalUrl(description)
 			  && !new UrlValidator().testSingleUrl(description)) {
 				// textual link
 				resourceInfos.add(new ResourceInfo("Fixed Value",  Optional.empty(), Optional.of(FhirURL.buildOrThrow(description, version)), 

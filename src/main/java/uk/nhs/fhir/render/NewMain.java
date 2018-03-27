@@ -196,6 +196,8 @@ public class NewMain {
         		
         		copyExamples(fhirFileRegistry);
         		copyGeneratedArtefacts();
+        	} else {
+        		LOG.warn("At least one error was encountered and allowCopyOnError is not set - not copying rendered resources");
         	}
         	
         	// if there is an error while copying the files, this gets skipped so they can be recovered if necessary
