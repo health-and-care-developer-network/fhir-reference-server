@@ -72,7 +72,7 @@ public class FullFhirURL extends FhirURL {
 		String linkUrl;
 		if (FhirURLConstants.startsWithNhsDomain(hostAndPath)) {
 			// make it local
-			linkUrl = FhirURLConstants.trimNhsResourcePrefix(hostAndPath);
+			linkUrl = FhirURLConstants.trimNhsDomainPrefix(hostAndPath);
 		} else {
 			// restore the scheme
 			linkUrl = scheme + hostAndPath;

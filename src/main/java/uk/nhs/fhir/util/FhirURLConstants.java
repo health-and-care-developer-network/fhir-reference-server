@@ -55,11 +55,30 @@ public class FhirURLConstants {
 		}
 	}
 	
+	public static String trimNhsUrlPrefix(String url) {
+		if (isNhsResourceUrl(url)) {
+			return trimNhsQualifiedPrefix(url);
+		} else if (startsWithNhsDomain(url)) {
+			return trimNhsDomainPrefix(url);
+		} else {
+			return url;
+		}
+	}
+	
 	private static final String[] NHS_PROFILE_PREFIXES = new String[]{"http://fhir.nhs.net", FHIR_NHS_UK, HTTPS_FHIR_HL7_ORG_UK, FHIR_TEST_NHS_UK, FHIR_TEST_HL7_NHS_UK};
 	public static boolean isNhsResourceUrl(String url) {
 		return StreamSupport
 			.stream(Arrays.spliterator(NHS_PROFILE_PREFIXES), false)
 			.anyMatch(prefix -> url.startsWith(prefix));
+	}
+	public static String trimNhsQualifiedPrefix(String url) {
+		for (String qualifiedPrefix : NHS_PROFILE_PREFIXES) {
+			if (url.startsWith(qualifiedPrefix)) {
+				return url.substring(qualifiedPrefix.length());
+			}
+		}
+		
+		throw new IllegalStateException("Expected url (" + url + ") to start with an NHS qualified URL prefix");
 	}
 	
 	private static final String[] NHS_PROFILE_DOMAINS = new String[] {"fhir.nhs.net", "fhir.nhs.uk", "fhir.hl7.org.uk", "fhir-test.hl7.org.uk", "fhir-test.nhs.uk"};
@@ -68,7 +87,7 @@ public class FhirURLConstants {
 				.stream(Arrays.spliterator(NHS_PROFILE_DOMAINS), false)
 				.anyMatch(prefix -> url.startsWith(prefix));
 	}
-	public static String trimNhsResourcePrefix(String url) {
+	public static String trimNhsDomainPrefix(String url) {
 		for (String domain : NHS_PROFILE_DOMAINS) {
 			if (url.startsWith(domain)) {
 				return url.substring(domain.length());
