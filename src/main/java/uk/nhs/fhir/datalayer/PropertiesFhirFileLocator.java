@@ -19,9 +19,6 @@ public class PropertiesFhirFileLocator extends AbstractFhirFileLocator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PropertiesFhirFileLocator.class);
 	
-	private static final String DSTU2_DIRECTORY_SUFFIX = "";
-	private static final String STU3_DIRECTORY_SUFFIX = "STU3";
-	
 	private final Path rootDirFromProperties;
 	private final String resourceFolderPrefixFromProperties;
 	public PropertiesFhirFileLocator() {
@@ -34,14 +31,7 @@ public class PropertiesFhirFileLocator extends AbstractFhirFileLocator {
 	
 	@Override
 	public Path getSourceRoot(FhirVersion fhirVersion) {
-		switch(fhirVersion) {
-		case DSTU2:
-			return rootDirFromProperties.resolve(resourceFolderPrefixFromProperties + DSTU2_DIRECTORY_SUFFIX);
-		case STU3:
-			return rootDirFromProperties.resolve(resourceFolderPrefixFromProperties + STU3_DIRECTORY_SUFFIX);
-		default:
-			throw new IllegalStateException("No default file path for FHIR version " + fhirVersion.toString());
-		}
+		return rootDirFromProperties.resolve(resourceFolderPrefixFromProperties).resolve(fhirVersion.toString());
 	}
 	
 	public Path getDestinationPathForResourceType(ResourceType type, FhirVersion version) {
