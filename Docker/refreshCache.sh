@@ -13,6 +13,6 @@ else
   TARGET_PREFIX="--tlsverify -H $TARGET_HOST:2376"
 fi
 
-docker $TARGET_PREFIX exec -it $CONTAINER_NAME wget -O - http://localhost:8080/InvalidateCache
+docker $TARGET_PREFIX exec $CONTAINER_NAME wget -O - http://localhost:8080/InvalidateCache
 
 echo "Complete."
