@@ -136,7 +136,7 @@ public class ValueSetMetadataFormatter extends TableFormatter<WrappedValueSet> {
 				Elements.withChildren("tr",
 					labelledValueCell("Identifier system", identifierSystem, 1, true),
 					labelledValueCell("Identifier", identifierType, 1, true),
-					labelledValueCell("Immutable", identifierSystem, 1, true),
+					labelledValueCell("Immutable", immutableDesc, 1, true),
 					TableCell.emptyBordered().makeCell()));
 		}
 		
