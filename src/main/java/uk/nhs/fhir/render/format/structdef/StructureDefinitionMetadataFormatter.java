@@ -1,6 +1,4 @@
 package uk.nhs.fhir.render.format.structdef;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +63,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		
 		Optional<String> baseUrl = Optional.ofNullable(structureDefinition.getBase());
 		
-		Optional<String> version = structureDefinition.getVersion();
+		Optional<String> version = StringUtil.firstPresent(structureDefinition.getVersionId(), structureDefinition.getVersion());
 		Optional<String> display = structureDefinition.getDisplay();
 		
 		Optional<String> description = structureDefinition.getDescription();
@@ -83,11 +81,9 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 		Optional<String> publisher = structureDefinition.getPublisher();
 		
 		
-		Optional<Date> date = structureDefinition.getDate();
 		Optional<String> displayDate = 
-			date.isPresent() ?
-				Optional.of(StringUtil.dateToString(date.get())) :
-				Optional.empty();
+			structureDefinition.getDate()
+				.map(date -> StringUtil.dateToString(date));
 		
 		Optional<String> copyrightInfo = structureDefinition.getCopyright();
 		
@@ -137,7 +133,7 @@ public class StructureDefinitionMetadataFormatter extends TableFormatter<Wrapped
 				labelledValueCell("URL", url, 2, true)));
 		tableContent.add(
 			Elements.withChildren("tr",
-				labelledValueCell("Version", StringUtil.firstPresent(structureDefinition.getVersionId(), version), 1),
+				labelledValueCell("Version", version, 1),
 				labelledValueCell("Constrained type", constrainedType, 1),
 				labelledValueCell("Constrained URL", baseUrl, 1),
 				labelledValueCell("Status", status, 1)));
