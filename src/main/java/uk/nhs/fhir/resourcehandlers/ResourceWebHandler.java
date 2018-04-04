@@ -50,7 +50,7 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
     }
     
     public HashMap<String, List<ResourceMetadata>> getAGroupedListOfResources(ResourceType resourceType) {
-        LOG.debug("Called: ResourceWebHandler.getAlGroupedNames()");
+        LOG.debug("Called: ResourceWebHandler.getAGroupedListOfResources()");
         
         if (FhirBrowserRequestServlet.isIndexedType(resourceType)) {
             if (resourceType == ResourceType.STRUCTUREDEFINITION) {
