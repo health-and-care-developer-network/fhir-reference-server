@@ -1,9 +1,7 @@
 package uk.nhs.fhir.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -93,12 +91,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			String rawResource;
 			if (localCopiesOfExternalFhirResources.containsKey(resourceUrl)) {
 				// This was found in the local set of resources - now that we know which FHIR version we are dealing with, we can parse it
-				try {
-					byte[] fileBytes = Files.readAllBytes(localCopiesOfExternalFhirResources.get(resourceUrl).toPath());
-					rawResource = new String(fileBytes, FileLoader.DEFAULT_ENCODING);
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
+				rawResource = FileLoader.loadFile(localCopiesOfExternalFhirResources.get(resourceUrl));
 			} else if (resourceUrl.startsWith("http://hl7.org/")) {
 				// these are all known ahead of time and should be baked into the jar
 				rawResource = getHl7Resource(version, resourceUrl);
@@ -118,13 +111,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		}
 		
 		File resourceFile = hl7Extensions.get(version).get(resourceUrl);
-		
-		try {
-			byte[] fileBytes = Files.readAllBytes(resourceFile.toPath());
-			return new String(fileBytes, FileLoader.DEFAULT_ENCODING);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+		return FileLoader.loadFile(resourceFile);
 	}
 
 	private String requestExternalResource(String resourceUrl) {

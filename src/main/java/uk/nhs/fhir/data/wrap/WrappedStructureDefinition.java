@@ -21,6 +21,7 @@ import uk.nhs.fhir.data.structdef.tree.SnapshotData;
 import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.structdef.tree.StructureDefinitionTreeDataProvider;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
+import uk.nhs.fhir.util.text.EscapeUtils;
 
 public abstract class WrappedStructureDefinition extends WrappedResource<WrappedStructureDefinition> {
 	
@@ -68,11 +69,10 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	
 	public void fixHtmlEntities() {
 		Optional<String> copyRight = getCopyright();
-	    if(copyRight.isPresent()) {
-	        String updatedCopyRight = copyRight.get().replace("©", "&#169;");
-	        updatedCopyRight = updatedCopyRight.replace("\\u00a9", "&#169;");
-	        setCopyright(updatedCopyRight);
+	    if (copyRight.isPresent()) {
+	        setCopyright(EscapeUtils.escapeCopyright(copyRight.get()));
 	    }
+	    
 	}
 	
 	public ResourceMetadata getMetadataImpl(File source) {

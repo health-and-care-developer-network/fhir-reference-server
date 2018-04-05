@@ -17,6 +17,7 @@ import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.util.FhirFileRegistry;
+import uk.nhs.fhir.util.text.EscapeUtils;
 
 public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 
@@ -44,9 +45,7 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public void fixHtmlEntities() {
 		Optional<String> copyRight = getCopyright();
 	    if(copyRight.isPresent()) {
-	        String updatedCopyRight = copyRight.get().replace("©", "&#169;");
-	        updatedCopyRight = updatedCopyRight.replace("\\u00a9", "&#169;");
-	        setCopyright(updatedCopyRight);
+	        setCopyright(EscapeUtils.escapeCopyright(copyRight.get()));
 	    }
 	}
 	

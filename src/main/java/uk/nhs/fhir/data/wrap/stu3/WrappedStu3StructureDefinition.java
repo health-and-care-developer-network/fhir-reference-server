@@ -19,7 +19,6 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.ExtensionType;
@@ -120,13 +119,8 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	@Override
 	public Optional<String> getFhirVersion() {
-		Optional<String> fhirVersionDesc = Optional.empty();
-		
-		if (!Strings.isNullOrEmpty(definition.getFhirVersion())) {
-			fhirVersionDesc = Optional.of(FhirRelease.forString(definition.getFhirVersion()).getDesc());
-		}
-		
-		return fhirVersionDesc;
+		return Optional.ofNullable(definition.getFhirVersion())
+			.map(version -> FhirRelease.forString(version).getDesc());
 	}
 
 	@Override

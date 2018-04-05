@@ -8,7 +8,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
@@ -120,11 +119,8 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 
 	@Override
 	public Optional<String> getFhirVersion() {
-		if (Strings.isNullOrEmpty(definition.getFhirVersion())) {
-			return Optional.empty();
-		} else {
-			return Optional.of(FhirRelease.forString(definition.getFhirVersion()).getDesc());
-		}
+		return Optional.ofNullable(definition.getFhirVersion())
+			.map(version -> FhirRelease.forString(version).getDesc());
 	}
 
 	@Override
