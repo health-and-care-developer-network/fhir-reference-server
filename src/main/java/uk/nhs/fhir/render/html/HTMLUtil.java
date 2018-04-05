@@ -9,6 +9,12 @@ import org.jdom2.output.XMLOutputter;
 public class HTMLUtil {
 	
 	public static String docToString(Document document, boolean prettyPrint, boolean xmlDeclaration) throws IOException {
+		//fix html entities which will have had their apersands escaped
+        return docToEscapedString(document, prettyPrint, xmlDeclaration)
+        	.replaceAll("&amp;#([\\dA-Fa-f]+);", "&#$1;");
+	}
+	
+	public static String docToEscapedString(Document document, boolean prettyPrint, boolean xmlDeclaration) throws IOException {
 		Format format = prettyPrint ? Format.getPrettyFormat() : Format.getCompactFormat();
 		
 		String output = 
@@ -19,7 +25,6 @@ public class HTMLUtil {
 					.setLineSeparator(prettyPrint ? "\n" : ""))
 					.outputString(document);
 		
-		//fix html entities which will have had their apersands escaped
-        return output.replaceAll("&amp;#([\\dA-Fa-f]+);", "&#$1;");
+        return output;
 	}
 }

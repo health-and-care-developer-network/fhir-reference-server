@@ -17,6 +17,7 @@ import uk.nhs.fhir.render.format.SectionedHTMLDoc;
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.HTMLUtil;
 import uk.nhs.fhir.util.FhirFileUtils;
+import uk.nhs.fhir.util.text.EscapeUtils;
 
 public class FileProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(FileProcessor.class.getName());
@@ -61,16 +62,17 @@ public class FileProcessor {
 		Element textSection = Elements.withChildren("div", 
 			defaultView.createStyleSection(),
 			Elements.withChildren("div", defaultView.getBodyElements()));
-		    
-	    String renderedTextSection = HTMLUtil.docToString(new Document(textSection), true, false);
+		
+	    String renderedTextSection = HTMLUtil.docToEscapedString(new Document(textSection), true, false);
 	    
         String augmentedResource = prepareAndSerialise(resource, renderedTextSection, newBaseURL);
         FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes(FileLoader.DEFAULT_ENCODING));
 	}
 	
 	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, String newBaseURL) {
+		textSection = EscapeUtils.escapeTextSection(textSection);
 
-		resource.addHumanReadableText(textSection);		
+		resource.addHumanReadableText(textSection);
         resource.fixHtmlEntities();
 		
 		if (newBaseURL != null) {
