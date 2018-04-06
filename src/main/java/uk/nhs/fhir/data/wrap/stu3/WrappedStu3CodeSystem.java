@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.hl7.fhir.dstu3.model.CodeSystem;
 import org.hl7.fhir.dstu3.model.CodeSystem.CodeSystemFilterComponent;
-import org.hl7.fhir.dstu3.model.CodeSystem.CodeSystemHierarchyMeaning;
 import org.hl7.fhir.dstu3.model.CodeSystem.ConceptDefinitionComponent;
 import org.hl7.fhir.dstu3.model.CodeSystem.FilterOperator;
 import org.hl7.fhir.dstu3.model.Enumeration;
@@ -175,12 +174,9 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 
 	@Override
 	public Optional<FhirIdentifier> getIdentifier() {
-		Identifier identifier = definition.getIdentifier();
-		if (identifier == null) {
-			return Optional.empty();
-		} else {
-			return Optional.of(new FhirIdentifier(identifier.getValue(), identifier.getSystem()));
-		}
+		return Optional.ofNullable(definition.getIdentifier())
+				.map(id -> new FhirIdentifier(id.getValue(), id.getSystem()));
+		
 	}
 
 	@Override
@@ -205,7 +201,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	
 	@Override
 	public Optional<Boolean> getCompositional() {
-		if (definition.getCompositionalElement() == null) {
+		if (!definition.hasCompositional()) {
 			return Optional.empty();
 		} else {
 			return Optional.of(definition.getCompositional());
@@ -214,12 +210,8 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 
 	@Override
 	public Optional<String> getHierarchyMeaning() {
-		CodeSystemHierarchyMeaning hierarchyMeaning = definition.getHierarchyMeaning();
-		if (hierarchyMeaning == null) {
-			return Optional.empty();
-		} else {
-			return Optional.of(hierarchyMeaning.getDisplay());
-		}
+		return Optional.ofNullable(definition.getHierarchyMeaning())
+			.map(meaning -> meaning.getDisplay());
 	}
 
 	@Override
