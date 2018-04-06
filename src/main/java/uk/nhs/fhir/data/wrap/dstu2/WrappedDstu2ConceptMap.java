@@ -136,11 +136,6 @@ public class WrappedDstu2ConceptMap extends WrappedConceptMap {
 	}
 
 	@Override
-	public void fixHtmlEntities() {
-		
-	}
-
-	@Override
 	public void addHumanReadableText(String textSection) {
 		NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);

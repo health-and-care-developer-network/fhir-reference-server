@@ -57,9 +57,6 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	// Name as used in the resource's URL
 	public abstract String getName();
 	
-	// Update any fields which may need entities escaping
-	public abstract void fixHtmlEntities();
-	
 	public abstract void addHumanReadableText(String textSection);
 
 	public Class<? extends IBaseResource> getFhirClass() {

@@ -200,11 +200,6 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	}
 
 	@Override
-	public void fixHtmlEntities() {
-		// nothing to do
-	}
-
-	@Override
 	public void addHumanReadableText(String textSection) {
 		NarrativeDt textElement = new NarrativeDt();
         textElement.setStatus(NarrativeStatusEnum.GENERATED);

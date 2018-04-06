@@ -202,11 +202,6 @@ private final OperationDefinition definition;
 	}
 
 	@Override
-	public void fixHtmlEntities() {
-		// nothing to do
-	}
-
-	@Override
 	public void addHumanReadableText(String textSection) {
 		try {
 			Narrative textElement = Factory.newNarrative(NarrativeStatus.GENERATED, textSection);

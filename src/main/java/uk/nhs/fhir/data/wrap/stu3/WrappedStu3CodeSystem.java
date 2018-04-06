@@ -141,11 +141,6 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 	}
 
 	@Override
-	public void fixHtmlEntities() {
-		
-	}
-
-	@Override
 	public void addHumanReadableText(String textSection) {
 		try {
 			Narrative textElement = Factory.newNarrative(NarrativeStatus.GENERATED, textSection);

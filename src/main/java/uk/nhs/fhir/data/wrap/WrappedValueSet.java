@@ -17,7 +17,6 @@ import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.valueset.FhirValueSetCompose;
 import uk.nhs.fhir.data.valueset.FhirValueSetComposeInclude;
 import uk.nhs.fhir.util.FhirFileRegistry;
-import uk.nhs.fhir.util.text.EscapeUtils;
 
 public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 
@@ -43,10 +42,10 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	protected abstract void checkForUnexpectedFeatures();
 	
 	public void fixHtmlEntities() {
-		Optional<String> copyRight = getCopyright();
-	    if(copyRight.isPresent()) {
-	        setCopyright(EscapeUtils.escapeCopyright(copyRight.get()));
-	    }
+		//Optional<String> copyRight = getCopyright();
+	    //if(copyRight.isPresent()) {
+	    //    setCopyright(EscapeUtils.escapeCopyright(copyRight.get()));
+	    //}
 	}
 	
 	public List<FhirCodeSystemConcept> getConceptsToDisplay() {

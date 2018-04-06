@@ -13,9 +13,10 @@ public class EscapeUtils {
 		textSection = escapeSectionSign(textSection);
 		textSection = escapeTrademark(textSection);
 		textSection = escapeMu(textSection);
+		
 		return textSection;
 	}
-	
+
 	private static String escapeRegistered(String toEscape) {
         String escaped = toEscape.replace("®", "&#174;");
         escaped = escaped.replace("\\u00ae", "&#174;");

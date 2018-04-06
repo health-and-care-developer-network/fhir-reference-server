@@ -144,11 +144,6 @@ public class WrappedStu3ConceptMap extends WrappedConceptMap {
 	}
 
 	@Override
-	public void fixHtmlEntities() {
-		
-	}
-
-	@Override
 	public void addHumanReadableText(String textSection) {
 		try {
 			Narrative textElement = Factory.newNarrative(NarrativeStatus.GENERATED, textSection);
