@@ -37,19 +37,20 @@ public class ValueSetConceptsTableDataProvider {
 		}
 		
 		for (FhirValueSetComposeInclude include : valueSet.getCompose().getIncludes()) {
-			if (include.getConcepts().isEmpty()) {
-				// try to find the concept map from the registry
-				WrappedCodeSystem standaloneCodeSystem = RendererContext.forThread().getFhirFileRegistry().getCodeSystem(include.getSystem());
-				if (standaloneCodeSystem != null) {
-					addConcepts(rows, include.getSystem(), standaloneCodeSystem.getCodeSystemConcepts().getConcepts());
-				} else {
-					EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
-						"Empty include and url [" + include.getSystem() + "] wasn't found locally (does it start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK + "?)");
-					// ensure that we still display the code system
-					addConcepts(rows, include.getSystem(), Lists.newArrayList());
-				}
+			String system = include.getSystem();
+			Optional<WrappedCodeSystem> standaloneCodeSystem = RendererContext.forThread().getFhirFileRegistry().getCodeSystem(system);
+			List<FhirCodeSystemConcept> concepts = include.getConcepts();
+			
+			if (!concepts.isEmpty()) {
+				//TODO could validate the codes selected by this ValueSet?
+				addConcepts(rows, system, concepts);
+			} else if (standaloneCodeSystem.isPresent()) {
+				addConcepts(rows, system, standaloneCodeSystem.get().getCodeSystemConcepts().getConcepts());
 			} else {
-				addConcepts(rows, include.getSystem(), include.getConcepts());
+				EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
+					"Empty include and CodeSystem url [" + system + "] wasn't found locally (does it start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK + "?)");
+					// ensure that we still display the code system
+					addConcepts(rows, system, Lists.newArrayList());
 			}
 		}
 		

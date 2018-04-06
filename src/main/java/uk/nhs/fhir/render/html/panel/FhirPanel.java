@@ -84,6 +84,12 @@ public class FhirPanel {
 					new CSSRule(CSSTag.BORDER_RADIUS, "4px"),
 					new CSSRule(CSSTag.BOX_SHADOW, "0 1px 1px rgba(0, 0, 0, 0.05)"))));
 
+		styles.add(
+			new CSSStyleBlock(Lists.newArrayList("." + FhirCSS.PANEL + " " + "." + FhirCSS.LINK), 
+				Lists.newArrayList(
+					new CSSRule(CSSTag.TEXT_DECORATION, "none"),
+					new CSSRule(CSSTag.COLOR, FhirColour.LINK))));
+
 		return styles;
 	}
 }
