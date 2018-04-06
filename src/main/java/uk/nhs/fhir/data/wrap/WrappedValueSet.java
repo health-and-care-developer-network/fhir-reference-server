@@ -97,4 +97,26 @@ public abstract class WrappedValueSet extends WrappedResource<WrappedValueSet> {
 	public String getCrawlerDescription() {
 		return getDescription().orElse("FHIR Server: ValueSet " + getName());
 	}
+	public boolean hasUnavailableCodeSystem(FhirFileRegistry fhirFileRegistry) {
+		boolean hasUnavailable = false;
+		boolean foundHandledInclude = false;
+		
+		for (FhirValueSetComposeInclude include : getCompose().getIncludes()) {
+			String system = include.getSystem();
+			Optional<WrappedCodeSystem> codeSystem = fhirFileRegistry.getCodeSystem(system);
+			List<FhirCodeSystemConcept> concepts = include.getConcepts();
+			
+			if (!codeSystem.isPresent() && concepts.isEmpty()) {
+				hasUnavailable = true;
+			} else {
+				foundHandledInclude = true;
+			}
+		}
+		
+		if (hasUnavailable && foundHandledInclude) {
+			throw new IllegalStateException("ValueSet has at least one include with an unavailable CodeSystem and at least one with either an available CodeSystem or concepts");
+		}
+		
+		return hasUnavailable;
+	}
 }

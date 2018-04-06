@@ -265,11 +265,11 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			.collect(Collectors.toList());
 	}
 	
-	public WrappedCodeSystem getCodeSystem(String url) {
+	public Optional<WrappedCodeSystem> getCodeSystem(String url) {
 		if (resourcesByUrl.containsKey(url)) {
-			return (WrappedCodeSystem)resourcesByUrl.get(url);
+			return Optional.of((WrappedCodeSystem)resourcesByUrl.get(url));
 		} else {
-			throw new IllegalStateException("Couldn't find code system by url [" + url + "]");
+			return Optional.empty();
 		}
 	}
 
