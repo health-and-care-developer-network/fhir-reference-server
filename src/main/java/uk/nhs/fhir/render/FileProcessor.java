@@ -71,9 +71,7 @@ public class FileProcessor {
 	
 	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, String newBaseURL) {
 		textSection = EscapeUtils.escapeTextSection(textSection);
-
 		resource.addHumanReadableText(textSection);
-        resource.fixHtmlEntities();
 		
 		if (newBaseURL != null) {
         	if (newBaseURL.endsWith("/")) {
@@ -84,7 +82,6 @@ public class FileProcessor {
         }
 		
 		String serialised = resource.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource.getWrappedResource());
-        serialised = serialised.replace("Σ", "&#931;");
         return serialised;
 	}
 }
