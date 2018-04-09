@@ -21,7 +21,7 @@ import uk.nhs.fhir.render.format.conceptmap.ConceptMapFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapTableFormatter;
 import uk.nhs.fhir.render.format.opdef.OperationDefinitionFormatter;
-import uk.nhs.fhir.render.format.structdef.StructureDefinitionBindingFormatter;
+import uk.nhs.fhir.render.format.structdef.StructureDefinitionBindingsTableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionDetailsFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionDifferentialFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionFormatter;
@@ -72,7 +72,7 @@ public class ResourceFormatterFactory {
 			WrappedStructureDefinition wrappedStructureDefinition = (WrappedStructureDefinition)wrappedResource;
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionMetadataFormatter(wrappedStructureDefinition), outputDirectory, "metadata.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionSnapshotFormatter(wrappedStructureDefinition), outputDirectory, "snapshot.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingFormatter(wrappedStructureDefinition), outputDirectory, "bindings.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingsTableFormatter(wrappedStructureDefinition), outputDirectory, "bindings.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
 			

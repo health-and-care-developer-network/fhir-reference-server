@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.html.cell;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jdom2.Attribute;
@@ -20,10 +21,13 @@ import uk.nhs.fhir.render.html.style.CSSStyleBlock;
 import uk.nhs.fhir.render.html.style.CSSTag;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
+import uk.nhs.fhir.render.html.tree.FhirIcon;
 
 public class LinkCell extends TableCell {
 	private final LinkDatas linkDatas;
 	private final Set<String> linkClasses;
+	
+	private Optional<FhirIcon> linkIconUrl = Optional.empty();
 
 	public LinkCell(LinkDatas linkDatas) {
 		this(linkDatas, Sets.newHashSet(), Sets.newHashSet());
@@ -88,25 +92,41 @@ public class LinkCell extends TableCell {
 			children.add(new Text(")"));
 		}
 		
+		if (linkIconUrl.isPresent()) {
+			children.add(
+    			Elements.withAttributes("img",
+           			Lists.newArrayList(
+       					new Attribute("src", linkIconUrl.get().getUrl()),
+       					new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
+		}
+		
 		return children;
 	}
 	
 	private Element makeMultiLinkCell() {
 		List<Content> cellContents = Lists.newArrayList();
 
-		boolean addedLink = false;
 		for (Map.Entry<LinkData, List<LinkData>> link : linkDatas.links()) {
-			if (addedLink) {
+			if (!cellContents.isEmpty()) {
 				cellContents.add(new Text(" | "));
 			}
 			
 			LinkData primaryLink = link.getKey();
 			if (link.getValue().isEmpty()) {
-				cellContents.add(makeLinkElement(primaryLink));
+				Element linkElement = makeLinkElement(primaryLink);
+
+				if (linkIconUrl.isPresent()) {
+					linkElement.addContent(
+		    			Elements.withAttributes("img",
+		           			Lists.newArrayList(
+		       					new Attribute("src", linkIconUrl.get().getUrl()),
+		       					new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
+				}
+				
+				cellContents.add(linkElement);
 			} else {
 				cellContents.addAll(makeNestedLinkContents(primaryLink, link.getValue()));
 			}
-			addedLink = true;
 		}
 		
 		return makeDataCell(cellContents);
@@ -154,5 +174,9 @@ public class LinkCell extends TableCell {
 					new CSSRule(CSSTag.TEXT_DECORATION, "line-through"))));
 		
 		return styles;
+	}
+
+	public void setLinkIcon(FhirIcon icon) {
+		this.linkIconUrl = Optional.of(icon);
 	}
 }

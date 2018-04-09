@@ -46,6 +46,7 @@ public interface FhirCSS {
 	public static final String TELECOM_NAME = "fhir-telecom-name";
 	public static final String TELECOM_VALUE = "fhir-telecom-value";
 	
-	
+	// This is used by javascript to identify links that are intended to switch tabs
+	public static final String TAB_LINK = "tabLink";
 
 }

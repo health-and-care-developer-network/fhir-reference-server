@@ -18,7 +18,7 @@ public class StructureDefinitionFormatter extends ResourceFormatter<WrappedStruc
 		HTMLDocSection snapshotTree = new StructureDefinitionSnapshotFormatter(wrappedResource).makeSectionHTML();
 		HTMLDocSection differentialTree = new StructureDefinitionDifferentialFormatter(wrappedResource).makeSectionHTML();
 		HTMLDocSection detailsTable = new StructureDefinitionDetailsFormatter(wrappedResource).makeSectionHTML();
-		HTMLDocSection bindingTable = new StructureDefinitionBindingFormatter(wrappedResource).makeSectionHTML();
+		HTMLDocSection bindingTable = new StructureDefinitionBindingsTableFormatter(wrappedResource).makeSectionHTML();
 		
 		HTMLDocSection structureDefinitionSection = new HTMLDocSection();
 		
