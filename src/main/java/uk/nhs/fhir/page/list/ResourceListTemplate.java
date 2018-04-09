@@ -1,5 +1,6 @@
 package uk.nhs.fhir.page.list;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,10 @@ public class ResourceListTemplate extends VelocityTemplate {
 	public ResourceListTemplate(ResourceType resourceType, Map<String, List<ResourceMetadata>> groupedResources) {
 		super("list.vm", Optional.of(resourceType), Optional.empty());
 
+		for (List<ResourceMetadata> resourceList : groupedResources.values()) {
+			resourceList.sort(Comparator.comparing(r -> r.getResourceName().toLowerCase()));
+		}
+		
     	SortedMap<String, List<ResourceMetadata>> sortedGroupedResources = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     	sortedGroupedResources.putAll(groupedResources);
 		this.sortedGroupedResources = sortedGroupedResources;
