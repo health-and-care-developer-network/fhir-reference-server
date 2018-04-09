@@ -6,7 +6,7 @@ function setupLinkInterceptsInTabs() {
 	if (anchorToJumpTo.length > 0) {
 		// Jump to the required anchor
 		var anchorElement = $('[name="'+anchorToJumpTo+'"]');
-		$(document.body).scrollTop( anchorElement.offset().top);
+		$("html,body").scrollTop( anchorElement.offset().top);
 		anchorToJumpTo = "";
 	}
 	
