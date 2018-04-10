@@ -1,13 +1,12 @@
 package uk.nhs.fhir.render.format.structdef;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.jdom2.Element;
-
-import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
@@ -20,6 +19,7 @@ import uk.nhs.fhir.render.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.table.TableRow;
+import uk.nhs.fhir.util.FhirFileRegistry;
 
 public class StructureDefinitionBindingsTableFormatter extends TableFormatter<WrappedStructureDefinition> {
 	
@@ -30,12 +30,14 @@ public class StructureDefinitionBindingsTableFormatter extends TableFormatter<Wr
 	@Override
 	public HTMLDocSection makeSectionHTML() {
 		List<SnapshotTreeNode> nodesWithBindings = getNodesWithBindings(wrappedResource);
+		Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings = getExtensionsWithBindings(wrappedResource);
 		
-		if (nodesWithBindings.isEmpty()) {
+		if (nodesWithBindings.isEmpty()
+		  && extensionsWithBindings.isEmpty()) {
 			return null;
 		} else {
 			HTMLDocSection section = new HTMLDocSection();
-			Element bindingsPanel = buildBindingsPanel(nodesWithBindings);
+			Element bindingsPanel = buildBindingsPanel(nodesWithBindings, extensionsWithBindings);
 			section.addBodyElement(bindingsPanel);
 
 			addStyles(section);
@@ -43,6 +45,11 @@ public class StructureDefinitionBindingsTableFormatter extends TableFormatter<Wr
 		}
 	}
 	
+	private Map<SnapshotTreeNode, List<SnapshotTreeNode>> getExtensionsWithBindings(WrappedStructureDefinition wrappedResource) {
+		FhirFileRegistry fileRegistry = RendererContext.forThread().getFhirFileRegistry();
+		return wrappedResource.getExtensionsWithBindings(fileRegistry);
+	}
+
 	private List<SnapshotTreeNode> getNodesWithBindings(WrappedStructureDefinition wrappedResource) {
 		return StreamSupport.stream(wrappedResource
         	.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()))
@@ -53,14 +60,14 @@ public class StructureDefinitionBindingsTableFormatter extends TableFormatter<Wr
         	.collect(Collectors.toList());
 	}
 
-	private Element buildBindingsPanel(List<SnapshotTreeNode> nodesWithBindings) {
-		StructureDefinitionBindingsTableDataProvider tableData = new StructureDefinitionBindingsTableDataProvider(nodesWithBindings);
+	private Element buildBindingsPanel(List<SnapshotTreeNode> nodesWithBindings, Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings) {
+		StructureDefinitionBindingsTableDataProvider tableData = new StructureDefinitionBindingsTableDataProvider(nodesWithBindings, extensionsWithBindings);
 		
-		List<StructureDefinitionBindingsTableRowData> rows = tableData.getRows();
-		StructureDefinitionBindingsTableRowFormatter rowFormatter = new StructureDefinitionBindingsTableRowFormatter();
+		List<StructureDefinitionBindingsTableSection> sections = tableData.getSections();
 		
-		List<TableRow> tableRows = Lists.newArrayList();
-		rows.forEach(data -> tableRows.add(rowFormatter.formatRow(data, wrappedResource.getImplicitFhirVersion())));
+		List<TableRow> tableRows = 
+			new StructureDefinitionBindingsTableSectionFormatter(getResourceVersion())
+				.formatSections(sections);
 		
 		Element bindingsTable = new Table(tableData.getColumns(), tableRows).makeTable();
 		return new FhirPanel("Bindings", bindingsTable).makePanel();

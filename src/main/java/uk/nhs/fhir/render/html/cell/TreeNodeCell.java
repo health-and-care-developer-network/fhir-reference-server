@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.html.cell;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -82,6 +83,11 @@ public class TreeNodeCell extends TableCell {
 		return Elements.withAttributeAndChildren("td", 
 			new Attribute("class", String.join(" ", backgroundClass, FhirCSS.TREE_ICONS)), 
 			contents);
+	}
+	
+	@Override
+	public void colspan(int span) {
+		throw new NotImplementedException("Tree Node Cells don't take colspan into account");
 	}
 
 }

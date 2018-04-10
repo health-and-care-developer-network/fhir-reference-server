@@ -40,7 +40,8 @@ public class TestFhirTreeTable {
 			Lists.newArrayList(),
 			new ImmutableNodePath("path.to.resource"),
 			FhirElementDataType.ELEMENT,
-			FhirVersion.DSTU2);
+			FhirVersion.DSTU2,
+			Optional.empty());
 		
 		FhirTreeData<SnapshotData, SnapshotTreeNode> data = new FhirTreeData<>(new SnapshotTreeNode(node));
 		

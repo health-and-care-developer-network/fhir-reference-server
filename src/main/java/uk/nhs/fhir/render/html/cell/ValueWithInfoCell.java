@@ -59,8 +59,13 @@ public class ValueWithInfoCell extends TableCell {
 					resourceInfoContent));
 		}
 		
-		return Elements.withAttributeAndChildren("td", 
-			new Attribute("class", FhirCSS.RESOURCE_INFO_CELL), 
+		List<Attribute> attributes = Lists.newArrayList(new Attribute("class", FhirCSS.RESOURCE_INFO_CELL));
+		if (colspan.isPresent()) {
+			attributes.add(new Attribute("colspan", Integer.toString(colspan.get())));
+		}
+		
+		return Elements.withAttributesAndChildren("td",
+			attributes,
 			valueDataNodes);
 	}
 	

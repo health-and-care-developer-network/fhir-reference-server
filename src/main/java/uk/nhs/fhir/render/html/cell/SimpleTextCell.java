@@ -1,7 +1,11 @@
 package uk.nhs.fhir.render.html.cell;
 
+import java.util.List;
+
 import org.jdom2.Attribute;
 import org.jdom2.Element;
+
+import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.render.html.Elements;
 
@@ -24,13 +28,16 @@ public class SimpleTextCell extends TableCell {
 	
 	@Override
 	public Element makeCell() {
-		if (cellClasses.isEmpty()) {
-			return Elements.withText("td", text);
-		} else {
-			return Elements.withAttributeAndText("td", 
-				new Attribute("class", String.join(" ", cellClasses)),
-				text);
+		List<Attribute> attributes = Lists.newArrayList();
+		if (colspan.isPresent()) {
+			attributes.add(new Attribute("colspan", Integer.toString(colspan.get())));
 		}
+		
+		return Elements.addClasses(
+			Elements.withAttributesAndText("td",
+				attributes,
+				text),
+			cellClasses);
 	}
 
 }

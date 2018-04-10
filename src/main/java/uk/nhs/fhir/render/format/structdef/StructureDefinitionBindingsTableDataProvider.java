@@ -1,7 +1,10 @@
 package uk.nhs.fhir.render.format.structdef;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
@@ -14,9 +17,11 @@ import uk.nhs.fhir.render.html.table.TableTitle;
 
 public class StructureDefinitionBindingsTableDataProvider {
 	private final List<SnapshotTreeNode> nodesWithBindings;
+	private final Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings;
 	
-	public StructureDefinitionBindingsTableDataProvider(List<SnapshotTreeNode> nodesWithBindings) {
+	public StructureDefinitionBindingsTableDataProvider(List<SnapshotTreeNode> nodesWithBindings, Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings) {
 		this.nodesWithBindings = nodesWithBindings;
+		this.extensionsWithBindings = extensionsWithBindings;
 	}
 	
 	public List<TableTitle> getColumns() {
@@ -26,9 +31,26 @@ public class StructureDefinitionBindingsTableDataProvider {
 			new TableTitle("Type", "Type of binding.", "10%"),
 			new TableTitle("Reference", "ValueSet containing permitted codes.", "30%"));
 	}
+	
+	public List<StructureDefinitionBindingsTableSection> getSections() {
+		List<StructureDefinitionBindingsTableSection> tableSections = Lists.newArrayList();
 
-	public List<StructureDefinitionBindingsTableRowData> getRows() {
-		return nodesWithBindings
+		for (Entry<SnapshotTreeNode, List<SnapshotTreeNode>> extensionWithBindings : extensionsWithBindings.entrySet()) {
+			String nodeKey = extensionWithBindings.getKey().getNodeKey();
+			String externalUrl = extensionWithBindings.getKey().getData().getLinkedStructureDefinitionUrl().get();
+			List<StructureDefinitionBindingsTableRowData> sectionRows = getRows(extensionWithBindings.getValue());
+			tableSections.add(new StructureDefinitionBindingsTableSection(nodeKey, externalUrl, sectionRows));
+		}
+		
+		tableSections.sort(Comparator.comparing(section -> section.getSourceNodeKey().get()));
+
+		tableSections.add(0, new StructureDefinitionBindingsTableSection(getRows(nodesWithBindings)));
+		
+		return tableSections;
+	}
+
+	private List<StructureDefinitionBindingsTableRowData> getRows(List<SnapshotTreeNode> nodes) {
+		return nodes
 			.stream()
 			.map(node -> toRowData(node))
 			.collect(Collectors.toList());
@@ -38,7 +60,7 @@ public class StructureDefinitionBindingsTableDataProvider {
 		SnapshotData nodeData = node.getData();
 		BindingInfo bindingInfo = 
 			nodeData.getBinding()
-				.orElseThrow(() -> new IllegalStateException("SnapshotTreeNode " + node.getNodeKey() + " doesn't have a binding."));
+				.orElseThrow(() -> new IllegalStateException(node.getNodeKey() + " doesn't have a binding."));
         
 		String nodeKey = node.getNodeKey();
     	Optional<String> description = nodeData.getDefinition();

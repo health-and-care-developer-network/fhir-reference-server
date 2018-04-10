@@ -1,9 +1,11 @@
 package uk.nhs.fhir.render.html.cell;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.jdom2.Element;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.render.html.style.FhirCSS;
@@ -25,6 +27,17 @@ public abstract class TableCell {
 	public abstract Element makeCell();
 	
 	protected final Set<String> cellClasses = Sets.newHashSet(FhirCSS.TREE_CELL);
+	
+	public void addClass(String cssClass) {
+		Preconditions.checkArgument(!cssClass.contains(" "), "CSS classes may not contain spaces");
+		cellClasses.add(cssClass);
+	}
+	
+	protected Optional<Integer> colspan = Optional.empty();
+	
+	public void colspan(int span) {
+		this.colspan = Optional.of(span);
+	}
 	
 	public TableCell() {
 		this(false, false, false);

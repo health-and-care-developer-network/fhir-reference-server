@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.html.cell;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -58,5 +59,10 @@ public class ResourceFlagsCell extends TableCell {
 					new CSSRule(CSSTag.BACKGROUND_COLOR, FhirColour.RESOURCE_FLAG_HIGHLIGHT))));*/
 		
 		return styles;
+	}
+	
+	@Override
+	public void colspan(int span) {
+		throw new NotImplementedException("Resource Flags Cells don't take colspan into account");
 	}
 }

@@ -137,8 +137,15 @@ public class LinkCell extends TableCell {
 	}
 	
 	Element makeDataCell(List<Content> children) {
+		List<Attribute> attributes = Lists.newArrayList();
+		if (colspan.isPresent()) {
+			attributes.add(new Attribute("colspan", Integer.toString(colspan.get())));
+		}
+		
 		return Elements.addClasses(
-			Elements.withChildren("td", children),
+			Elements.withAttributesAndChildren("td",
+				attributes,
+				children),
 			cellClasses);
 	}
 
