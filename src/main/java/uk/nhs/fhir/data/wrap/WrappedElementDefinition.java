@@ -54,6 +54,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	public abstract List<FhirElementMapping> getMappings();
 	public abstract Optional<String> getId();
 	public abstract FhirVersion getVersion();
+	public abstract Optional<String> getLinkedStructureDefinitionUrl();
 	
 	// Introduced with STU3
 	public abstract Optional<String> getSliceName();

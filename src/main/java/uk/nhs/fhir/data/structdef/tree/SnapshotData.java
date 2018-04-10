@@ -17,10 +17,11 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 
 	protected final Integer min;
 	protected final String max;
+	private final Optional<String> linkedStructureDefinitionUrl;
 	
 	public SnapshotData(Optional<String> id, Optional<String> name, ResourceFlags flags, Integer min, String max, LinkDatas typeLinks,
 			String information, List<ConstraintInfo> constraints, ImmutableNodePath path, FhirElementDataType dataType,
-			FhirVersion version) {
+			FhirVersion version, Optional<String> linkedStructureDefinitionUrl) {
 		super(id, name, flags, typeLinks, information, constraints, path, dataType, version);
 
 		if (min == null) {
@@ -34,6 +35,8 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 		
 		this.min = Preconditions.checkNotNull(min);
 		this.max = Preconditions.checkNotNull(max);
+		
+		this.linkedStructureDefinitionUrl = linkedStructureDefinitionUrl;
 	}
 
 	public Optional<String> getDefinition() {
@@ -62,5 +65,9 @@ public class SnapshotData extends AbstractFhirTreeNodeData {
 
 	public boolean useBackupTypeLinks() {
 		return false;
+	}
+	
+	public Optional<String> getLinkedStructureDefinitionUrl() {
+		return linkedStructureDefinitionUrl;
 	}
 }

@@ -46,11 +46,6 @@ public class FhirTreeNodeDataBuilder {
 
 		LinkDatas typeLinks;
 		if (elementDefinition.isRootElement()) {
-			/*
-			typeLinks = new LinkDatas(
-				new LinkData(
-					FhirURL.buildOrThrow(FhirURLConstants.HTTP_HL7_FHIR + "/profiling.html", elementDefinition.getVersion()), 
-					"Profile"));*/
 			typeLinks = new LinkDatas();
 		} else {
 			typeLinks = elementDefinition.getTypeLinks(structureDefinitions);
@@ -161,6 +156,11 @@ public class FhirTreeNodeDataBuilder {
 		setSliceName(elementDefinition.getSliceName());
 		
 		setExtensionType(elementDefinition.getExtensionType(structureDefinitions));
+		
+		Optional<String> linkedStructureDefinitionUrl = elementDefinition.getLinkedStructureDefinitionUrl();
+		if (linkedStructureDefinitionUrl.isPresent() && !linkedStructureDefinitionUrl.get().isEmpty()) {
+			setLinkedStructureDefinitionUrl(linkedStructureDefinitionUrl);
+		}
 		
 		return this;
 	}
@@ -317,6 +317,13 @@ public class FhirTreeNodeDataBuilder {
 		this.mappings = mappings;
 		return this;
 	}
+
+	protected Optional<String> linkedStructureDefinitionUrl = Optional.empty();
+	
+	public FhirTreeNodeDataBuilder setLinkedStructureDefinitionUrl(Optional<String> linkedStructureDefinitionUrl) {
+		this.linkedStructureDefinitionUrl = linkedStructureDefinitionUrl;
+		return this;
+	}
 	
 	private DifferentialData toDifferentialData(SnapshotTreeNode backupNode) {
 		DifferentialData data = new DifferentialData(id, name, resourceFlags, Optional.ofNullable(min), Optional.ofNullable(max), typeLinks, information, constraints, path, dataType, version, backupNode);
@@ -339,7 +346,7 @@ public class FhirTreeNodeDataBuilder {
 	}
 	
 	private SnapshotData toSnapshotData() {
-		SnapshotData data = new SnapshotData(id, name, resourceFlags, min, max, typeLinks, information, constraints, path, dataType, version);
+		SnapshotData data = new SnapshotData(id, name, resourceFlags, min, max, typeLinks, information, constraints, path, dataType, version, linkedStructureDefinitionUrl);
 		data.setSlicingInfo(slicingInfo);
 		data.setSliceName(sliceName);
 		data.setFixedValue(fixedValue);

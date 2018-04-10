@@ -37,6 +37,7 @@ import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.ListUtils;
 import uk.nhs.fhir.util.StringUtil;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
@@ -310,21 +311,37 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 			.map(stringType -> stringType.getValue())
 			.collect(Collectors.toList());
 	}
-
+	
 	@Override
 	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
+		} else {
+			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions));
 		}
 		
-		for (TypeRefComponent type : definition.getType()) {
+		/*for (TypeRefComponent type : definition.getType()) {
 			if (type.getCode() != null 
 			  && type.getCode().equals("Extension")) {
 				return Optional.of(lookupExtensionType(type.getProfile(), structureDefinitions));
 			}
 		}
 		
-		return Optional.empty();
+		return Optional.empty();*/
+	}
+	
+	public Optional<String> getLinkedStructureDefinitionUrl() {
+		return 
+			ListUtils.uniqueIfPresent(
+				definition
+					.getType()
+					.stream()
+					.filter(type -> 
+						type.getCode() != null 
+						  && type.getCode().equals("Extension")
+						  && type.getProfile() != null)
+					.map(type -> type.getProfile())
+					.collect(Collectors.toList()), "extension types");
 	}
 
 	@Override

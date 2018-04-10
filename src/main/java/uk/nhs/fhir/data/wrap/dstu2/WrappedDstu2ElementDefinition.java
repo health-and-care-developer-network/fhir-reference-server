@@ -1,6 +1,5 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -8,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.model.api.BasePrimitive;
 import ca.uhn.fhir.model.api.IDatatype;
@@ -36,6 +34,7 @@ import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.ListUtils;
 import uk.nhs.fhir.util.StringUtil;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
@@ -298,9 +297,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
+		} else {
+			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions));
 		}
 		
-		Set<ExtensionType> extensionTypes = Sets.newHashSet();
+		/*Set<ExtensionType> extensionTypes = Sets.newHashSet();
 		
 		for (Type type : definition.getType()) {
 			if (type.getCode() != null 
@@ -320,7 +321,21 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 			return Optional.of(extensionTypes.iterator().next());
 		} else {
 			throw new IllegalStateException("Unsure of extension type - multiple found: " + Arrays.toString(extensionTypes.toArray()));
-		}
+		}*/
+	}
+	
+	public Optional<String> getLinkedStructureDefinitionUrl() {
+		return 
+			ListUtils.uniqueIfPresent(
+				definition
+					.getType()
+					.stream()
+					.filter(type -> 
+						type.getCode() != null 
+						  && type.getCode().equals("Extension"))
+					.flatMap(type -> type.getProfile().stream())
+					.map(uri -> uri.getValue())
+					.collect(Collectors.toList()), "extension types");
 	}
 
 	@Override

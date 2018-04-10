@@ -3,9 +3,11 @@ package uk.nhs.fhir.data.wrap;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
@@ -20,6 +22,7 @@ import uk.nhs.fhir.data.structdef.tree.DifferentialTreeNode;
 import uk.nhs.fhir.data.structdef.tree.SnapshotData;
 import uk.nhs.fhir.data.structdef.tree.SnapshotTreeNode;
 import uk.nhs.fhir.data.structdef.tree.StructureDefinitionTreeDataProvider;
+import uk.nhs.fhir.util.FhirFileRegistry;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedStructureDefinition extends WrappedResource<WrappedStructureDefinition> {
@@ -142,5 +145,41 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	@Override
 	public String getCrawlerDescription() {
 		return getDescription().orElse("FHIR Server: StructureDefinition " + getName());
+	}
+
+	public Map<SnapshotTreeNode, List<SnapshotTreeNode>> getExtensionsWithBindings(FhirFileRegistry fileRegistry) {
+		Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings = Maps.newHashMap();
+		
+		for (SnapshotTreeNode node : getSnapshotTree(Optional.of(fileRegistry)).nodes()) {
+			Optional<WrappedStructureDefinition> extensionDefinition = 
+				node.getData()
+					.getLinkedStructureDefinitionUrl()
+					.map(url -> fileRegistry.getStructureDefinitionIgnoreCase(getImplicitFhirVersion(), url));
+			
+			if (extensionDefinition.isPresent()) {
+				WrappedStructureDefinition definition = extensionDefinition.get();
+				String extensionUrl = definition.getUrl().get();
+
+				List<SnapshotTreeNode> extensionNodesWithBindings = Lists.newArrayList();
+				
+				for (SnapshotTreeNode extensionNode : definition.getSnapshotTree(Optional.of(fileRegistry)).nodes()) {
+					if (extensionNode.getData().getLinkedStructureDefinitionUrl().isPresent()) {
+						throw new IllegalStateException("Structure definition " + getUrl() + " refers to extension " + extensionUrl 
+						  + " which contains a nested extension at " + extensionNode.getNodeKey() + " but nested extensions are not currently supported");
+					}
+					
+					if (!extensionNode.isRemovedByProfile()
+	              	  && extensionNode.getData().getBinding().isPresent()) {
+						extensionNodesWithBindings.add(extensionNode);
+					}
+				}
+				
+				if (!extensionNodesWithBindings.isEmpty()) {
+					extensionsWithBindings.put(node, extensionNodesWithBindings);
+				}
+			}
+		}
+		
+		return extensionsWithBindings;
 	}
 }
