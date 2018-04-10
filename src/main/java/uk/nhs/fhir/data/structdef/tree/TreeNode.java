@@ -68,6 +68,15 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public U getRoot() {
+		U ancestor = (U)this;
+		while (!ancestor.isRoot()) {
+			ancestor = ancestor.getParent();
+		}
+		return ancestor;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void addChild(U child) {
 		children.add(child);
 		child.setParent((U) this);

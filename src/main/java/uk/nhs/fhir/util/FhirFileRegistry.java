@@ -81,7 +81,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		}
 	}
 	
-	public IBaseResource getExternal(FhirVersion version, String resourceUrl) {
+	public IBaseResource getExternal(FhirVersion version, String resourceUrl) throws ResourceNotAvailableException {
 		if (externalFhirResources.get(version).containsKey(resourceUrl)) {
 			return externalFhirResources.get(version).get(resourceUrl);
 		} else {
@@ -115,7 +115,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 	}
 
 	private String requestExternalResource(String resourceUrl) {
-		throw new IllegalStateException("Need to request resource from external provider: " + resourceUrl);
+		throw new ResourceNotAvailableException("Need to request resource from external provider: " + resourceUrl);
 		/*URL url;
 		try {
 			url = new URL(resourceUrl);
@@ -273,7 +273,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		}
 	}
 
-	public WrappedStructureDefinition getStructureDefinitionIgnoreCase(FhirVersion version, String url) {
+	public WrappedStructureDefinition getStructureDefinitionIgnoreCase(FhirVersion version, String url) throws ResourceNotAvailableException {
 		List<WrappedStructureDefinition> matchingDefinitions = 
 			resourcesByUrl
 				.entrySet()
@@ -290,7 +290,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			String lastUrlPart = StringUtil.getLastPartOfUrlWithoutExtension(url).toLowerCase(Locale.UK);
 			if (FhirURLConstants.isNhsResourceUrl(url)
 			  && possibleFileNames.contains(lastUrlPart)) {
-				throw new IllegalStateException("Cannot find NHS extension " + url + " (did rendering fail for this extension?)");
+				throw new ResourceNotAvailableException("Cannot find NHS extension " + url + " (did rendering fail for this extension?)");
 			}
 			
 			IBaseResource external = getExternal(version, url);

@@ -24,6 +24,7 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ElementDefinition;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.ResourceNotAvailableException;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedElementDefinition implements HasConstraints {
@@ -93,16 +94,11 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 		} else if (structureDefinitions.isPresent() 
 				&& structureDefinitions.get().isCachedPermittedMissingExtension(typeProfile)) {
 			return ExtensionType.SIMPLE;
-		} else {
-			WrappedStructureDefinition extensionDefinition;
+		} else if (structureDefinitions.isPresent()) {
 			try {
-				if (structureDefinitions.isPresent()) {
-					extensionDefinition = structureDefinitions.get().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
-					return extensionDefinition.getExtensionType();
-				} else {
-					throw new IllegalStateException("Cannot find extension type for " + typeProfile + " because there is no StructureDefinitionRepository available");
-				}
-			} catch (Exception e) {
+				WrappedStructureDefinition extensionDefinition = structureDefinitions.get().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
+				return extensionDefinition.getExtensionType();	
+			} catch (ResourceNotAvailableException e) {
 				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
 				
 				if (!Strings.isNullOrEmpty(permittedMissingExtensionRoot)
@@ -115,9 +111,12 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 					
 					return ExtensionType.SIMPLE;
 				} else {
-					throw e;
+					throw new IllegalStateException("Couldn't find " + getVersion().toString() + " extension " + typeProfile
+						+ " and it didn't begin with a permitted missing extension prefix");
 				}
 			}
+		} else {
+			throw new IllegalStateException("Cannot find extension type for " + typeProfile + " because there is no StructureDefinitionRepository available");
 		}
 	}
 	
