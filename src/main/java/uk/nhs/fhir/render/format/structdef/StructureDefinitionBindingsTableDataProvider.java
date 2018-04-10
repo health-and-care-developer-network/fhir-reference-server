@@ -36,34 +36,35 @@ public class StructureDefinitionBindingsTableDataProvider {
 		List<StructureDefinitionBindingsTableSection> tableSections = Lists.newArrayList();
 
 		for (Entry<SnapshotTreeNode, List<SnapshotTreeNode>> extensionWithBindings : extensionsWithBindings.entrySet()) {
-			String nodeKey = extensionWithBindings.getKey().getNodeKey();
-			String externalUrl = extensionWithBindings.getKey().getData().getLinkedStructureDefinitionUrl().get();
-			List<StructureDefinitionBindingsTableRowData> sectionRows = getRows(extensionWithBindings.getValue());
-			tableSections.add(new StructureDefinitionBindingsTableSection(nodeKey, externalUrl, sectionRows));
+			List<StructureDefinitionBindingsTableRowData> sectionRows = getRows(extensionWithBindings.getValue(), true);
+			tableSections.add(new StructureDefinitionBindingsTableSection(extensionWithBindings.getKey(), sectionRows));
 		}
 		
-		tableSections.sort(Comparator.comparing(section -> section.getSourceNodeKey().get()));
+		tableSections.sort(Comparator.comparing(section -> section.getSourceNode().get().getNodeKey()));
 
-		tableSections.add(0, new StructureDefinitionBindingsTableSection(getRows(nodesWithBindings)));
+		tableSections.add(0, new StructureDefinitionBindingsTableSection(getRows(nodesWithBindings, false)));
 		
 		return tableSections;
 	}
 
-	private List<StructureDefinitionBindingsTableRowData> getRows(List<SnapshotTreeNode> nodes) {
+	private List<StructureDefinitionBindingsTableRowData> getRows(List<SnapshotTreeNode> nodes, boolean isReferencedResource) {
 		return nodes
 			.stream()
-			.map(node -> toRowData(node))
+			.map(node -> toRowData(node, isReferencedResource))
 			.collect(Collectors.toList());
 	}
 	
-	private StructureDefinitionBindingsTableRowData toRowData(SnapshotTreeNode node) {
+	private StructureDefinitionBindingsTableRowData toRowData(SnapshotTreeNode node, boolean isReferencedResource) {
 		SnapshotData nodeData = node.getData();
 		BindingInfo bindingInfo = 
 			nodeData.getBinding()
 				.orElseThrow(() -> new IllegalStateException(node.getNodeKey() + " doesn't have a binding."));
         
 		String nodeKey = node.getNodeKey();
-    	Optional<String> description = nodeData.getDefinition();
+    	Optional<String> description = 
+    		isReferencedResource ?
+    			Optional.of(node.getRoot().getData().getInformation()) :
+    			nodeData.getDefinition();
         String bindingStrength = bindingInfo.getStrength();
     	String anchorStrength = bindingStrength.equals("required") ? "code" : bindingStrength;
         Optional<FhirURL> valueSetUrl = bindingInfo.getUrl();

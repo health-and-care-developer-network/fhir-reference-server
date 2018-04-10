@@ -40,11 +40,11 @@ public class StructureDefinitionBindingsTableSectionFormatter implements TableRo
 	private List<TableRow> formatSection(StructureDefinitionBindingsTableSection section) {
 		List<TableRow> sectionRows = Lists.newArrayList();
 		
-		if (section.getSourceNodeKey().isPresent()) {
+		if (section.getSourceNode().isPresent()) {
 			// section title row
 			sectionRows.add(new TableRow(titleCell(section)));
-			
-			section.getRowData().forEach(data -> sectionRows.add(formatRow(data, fhirVersion, section.getSourceNodeKey().get())));
+			String nodeKey = section.getSourceNode().get().getNodeKey();
+			section.getRowData().forEach(data -> sectionRows.add(formatRow(data, fhirVersion, nodeKey)));
 		} else {
 			section.getRowData().forEach(data -> sectionRows.add(formatRow(data, fhirVersion)));
 		}
@@ -53,7 +53,8 @@ public class StructureDefinitionBindingsTableSectionFormatter implements TableRo
 	}
 	
 	private TableCell titleCell(StructureDefinitionBindingsTableSection section) {
-		TableCell titleCell = new SimpleTextCell("Inherited via referenced resource: " + section.getSourceExternalResourceUrl().get());
+		String externalUrl = section.getSourceNode().get().getData().getLinkedStructureDefinitionUrl().get();
+		TableCell titleCell = new SimpleTextCell("Inherited via referenced resource: " + externalUrl);
 		titleCell.colspan(4);
 		titleCell.addClass(FhirCSS.DATA_LABEL);
 		return titleCell;
@@ -75,16 +76,20 @@ public class StructureDefinitionBindingsTableSectionFormatter implements TableRo
 			bindingStrength)));
 		
 		TableCell referenceCell;
-		if (valueSetUrl.isPresent()) {
+		if (!valueSetUrl.isPresent()) {
+			referenceCell = TableCell.empty();
+		} else if (valueSetUrl.get().isLogicalUrl()) {
+			referenceCell = new SimpleTextCell(valueSetUrl.get().toFullString());
+		} else {
 			LinkCell referenceLink = new LinkCell(new LinkDatas(new LinkData(
 				valueSetUrl.get(), 
 				valueSetUrl.get().toFullString())));
+			
 			if (!FhirURLConstants.isNhsResourceUrl(valueSetUrl.get().toFullString())) {
 				referenceLink.setLinkIcon(FhirIcon.REFERENCE);
 			}
+			
 			referenceCell = referenceLink;
-		} else {
-			referenceCell = TableCell.empty();
 		}
 		
 		return new TableRow(
