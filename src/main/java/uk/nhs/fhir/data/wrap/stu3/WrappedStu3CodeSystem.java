@@ -18,6 +18,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -132,7 +133,7 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 
 	@Override
 	public void setUrl(String url) {
-		definition.setUrl(url);
+		definition.setUrl(Preconditions.checkNotNull(url));
 	}
 
 	@Override

@@ -16,6 +16,7 @@ public enum ResourceType {
 	// Added for STU3
 	CONCEPTMAP("ConceptMap", "ConceptMap", "ConceptMap", "ConceptMaps", "ConceptMap"),
 	CODESYSTEM("CodeSystem", "CodeSystem", "CodeSystem", "CodeSystems", "CodeSystem"),
+	MESSAGEDEFINITION("MessageDefinition", "MessageDefinition", "MessageDefinition", "MessageDefinitions", "MessageDefinition"),
 	
 	EXTENSION("Extension", null, "Extensions", "Extension Registry", "Extensions"),
 	EXAMPLES("Example", "Examples", "Examples", "Examples", "Examples"),

@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
@@ -132,7 +133,7 @@ public class WrappedDstu2ConceptMap extends WrappedConceptMap {
 
 	@Override
 	public void setUrl(String url) {
-		definition.setUrl(url);
+		definition.setUrl(Preconditions.checkNotNull(url));
 	}
 
 	@Override
