@@ -92,6 +92,8 @@ public class ResourcePageRenderer {
 	        	return "Description";
 	        case CONCEPTMAP:
 	        	return "Description";
+	        case MESSAGEDEFINITION:
+	        	return "Description";
         	default:
 	        	throw new IllegalStateException("Unhandled resource type: " + resourceType.toString());
         }

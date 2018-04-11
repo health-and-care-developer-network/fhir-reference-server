@@ -405,7 +405,7 @@ public class FileCache {
         try {
             for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
 	        	for(ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.get(fhirVersion)) {
-	            	if (entry.getLatest().getResourceType() == resourceType) {
+	            	if (entry.getLatest().getResourceType().equals(resourceType)) {
 		            	boolean isExtension = entry.getLatest().isExtension();
 		                String group = entry.getLatest().getDisplayGroup();
 		                
