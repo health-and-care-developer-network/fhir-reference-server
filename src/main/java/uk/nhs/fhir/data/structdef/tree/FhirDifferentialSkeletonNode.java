@@ -68,8 +68,10 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 			}
 			
 			// no slice name to filter on
-			EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME,
-				"No slice name available to identify node to match to a backup: " + (getData().getId().isPresent() ? getData().getId().get() : getPath()));
+			if (!getData().getSliceName().isPresent()) {
+				EventHandlerContext.forThread().event(RendererEventType.DIFFERENTIAL_MISSING_SLICE_NAME,
+					"No slice name available to identify node to match to a backup: " + (getData().getId().isPresent() ? getData().getId().get() : getPath()));
+			}
 			
 			backupNodesWithMatchingPaths = filterOnIdIfPresent(backupNodesWithMatchingPaths);
 
