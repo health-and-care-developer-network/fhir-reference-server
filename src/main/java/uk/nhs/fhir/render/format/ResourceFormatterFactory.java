@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
+import uk.nhs.fhir.data.wrap.WrappedMessageDefinition;
 import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
@@ -20,6 +21,8 @@ import uk.nhs.fhir.render.format.codesys.CodeSystemMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapTableFormatter;
+import uk.nhs.fhir.render.format.message.MessageDefinitionFormatter;
+import uk.nhs.fhir.render.format.message.MessageDefinitionMetadataFormatter;
 import uk.nhs.fhir.render.format.opdef.OperationDefinitionFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionBindingsTableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionDetailsFormatter;
@@ -41,6 +44,8 @@ public class ResourceFormatterFactory {
 			return new ValueSetFormatter((WrappedValueSet) wrappedResource);
 		} else if (wrappedResource instanceof WrappedStructureDefinition) {
 			return new StructureDefinitionFormatter((WrappedStructureDefinition) wrappedResource);
+		} else if (wrappedResource instanceof WrappedMessageDefinition) { 
+			return new MessageDefinitionFormatter((WrappedMessageDefinition) wrappedResource);
 		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
 		}
@@ -79,6 +84,10 @@ public class ResourceFormatterFactory {
 			if (!wrappedStructureDefinition.isExtension()) {
 				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition), outputDirectory, "differential.html"));
 			}
+		} else if (wrappedResource instanceof WrappedMessageDefinition) {
+			WrappedMessageDefinition wrappedMessageDefinition = (WrappedMessageDefinition)wrappedResource;
+			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionMetadataFormatter(wrappedMessageDefinition), outputDirectory, "metadata.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionMetadataFormatter(wrappedMessageDefinition), outputDirectory, "focus.html"));
 		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
 		}
