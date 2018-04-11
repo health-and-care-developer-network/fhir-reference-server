@@ -23,7 +23,7 @@ public enum ResourceType {
 	OTHER("Other", "Other", "Other", null, null);
 
 	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
-	private static final ResourceType[] STU3_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM};
+	private static final ResourceType[] STU3_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION};
 	
 	public static List<ResourceType> typesForFhirVersion(FhirVersion fhirVersion) {
 		switch (fhirVersion) {

@@ -35,6 +35,9 @@ public enum ArtefactType {
 	//CODESYSTEM_DETAILS("codesystem-full.html", ResourceType.CODESYSTEM, "Details", 0, false),
 	CODESYSTEM_CONCEPTS("concepts.html", ResourceType.CODESYSTEM, "Concepts", 0, false),
 	CODESYSTEM_FILTERS("filters.html", ResourceType.CODESYSTEM, "Filters", 10, false),
+	
+	MESSAGE_METADATA("metadata.html", ResourceType.MESSAGEDEFINITION, "Metadata", -1, true),
+	MESSAGE_FOCUS("focus.html", ResourceType.MESSAGEDEFINITION, "Message Content", 0, false)
 	;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ArtefactType.class.getName());

@@ -43,7 +43,8 @@ public class FhirFileParser {
 			org.hl7.fhir.dstu3.model.ValueSet.class,
 			org.hl7.fhir.dstu3.model.OperationDefinition.class,
 			org.hl7.fhir.dstu3.model.ConceptMap.class,
-			org.hl7.fhir.dstu3.model.CodeSystem.class);
+			org.hl7.fhir.dstu3.model.CodeSystem.class,
+			org.hl7.fhir.dstu3.model.MessageDefinition.class);
 	
 	public static boolean isSupported(IBaseResource resource) {
 		return supportedClasses.contains(resource.getClass());

@@ -27,6 +27,7 @@ import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ValueSet;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3MessageDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
@@ -189,6 +190,10 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			return new WrappedDstu2ConceptMap((ca.uhn.fhir.model.dstu2.resource.ConceptMap)resource);
 		} else if (resource instanceof org.hl7.fhir.dstu3.model.ConceptMap) {
 			return new WrappedStu3ConceptMap((org.hl7.fhir.dstu3.model.ConceptMap)resource);
+		}
+		
+		else if (resource instanceof org.hl7.fhir.dstu3.model.MessageDefinition) {
+			return new WrappedStu3MessageDefinition((org.hl7.fhir.dstu3.model.MessageDefinition)resource);
 		}
 		
 		else {
