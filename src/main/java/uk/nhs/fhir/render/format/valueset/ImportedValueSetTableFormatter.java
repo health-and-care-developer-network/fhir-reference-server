@@ -38,7 +38,7 @@ public class ImportedValueSetTableFormatter extends TableFormatter<WrappedValueS
 	}
 	
 	private Element buildReferencedCodeSystemPanel() {
-		FhirValueSetComposeInclude include = ListUtils.expectUnique(wrappedResource.getCompose().getIncludes(), "include");
+		FhirValueSetComposeInclude include = ListUtils.expectUnique(wrappedResource.getCompose().getIncludes(), "CodeSystem includes");
 		String system = include.getSystem();
 
 		// Display a single row with a link to the CodeSystem url

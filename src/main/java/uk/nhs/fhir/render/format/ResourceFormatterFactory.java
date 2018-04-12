@@ -21,6 +21,7 @@ import uk.nhs.fhir.render.format.codesys.CodeSystemMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapTableFormatter;
+import uk.nhs.fhir.render.format.message.MessageDefinitionFocusTableFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionMetadataFormatter;
 import uk.nhs.fhir.render.format.opdef.OperationDefinitionFormatter;
@@ -87,7 +88,7 @@ public class ResourceFormatterFactory {
 		} else if (wrappedResource instanceof WrappedMessageDefinition) {
 			WrappedMessageDefinition wrappedMessageDefinition = (WrappedMessageDefinition)wrappedResource;
 			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionMetadataFormatter(wrappedMessageDefinition), outputDirectory, "metadata.html"));
-			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionMetadataFormatter(wrappedMessageDefinition), outputDirectory, "focus.html"));
+			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionFocusTableFormatter(wrappedMessageDefinition), outputDirectory, "focus.html"));
 		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
 		}
