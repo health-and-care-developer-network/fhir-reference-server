@@ -20,10 +20,12 @@ public class RendererEventConfig {
 		
 		// Error in profile
 		responses.put(RendererEventType.DUPLICATE_CONSTRAINT_KEYS, RendererEventResponse.IGNORE); // should be a warning, but too many
+		responses.put(RendererEventType.MESSAGE_ASSET_TYPE_CODING, RendererEventResponse.LOG_WARNING); // should be CodeType not CodingType
 		
 		// Perhaps valid?
 		responses.put(RendererEventType.MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.TYPELINK_STRING_WITH_PROFILE, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.UNRECOGNISED_MESSAGE_ASSET_VERSION, RendererEventResponse.LOG_WARNING);
 		
 		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY, RendererEventResponse.IGNORE);
 		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, RendererEventResponse.IGNORE);

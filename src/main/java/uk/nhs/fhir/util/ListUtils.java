@@ -12,7 +12,7 @@ public class ListUtils {
 			return list.get(0);
 		} else {
 			int size = list.size();
-			throw new IllegalStateException("Found multiple (" + size + ")" + itemsDesc + " (expected 1)");
+			throw new IllegalStateException("Found multiple (" + size + ") " + itemsDesc + " (expected 1)");
 		}
 	}
 	

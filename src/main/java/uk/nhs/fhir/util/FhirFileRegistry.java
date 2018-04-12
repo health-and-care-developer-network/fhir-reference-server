@@ -219,10 +219,8 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			// else continue
 		}
 		
-		if (parsedFile.getMeta() != null
-		  && parsedFile.getMeta().getProfile().stream().anyMatch(profile -> FhirURLConstants.isNhsResourceUrl(profile.getValueAsString()))) {
-			exampleFhirResources.put(xmlFile, parsedFile);
-		} else if (FhirFileParser.isSupported(parsedFile)) {
+	
+		if (FhirFileParser.isSupported(parsedFile)) {
 			String errorNotes = "";
 			Optional<Exception> error = Optional.empty(); 
 			
@@ -246,6 +244,9 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			} else {
 				throw new IllegalStateException(errorMessage);
 			}
+		} else if (parsedFile.getMeta() != null
+		  && parsedFile.getMeta().getProfile().stream().anyMatch(profile -> FhirURLConstants.isNhsResourceUrl(profile.getValueAsString()))) {
+			exampleFhirResources.put(xmlFile, parsedFile);
 		} else {
 			LOG.warn("SKIPPING " + xmlFile.getAbsolutePath() + " - not an example and not a supported type");
 		}

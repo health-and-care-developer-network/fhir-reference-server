@@ -6,6 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.hl7.fhir.dstu3.model.CodeType;
+import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Extension;
 import org.hl7.fhir.dstu3.model.Factory;
 import org.hl7.fhir.dstu3.model.MessageDefinition;
 import org.hl7.fhir.dstu3.model.MessageDefinition.MessageDefinitionAllowedResponseComponent;
@@ -13,6 +17,8 @@ import org.hl7.fhir.dstu3.model.MessageDefinition.MessageDefinitionFocusComponen
 import org.hl7.fhir.dstu3.model.MessageDefinition.MessageSignificanceCategory;
 import org.hl7.fhir.dstu3.model.Narrative;
 import org.hl7.fhir.dstu3.model.Narrative.NarrativeStatus;
+import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.Type;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -22,12 +28,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.codesystem.FhirIdentifier;
+import uk.nhs.fhir.data.message.MessageDefinitionAsset;
 import uk.nhs.fhir.data.message.MessageDefinitionFocus;
 import uk.nhs.fhir.data.message.MessageResponse;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
 import uk.nhs.fhir.data.wrap.WrappedMessageDefinition;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.ListUtils;
 
@@ -35,6 +44,11 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 	
 	private MessageDefinition definition;
 
+	private static final String EXTENSION_URL_UTILISED_ASSET = "utilisedAsset";
+	private static final String EXTENSION_URL_TYPE = "type";
+	private static final String EXTENSION_URL_REFERENCE = "reference";
+	private static final String EXTENSION_URL_VERSION = "version";
+	
 	public WrappedStu3MessageDefinition(MessageDefinition definition) {
 		this.definition = definition;
 		checkForUnexpectedFeatures();
@@ -172,7 +186,7 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 		List<MessageResponse> allowedResponses = Lists.newArrayList();
 		
 		for (MessageDefinitionAllowedResponseComponent response : definition.getAllowedResponse()) {
-			
+			//throw new NotImplementedException("Render MessageDefinition allowed responses");
 		}
 		
 		return allowedResponses;
@@ -180,10 +194,78 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 
 	@Override
 	public MessageDefinitionFocus getFocus() {
+		MessageDefinitionFocusComponent sourceFocus = ListUtils.expectUnique(definition.getFocus(), "MessageDefinition focus components");
 		
-		MessageDefinitionFocusComponent focus = ListUtils.expectUnique(definition.getFocus(), "focus component");
+		if (!sourceFocus.hasProfile()) {
+			throw new IllegalStateException("Expected Message Definition focus to have a profile");
+		}
+
+		String code = sourceFocus.getCode();
+		Reference sourceProfile = sourceFocus.getProfile();
 		
-		return new MessageDefinitionFocus();
+		Extension bundleExtension = ListUtils.expectUnique(sourceProfile.getExtension(), "top level profile extensions");
+		String bundleExtensionUrl = bundleExtension.getUrl();
+
+		MessageDefinitionFocus focus = new MessageDefinitionFocus(code, bundleExtensionUrl);
+		
+		for (Extension assetExtension : bundleExtension.getExtension()) {
+			if (!assetExtension.getUrl().equals(EXTENSION_URL_UTILISED_ASSET)) {
+				throw new IllegalStateException("Expected contained extension to have url \"" + EXTENSION_URL_UTILISED_ASSET + "\" but found " + assetExtension.getUrl());
+			}
+
+			String assetCode = null;
+			String structureDefinitionReference = null;
+			String structureDefinitionVersion = null;
+			
+			for (Extension assetDetailExtension : assetExtension.getExtension()) {
+				switch (assetDetailExtension.getUrl()) {
+					case EXTENSION_URL_TYPE:
+						Type typeValue = assetDetailExtension.getValue();
+						if (typeValue instanceof CodeType) {
+							CodeType typeCode = (CodeType)typeValue;
+							assetCode = typeCode.asStringValue();
+						} else if (typeValue instanceof Coding) {
+							Coding typeCoding = (Coding)typeValue;
+							EventHandlerContext.forThread().event(RendererEventType.MESSAGE_ASSET_TYPE_CODING, "Found Coding for MessageDefinition Asset (should be Code)");
+							assetCode = typeCoding.getCode();
+						} else {
+							throw new IllegalStateException("Expected \"" + EXTENSION_URL_TYPE + "\" extension to have value of type Code, but found " + typeValue.getClass().getSimpleName());
+						}
+						break;
+					case EXTENSION_URL_REFERENCE:
+						Reference ref = (Reference)assetDetailExtension.getValue();
+						structureDefinitionReference = ref.getReference();
+						break;
+					case EXTENSION_URL_VERSION:
+						String versionString = assetDetailExtension.getValueAsPrimitive().getValueAsString();
+						try {
+							// validate
+							new VersionNumber(versionString);
+							structureDefinitionVersion = versionString;
+						} catch (Exception e) {
+							if (!WrappedMessageDefinition.PERMITTED_VERSION_STRINGS.contains(versionString)) {
+								EventHandlerContext.forThread().event(RendererEventType.UNRECOGNISED_MESSAGE_ASSET_VERSION, "Didn't recognise version string \"" + versionString + "\"");
+							}
+							structureDefinitionVersion = versionString;
+						}
+						break;
+					default: 
+						throw new IllegalStateException("Unexpected asset detail extension URL: " + assetDetailExtension.getUrl());
+				}
+			}
+			
+			if (assetCode == null) {throw new IllegalStateException("Asset didn't have a \"" + EXTENSION_URL_TYPE + "\" extension");}
+			if (structureDefinitionReference == null) {throw new IllegalStateException("Asset didn't have a \"" + EXTENSION_URL_REFERENCE + "\" extension");}
+			if (structureDefinitionVersion == null) {throw new IllegalStateException("Asset didn't have a \"" + EXTENSION_URL_VERSION + "\" extension");}
+			
+			focus.addAsset(new MessageDefinitionAsset(assetCode, structureDefinitionReference, structureDefinitionVersion));
+		}
+		
+		if (focus.getAssets().isEmpty()) {
+			throw new IllegalStateException("Focus didn't contain any assets");
+		}
+		
+		return focus;
 	}
 
 	private void checkForUnexpectedFeatures() {
