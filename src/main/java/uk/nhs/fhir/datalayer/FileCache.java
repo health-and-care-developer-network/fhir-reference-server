@@ -200,7 +200,7 @@ public class FileCache {
 		}
     }
     
-    private static HashMap<String, List<ResourceMetadata>> cacheExamples(FhirVersion fhirVersion){
+    private static HashMap<String, List<ResourceMetadata>> cacheExamples(FhirVersion fhirVersion) {
     	
     	// Call pre-processor to copy files into the versioned directory
         Path renderedExamplesPath = fhirFileLocator.getSourcePathForResourceType(EXAMPLES, fhirVersion);
@@ -227,8 +227,12 @@ public class FileCache {
     	
         // Now, read the resources into our cache
 		HashMap<String, List<ResourceMetadata>> examplesList = Maps.newHashMap();
-        String path = fhirFileLocator.getDestinationPathForResourceType(EXAMPLES, fhirVersion).toString();
-        List<File> fileList = resourceFileFinder.findFiles(path);
+		// We want resources that qualify as full implementations AND examples to be included in both places, so start from the source root.
+        //String path = fhirFileLocator.getDestinationPathForResourceType(EXAMPLES, fhirVersion).toString();
+		Path rootPath = fhirFileLocator.getSourceRoot(fhirVersion);
+		List<File> fileList = rootPath.toFile().isDirectory() ?
+			resourceFileFinder.findFilesRecursively(rootPath) :
+			Lists.newArrayList();
         
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
@@ -241,7 +245,7 @@ public class FileCache {
                 	
                 	// A supported file is any class we treat as part of a specification (StructureDefinition, ValueSet etc)
                 	// Anything else we have successfully parsed, can be treated as an example
-                	if (!FhirFileParser.isSupported(exampleResource)) {
+                	//if (!FhirFileParser.isSupported(exampleResource)) {
                 		resourceID = exampleResource.getIdElement().getIdPart();
                     
 	                    // Find the profile resource ID the example relates to
@@ -286,7 +290,7 @@ public class FileCache {
 	                    		addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " no profile was specified in the example!");
 	                    	}
 	                    }
-                	}
+                	//}
 	                
                 } catch (FhirParsingFailedException | RuntimeException ex) {
                 	LOG.error("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - IGNORING");
