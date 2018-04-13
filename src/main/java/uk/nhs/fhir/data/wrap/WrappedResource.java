@@ -219,7 +219,6 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
     	}
 	}
 
-
 	protected void checkNoInfoPresent(Object o) {
 		if (o instanceof Collection<?>) {
 			if (!((Collection<?>) o).isEmpty()) {
@@ -232,6 +231,22 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		} else {
 			if (o != null) {
 				throw new IllegalStateException("Expected " + o.toString() + " to be empty");
+			}
+		}
+	}
+
+	protected void checkNoInfoPresent(Object o, String path) {
+		if (o instanceof Collection<?>) {
+			if (!((Collection<?>) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + path + " to be empty");
+			}
+		} else if (o instanceof Base) {
+			if (!((Base) o).isEmpty()) {
+				throw new IllegalStateException("Expected " + path + " to be empty");
+			}
+		} else {
+			if (o != null) {
+				throw new IllegalStateException("Expected " + path + " to be empty");
 			}
 		}
 	}

@@ -26,7 +26,7 @@ public class Dstu2UrlFixer extends UrlFixer {
 		}
 		
 		// sanity check
-		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT + "/")
+		if (hostAndPath.contains(FhirURLConstants.HL7_ORG_DOMAIN + "/")
 		  && !hostAndPath.toLowerCase(Locale.UK).contains("dstu2")) {
 			EventHandlerContext.forThread().event(RendererEventType.HL7_URL_WITHOUT_DSTU2, 
 				"Should " + hostAndPath + " have been modified to contain /dstu2/ ?");
@@ -34,7 +34,7 @@ public class Dstu2UrlFixer extends UrlFixer {
 			if (hostAndPath.contains(FhirURLConstants.HL7_FHIR)) {
 				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_FHIR, FhirURLConstants.HL7_DSTU2);
 			} else {
-				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_ROOT, FhirURLConstants.HL7_DSTU2);
+				hostAndPath = hostAndPath.replace(FhirURLConstants.HL7_ORG_DOMAIN, FhirURLConstants.HL7_DSTU2);
 			}
 		}
 		

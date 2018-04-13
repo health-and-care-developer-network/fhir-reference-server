@@ -8,17 +8,23 @@ import com.google.common.collect.Lists;
 
 public class MessageDefinitionFocus {
 
-	private final String profileId;
+	private final String code;
+	private final String structureDefinitionReference;
 	private final String bundleExtensionUrl;
 	private final List<MessageDefinitionAsset> assets = Lists.newArrayList();
 
-	public MessageDefinitionFocus(String profileId, String bundleExtensionUrl) {
-		this.profileId = Preconditions.checkNotNull(profileId);
+	public MessageDefinitionFocus(String code, String structureDefinitionReference, String bundleExtensionUrl) {
+		this.code = Preconditions.checkNotNull(code);
+		this.structureDefinitionReference = Preconditions.checkNotNull(structureDefinitionReference); 
 		this.bundleExtensionUrl = Preconditions.checkNotNull(bundleExtensionUrl);
 	}
 
-	public String getProfileId() {
-		return profileId;
+	public String getCode() {
+		return code;
+	}
+	
+	public String getStructureDefinitionReference() {
+		return structureDefinitionReference;
 	}
 	
 	public String getBundleExtensionUrl() {

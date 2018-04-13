@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.hl7.fhir.dstu3.model.CodeType;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Extension;
@@ -34,6 +33,7 @@ import uk.nhs.fhir.data.message.MessageResponse;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
+import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedMessageDefinition;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
@@ -186,7 +186,8 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 		List<MessageResponse> allowedResponses = Lists.newArrayList();
 		
 		for (MessageDefinitionAllowedResponseComponent response : definition.getAllowedResponse()) {
-			//throw new NotImplementedException("Render MessageDefinition allowed responses");
+			FhirURL messageDefinitionId = FhirURL.buildOrThrow(response.getMessage().getReference(), getImplicitFhirVersion());
+			allowedResponses.add(new MessageResponse(messageDefinitionId));
 		}
 		
 		return allowedResponses;
@@ -202,11 +203,12 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 
 		String code = sourceFocus.getCode();
 		Reference sourceProfile = sourceFocus.getProfile();
+		String profile = sourceProfile.getReference();
 		
 		Extension bundleExtension = ListUtils.expectUnique(sourceProfile.getExtension(), "top level profile extensions");
 		String bundleExtensionUrl = bundleExtension.getUrl();
 
-		MessageDefinitionFocus focus = new MessageDefinitionFocus(code, bundleExtensionUrl);
+		MessageDefinitionFocus focus = new MessageDefinitionFocus(code, profile, bundleExtensionUrl);
 		
 		for (Extension assetExtension : bundleExtension.getExtension()) {
 			if (!assetExtension.getUrl().equals(EXTENSION_URL_UTILISED_ASSET)) {
@@ -275,23 +277,29 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 		// checkNoInfoPresent(definition.getName());
 		// checkNoInfoPresent(definition.getTitle());
 		// checkNoInfoPresent(definition.getStatus());
-		checkNoInfoPresent(definition.getExperimentalElement());
+		checkNoInfoPresent(definition.getExperimentalElement(), "MessageDefinition.experimental");
 		// checkNoInfoPresent(definition.getDate());
-		checkNoInfoPresent(definition.getPublisher());
-		checkNoInfoPresent(definition.getContact());
+		checkNoInfoPresent(definition.getPublisher(), "MessageDefinition.publisher");
+		checkNoInfoPresent(definition.getContact(), "MessageDefinition.contact");
 		// checkNoInfoPresent(definition.getDescription());
-		checkNoInfoPresent(definition.getUseContext());
-		checkNoInfoPresent(definition.getJurisdiction());
-		checkNoInfoPresent(definition.getPurpose());
-		checkNoInfoPresent(definition.getBase());
-		checkNoInfoPresent(definition.getParent());
+		checkNoInfoPresent(definition.getUseContext(), "MessageDefinition.useContext");
+		checkNoInfoPresent(definition.getJurisdiction(), "MessageDefinition.jurisdiction");
+		checkNoInfoPresent(definition.getPurpose(), "MessageDefinition.purpose");
+		checkNoInfoPresent(definition.getBase(), "MessageDefinition.base");
+		checkNoInfoPresent(definition.getParent(), "MessageDefinition.parent");
 		// checkNoInfoPresent(definition.getCopyright());
-		checkNoInfoPresent(definition.getReplaces());
+		checkNoInfoPresent(definition.getReplaces(), "MessageDefinition.replaces");
 		// checkNoInfoPresent(definition.getEvent());
 		// checkNoInfoPresent(definition.getCategory());
 		// checkNoInfoPresent(definition.getFocus());
-		checkNoInfoPresent(definition.getResponseRequiredElement());
-		// checkNoInfoPresent(definition.getAllowedResponse());
+		for (MessageDefinitionFocusComponent focus : definition.getFocus()) {
+			checkNoInfoPresent(focus.getMinElement());
+			checkNoInfoPresent(focus.getMaxElement());
+		}
+		checkNoInfoPresent(definition.getResponseRequiredElement(), "MessageDefinition.responseRequired");
+		for (MessageDefinitionAllowedResponseComponent response : definition.getAllowedResponse()) {
+			checkNoInfoPresent(response.getSituation(), "MessageDefinition.response.situation");
+		}
 	}
 	
 }

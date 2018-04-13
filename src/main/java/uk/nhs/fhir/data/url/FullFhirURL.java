@@ -65,7 +65,7 @@ public class FullFhirURL extends FhirURL {
 		}
 		
 		// fix up hl7.org/ hosts, excluding hl7.org.uk/ hosts
-		if (hostAndPath.contains(FhirURLConstants.HL7_ROOT + "/")) {
+		if (hostAndPath.contains(FhirURLConstants.HL7_ORG_DOMAIN + "/")) {
 			hostAndPath = fixHL7URL(hostAndPath);
 		}
 		

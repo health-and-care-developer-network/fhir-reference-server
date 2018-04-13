@@ -2,8 +2,6 @@ package uk.nhs.fhir.data.message;
 
 import com.google.common.base.Preconditions;
 
-import uk.nhs.fhir.data.metadata.VersionNumber;
-
 public class MessageDefinitionAsset {
 	private final String code;
 	private final String structureDefinitionReference;
