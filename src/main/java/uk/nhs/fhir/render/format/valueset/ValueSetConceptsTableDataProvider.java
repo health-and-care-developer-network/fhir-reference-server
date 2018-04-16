@@ -48,7 +48,7 @@ public class ValueSetConceptsTableDataProvider {
 				addConcepts(rows, system, standaloneCodeSystem.get().getCodeSystemConcepts().getConcepts());
 			} else {
 				EventHandlerContext.forThread().event(RendererEventType.EMPTY_VALUE_SET, 
-					"Empty include and CodeSystem url [" + system + "] wasn't found locally (does it start with " + FhirURLConstants.HTTPS_FHIR_HL7_ORG_UK + "?)");
+					"Empty include and CodeSystem url [" + system + "] wasn't found locally (does it start with " + FhirURLConstants.FHIR_HL7_ORG_UK_QDOMAIN + "?)");
 					// ensure that we still display the code system
 					addConcepts(rows, system, Lists.newArrayList());
 			}

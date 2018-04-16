@@ -13,7 +13,7 @@ import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.FhirCSS;
 
-public class FhirContactRenderer {
+public class FhirContactRenderer extends MetadataListCellRenderer<FhirContacts> {
 	public List<Content> getPublishingOrgContactsContents(List<FhirContacts> contacts) {
 		
 		List<Content> publishingOrgContacts = Lists.newArrayList();
@@ -32,9 +32,9 @@ public class FhirContactRenderer {
 						telecomDesc));
 				
 				if (individualTelecoms.size() == 1) {
-					renderSingleTelecom(publishingOrgContacts, individualTelecoms);
+					publishingOrgContacts.addAll(renderSingleTelecom(individualTelecoms));
 				} else {
-					renderMultipleTelecoms(publishingOrgContacts, individualTelecoms);
+					publishingOrgContacts.addAll(renderMultipleTelecoms(individualTelecoms));
 				}
 			}
 		}
@@ -47,7 +47,9 @@ public class FhirContactRenderer {
 		return publishingOrgContacts;
 	}
 
-	void renderMultipleTelecoms(List<Content> publishingOrgContacts, List<FhirContact> individualTelecoms) {
+	private List<Content> renderMultipleTelecoms(List<FhirContact> individualTelecoms) {
+		List<Content> renderedTelecoms = Lists.newArrayList();
+		
 		List<FhirContact> contactsByPrecedence = 
 			individualTelecoms
 				.stream()
@@ -61,30 +63,30 @@ public class FhirContactRenderer {
 				.collect(Collectors.toList()); 
 		
 		for (FhirContact individualTelecom : contactsByPrecedence) {
-			publishingOrgContacts.add(Elements.newElement("br"));
+			renderedTelecoms.add(Elements.newElement("br"));
 			
-			publishingOrgContacts.add(
+			renderedTelecoms.add(
 				Elements.withAttributeAndText("span", 
 					new Attribute("class", FhirCSS.DATA_VALUE), 
 					"\t" + individualTelecom.getContactData()));
 		}
+		
+		return renderedTelecoms;
 	}
 
-	void renderSingleTelecom(List<Content> publishingOrgContacts, List<FhirContact> individualTelecoms) {
-		publishingOrgContacts.add(
+	private List<Content> renderSingleTelecom(List<FhirContact> individualTelecoms) {
+		List<Content> renderedTelecom = Lists.newArrayList();
+		
+		renderedTelecom.add(
 			Elements.withAttributeAndText("span", 
 				new Attribute("class", FhirCSS.TELECOM_NAME), 
 				": "));
 		
-		publishingOrgContacts.add(
+		renderedTelecom.add(
 			Elements.withAttributeAndText("span", 
 				new Attribute("class", FhirCSS.DATA_VALUE), 
 				individualTelecoms.get(0).getContactData()));
-	}
-
-	void newlineIfNeeded(List<Content> publishingOrgContacts) {
-		if (!publishingOrgContacts.isEmpty()) {
-			publishingOrgContacts.add(Elements.newElement("br"));
-		}
+		
+		return renderedTelecom;
 	}
 }
