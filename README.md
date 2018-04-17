@@ -59,6 +59,12 @@ No guarantee of correctness is provided. You may get benefit from the use of thi
 
 ## Release Notes
 
+> ### v1.2.1 (17/04/2018)
+> - support MessageDefinition resources
+> - add command line arguments support
+> - display StructureDefinition bindings inherited from utilised Extensions
+> - upversion to HAPI v3.3.0
+
 > ### v1.2.0 (23/03/2018)
 > - Render OperationDefinition parameter parts
 > - Allow viewing event messages while file copying is carried out
