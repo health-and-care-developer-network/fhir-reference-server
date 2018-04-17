@@ -3,6 +3,7 @@ package uk.nhs.fhir.data.structdef.tree;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -375,5 +376,23 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	@Override
 	public FhirCardinality getCardinality() {
 		return new FhirCardinality(getMin(), getMax());
+	}
+	
+	public List<FhirURL> getExtensionUrls() {
+		List<FhirURL> urls = Lists.newArrayList();
+		
+		if (getPathName().equals("extension")) {
+			LinkDatas typeLinks = getTypeLinks();
+			for (Entry<LinkData, List<LinkData>> link : typeLinks.links()) {
+				if (!link.getValue().isEmpty()
+				  && link.getKey().getText().equals("Extension")) {
+					for (LinkData nestedLink : link.getValue()) {
+						urls.add(nestedLink.getURL());
+					}
+				}
+			}
+		}
+		
+		return urls;
 	}
 }
