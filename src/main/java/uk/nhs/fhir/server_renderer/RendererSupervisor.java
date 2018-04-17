@@ -2,12 +2,16 @@ package uk.nhs.fhir.server_renderer;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFrame;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
+import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.render.NewMain;
 
 public class RendererSupervisor {
@@ -35,11 +39,11 @@ public class RendererSupervisor {
 		} else {
 			Thread renderer = createRenderMainThread(sourceDirectory, destinationDirectory, mainAppWindow);
 			
-			if (!isRendering.compareAndSet(false, true)) {
+			if (isRendering.compareAndSet(false, true)) {
+				renderer.start();
+			} else {
 				// rendering already in progress
 				output.displayUpdate("Tried to start rendering but it was already in progress");
-			} else {
-				renderer.start();
 			}
 		}
 	}
@@ -56,10 +60,15 @@ public class RendererSupervisor {
 						listener.startRender();
 					}
 					
-					NewMain renderer = new NewMain(sourceDirectory, destinationDirectory, new DeferredDialogEventAccumulator(parentWindow));
+					Optional<Set<String>> allowedMissingExtensionPrefix = 
+						Optional.ofNullable(System.getProperty(WrappedElementDefinition.SYS_PROP_PERMITTED_MISSING_EXTENSION))
+							.map(prop -> Sets.newHashSet(prop));
+					NewMain renderer = new NewMain(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, new DeferredDialogEventAccumulator(parentWindow));
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
+					
 					renderer.process();
+					
 				} catch (Exception e) {
 					output.displayUpdate("Caught exception while rendering: ");
 					e.printStackTrace();

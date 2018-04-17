@@ -20,6 +20,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.event.EventType;
 import uk.nhs.fhir.event.RendererEvent;
@@ -28,6 +31,8 @@ import uk.nhs.fhir.util.StringUtil;
 
 @SuppressWarnings("serial")
 public class RendererEventDisplayDialog extends JDialog {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(RendererEventDisplayDialog.class);
 	
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Events");
 	private final DefaultMutableTreeNode justWarnings = new DefaultMutableTreeNode("Warnings");
@@ -124,8 +129,13 @@ public class RendererEventDisplayDialog extends JDialog {
 				// order by filepaths
 				return filepath1.compareTo(filepath2);
 			} else {
+				try {
 				// hasResource1 && hasResource2
 				return wrappedResource1.get().getName().compareTo(wrappedResource2.get().getName());
+				} catch (Exception e) {
+					LOG.error("Error calling getName() on one or more resources", e);
+					return 0;
+				}
 			}
 		}
 	}
@@ -216,12 +226,16 @@ public class RendererEventDisplayDialog extends JDialog {
 		if (trimmedFilePath.length() > 0) {
 			truncatedFilePath = " (" + trimmedFilePath + ")";
 		}
-
+		
 		String name;
-		if (resource.isPresent()) {
-			name = resource.get().getName();
-		} else {
-			name = "[unknown resource name]";
+		try {
+			if (resource.isPresent()) {
+				name = resource.get().getName();
+			} else {
+				name = "[unknown resource name]";
+			}
+		} catch (Exception e) {
+			name = "[exception while trying to read resource name]";
 		}
 		
 		return new DefaultMutableTreeNode(name + truncatedFilePath);
