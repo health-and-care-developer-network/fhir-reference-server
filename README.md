@@ -61,6 +61,10 @@ The server uses a temporary folder to hold imported artefacts. This should be de
 
 ## Release Notes
 
+> ### v1.2.1 (17/04/2018)
+> - handle exceptions arising when sorting events for event dialog
+> - improve logging in the event of a failure
+
 > ### v1.2.0 (23/03/2018)
 > - minor changes to allow use of reference server and profile renderer version 1.2.0
 
