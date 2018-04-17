@@ -54,6 +54,13 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 
 ## Release Notes
 
+> ### v1.2.1 (17/04/2018)
+> support MessageDefinition resources
+> allow fully rendered resources to also be displayed as examples
+> fix issue linking between tabs
+> display resources in alphabetical order
+> upversion to HAPI v3.3.0
+
 > ### v1.2.0 (23/03/2018)
 > - make pluralisation of resource list title consistent
 > - add link to STU3 conformance document
