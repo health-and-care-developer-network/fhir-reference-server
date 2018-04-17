@@ -233,7 +233,7 @@ public class FileCache {
 		List<File> fileList = rootPath.toFile().isDirectory() ?
 			resourceFileFinder.findFilesRecursively(rootPath) :
 			Lists.newArrayList();
-        
+		
         for (File thisFile : fileList) {
             if (thisFile.isFile()) {
                 LOG.debug("Reading example ResourceEntity into cache: " + thisFile.getName());
@@ -250,7 +250,8 @@ public class FileCache {
                     
 	                    // Find the profile resource ID the example relates to
 	                    List<? extends IPrimitiveType<String>> profiles = exampleResource.getMeta().getProfile();
-	                    if (profiles.isEmpty()) {
+	                    if (profiles.isEmpty()
+	                      && thisFile.getAbsolutePath().contains("/" + ResourceType.EXAMPLES.getFolderName() + "/")) {
 	                    	LOG.error("Unable to load FHIR example resource from file: "+thisFile.getAbsolutePath() + " - no profile was specified in the example!");
 	                		addMessage("[!] Error loading example resource from file : " + thisFile.getAbsolutePath() + " no profile was specified in the example!");
 	                    }
