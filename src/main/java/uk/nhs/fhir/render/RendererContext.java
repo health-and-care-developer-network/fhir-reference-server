@@ -2,6 +2,9 @@ package uk.nhs.fhir.render;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.util.FhirFileRegistry;
@@ -17,6 +20,7 @@ public class RendererContext {
 	private FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
 	private File currentSource = null;
 	private Optional<WrappedResource<?>> currentParsedResource = null;
+	private Set<String> localQDomains = ImmutableSet.of();
 	
 	public RendererContext() {
 		this(new FhirFileRegistry());
@@ -53,5 +57,9 @@ public class RendererContext {
 	public void clearCurrent() {
 		setCurrentParsedResource(Optional.empty());
 		setCurrentSource(null);
+	}
+
+	public void setLocalQDomains(Set<String> localQDomains) {
+		this.localQDomains  = localQDomains;
 	}
 }

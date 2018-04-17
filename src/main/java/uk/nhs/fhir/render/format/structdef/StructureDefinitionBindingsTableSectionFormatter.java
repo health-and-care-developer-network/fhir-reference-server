@@ -85,7 +85,7 @@ public class StructureDefinitionBindingsTableSectionFormatter implements TableRo
 				valueSetUrl.get(), 
 				valueSetUrl.get().toFullString())));
 			
-			if (!FhirURLConstants.isNhsResourceUrl(valueSetUrl.get().toFullString())) {
+			if (!FhirURL.startsWithLocalQDomain(valueSetUrl.get().toFullString())) {
 				referenceLink.setLinkIcon(FhirIcon.REFERENCE);
 			}
 			

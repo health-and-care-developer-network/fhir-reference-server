@@ -2,6 +2,7 @@ package uk.nhs.fhir.render;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -26,7 +27,7 @@ public class FileProcessor {
     
     private final ResourceFormatterFactory resourceFormatterFactory = new ResourceFormatterFactory(); 
     
-	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
+	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, Optional<String> newBaseURL) throws Exception {
 		
 	    WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
 		String inFilePath = RendererContext.forThread().getCurrentSource().getPath();
@@ -41,7 +42,7 @@ public class FileProcessor {
 		}
 	}
 	
-	public void saveAugmentedResource(RendererFileLocator rendererFileLocator, String newBaseURL) throws Exception {
+	public void saveAugmentedResource(RendererFileLocator rendererFileLocator, Optional<String> newBaseURL) throws Exception {
 		WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
@@ -69,16 +70,18 @@ public class FileProcessor {
         FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes(FileLoader.DEFAULT_ENCODING));
 	}
 	
-	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, String newBaseURL) {
+	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, Optional<String> newBaseURL) {
 		textSection = EscapeUtils.escapeTextSection(textSection);
 		resource.addHumanReadableText(textSection);
 		
-		if (newBaseURL != null) {
-        	if (newBaseURL.endsWith("/")) {
-        		newBaseURL = newBaseURL.substring(0, newBaseURL.length()-1);
+		if (newBaseURL.isPresent()) {
+			String replacementUrl = newBaseURL.get();
+			
+        	if (replacementUrl.endsWith("/")) {
+        		replacementUrl = replacementUrl.substring(0, replacementUrl.length()-1);
         	}
         	
-        	resource.setUrl(newBaseURL + "/" + resource.getOutputFolderName() + "/" + resource.getName());
+        	resource.setUrl(replacementUrl + "/" + resource.getOutputFolderName() + "/" + resource.getName());
         }
 		
 		String serialised = resource.newXmlParser().setPrettyPrint(true).encodeResourceToString(resource.getWrappedResource());
