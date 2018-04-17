@@ -49,11 +49,13 @@ public class StructureDefinitionDetails {
 	private final Optional<String> linkedNodeKey;
 	private final List<FhirElementMapping> mappings;
 	private final FhirVersion version;
+	private final Optional<String> extensionUrl;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			LinkDatas typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
-			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings, FhirVersion version) {
+			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings, FhirVersion version,
+			Optional<String> extensionUrl) {
 		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
@@ -70,6 +72,7 @@ public class StructureDefinitionDetails {
 		this.linkedNodeKey = linkedNodeKey;
 		this.mappings = mappings;
 		this.version = version;
+		this.extensionUrl = extensionUrl;
 		// add any new fields to assertEqualTo below
 	}
 
@@ -88,6 +91,20 @@ public class StructureDefinitionDetails {
 		addConstraints(tableContent);
 		addSlicing(tableContent);
 		addMappings(tableContent);
+		addUrlRow(tableContent, extensionUrl);
+	}
+
+	private void addUrlRow(List<Element> tableContent, Optional<String> extensionUrl2) {
+		if (extensionUrl.isPresent()) {
+			String url = extensionUrl.get();
+
+			tableContent.add(
+				Elements.withAttributeAndChildren("tr", 
+					new Attribute("class", FhirCSS.DETAILS_DATA_ROW),
+						Lists.newArrayList(
+							dataCell("Extension", FhirCSS.DETAILS_DATA_CELL),
+							linkCell(url, FhirURL.buildOrThrow(url, version)))));
+		}
 	}
 
 	private void addChoiceNoteIfPresent(List<Element> tableContent) {
@@ -389,6 +406,10 @@ public class StructureDefinitionDetails {
 		return mappings;
 	}
 
+	public Optional<String> getExtensionUrl() {
+		return extensionUrl;
+	}
+
 	public void assertEqualTo(StructureDefinitionDetails detail) {
 
 		if (!getDefinition().equals(detail.getDefinition())) {
@@ -428,6 +449,9 @@ public class StructureDefinitionDetails {
 			throw new IllegalStateException("Same key, different mappings (" + key + ").");
 		}
 		if (!version.equals(detail.version)) {
+			throw new IllegalStateException("Same key, different FHIR version(" + key + ").");
+		}
+		if (!extensionUrl.equals(detail.extensionUrl)) {
 			throw new IllegalStateException("Same key, different FHIR version(" + key + ").");
 		}
 	}

@@ -43,6 +43,7 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.style.FhirColour;
 import uk.nhs.fhir.render.html.style.FhirFont;
 import uk.nhs.fhir.render.html.table.Table;
+import uk.nhs.fhir.util.ListUtils;
 
 public class StructureDefinitionDetailsFormatter extends ResourceFormatter<WrappedStructureDefinition> {
 
@@ -100,6 +101,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			Optional<String> linkedNodeKey = nodeData.getLinkedNode().isPresent() ? 
 				Optional.of(nodeData.getLinkedNode().get().getPathString()) : 
 				Optional.empty();
+			Optional<String> url = ListUtils.uniqueIfPresent(nodeData.getExtensionUrls(), "extension URLs").map(fhirUrl -> fhirUrl.toFullString());
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
@@ -112,7 +114,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, nodeData.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, nodeData.getMappings(), getResourceVersion());
+				linkedNodeKey, nodeData.getMappings(), getResourceVersion(), url);
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);

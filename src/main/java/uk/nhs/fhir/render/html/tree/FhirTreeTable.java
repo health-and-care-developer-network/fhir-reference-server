@@ -1,9 +1,9 @@
 package uk.nhs.fhir.render.html.tree;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,6 @@ import uk.nhs.fhir.data.structdef.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.data.structdef.tree.BindingResourceInfo;
 import uk.nhs.fhir.data.structdef.tree.FhirTreeData;
 import uk.nhs.fhir.data.url.FhirURL;
-import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
@@ -234,17 +233,11 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 		}
 		
 		// Extensions
-		if (nodeData.getPathName().equals("extension")) {
-			LinkDatas typeLinks = nodeData.getTypeLinks();
-			for (Entry<LinkData, List<LinkData>> link : typeLinks.links()) {
-				if (!link.getValue().isEmpty()
-				  && link.getKey().getText().equals("Extension")) {
-					for (LinkData nestedLink : link.getValue()) {
-						resourceInfos.add(new ResourceInfo("URL", nestedLink.getURL(), ResourceInfoType.EXTENSION_URL));
-					}
-				}
-			}
-		}
+		resourceInfos.addAll(
+			nodeData.getExtensionUrls()
+				.stream()
+				.map(url -> new ResourceInfo("URL", url, ResourceInfoType.EXTENSION_URL))
+				.collect(Collectors.toList()));
 		
 		return resourceInfos;
 	}
