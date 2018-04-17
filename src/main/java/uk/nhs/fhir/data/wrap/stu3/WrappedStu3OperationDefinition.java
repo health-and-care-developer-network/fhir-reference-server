@@ -98,7 +98,7 @@ private final OperationDefinition definition;
 
 	@Override
 	public LinkData getCodeTypeLink() {
-		return linkFactory.forDataType(definition.getCodeElement());
+		return linkFactory.forDataTypeName("code");
 	}
 
 	@Override
