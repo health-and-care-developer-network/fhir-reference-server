@@ -50,12 +50,14 @@ public class StructureDefinitionDetails {
 	private final List<FhirElementMapping> mappings;
 	private final FhirVersion version;
 	private final Optional<String> extensionUrl;
+	private final Optional<String> fixedValue;
+	private final Optional<String> defaultValue;
 	
 	public StructureDefinitionDetails(String pathName, String key, Optional<String> definition, String cardinality, Optional<BindingInfo> binding, 
 			LinkDatas typeLinks, Optional<String> requirements, List<String> aliases, ResourceFlags resourceFlags,
 			Optional<String> comments, Optional<SlicingInfo> slicing, List<ConstraintInfo> inheritedConstraints, 
 			List<ConstraintInfo> profileConstraints, Optional<String> linkedNodeKey, List<FhirElementMapping> mappings, FhirVersion version,
-			Optional<String> extensionUrl) {
+			Optional<String> extensionUrl, Optional<String> fixedValue, Optional<String> defaultValue) {
 		this.pathName = pathName;
 		this.key = key;
 		this.definition = definition;
@@ -73,6 +75,8 @@ public class StructureDefinitionDetails {
 		this.mappings = mappings;
 		this.version = version;
 		this.extensionUrl = extensionUrl;
+		this.fixedValue = fixedValue;
+		this.defaultValue = defaultValue;
 		// add any new fields to assertEqualTo below
 	}
 
@@ -92,6 +96,10 @@ public class StructureDefinitionDetails {
 		addSlicing(tableContent);
 		addMappings(tableContent);
 		addUrlRow(tableContent, extensionUrl);
+		addDataIfPresent(tableContent, "Fixed Value", fixedValue);
+		if (!fixedValue.isPresent()) {
+			addDataIfPresent(tableContent, "Default", defaultValue);
+		}
 	}
 
 	private void addUrlRow(List<Element> tableContent, Optional<String> extensionUrl2) {

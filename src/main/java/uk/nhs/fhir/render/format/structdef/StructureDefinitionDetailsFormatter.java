@@ -102,6 +102,8 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 				Optional.of(nodeData.getLinkedNode().get().getPathString()) : 
 				Optional.empty();
 			Optional<String> url = ListUtils.uniqueIfPresent(nodeData.getExtensionUrls(), "extension URLs").map(fhirUrl -> fhirUrl.toFullString());
+			Optional<String> fixedValue = nodeData.getFixedValue();
+			Optional<String> defaultValue = nodeData.getDefaultValue();
 			
 			List<ConstraintInfo> inheritedConstraints = Lists.newArrayList();
 			List<ConstraintInfo> profileConstraints = Lists.newArrayList();
@@ -114,7 +116,7 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 			
 			StructureDefinitionDetails detail = new StructureDefinitionDetails(pathName, key, definition, cardinality, binding, typeLinks,
 				requirements, aliases, resourceFlags, comments, nodeData.getSlicingInfo(), inheritedConstraints, profileConstraints,
-				linkedNodeKey, nodeData.getMappings(), getResourceVersion(), url);
+				linkedNodeKey, nodeData.getMappings(), getResourceVersion(), url, fixedValue, defaultValue);
 
 			if (!details.containsKey(key)) {
 				details.put(key, detail);
