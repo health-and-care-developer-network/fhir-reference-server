@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.util.FhirFileRegistry;
@@ -17,10 +17,13 @@ public class RendererContext {
 		return theRendererContext.get();
 	}
 	
+	private Set<String> permittedMissingExtensionPrefixes = Sets.newHashSet();
 	private FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
 	private File currentSource = null;
 	private Optional<WrappedResource<?>> currentParsedResource = null;
-	private Set<String> localQDomains = ImmutableSet.of();
+	
+	// TODO migrate local domains to here from FhirURL. Will require passing into FullFhirURL.toLinkString() though.
+	// private DomainTrimmer localDomains = DomainTrimmer.nhsDomains();
 	
 	public RendererContext() {
 		this(new FhirFileRegistry());
@@ -58,8 +61,16 @@ public class RendererContext {
 		setCurrentParsedResource(Optional.empty());
 		setCurrentSource(null);
 	}
-
-	public void setLocalQDomains(Set<String> localQDomains) {
-		this.localQDomains  = localQDomains;
+	
+	public Set<String> getPermittedMissingExtensionPrefixes() {
+		return permittedMissingExtensionPrefixes;
 	}
+	
+	public void setPermittedMissingExtensionPrefixes(Set<String> permittedMissingExtensionPrefixes) {
+		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes;
+	}
+
+	/*public DomainTrimmer getLocalDomains() {
+		return localDomains;
+	}*/
 }

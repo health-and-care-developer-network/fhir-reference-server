@@ -1,6 +1,7 @@
 package uk.nhs.fhir.render.format.structdef;
 
 import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -33,7 +34,8 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 		HTMLDocSection section = new HTMLDocSection();
 		
 		StructureDefinitionRepository structureDefinitions = RendererContext.forThread().getFhirFileRegistry();
-		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(structureDefinitions));
+		Set<String> permittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(structureDefinitions), permittedMissingExtensionPrefixes);
 		
 		new ExtensionsSlicingNodesRemover<>(differentialTreeData).process();
 		new ChildlessDummyNodeRemover<>(differentialTreeData).process();

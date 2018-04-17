@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.format.structdef;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -47,12 +48,14 @@ public class StructureDefinitionBindingsTableFormatter extends TableFormatter<Wr
 	
 	private Map<SnapshotTreeNode, List<SnapshotTreeNode>> getExtensionsWithBindings(WrappedStructureDefinition wrappedResource) {
 		FhirFileRegistry fileRegistry = RendererContext.forThread().getFhirFileRegistry();
-		return wrappedResource.getExtensionsWithBindings(fileRegistry);
+		Set<String> permittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
+		return wrappedResource.getExtensionsWithBindings(fileRegistry, permittedMissingExtensionPrefixes);
 	}
 
 	private List<SnapshotTreeNode> getNodesWithBindings(WrappedStructureDefinition wrappedResource) {
+		Set<String> permittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
 		return StreamSupport.stream(wrappedResource
-        	.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()))
+        	.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()), permittedMissingExtensionPrefixes)
         	.nodes().spliterator(), false)
         	.filter(node -> 
         		!node.isRemovedByProfile()

@@ -1,6 +1,7 @@
 package uk.nhs.fhir.render.format.structdef;
 
 import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,12 +38,13 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 
 		HTMLDocSection section = new HTMLDocSection();
-		
-		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
+
+		Set<String> permittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
+		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()), permittedMissingExtensionPrefixes);
 
 		boolean isExtension = wrappedResource.isExtension();
 		if (!isExtension) {
-			FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
+			FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()), permittedMissingExtensionPrefixes);
 			new DefaultElementStripper<>(differentialTreeData).process(snapshotTreeData);
 			new UnchangedSliceInfoRemover<>(differentialTreeData).process(snapshotTreeData);
 			new RedundantValueNodeRemover<>(differentialTreeData).process(snapshotTreeData);

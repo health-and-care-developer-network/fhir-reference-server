@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.format.structdef;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -66,8 +67,11 @@ public class StructureDefinitionDetailsFormatter extends ResourceFormatter<Wrapp
 	}
 
 	private Element getDetailsPanel() {
-		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
-		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()));
+		Set<String> permittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
+		FhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTreeData = 
+			wrappedResource.getSnapshotTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()), permittedMissingExtensionPrefixes);
+		FhirTreeData<DifferentialData, DifferentialTreeNode> differentialTreeData = 
+			wrappedResource.getDifferentialTree(Optional.of(RendererContext.forThread().getFhirFileRegistry()), permittedMissingExtensionPrefixes);
 		
 		new ChildlessDummyNodeRemover<>(differentialTreeData).process();
 

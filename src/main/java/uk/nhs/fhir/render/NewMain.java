@@ -18,7 +18,6 @@ package uk.nhs.fhir.render;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.FullFhirURL;
@@ -54,6 +54,7 @@ public class NewMain {
 	
 	private final RendererFileLocator rendererFileLocator;
     private final Optional<String> newBaseURL;
+    private final Set<String> permittedMissingExtensionPrefixes;
     private final AbstractRendererEventHandler eventHandler;
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
@@ -67,13 +68,31 @@ public class NewMain {
     	this.allowCopyOnError = allowCopyOnError;
     }
 
-	public NewMain(Path inputDirectory, Path outputDirectory, AbstractRendererEventHandler errorHandler) {
-		this(inputDirectory, outputDirectory, Optional.empty(), errorHandler, Optional.empty());
+	public NewMain(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler) {
+		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty());
+	}
+	
+	public NewMain(RendererCliArgs args) {
+		this(
+			args.getInputDir(),
+			args.getOutputDir(),
+			args.getNewBaseUrl(),
+			args.getAllowedMissingExtensionPrefixes(),
+			new RendererLoggingEventHandler(),
+			args.getLocalDomains());
 	}
     
-	public NewMain(Path inputDirectory, Path outPath, Optional<String> newBaseURL, AbstractRendererEventHandler errorHandler, Optional<Set<String>> localQdomains) {
+	public NewMain(
+		Path inputDirectory, 
+		Path outPath, 
+		Optional<String> newBaseURL, 
+		Optional<Set<String>> permittedMissingExtensionPrefixes, 
+		AbstractRendererEventHandler errorHandler, 
+		Optional<Set<String>> localQdomains) 
+	{
 		this.rendererFileLocator = new DefaultRendererFileLocator(inputDirectory, makeRenderedArtefactTempDirectory(), outPath);
 		this.newBaseURL = newBaseURL;
+		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
 	}
@@ -84,23 +103,13 @@ public class NewMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
-    	if((args.length == 2) || (args.length == 3)) {
-			String inputDir = args[0];
-            String outputDir = args[1];
-            String newBaseURL = null;
-            if (args.length == 3) {
-            	newBaseURL = args[2];
-            	LOG.info("Using new base URL: " + newBaseURL);
-            }
-            
-            NewMain instance = new NewMain(Paths.get(inputDir), Paths.get(outputDir), Optional.ofNullable(newBaseURL), new RendererLoggingEventHandler(), Optional.empty());
-            instance.process();
-        }
-    	
     	RendererCliArgs cliArgs = new RendererCliArgsParser().parseArgs(args);
+    	if (cliArgs == null) {
+    		return;
+    	}
     	
-    	NewMain instance = new NewMain(cliArgs.getInputDir(), cliArgs.getOutputDir(), cliArgs.getNewBaseUrl(), new RendererLoggingEventHandler(), cliArgs.getLocalDomains());
+    	NewMain instance = new NewMain(cliArgs.getInputDir(), cliArgs.getOutputDir(), cliArgs.getNewBaseUrl(), cliArgs.getAllowedMissingExtensionPrefixes(), 
+    			new RendererLoggingEventHandler(), cliArgs.getLocalDomains());
         instance.process();
     }
 
@@ -118,6 +127,11 @@ public class NewMain {
      * @param directoryPath
      */
     public void process() {
+
+        if (newBaseURL.isPresent()) {
+        	LOG.info("Using new base URL: " + newBaseURL.get());
+        }
+    	
     	Path rawArtefactDirectory = rendererFileLocator.getRawArtefactDirectory();
     	LOG.info("Finding resources in " + rawArtefactDirectory.toString());
 
@@ -126,6 +140,8 @@ public class NewMain {
     	if (localQdomains.isPresent()) {
     		FhirURL.setLocalQDomains(localQdomains.get());
     	}
+    	final Set<String> oldPermittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
+		RendererContext.forThread().setPermittedMissingExtensionPrefixes(permittedMissingExtensionPrefixes);
     	
     	try {
 	    	FhirFileRegistry fhirFileRegistry = new FhirFileRegistry();
@@ -228,6 +244,7 @@ public class NewMain {
 	        } finally {
 	        	// reinstate the old event handler so we don't lose logging etc.
 	        	EventHandlerContext.setForThread(oldEventHandler);
+	        	RendererContext.forThread().setPermittedMissingExtensionPrefixes(oldPermittedMissingExtensionPrefixes);
 	        }
 	        
 	        
