@@ -25,6 +25,13 @@ A set of utilities to support rendering and serving FHIR specification resources
 
 ## Release Notes
 
+> ### v1.2.1 (17/04/2018)
+> - support MessageDefinition resources
+> - support accessing bindings on associated extension(s) for StructureDefinition nodes
+> - support identifying unavailable CodeSystem on ValueSets
+> - only HTML-escape text sections
+> - upversion HAPI to 3.3.0
+
 > ### v1.2.0 (23/03/2018)
 > - make OperationDefinition parameter parts accessible through WrappedOperationDefinition
 > - add unexpected features checks for OperationDefinitions
