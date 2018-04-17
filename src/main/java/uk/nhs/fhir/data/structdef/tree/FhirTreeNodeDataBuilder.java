@@ -22,15 +22,17 @@ import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public class FhirTreeNodeDataBuilder {
 	
-	public static SnapshotData buildSnapshotData(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions) {
+	public static SnapshotData buildSnapshotData(WrappedElementDefinition elementDefinition, Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		return fromElementDefinition(elementDefinition, structureDefinitions)
-			.withDefinitionDetails(elementDefinition, structureDefinitions)
+			.withDefinitionDetails(elementDefinition, structureDefinitions, permittedMissingExtensionPrefixes)
 			.toSnapshotData();
 	}
 	
-	public static DifferentialData buildDifferentialData(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode, Optional<StructureDefinitionRepository> structureDefinitions) {
+	public static DifferentialData buildDifferentialData(WrappedElementDefinition elementDefinition, SnapshotTreeNode backupNode, Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		return fromElementDefinition(elementDefinition, structureDefinitions)
-			.withDefinitionDetails(elementDefinition, structureDefinitions)
+			.withDefinitionDetails(elementDefinition, structureDefinitions, permittedMissingExtensionPrefixes)
 			.toDifferentialData(backupNode);
 	}
 	
@@ -103,7 +105,8 @@ public class FhirTreeNodeDataBuilder {
 	
 	private FhirTreeNodeDataBuilder withDefinitionDetails(
 			WrappedElementDefinition elementDefinition,
-			Optional<StructureDefinitionRepository> structureDefinitions) {
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 
 		if (elementDefinition.getCardinalityMin() != null) {
 			setMin(elementDefinition.getCardinalityMin());
@@ -155,7 +158,7 @@ public class FhirTreeNodeDataBuilder {
 		
 		setSliceName(elementDefinition.getSliceName());
 		
-		setExtensionType(elementDefinition.getExtensionType(structureDefinitions));
+		setExtensionType(elementDefinition.getExtensionType(structureDefinitions, permittedMissingExtensionPrefixes));
 		
 		Optional<String> linkedStructureDefinitionUrl = elementDefinition.getLinkedStructureDefinitionUrl();
 		if (linkedStructureDefinitionUrl.isPresent() && !linkedStructureDefinitionUrl.get().isEmpty()) {

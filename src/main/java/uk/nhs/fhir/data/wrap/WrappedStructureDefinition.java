@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -123,21 +124,31 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	/* Build once and copy as required */
 	
 	private Optional<CloneableFhirTreeData<SnapshotData, SnapshotTreeNode>> snapshotTree = Optional.empty();
-	public CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTree(Optional<StructureDefinitionRepository> structureDefinitions) {
+	public CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTree(Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
+		if (missingSnapshot()) {
+			throw new IllegalStateException("No snapshot information present");
+		}
+		
 		if (!snapshotTree.isPresent()) {
 			StructureDefinitionTreeDataProvider snapshotProvider = new StructureDefinitionTreeDataProvider(this);
-			snapshotTree = Optional.of(snapshotProvider.getSnapshotTreeData(structureDefinitions));
+			snapshotTree = Optional.of(snapshotProvider.getSnapshotTreeData(structureDefinitions, permittedMissingExtensionPrefixes));
 		}
 		
 		return snapshotTree.get().shallowCopy();
 	}
 
 	private Optional<CloneableFhirTreeData<DifferentialData, DifferentialTreeNode>> differentialTree = Optional.empty();
-	public CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTree(Optional<StructureDefinitionRepository> structureDefinitions) {
+	public CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTree(Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
+		if (missingSnapshot()) {
+			throw new IllegalStateException("No snapshot information present");
+		}
+		
 		if (!differentialTree.isPresent()) {
-			CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTree = getSnapshotTree(structureDefinitions);
+			CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTree = getSnapshotTree(structureDefinitions, permittedMissingExtensionPrefixes);
 			StructureDefinitionTreeDataProvider differentialProvider = new StructureDefinitionTreeDataProvider(this);
-			differentialTree = Optional.of(differentialProvider.getDifferentialTreeData(snapshotTree, structureDefinitions));
+			differentialTree = Optional.of(differentialProvider.getDifferentialTreeData(snapshotTree, structureDefinitions, permittedMissingExtensionPrefixes));
 		}
 		
 		return differentialTree.get().shallowCopy();
@@ -148,10 +159,11 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 		return getDescription().orElse("FHIR Server: StructureDefinition " + getName());
 	}
 
-	public Map<SnapshotTreeNode, List<SnapshotTreeNode>> getExtensionsWithBindings(FhirFileRegistry fileRegistry) {
+	public Map<SnapshotTreeNode, List<SnapshotTreeNode>> getExtensionsWithBindings(FhirFileRegistry fileRegistry,
+			Set<String> permittedMissingExtensionPrefixes) {
 		Map<SnapshotTreeNode, List<SnapshotTreeNode>> extensionsWithBindings = Maps.newHashMap();
 		
-		for (SnapshotTreeNode node : getSnapshotTree(Optional.of(fileRegistry)).nodes()) {
+		for (SnapshotTreeNode node : getSnapshotTree(Optional.of(fileRegistry), permittedMissingExtensionPrefixes).nodes()) {
 			try {
 				Optional<WrappedStructureDefinition> extensionDefinition = 
 					node.getData()
@@ -165,7 +177,7 @@ public abstract class WrappedStructureDefinition extends WrappedResource<Wrapped
 	
 					List<SnapshotTreeNode> extensionNodesWithBindings = Lists.newArrayList();
 					
-					for (SnapshotTreeNode extensionNode : definition.getSnapshotTree(Optional.of(fileRegistry)).nodes()) {
+					for (SnapshotTreeNode extensionNode : definition.getSnapshotTree(Optional.of(fileRegistry), permittedMissingExtensionPrefixes).nodes()) {
 						if (extensionNode.getData().getLinkedStructureDefinitionUrl().isPresent()) {
 							throw new IllegalStateException("Structure definition " + getUrl() + " refers to extension " + extensionUrl 
 							  + " which contains a nested extension at " + extensionNode.getNodeKey() + " but nested extensions are not currently supported");

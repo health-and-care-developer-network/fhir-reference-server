@@ -7,7 +7,6 @@ import java.util.Set;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
@@ -29,7 +28,7 @@ import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedElementDefinition implements HasConstraints {
 
-	private static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
+	public static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 	
 	public abstract String getName();
 	public abstract LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions);
@@ -49,7 +48,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	public abstract Optional<String> getRequirements();
 	public abstract Optional<String> getComments();
 	public abstract List<String> getAliases();
-	public abstract Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions);
+	public abstract Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions, Set<String> permittedMissingExtensionPrefixes);
 	public abstract Optional<String> getLinkedNodeName();
 	public abstract Optional<String> getLinkedNodePath();
 	public abstract List<FhirElementMapping> getMappings();
@@ -88,7 +87,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 		return getPath().isRoot();
 	}
 
-	protected ExtensionType lookupExtensionType(String typeProfile, Optional<StructureDefinitionRepository> structureDefinitions) {
+	protected ExtensionType lookupExtensionType(String typeProfile, Optional<StructureDefinitionRepository> structureDefinitions, Set<String> permittedMissingExtensions) {
 		if (typeProfile == null) {
 			return ExtensionType.SIMPLE;
 		} else if (structureDefinitions.isPresent() 
@@ -99,13 +98,11 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 				WrappedStructureDefinition extensionDefinition = structureDefinitions.get().getStructureDefinitionIgnoreCase(getVersion(), typeProfile);
 				return extensionDefinition.getExtensionType();	
 			} catch (ResourceNotAvailableException e) {
-				String permittedMissingExtensionRoot = System.getProperty(SYS_PROP_PERMITTED_MISSING_EXTENSION);
-				
-				if (!Strings.isNullOrEmpty(permittedMissingExtensionRoot)
-				  && typeProfile.startsWith(permittedMissingExtensionRoot)) {
+				Optional<String> matchingPrefix = permittedMissingExtensions.stream().filter(prefix -> typeProfile.startsWith(prefix)).findFirst();
+				if (matchingPrefix.isPresent()) {
 					
 					EventHandlerContext.forThread().event(RendererEventType.DEFAULT_TO_SIMPLE_EXTENSION, 
-						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + permittedMissingExtensionRoot + "\"");
+						"Defaulting type to Simple for missing extension " + typeProfile + " since it begins with \"" + matchingPrefix.get() + "\"");
 					
 					structureDefinitions.get().addCachedPermittedMissingExtension(typeProfile);
 					

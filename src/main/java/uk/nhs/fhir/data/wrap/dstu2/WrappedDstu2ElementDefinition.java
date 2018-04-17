@@ -294,11 +294,11 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions) {
+	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions, Set<String> permittedMissingExtensionPrefixes) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		} else {
-			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions));
+			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions, permittedMissingExtensionPrefixes));
 		}
 		
 		/*Set<ExtensionType> extensionTypes = Sets.newHashSet();

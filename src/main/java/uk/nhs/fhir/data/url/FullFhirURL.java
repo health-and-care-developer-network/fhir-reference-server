@@ -15,12 +15,8 @@ import uk.nhs.fhir.util.FhirVersion;
  */
 public class FullFhirURL extends FhirURL {
 
-	// convert any links with host fhir.hl7.org.uk into relative links
-	public static final boolean FHIR_HL7_ORG_LINKS_LOCAL = true;
 	// send requests to linked external pages and check the response. If false, use cached values where necessary. 
 	public static final boolean TEST_LINK_URLS = false;
-	
-	private static final String SCHEME_END = "://";
 
 	private static final UrlFixer dstu2UrlFixer = new Dstu2UrlFixer();
 	private static final UrlFixer stu3UrlFixer = new Stu3UrlFixer();
@@ -54,13 +50,13 @@ public class FullFhirURL extends FhirURL {
 		// split scheme off the front, if present	
 		String scheme;
 		String hostAndPath;
-		int schemeEndIndex = fullUrl.indexOf(SCHEME_END);
+		int schemeEndIndex = fullUrl.indexOf(FhirURLConstants.SCHEME_END);
 		if (schemeEndIndex > -1) {
-			schemeEndIndex += SCHEME_END.length();
+			schemeEndIndex += FhirURLConstants.SCHEME_END.length();
 			scheme = fullUrl.substring(0, schemeEndIndex);
 			hostAndPath = fullUrl.substring(scheme.length());
 		} else {
-			scheme = "http://";
+			scheme = FhirURLConstants.SCHEME_HTTP;
 			hostAndPath = fullUrl;
 		}
 		
@@ -70,9 +66,9 @@ public class FullFhirURL extends FhirURL {
 		}
 		
 		String linkUrl;
-		if (FhirURLConstants.startsWithNhsDomain(hostAndPath)) {
+		if (FhirURL.startsWithLocalDomain(hostAndPath)) {
 			// make it local
-			linkUrl = FhirURLConstants.trimNhsDomainPrefix(hostAndPath);
+			linkUrl = FhirURL.trimLocalDomainPrefix(hostAndPath);
 		} else {
 			// restore the scheme
 			linkUrl = scheme + hostAndPath;

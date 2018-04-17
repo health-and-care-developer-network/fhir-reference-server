@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.structdef.tree;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionSnapshotComponent;
@@ -17,13 +18,14 @@ public class FhirTreeDatas {
 	
 	public static CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTree(
 			WrappedStructureDefinition structureDefinition,
-			Optional<StructureDefinitionRepository> structureDefinitions) {
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		FhirVersion fhirVersion = structureDefinition.getImplicitFhirVersion();
 		switch (fhirVersion) {
 			case DSTU2:
-				return dstu2Snapshot(structureDefinition, structureDefinitions);
+				return dstu2Snapshot(structureDefinition, structureDefinitions, permittedMissingExtensionPrefixes);
 			case STU3:
-				return stu3Snapshot(structureDefinition, structureDefinitions);
+				return stu3Snapshot(structureDefinition, structureDefinitions, permittedMissingExtensionPrefixes);
 			default:
 				throw new IllegalStateException("Unexpected FHIR verison " + fhirVersion.toString());
 		}
@@ -31,13 +33,14 @@ public class FhirTreeDatas {
 
 	private static CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> dstu2Snapshot(
 			WrappedStructureDefinition structureDefinition,
-			Optional<StructureDefinitionRepository> structureDefinitions) {
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		FhirTreeDataBuilder<SnapshotData, SnapshotTreeNode> fhirTreeDataBuilder = new FhirTreeDataBuilder<>();
 		
 		Snapshot snapshot = ((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		for (ElementDefinitionDt element : snapshot.getElement()) {
 			WrappedElementDefinition wrappedElement = WrappedElementDefinition.fromDefinition(element);
-			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions);
+			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions, permittedMissingExtensionPrefixes);
 			SnapshotTreeNode snapshotNode = new SnapshotTreeNode(snapshotData);
 
 			fhirTreeDataBuilder.addFhirTreeNode(snapshotNode);
@@ -48,14 +51,15 @@ public class FhirTreeDatas {
 	
 	private static CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> stu3Snapshot(
 			WrappedStructureDefinition structureDefinition,
-			Optional<StructureDefinitionRepository> structureDefinitions) {
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		FhirTreeDataBuilder<SnapshotData, SnapshotTreeNode> fhirTreeDataBuilder = new FhirTreeDataBuilder<>();
 		
 		StructureDefinitionSnapshotComponent snapshot = ((org.hl7.fhir.dstu3.model.StructureDefinition)structureDefinition.getWrappedResource()).getSnapshot();
 		
 		for (ElementDefinition element : snapshot.getElement()) {
 			WrappedElementDefinition wrappedElement = WrappedElementDefinition.fromDefinition(element);
-			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions);
+			SnapshotData snapshotData = FhirTreeNodeDataBuilder.buildSnapshotData(wrappedElement, structureDefinitions, permittedMissingExtensionPrefixes);
 			SnapshotTreeNode node = new SnapshotTreeNode(snapshotData);
 			fhirTreeDataBuilder.addFhirTreeNode(node);
 		}
@@ -66,7 +70,8 @@ public class FhirTreeDatas {
 	public static CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTree(
 			WrappedStructureDefinition structureDefinition, 
 			CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> backupTreeData,
-			Optional<StructureDefinitionRepository> structureDefinitions) {
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		
 		FhirTreeData<FhirDifferentialSkeletonData, FhirDifferentialSkeletonNode> backupNodeResolvingTree;
 		FhirVersion fhirVersion = structureDefinition.getImplicitFhirVersion();
@@ -90,7 +95,7 @@ public class FhirTreeDatas {
 
 			if (elementDefinition != null) {
 				// i.e. not a dummy node - dummy nodes will be inserted automatically by the EmptyDifferentialNodeFactory
-				DifferentialData differentialNodeData = FhirTreeNodeDataBuilder.buildDifferentialData(elementDefinition, backupNode, structureDefinitions);
+				DifferentialData differentialNodeData = FhirTreeNodeDataBuilder.buildDifferentialData(elementDefinition, backupNode, structureDefinitions, permittedMissingExtensionPrefixes);
 				DifferentialTreeNode differentialNode = new DifferentialTreeNode(differentialNodeData);
 				fhirDifferentialTreeDataBuilder.addFhirTreeNode(differentialNode);
 			}

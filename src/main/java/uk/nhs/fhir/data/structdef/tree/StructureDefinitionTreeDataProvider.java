@@ -1,6 +1,7 @@
 package uk.nhs.fhir.data.structdef.tree;
 
 import java.util.Optional;
+import java.util.Set;
 
 import uk.nhs.fhir.data.structdef.tree.cache.IdLinkedNodeResolver;
 import uk.nhs.fhir.data.structdef.tree.cache.NameLinkedNodeResolver;
@@ -17,8 +18,10 @@ public class StructureDefinitionTreeDataProvider {
 		this.source = source;
 	}
 	
-	public CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTreeData(Optional<StructureDefinitionRepository> structureDefinitions) {
-		CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTree = FhirTreeDatas.getSnapshotTree(source, structureDefinitions);
+	public CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> getSnapshotTreeData(Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
+		CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> snapshotTree = 
+			FhirTreeDatas.getSnapshotTree(source, structureDefinitions, permittedMissingExtensionPrefixes);
 		
 		cacheTreeData(snapshotTree);
 		
@@ -35,8 +38,10 @@ public class StructureDefinitionTreeDataProvider {
 	
 	public CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> getDifferentialTreeData(
 			CloneableFhirTreeData<SnapshotData, SnapshotTreeNode> backupTreeData, 
-			Optional<StructureDefinitionRepository> structureDefinitions) {
-		CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> differentialTree = FhirTreeDatas.getDifferentialTree(source, backupTreeData, structureDefinitions);
+			Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
+		CloneableFhirTreeData<DifferentialData, DifferentialTreeNode> differentialTree = 
+			FhirTreeDatas.getDifferentialTree(source, backupTreeData, structureDefinitions, permittedMissingExtensionPrefixes);
 		
 		cacheTreeData(differentialTree);
 		

@@ -313,11 +313,12 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 	
 	@Override
-	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions) {
+	public Optional<ExtensionType> getExtensionType(Optional<StructureDefinitionRepository> structureDefinitions,
+			Set<String> permittedMissingExtensionPrefixes) {
 		if (!definition.getSlicing().isEmpty()) {
 			return Optional.empty();
 		} else {
-			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions));
+			return getLinkedStructureDefinitionUrl().map(url -> lookupExtensionType(url, structureDefinitions, permittedMissingExtensionPrefixes));
 		}
 		
 		/*for (TypeRefComponent type : definition.getType()) {

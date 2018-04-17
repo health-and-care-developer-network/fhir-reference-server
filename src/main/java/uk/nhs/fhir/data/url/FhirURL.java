@@ -2,13 +2,53 @@ package uk.nhs.fhir.data.url;
 
 import java.net.MalformedURLException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.util.FhirURLConstants;
 import uk.nhs.fhir.util.FhirVersion;
 
 public abstract class FhirURL {
+	
+	// The set of domains considered 'local', i.e. hosted on the same server
+	private static Set<String> localQDomains = FhirURLConstants.DEFAULT_LOCAL_QDOMAINS;
+	
+	private static Set<String> domainsFromQDomains(Set<String> qDomains) { 
+    	return ImmutableSet.copyOf(qDomains.stream()
+    		.map(qdomain -> qdomain.substring(qdomain.indexOf("://") + "://".length()))
+    		.collect(Collectors.toSet()));
+	}
+	
+	private static Set<String> localDomains = domainsFromQDomains(localQDomains);
+	
+	public static Set<String> getLocalQDomains() {
+		return FhirURL.localQDomains;
+	}
+	
+	public static void setLocalQDomains(Set<String> localQDomains) {
+		FhirURL.localQDomains = ImmutableSet.copyOf(localQDomains);
+		FhirURL.localDomains = domainsFromQDomains(localQDomains);
+	}
+	
+	public static boolean startsWithLocalQDomain(String url) {
+		return localQDomains.stream().anyMatch(qd -> url.startsWith(qd));
+	}
+
+	public static boolean startsWithLocalDomain(String url) {
+		return localDomains.stream().anyMatch(domain -> url.startsWith(domain));
+	}
+	
+	public static String trimLocalDomainPrefix(String url) {
+		for (String domain : localDomains) {
+			if (url.startsWith(domain)) {
+				return url.substring(domain.length());
+			}
+		}
+		
+		throw new IllegalStateException("Expected url (" + url + ") to start with local Domain");
+	}
 	
 	public abstract String toLinkString();
 	public abstract String toFullString();
@@ -28,7 +68,7 @@ public abstract class FhirURL {
 			try {
 				return new RelativeFhirUrl(url);
 			} catch (IllegalArgumentException e2) {
-				throw new IllegalStateException("Not a valid FHIR URL string");
+				throw new IllegalStateException("Not a valid FHIR URL string: " + url);
 			}
 		}
 	}

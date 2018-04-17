@@ -1,11 +1,17 @@
 package uk.nhs.fhir.util;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+
 public class FhirURLConstants {
-	private static final String SCHEME_HTTP = "http://";
-	private static final String SCHEME_HTTPS = "https://";
+	
+	public static final String SCHEME_END = "://";
+	public static final String SCHEME_HTTP = "http" + SCHEME_END;
+	public static final String SCHEME_HTTPS = "https" + SCHEME_END;
 	
 	public static final String HL7_ORG_DOMAIN = "hl7.org";
 	public static final String HL7_FHIR = HL7_ORG_DOMAIN + "/fhir";
@@ -98,6 +104,7 @@ public class FhirURLConstants {
 				.stream(Arrays.spliterator(NHS_PROFILE_DOMAINS), false)
 				.anyMatch(prefix -> url.startsWith(prefix));
 	}
+	
 	public static String trimNhsDomainPrefix(String url) {
 		for (String domain : NHS_PROFILE_DOMAINS) {
 			if (url.startsWith(domain)) {
@@ -107,4 +114,17 @@ public class FhirURLConstants {
 		
 		throw new IllegalStateException("Expected url (" + url + ") to start with an NHS profile domain");
 	}
+
+    public static final Set<String> DEFAULT_LOCAL_QDOMAINS = ImmutableSet.copyOf(Sets.newHashSet(
+    	// some GPConnect DSTU2 resources
+		FhirURLConstants.FHIR_NHS_NET_QDOMAIN,
+		// test NHSD site
+		FhirURLConstants.FHIR_TEST_NHS_UK_QDOMAIN,
+		// live NHSD site
+		FhirURLConstants.FHIR_NHS_UK_QDOMAIN,
+		// test HL7 site
+		FhirURLConstants.FHIR_TEST_HL7_NHS_UK_QDOMAIN,
+		// live HL7 site
+		FhirURLConstants.FHIR_HL7_ORG_UK_QDOMAIN
+    ));
 }

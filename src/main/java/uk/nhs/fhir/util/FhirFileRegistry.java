@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 
 import ca.uhn.fhir.parser.IParser;
 import uk.nhs.fhir.data.metadata.ResourceType;
+import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
@@ -165,7 +166,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
 			
 			if (wrappedResource.getUrl().isPresent()
-			  && FhirURLConstants.isNhsResourceUrl(wrappedResource.getUrl().get())) {
+			  && FhirURL.startsWithLocalQDomain(wrappedResource.getUrl().get())) {
 				
 				Optional<String> version = Optional.empty();
 				try {
@@ -203,8 +204,10 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 					if (structureDefinition.getKind().equals("complex-type") 
 					  || structureDefinition.getKind().equals("primitive-type")) {
 						if (structureDefinition.getConstrainedType().isPresent()) {
-							Map<String, Map<String, WrappedStructureDefinition>> mapForVersion = userDefinedDatatypes.computeIfAbsent(wrappedResource.getImplicitFhirVersion(), v -> Maps.newHashMap());
-							Map<String, WrappedStructureDefinition> mapForType = mapForVersion.computeIfAbsent(structureDefinition.getConstrainedType().get(), s -> Maps.newHashMap());
+							Map<String, Map<String, WrappedStructureDefinition>> mapForVersion = 
+								userDefinedDatatypes.computeIfAbsent(wrappedResource.getImplicitFhirVersion(), v -> Maps.newHashMap());
+							Map<String, WrappedStructureDefinition> mapForType = 
+								mapForVersion.computeIfAbsent(structureDefinition.getConstrainedType().get(), s -> Maps.newHashMap());
 							// should never get duplicates because URL collisions already blow up above
 							mapForType.put(structureDefinition.getUrl().get(), structureDefinition);
 						} else {
@@ -219,7 +222,6 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			// else continue
 		}
 		
-	
 		if (FhirFileParser.isSupported(parsedFile)) {
 			String errorNotes = "";
 			Optional<Exception> error = Optional.empty(); 
@@ -245,7 +247,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 				throw new IllegalStateException(errorMessage);
 			}
 		} else if (parsedFile.getMeta() != null
-		  && parsedFile.getMeta().getProfile().stream().anyMatch(profile -> FhirURLConstants.isNhsResourceUrl(profile.getValueAsString()))) {
+		  && parsedFile.getMeta().getProfile().stream().anyMatch(profile -> FhirURL.startsWithLocalQDomain(profile.getValueAsString()))) {
 			exampleFhirResources.put(xmlFile, parsedFile);
 		} else {
 			LOG.warn("SKIPPING " + xmlFile.getAbsolutePath() + " - not an example and not a supported type");
@@ -289,7 +291,7 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 			return matchingDefinitions.get(0);
 		} else {
 			String lastUrlPart = StringUtil.getLastPartOfUrlWithoutExtension(url).toLowerCase(Locale.UK);
-			if (FhirURLConstants.isNhsResourceUrl(url)
+			if (FhirURL.startsWithLocalQDomain(url)
 			  && possibleFileNames.contains(lastUrlPart)) {
 				throw new ResourceNotAvailableException("Cannot find NHS extension " + url + " (did rendering fail for this extension?)");
 			}
