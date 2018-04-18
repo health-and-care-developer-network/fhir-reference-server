@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
-import uk.nhs.fhir.render.NewMain;
+import uk.nhs.fhir.render.FhirProfileRenderer;
 
 public class RendererSupervisor {
 
@@ -63,7 +63,7 @@ public class RendererSupervisor {
 					Optional<Set<String>> allowedMissingExtensionPrefix = 
 						Optional.ofNullable(System.getProperty(WrappedElementDefinition.SYS_PROP_PERMITTED_MISSING_EXTENSION))
 							.map(prop -> Sets.newHashSet(prop));
-					NewMain renderer = new NewMain(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, new DeferredDialogEventAccumulator(parentWindow));
+					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, new DeferredDialogEventAccumulator(parentWindow));
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
 					
