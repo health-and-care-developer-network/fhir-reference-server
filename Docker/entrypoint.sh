@@ -33,7 +33,7 @@ else
   cd /usr/makehtml
   jarName=`cat ./target/jarName.txt`
   echo "Using Jar name: $jarName"
-  echo "Running command: java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH"
+  echo "Running command: java ${JVM_ARGUMENTS} -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH ${APP_ARGUMENTS}"
   ls ./target
   java ${JVM_ARGUMENTS} -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH ${APP_ARGUMENTS}
 fi
