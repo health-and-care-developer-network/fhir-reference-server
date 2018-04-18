@@ -51,7 +51,7 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
-	-e "JVM_ARGUMENTS=${JVM_ARGUMENTS}" \
-	-e "APP_ARGUMENTS=${APP_ARGUMENTS}" \
+	-e "JVM_ARGUMENTS=$JVM_ARGUMENTS" \
+	-e "APP_ARGUMENTS=$APP_ARGUMENTS" \
 	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH $COPY_ONLY
 
