@@ -8,7 +8,6 @@
   <packaging>jar</packaging>
 
   <name>fhir-model-utils</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,22 +22,27 @@
       <version>23.1-jre</version>
     </dependency>
     
-    <dependency>
+	<dependency>
       <groupId>ca.uhn.hapi.fhir</groupId>
       <artifactId>hapi-fhir-structures-dstu3</artifactId>
       <version>3.3.0</version>
       <type>jar</type>
+	  <!-- If we don't exclude this part of the dependency, it results in maven warnings as it contains 
+	  duplicates of some of the sl4j classes also included by logback. 
+	  If the logging for this package functions correctly without it, let's leave it out -->
+      <exclusions>
+	    <exclusion>
+	      <artifactId>jcl-over-slf4j</artifactId>
+	      <groupId>org.slf4j</groupId>
+	    </exclusion>
+	  </exclusions>
     </dependency>
-      <dependency>
+
+    <dependency>
       <groupId>ca.uhn.hapi.fhir</groupId>
       <artifactId>hapi-fhir-structures-dstu2</artifactId>
       <version>3.3.0</version>
       <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.13</version>
     </dependency>
   
     <dependency>
