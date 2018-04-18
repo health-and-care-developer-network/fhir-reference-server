@@ -12,7 +12,8 @@ OLD_URL=$4
 NEW_URL=$5
 OUT_PATH=$6
 COPY_ONLY=$7
-ARGUMENTS=${ARGUMENTS}
+JVM_ARGUMENTS=${JVM_ARGUMENTS}
+APP_ARGUMENTS=${APP_ARGUMENTS}
 
 # First, clone the repository with our source files
 rm -Rf /source/files
@@ -34,6 +35,6 @@ else
   echo "Using Jar name: $jarName"
   echo "Running command: java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH"
   ls ./target
-  java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH
+  java ${JVM_ARGUMENTS} -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH ${APP_ARGUMENTS}
 fi
 

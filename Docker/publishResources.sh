@@ -16,7 +16,8 @@ TARGET_HOST=${TARGET_HOST:-${7}}
 OUT_PATH=${OUT_PATH:-${8}}
 COPY_ONLY=${COPY_ONLY:-${9}}
 TAG_NAME=${TAG_NAME:-${10}}
-ARGUMENTS=${ARGUMENTS:-${11}}
+JVM_ARGUMENTS=${JVM_ARGUMENTS:-${11}}
+APP_ARGUMENTS=${APP_ARGUMENTS:-${12}}
 
 IMAGE_NAME="nhsd/fhir-make-html"
 
@@ -50,6 +51,7 @@ docker $TARGET_PREFIX rm makehtml
 docker $TARGET_PREFIX run --name makehtml \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
-	-e "ARGUMENTS=$ARGUMENTS" \
+	-e "JVM_ARGUMENTS=${JVM_ARGUMENTS}" \
+	-e "APP_ARGUMENTS=${APP_ARGUMENTS}" \
 	$SOURCE $GITHUB_URL $BRANCH $IN_PATH $OLD_URL $NEW_URL $OUT_PATH $COPY_ONLY
 
