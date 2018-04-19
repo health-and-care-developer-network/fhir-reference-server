@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>uk.nhs</groupId>
+  <groupId>uk.nhs.interoperability</groupId>
   <artifactId>server-renderer</artifactId>
   <version>1.2.1-SNAPSHOT</version>
 
@@ -30,12 +30,12 @@
     </dependency>
     
     <dependency>
-      <groupId>uk.nhs.fhir</groupId>
+      <groupId>uk.nhs.interoperability</groupId>
       <artifactId>reference-server-lib</artifactId>
       <version>1.2.1-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>uk.nhs.fhir</groupId>
+      <groupId>uk.nhs.interoperability</groupId>
       <artifactId>profile-renderer-lib</artifactId>
       <version>1.2.1-SNAPSHOT</version>
     </dependency>
