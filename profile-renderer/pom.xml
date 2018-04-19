@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
     <dependencies>
     	<dependency>
-    		<groupId>uk.nhs.fhir</groupId>
+    		<groupId>uk.nhs.interoperability</groupId>
   			<artifactId>profile-renderer-lib</artifactId>
   			<version>1.2.1-SNAPSHOT</version>
   		</dependency>
