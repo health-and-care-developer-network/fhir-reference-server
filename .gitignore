@@ -1,6 +1,0 @@
-/target/
-/dependency-reduced-pom.xml
-/Docker/target/
-.classpath
-.project
-.settings/
