@@ -17,7 +17,11 @@
     </properties>
 
     <modules>
-        <module>reference-server</module>
+		<module>model-utils</module>
         <module>reference-server-lib</module>
+        <module>reference-server</module>
+		<module>profile-renderer-lib</module>
+		<module>profile-renderer</module>
+		<module>server-renderer</module>
     </modules>
 </project>

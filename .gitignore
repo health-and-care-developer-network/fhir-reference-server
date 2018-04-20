@@ -1,8 +1,5 @@
-/fhir-reference-server-lib/target/
-/fhir-reference-server-jar/target/
-.project
-.classpath
-.settings/
-/fhir-reference-server-lib/bin/
-/fhir-reference-server-jar/bin/
-/target/
+*/.project
+*/.classpath
+*/.settings/
+*/target/
+*/bin/
