@@ -1,0 +1,549 @@
+<ns0:resource xmlns:ns0="http://hl7.org/fhir">
+      <ns0:StructureDefinition>
+        <ns0:id value="family-member-history-genetics-parent" />
+        <ns0:url value="http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent" />
+        <ns0:name value="Mother(s) &amp; Father(s) - genetic &amp; other" />
+        <ns0:status value="draft" />
+        <ns0:publisher value="Health Level Seven International (Clinical Genomics)" />
+        <ns0:contact>
+          <ns0:telecom>
+            <ns0:system value="other" />
+            <ns0:value value="http://www.hl7.org/Special/committees/clingenomics" />
+          </ns0:telecom>
+        </ns0:contact>
+        <ns0:date value="2013-10-02" />
+        <ns0:description value="Identifies a parent of the relative." />
+        <ns0:fhirVersion value="1.0.2" />
+        <ns0:mapping>
+          <ns0:identity value="rim" />
+          <ns0:uri value="http://hl7.org/v3" />
+          <ns0:name value="RIM" />
+        </ns0:mapping>
+        <ns0:kind value="datatype" />
+        <ns0:constrainedType value="Extension" />
+        <ns0:abstract value="false" />
+        <ns0:contextType value="resource" />
+        <ns0:context value="FamilyMemberHistory" />
+        <ns0:base value="http://hl7.org/fhir/StructureDefinition/Extension" />
+        <ns0:snapshot>
+          <ns0:element>
+            <ns0:path value="Extension" />
+            <ns0:short value="Mother(s) &amp; Father(s) - genetic &amp; other" />
+            <ns0:definition value="Identifies a parent of the relative." />
+            <ns0:comments value="Some individuals may have more than two parents (e.g. genetic vs. adoptive parents).  Even non-genetic relationships can be relevant in terms of genetic exposure." />
+            <ns0:min value="0" />
+            <ns0:max value="*" />
+            <ns0:base>
+              <ns0:path value="Extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="player[classCode&lt;LIV, determinerCode=INSTANCE].scopesRole" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.id" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="xml:id (or equivalent in JSON)" />
+            <ns0:definition value="unique id for the element within a resource (for internal references)." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.id" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="id" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:slicing>
+              <ns0:discriminator value="url" />
+              <ns0:ordered value="false" />
+              <ns0:rules value="open" />
+            </ns0:slicing>
+            <ns0:short value="Additional Content defined by implementations" />
+            <ns0:definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension." />
+            <ns0:comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
+            <ns0:alias value="extensions" />
+            <ns0:alias value="user content" />
+            <ns0:min value="0" />
+            <ns0:max value="*" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="type" />
+            <ns0:short value="mother | father | adoptive mother | etc." />
+            <ns0:definition value="Distinguishes between different types of parental relationships with varying granularity to support capturing the relationship &quot;to the degree known&quot;." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="code" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.id" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="xml:id (or equivalent in JSON)" />
+            <ns0:definition value="unique id for the element within a resource (for internal references)." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.id" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="id" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:short value="Extension" />
+            <ns0:definition value="An Extension" />
+            <ns0:min value="0" />
+            <ns0:max value="0" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.url" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="identifies the meaning of the extension" />
+            <ns0:definition value="Source of the definition for the extension code - a logical name or a URL." />
+            <ns0:comments value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.url" />
+              <ns0:min value="1" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="type" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.valueCodeableConcept" />
+            <ns0:short value="Value of extension" />
+            <ns0:definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.value[x]" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="CodeableConcept" />
+            </ns0:type>
+            <ns0:binding>
+              <ns0:strength value="required" />
+              <ns0:description value="Parental relationship types" />
+              <ns0:valueSetReference>
+                <ns0:reference value="http://hl7.org/fhir/ValueSet/parent-relationship-codes" />
+              </ns0:valueSetReference>
+            </ns0:binding>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="identifier" />
+            <ns0:short value="Link to parent relative(s)" />
+            <ns0:definition value="Points to the FamilyMemberHistory record of the relation who is the parent of this relation." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="player.id" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.id" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="xml:id (or equivalent in JSON)" />
+            <ns0:definition value="unique id for the element within a resource (for internal references)." />
+            <ns0:min value="0" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.id" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="id" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="n/a" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:short value="Extension" />
+            <ns0:definition value="An Extension" />
+            <ns0:min value="0" />
+            <ns0:max value="0" />
+            <ns0:base>
+              <ns0:path value="Extension.extension" />
+              <ns0:min value="0" />
+              <ns0:max value="*" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.url" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="identifies the meaning of the extension" />
+            <ns0:definition value="Source of the definition for the extension code - a logical name or a URL." />
+            <ns0:comments value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.url" />
+              <ns0:min value="1" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="identifier" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.valueReference" />
+            <ns0:short value="Value of extension" />
+            <ns0:definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.value[x]" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="Reference" />
+              <ns0:profile value="http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.url" />
+            <ns0:representation value="xmlAttr" />
+            <ns0:short value="identifies the meaning of the extension" />
+            <ns0:definition value="Source of the definition for the extension code - a logical name or a URL." />
+            <ns0:comments value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:base>
+              <ns0:path value="Extension.url" />
+              <ns0:min value="1" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.value[x]" />
+            <ns0:short value="Value of extension" />
+            <ns0:definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+            <ns0:min value="0" />
+            <ns0:max value="0" />
+            <ns0:base>
+              <ns0:path value="Extension.value[x]" />
+              <ns0:min value="0" />
+              <ns0:max value="1" />
+            </ns0:base>
+            <ns0:type>
+              <ns0:code value="boolean" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="integer" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="decimal" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="base64Binary" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="instant" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="string" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="date" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="dateTime" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="time" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="code" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="oid" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="id" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="unsignedInt" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="positiveInt" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="markdown" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Annotation" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Attachment" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Identifier" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="CodeableConcept" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Coding" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Quantity" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Range" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Period" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Ratio" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="SampledData" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Signature" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="HumanName" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Address" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="ContactPoint" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Timing" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Reference" />
+            </ns0:type>
+            <ns0:type>
+              <ns0:code value="Meta" />
+            </ns0:type>
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="N/A" />
+            </ns0:mapping>
+          </ns0:element>
+        </ns0:snapshot>
+        <ns0:differential>
+          <ns0:element>
+            <ns0:path value="Extension" />
+            <ns0:short value="Mother(s) &amp; Father(s) - genetic &amp; other" />
+            <ns0:definition value="Identifies a parent of the relative." />
+            <ns0:comments value="Some individuals may have more than two parents (e.g. genetic vs. adoptive parents).  Even non-genetic relationships can be relevant in terms of genetic exposure." />
+            <ns0:min value="0" />
+            <ns0:max value="*" />
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="player[classCode&lt;LIV, determinerCode=INSTANCE].scopesRole" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="type" />
+            <ns0:short value="mother | father | adoptive mother | etc." />
+            <ns0:definition value="Distinguishes between different types of parental relationships with varying granularity to support capturing the relationship &quot;to the degree known&quot;." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="code" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:max value="0" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.url" />
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="type" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.value[x]" />
+            <ns0:min value="1" />
+            <ns0:type>
+              <ns0:code value="CodeableConcept" />
+            </ns0:type>
+            <ns0:binding>
+              <ns0:strength value="required" />
+              <ns0:description value="Parental relationship types" />
+              <ns0:valueSetReference>
+                <ns0:reference value="http://hl7.org/fhir/ValueSet/parent-relationship-codes" />
+              </ns0:valueSetReference>
+            </ns0:binding>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension" />
+            <ns0:name value="identifier" />
+            <ns0:short value="Link to parent relative(s)" />
+            <ns0:definition value="Points to the FamilyMemberHistory record of the relation who is the parent of this relation." />
+            <ns0:min value="1" />
+            <ns0:max value="1" />
+            <ns0:type>
+              <ns0:code value="Extension" />
+            </ns0:type>
+            <ns0:isModifier value="false" />
+            <ns0:mapping>
+              <ns0:identity value="rim" />
+              <ns0:map value="player.id" />
+            </ns0:mapping>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.extension" />
+            <ns0:name value="extension" />
+            <ns0:max value="0" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.url" />
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="identifier" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.extension.value[x]" />
+            <ns0:min value="1" />
+            <ns0:type>
+              <ns0:code value="Reference" />
+              <ns0:profile value="http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory" />
+            </ns0:type>
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.url" />
+            <ns0:type>
+              <ns0:code value="uri" />
+            </ns0:type>
+            <ns0:fixedUri value="http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-parent" />
+          </ns0:element>
+          <ns0:element>
+            <ns0:path value="Extension.value[x]" />
+            <ns0:min value="0" />
+            <ns0:max value="0" />
+          </ns0:element>
+        </ns0:differential>
+      </ns0:StructureDefinition>
+    </ns0:resource>
+  
