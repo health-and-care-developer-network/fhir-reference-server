@@ -1,5 +1,7 @@
 package uk.nhs.fhir.server_renderer;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -22,9 +24,13 @@ import uk.nhs.fhir.util.SimpleFhirFileLocator;
 
 public class ServerRendererMain 
 {
+	private static final String TEMP_DIR_PREFIX = "FhirServerRenderer-";
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ServerRendererMain.class);
 	
     public static void main(String[] args) {
+    	deleteOldTmpDirs();
+    	
 		Path tmpDir = getTmpDir();
 		
 		registerShutdownHook(tmpDir);
@@ -59,9 +65,23 @@ public class ServerRendererMain
     	waitForServer(server);
     }
 
+    private static final FileFilter TEMP_DIR_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.getName().startsWith(TEMP_DIR_PREFIX);
+		}
+    };
+    
+	private static void deleteOldTmpDirs() {
+		for (File f : FhirFileUtils.getSystemTempDir().toFile().listFiles(TEMP_DIR_FILTER)) {
+			LOG.info("Deleting old temp directory: " + f.getAbsolutePath());
+			FhirFileUtils.deleteRecursive(f.toPath());
+		}
+	}
+
 	private static Path getTmpDir() {
 		try {
-			String tmpDirName = "FhirServerRenderer" + "-" + System.currentTimeMillis();
+			String tmpDirName = TEMP_DIR_PREFIX + System.currentTimeMillis();
 			Path tmpDir = FhirFileUtils.makeTempDir(tmpDirName, false);
 			return tmpDir;
 		} catch (IOException e) {

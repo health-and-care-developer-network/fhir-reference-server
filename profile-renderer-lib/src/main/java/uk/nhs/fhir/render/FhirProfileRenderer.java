@@ -1,6 +1,7 @@
 package uk.nhs.fhir.render;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -32,6 +33,8 @@ import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.UrlValidator;
 
 public class FhirProfileRenderer {
+	private static final String RENDERER_TEMP_DIR_PREFIX = "fhir-renderer-tmp-";
+	
     private static final Logger LOG = LoggerFactory.getLogger(FhirProfileRenderer.class.getName());
 	
 	private final RendererFileLocator rendererFileLocator;
@@ -80,19 +83,31 @@ public class FhirProfileRenderer {
 	}
 	private static Path makeRenderedArtefactTempDirectory() {
 		try {
-			return FhirFileUtils.makeTempDir("fhir-renderer-tmp-" + System.currentTimeMillis(), true);
+			return FhirFileUtils.makeTempDir(RENDERER_TEMP_DIR_PREFIX + System.currentTimeMillis(), true);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
+	private static final FileFilter TMP_DIR_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.getName().startsWith(RENDERER_TEMP_DIR_PREFIX);
+		}
+	};
+	
     /**
      * Process a directory of Profile files.
      *
      * @param directoryPath
      */
     public void process() {
-
+    	// clear down any previous temp directories
+    	for (File f : FhirFileUtils.getSystemTempDir().toFile().listFiles(TMP_DIR_FILTER)) {
+    		LOG.warn("Directory " + f.getAbsolutePath() + " should have been deleted after rendering. Clearing up now.");
+    		FhirFileUtils.deleteRecursive(f.toPath());
+    	}
+    	
         if (newBaseURL.isPresent()) {
         	LOG.info("Using new base URL: " + newBaseURL.get());
         }

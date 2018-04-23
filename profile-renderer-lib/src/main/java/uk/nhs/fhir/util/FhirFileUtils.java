@@ -20,8 +20,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -92,12 +96,16 @@ public class FhirFileUtils {
     }
     
     private static Path getTempDir(String tmpDirName) {
+	    return getSystemTempDir().resolve(tmpDirName);
+    }
+    
+    public static Path getSystemTempDir() {
     	String systemTempDir = System.getProperty("java.io.tmpdir");
 	    if (Strings.isNullOrEmpty(systemTempDir)) {
 	    	throw new IllegalStateException("No system temp dir available");
 	    }
 	    
-	    return Paths.get(systemTempDir).resolve(tmpDirName);
+	    return Paths.get(systemTempDir);
     }
     
     private static Path makeTempDir(String tmpDirName) {
@@ -108,5 +116,25 @@ public class FhirFileUtils {
 		}
 		
 		return tmpDir;
+    }
+    
+    public static void deleteRecursive(Path f) {
+    	try {
+			Files.walkFileTree(f, new SimpleFileVisitor<Path>() {
+			   @Override
+			   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			       Files.delete(file);
+			       return FileVisitResult.CONTINUE;
+			   }
+
+			   @Override
+			   public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			       Files.delete(dir);
+			       return FileVisitResult.CONTINUE;
+			   }
+			});
+		} catch (IOException e) {
+			logger.error("Caught exception trying to delete " + f.toString() + ".", e);
+		}
     }
 }
