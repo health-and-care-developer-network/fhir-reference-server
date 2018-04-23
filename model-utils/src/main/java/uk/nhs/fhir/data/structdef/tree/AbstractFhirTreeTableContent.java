@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
@@ -37,7 +38,7 @@ public interface AbstractFhirTreeTableContent extends HasMappings, HasSlicingInf
 	public boolean isFixedValue();
 	public Optional<String> getFixedValue();
 
-	public List<String> getExamples();
+	public List<Example> getExamples();
 
 	public boolean hasDefaultValue();
 	public Optional<String> getDefaultValue();

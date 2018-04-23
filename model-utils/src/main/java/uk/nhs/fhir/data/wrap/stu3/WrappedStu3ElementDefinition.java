@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementDataTypeStu3;
@@ -234,21 +235,22 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public List<String> getExamples() {
-		List<String> examples = Lists.newArrayList();
+	public List<Example> getExamples() {
+		List<Example> examples = Lists.newArrayList();
 		for (ElementDefinitionExampleComponent example : definition.getExample()) {
 			Type value = example.getValue();
+			Optional<String> label = Optional.ofNullable(example.getLabel());
 			if (value instanceof PrimitiveType) {
-				examples.add(((PrimitiveType<?>)value).asStringValue());
+				examples.add(new Example(((PrimitiveType<?>)value).asStringValue(), label));
 			} else if (value instanceof Period) {
 				Period examplePeriod = ((Period)value);
 				
 				String dateText = StringUtil.dateRange(examplePeriod.getStart(), examplePeriod.getEnd());
 				
-				examples.add(dateText);
+				examples.add(new Example(dateText, label));
 			} else if (value instanceof Identifier){
 				Identifier exampleIdentifier = (Identifier)value;
-				examples.add(exampleIdentifier.getValue());
+				examples.add(new Example(exampleIdentifier.getValue(), label));
 			} else {
 				throw new IllegalStateException("Handle example value of type " + value.getClass().getName());
 			}

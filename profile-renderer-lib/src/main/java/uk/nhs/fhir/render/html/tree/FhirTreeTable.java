@@ -14,6 +14,7 @@ import uk.nhs.fhir.data.ResourceInfo;
 import uk.nhs.fhir.data.ResourceInfoType;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.tree.AbstractFhirTreeNode;
 import uk.nhs.fhir.data.structdef.tree.AbstractFhirTreeNodeData;
 import uk.nhs.fhir.data.structdef.tree.BindingResourceInfo;
@@ -203,9 +204,12 @@ public class FhirTreeTable<T extends AbstractFhirTreeNodeData, U extends Abstrac
 		}
 		
 		// Examples
-		for (String example : nodeData.getExamples()) {
-			if (!nodeData.isFixedValue()) {
-				resourceInfos.add(new ResourceInfo("Example Value", example, ResourceInfoType.EXAMPLE_VALUE));
+		if (!nodeData.isFixedValue()) {
+			for (Example example : nodeData.getExamples()) {
+				if (!example.getLabel().isPresent()
+					|| !example.getLabel().get().toLowerCase().equals("general")) {
+					resourceInfos.add(new ResourceInfo("Example Value", example.getValue(), ResourceInfoType.EXAMPLE_VALUE));
+				}
 			}
 		}
 		

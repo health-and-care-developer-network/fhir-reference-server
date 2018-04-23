@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
@@ -156,7 +157,7 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 	protected Optional<SlicingInfo> slicingInfo = Optional.empty();
 	protected Optional<String> sliceName = Optional.empty();
 	protected Optional<String> fixedValue = Optional.empty();
-	protected List<String> examples = Lists.newArrayList();
+	protected List<Example> examples = Lists.newArrayList();
 	protected Optional<String> defaultValue = Optional.empty();
 	protected Optional<BindingInfo> binding = Optional.empty();
 	protected Optional<String> definition = Optional.empty();
@@ -221,11 +222,11 @@ public abstract class AbstractFhirTreeNodeData implements AbstractFhirTreeTableC
 		this.fixedValue = fixedValue;
 	}
 
-	public List<String> getExamples() {
+	public List<Example> getExamples() {
 		return examples;
 	}
 
-	public void setExamples(List<String> examples) {
+	public void setExamples(List<Example> examples) {
 		this.examples = examples;
 	}
 

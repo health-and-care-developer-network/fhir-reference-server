@@ -19,6 +19,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.UriDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementDataTypeDstu2;
@@ -213,21 +214,21 @@ public class WrappedDstu2ElementDefinition extends WrappedElementDefinition {
 	}
 
 	@Override
-	public List<String> getExamples() {
-		List<String> examples = Lists.newArrayList();
+	public List<Example> getExamples() {
+		List<Example> examples = Lists.newArrayList();
 		
 		IDatatype example = definition.getExample();
 		
 		if (example != null) {
 			if (example instanceof BasePrimitive) {
 				BasePrimitive<?> examplePrimitive = (BasePrimitive<?>)example;
-				examples.add(examplePrimitive.getValueAsString());
+				examples.add(new Example(examplePrimitive.getValueAsString(), Optional.empty()));
 			} else if (example instanceof PeriodDt) {
 				PeriodDt examplePeriod = (PeriodDt)example;
 				
 				String dateText = StringUtil.dateRange(examplePeriod.getStart(), examplePeriod.getEnd());
 				
-				examples.add(dateText);
+				examples.add(new Example(dateText, Optional.empty()));
 			} else {
 				throw new IllegalStateException("Unhandled type for example value: " + example.getClass().getName());
 			}

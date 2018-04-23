@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
@@ -251,9 +252,9 @@ public class FhirTreeNodeDataBuilder {
 		return this;
 	}
 	
-	protected List<String> examples = Lists.newArrayList();
+	protected List<Example> examples = Lists.newArrayList();
 	
-	public FhirTreeNodeDataBuilder setExamples(List<String> examples) {
+	public FhirTreeNodeDataBuilder setExamples(List<Example> examples) {
 		this.examples = examples;
 		return this;
 	}

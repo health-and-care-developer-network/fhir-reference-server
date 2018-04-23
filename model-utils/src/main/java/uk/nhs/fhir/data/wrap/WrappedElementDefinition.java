@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import uk.nhs.fhir.data.structdef.BindingInfo;
 import uk.nhs.fhir.data.structdef.ConstraintInfo;
+import uk.nhs.fhir.data.structdef.Example;
 import uk.nhs.fhir.data.structdef.ExtensionType;
 import uk.nhs.fhir.data.structdef.FhirElementDataType;
 import uk.nhs.fhir.data.structdef.FhirElementMapping;
@@ -42,7 +43,7 @@ public abstract class WrappedElementDefinition implements HasConstraints {
 	public abstract Optional<String> getDefinition();
 	public abstract Optional<SlicingInfo> getSlicing();
 	public abstract Optional<String> getFixedValue();
-	public abstract List<String> getExamples();
+	public abstract List<Example> getExamples();
 	public abstract Optional<String> getDefaultValue();
 	public abstract Optional<BindingInfo> getBinding();
 	public abstract Optional<String> getRequirements();
