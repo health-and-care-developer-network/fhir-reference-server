@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.nhs.fhir</groupId>
     <artifactId>profile-renderer</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencies>
     	<dependency>
     		<groupId>uk.nhs.interoperability</groupId>
   			<artifactId>profile-renderer-lib</artifactId>
-  			<version>1.2.1-SNAPSHOT</version>
+  			<version>1.3.0-SNAPSHOT</version>
   		</dependency>
   		
 	    <dependency>
