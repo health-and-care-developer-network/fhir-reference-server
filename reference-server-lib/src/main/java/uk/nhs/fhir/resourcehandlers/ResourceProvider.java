@@ -15,6 +15,7 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirVersion;
+import uk.nhs.fhir.util.text.FhirTextSectionHelpers;
 
 public class ResourceProvider implements IResourceProvider {
 
@@ -93,7 +94,9 @@ public class ResourceProvider implements IResourceProvider {
      */
     @Read(version=true)
     public IBaseResource getResourceById(@IdParam IIdType theId) {
-        return dataSource.getResourceByID(fhirVersion, theId);
+        IBaseResource resource = dataSource.getResourceByID(fhirVersion, theId);
+        FhirTextSectionHelpers.forVersion(fhirVersion).removeTextSection(resource);
+		return resource;
     }
 
 }
