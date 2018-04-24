@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 
 import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.render.FhirProfileRenderer;
+import uk.nhs.fhir.render.RendererExitStatus;
 
 public class RendererSupervisor {
 
@@ -67,8 +68,8 @@ public class RendererSupervisor {
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
 					
-					renderer.process();
-					
+					RendererExitStatus exitStatus = renderer.process();
+					output.displayUpdate("Renderer exited with code " + exitStatus.exitCode());
 				} catch (Exception e) {
 					output.displayUpdate("Caught exception while rendering: ");
 					e.printStackTrace();

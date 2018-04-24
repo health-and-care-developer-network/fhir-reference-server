@@ -26,10 +26,10 @@ public class ProfileRendererMain {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static int main(String[] args) {
     	RendererCliArgs cliArgs = new RendererCliArgsParser().parseArgs(args);
     	if (cliArgs == null) {
-    		return;
+    		return 1;
     	}
     	
     	FhirProfileRenderer renderer = new FhirProfileRenderer(
@@ -40,6 +40,7 @@ public class ProfileRendererMain {
     		new RendererLoggingEventHandler(), 
     		cliArgs.getLocalDomains());
     	
-    	renderer.process();
+    	RendererExitStatus exitStatus = renderer.process();
+    	return exitStatus.exitCode();
     }
 }

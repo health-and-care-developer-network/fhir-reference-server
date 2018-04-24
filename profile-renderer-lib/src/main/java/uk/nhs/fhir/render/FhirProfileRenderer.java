@@ -101,7 +101,9 @@ public class FhirProfileRenderer {
      *
      * @param directoryPath
      */
-    public void process() {
+    public RendererExitStatus process() {
+    	RendererExitStatus exitStatus;
+    	
     	// clear down any previous temp directories
     	for (File f : FhirFileUtils.getSystemTempDir().toFile().listFiles(TMP_DIR_FILTER)) {
     		LOG.warn("Directory " + f.getAbsolutePath() + " should have been deleted after rendering. Clearing up now.");
@@ -219,6 +221,14 @@ public class FhirProfileRenderer {
 	        	LOG.info("Deleting temporary files");
 	        	deleteTempFiles();
 	        	
+	        	if (eventHandler.foundErrors()) {
+	        		exitStatus = RendererExitStatus.FINISHED_WITH_ERRORS;
+	        	} else if (eventHandler.foundWarnings()) {
+	        		exitStatus = RendererExitStatus.FINISHED_WITH_WARNINGS;
+	        	} else {
+	        		exitStatus = RendererExitStatus.FINISHED_OK;
+	        	}
+	        	
 	        } catch (Exception e) {
 	        	throw new IllegalStateException("Renderer failed", e);
 	        } finally {
@@ -232,7 +242,9 @@ public class FhirProfileRenderer {
 	        	new UrlValidator().testUrls(FhirURL.getLinkUrls());
 	            UrlValidator.logSuccessAndFailures();
 	        }
-        
+	        
+	        return exitStatus;
+	        
     	} finally {
             // restore previous state
             FhirURL.setLocalQDomains(originalQDomains);
