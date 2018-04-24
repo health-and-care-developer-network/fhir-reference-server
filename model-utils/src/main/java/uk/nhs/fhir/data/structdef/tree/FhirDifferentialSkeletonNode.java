@@ -58,7 +58,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 			return backup;
 		} else {
 			// didn't have slicing, try matching on slice name anyway
-			backupNodesWithMatchingPaths = filterOnNameIfPresent(backupNodesWithMatchingPaths);
+			backupNodesWithMatchingPaths = filterOnSliceNameIfPresent(backupNodesWithMatchingPaths);
 			
 			if (backupNodesWithMatchingPaths.size() == 1) {
 				return backupNodesWithMatchingPaths.get(0);
@@ -94,7 +94,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 			SlicingInfo slicingInfo = backupNodesWithMatchingPaths.get(0).getData().getSlicingInfo().get();
 			
 			removeSlicingInfoMismatches(backupNodesWithMatchingPaths);
-			backupNodesWithMatchingPaths = filterOnNameIfPresent(backupNodesWithMatchingPaths);
+			backupNodesWithMatchingPaths = filterOnSliceNameIfPresent(backupNodesWithMatchingPaths);
 			
 			if (backupNodesWithMatchingPaths.size() == 1) {
 				return backupNodesWithMatchingPaths.get(0);
@@ -190,7 +190,7 @@ public class FhirDifferentialSkeletonNode extends CloneableTreeNode<FhirDifferen
 		}
 	}
 	
-	private List<SnapshotTreeNode> filterOnNameIfPresent(List<SnapshotTreeNode> toFilter) {
+	private List<SnapshotTreeNode> filterOnSliceNameIfPresent(List<SnapshotTreeNode> toFilter) {
 		return filterIfPresent(getData().getSliceName(), toFilter, node -> node.getData().getSliceName());
 	}
 

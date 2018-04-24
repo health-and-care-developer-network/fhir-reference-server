@@ -22,6 +22,8 @@ import uk.nhs.fhir.event.RendererEventType;
 
 public class SlicingDiscriminatorCacher<T extends AbstractFhirTreeNodeData, U extends AbstractFhirTreeNode<T, U>> {
 	
+	private static final String MISSING_DISCRIMINATOR = "<missing>";
+	
 	private final FhirTreeData<T, U> treeData;
 	
 	public SlicingDiscriminatorCacher(FhirTreeData<T, U> treeData) {
@@ -184,7 +186,7 @@ public class SlicingDiscriminatorCacher<T extends AbstractFhirTreeNodeData, U ex
 				EventHandlerContext.forThread().event(RendererEventType.UNRESOLVED_DISCRIMINATOR, 
 					"Expected Fixed Value or Binding on discriminator node at " + discriminatorPath + " for sliced node " + node.getPath());
 			}
-			discriminators.add("<missing>");
+			discriminators.add(MISSING_DISCRIMINATOR);
 		}
 		
 		return discriminators;
