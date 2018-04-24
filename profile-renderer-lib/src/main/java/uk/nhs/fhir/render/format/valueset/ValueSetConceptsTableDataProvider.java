@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.format.valueset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.google.common.collect.Lists;
 
@@ -67,15 +68,15 @@ public class ValueSetConceptsTableDataProvider {
 				valueSet
 					.getConceptMaps(RendererContext.forThread().getFhirFileRegistry()).stream()
 					.flatMap(conceptMap -> 
-						conceptMap
-							.getElements()
-							.stream())
-					.filter(mapElement -> 
-						code.equals(mapElement.getCode()))
-					.filter(mapElement ->
-						assertHasTargets(mapElement, code))
-					.flatMap(mapElement -> 
-						mapElement.getTargets().stream())
+						StreamSupport.stream(conceptMap
+							.getMappingGroups().spliterator(), false)
+							.flatMap(group -> group.getMappings().stream()))
+					.filter(mapping -> 
+						code.equals(mapping.getCode()))
+					.filter(mapping ->
+						assertHasTargets(mapping, code))
+					.flatMap(mapping -> 
+						mapping.getTargets().stream())
 					.map(target -> "~" + target.getCode())
 					.collect(Collectors.toList());
 			

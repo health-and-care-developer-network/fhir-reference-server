@@ -10,6 +10,7 @@ public interface FhirCSS {
 	public static final String PANEL_HEADING_BOX = "fhir-panel-heading-box";
 	public static final String PANEL_HEADING_TEXT = "fhir-panel-heading-text";
 	public static final String PANEL_BODY = "fhir-panel-body";
+	public static final String PANEL_SUBHEADING = "fhir-panel-subheading";
 	
 	public static final String LINK = "fhir-link";
 	public static final String RESOURCE_FLAG = "fhir-resource-flag";

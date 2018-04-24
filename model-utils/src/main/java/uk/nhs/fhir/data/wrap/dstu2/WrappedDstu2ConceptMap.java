@@ -1,14 +1,12 @@
 package uk.nhs.fhir.data.wrap.dstu2;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
@@ -16,8 +14,8 @@ import ca.uhn.fhir.model.dstu2.resource.ConceptMap;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap.Element;
 import ca.uhn.fhir.model.dstu2.resource.ConceptMap.ElementTarget;
 import ca.uhn.fhir.model.dstu2.valueset.NarrativeStatusEnum;
-import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapGroupCollection;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -91,29 +89,41 @@ public class WrappedDstu2ConceptMap extends WrappedConceptMap {
 		throw new IllegalStateException("Test with real data to ensure toString returns the URL as expected");
 	}
 
+	/* In DSTU2, the organisation of mappings was:
+	 * Concept Map
+	 * 	-> Element (codesystem + code)
+	 * 		-> Targets (each with a codesystem + code)
+	 * 
+	 * In STU3 (and so potentially going forwards) the organisation is:
+	 * Concept Map
+	 * 	-> Group [source code system and dest code system]
+	 * 		-> Source code (potentially many)
+	 * 			-> Target Code (potentially many)
+	 * 
+	 * So for consistency we reorganise the DSTU2 codes to match the STU3 system:
+	 */
 	@Override
-	public List<FhirConceptMapElement> getElements() {
-		List<FhirConceptMapElement> elements = Lists.newArrayList();
+	public FhirConceptMapGroupCollection getMappingGroups() {
+		FhirConceptMapGroupCollection groups = new FhirConceptMapGroupCollection();
 		
-		for (Element sourceElement : definition.getElement()) {
+		for (Element element : definition.getElement()) {
+			String fromCodeSystem = element.getCodeSystem();
+			String fromCode = element.getCode();
 			
-			FhirConceptMapElement element = new FhirConceptMapElement(sourceElement.getCode());
-			
-			for (ElementTarget sourceTarget : sourceElement.getTarget()) {
+			for (ElementTarget target : element.getTarget()) {
+				String toCodeSystem = target.getCodeSystem();
 				
-				FhirConceptMapElementTarget target = 
+				FhirConceptMapElementTarget mappingTarget = 
 					new FhirConceptMapElementTarget(
-						sourceTarget.getCode(), 
-						sourceTarget.getEquivalence(), 
-						Optional.ofNullable(sourceTarget.getComments()));
+						target.getCode(), 
+						target.getEquivalence(), 
+						Optional.ofNullable(target.getComments()));
 				
-				element.addTarget(target);
+				groups.add(fromCodeSystem, fromCode, toCodeSystem, mappingTarget);
 			}
-			
-			elements.add(element);
 		}
 		
-		return elements;
+		return groups;
 	}
 
 	@Override

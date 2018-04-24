@@ -90,6 +90,14 @@ public class FhirPanel {
 					new CSSRule(CSSTag.TEXT_DECORATION, "none"),
 					new CSSRule(CSSTag.COLOR, FhirColour.LINK))));
 
+		styles.add(
+			new CSSStyleBlock(
+				Lists.newArrayList("." + FhirCSS.PANEL_SUBHEADING),
+				Lists.newArrayList(
+					new CSSRule(CSSTag.COLOR, FhirColour.DATA_LABEL),
+					new CSSRule(CSSTag.FONT_WEIGHT, "bold"),
+					new CSSRule(CSSTag.FONT_SIZE, "13"))));
+		
 		return styles;
 	}
 }

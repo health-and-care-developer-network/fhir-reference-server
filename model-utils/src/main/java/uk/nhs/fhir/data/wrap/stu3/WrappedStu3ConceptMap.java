@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapGroupCollection;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -89,6 +90,32 @@ public class WrappedStu3ConceptMap extends WrappedConceptMap {
 	}
 
 	@Override
+	public FhirConceptMapGroupCollection getMappingGroups() {
+		FhirConceptMapGroupCollection groups = new FhirConceptMapGroupCollection();
+		
+		for (ConceptMapGroupComponent group : definition.getGroup()) {
+			String fromCodeSystem = group.getSource();
+			String toCodeSystem = group.getTarget();
+			
+			for (SourceElementComponent element : group.getElement()) {
+				String fromCode = element.getCode();
+				
+				for (TargetElementComponent target : element.getTarget()) {
+					FhirConceptMapElementTarget mappingTarget = 
+						new FhirConceptMapElementTarget(
+							target.getCode(), 
+							target.getEquivalence().toCode(), 
+							Optional.ofNullable(target.getComment()));
+					
+					groups.add(fromCodeSystem, fromCode, toCodeSystem, mappingTarget);
+				}
+			}
+		}
+		
+		
+		return groups;
+	}
+	
 	public List<FhirConceptMapElement> getElements() {
 		List<FhirConceptMapElement> elements = Lists.newArrayList();
 		

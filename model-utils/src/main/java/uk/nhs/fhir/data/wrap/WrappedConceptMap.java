@@ -2,10 +2,9 @@ package uk.nhs.fhir.data.wrap;
 
 import java.io.File;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
-import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapGroupCollection;
 import uk.nhs.fhir.data.metadata.ResourceMetadata;
 import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.data.metadata.VersionNumber;
@@ -25,7 +24,7 @@ public abstract class WrappedConceptMap extends WrappedResource<WrappedConceptMa
 	public abstract String getTarget();
 	public abstract String getSourceUrl();
 	
-	public abstract List<FhirConceptMapElement> getElements();
+	public abstract FhirConceptMapGroupCollection getMappingGroups();
 	
 	public static WrappedConceptMap fromDefinition(Object definition) {
 		if (definition instanceof ca.uhn.fhir.model.dstu2.resource.ConceptMap) {

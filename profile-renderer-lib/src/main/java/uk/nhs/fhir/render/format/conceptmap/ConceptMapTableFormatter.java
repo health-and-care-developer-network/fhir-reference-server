@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElement;
 import uk.nhs.fhir.data.conceptmap.FhirConceptMapElementTarget;
+import uk.nhs.fhir.data.conceptmap.FhirConceptMapGroup;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.render.format.HTMLDocSection;
@@ -33,8 +34,10 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 	@Override
 	public HTMLDocSection makeSectionHTML() throws ParserConfigurationException {
 		HTMLDocSection section = new HTMLDocSection();
-		
-		section.addBodyElement(getElementMapsDataTable());
+
+		for (FhirConceptMapGroup group : wrappedResource.getMappingGroups()) {
+			section.addBodyElement(getMappingGroupPanel(group));
+		}
 		section.addStyles(getStyles());
 		section.addStyles(FhirPanel.getStyles());
 		section.addStyles(Table.getStyles());
@@ -42,7 +45,7 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 		return section;
 	}
 
-	public Element getElementMapsDataTable() {
+	public Element getMappingGroupPanel(FhirConceptMapGroup group) {
 
 		Element colgroup = Elements.newElement("colgroup");
 		int columns = 4;
@@ -50,8 +53,7 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 
     	List<Element> tableContent = Lists.newArrayList(colgroup);
         Boolean first = true;
-
-		for (FhirConceptMapElement element: wrappedResource.getElements()) {
+        for (FhirConceptMapElement element : group.getMappings()) {
 			if (first) {
 				tableContent.add(
 						Elements.withChildren("tr",
@@ -61,6 +63,7 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 								labelledValueCell("Comments", BLANK, 1, true, true)));
 				first = false;
 			}
+			
 			for (FhirConceptMapElementTarget target : element.getTargets()) {
 				Optional<String> comments = target.getComments();
 				String displayComments = (comments != null && comments.isPresent() ) ? comments.get() : BLANK;
@@ -73,15 +76,29 @@ public class ConceptMapTableFormatter extends TableFormatter<WrappedConceptMap> 
 						labelledValueCell(BLANK, target.getCode(), 1, true, false),
 						labelledValueCell(BLANK, displayComments, 1, true, false)));
 			}
-		}
+        }
+	
         Element table =
-                Elements.withAttributeAndChildren("table",
-                        new Attribute("class", FhirCSS.TABLE),
-                        tableContent);
+            Elements.withAttributeAndChildren("table",
+                new Attribute("class", FhirCSS.TABLE),
+                tableContent);
 
-		FhirPanel panel = new FhirPanel(null, table);
+        String labelClass = FhirCSS.INFO_PLAIN;
+        String codeSystemIdClass = FhirCSS.DATA_LABEL;
+        
+        Element panelContents =
+        	Elements.withChildren("div",
+        		Elements.withChildren("div",
+        			Elements.withAttributeAndText("span", new Attribute("class", labelClass), "From code system: "),
+        			Elements.withAttributeAndText("span", new Attribute("class", codeSystemIdClass), group.getFromCodeSystem())),
+        		Elements.withChildren("div",
+        			Elements.withAttributeAndText("span", new Attribute("class", labelClass), "To code system: "),
+        			Elements.withAttributeAndText("span", new Attribute("class", codeSystemIdClass), group.getToCodeSystem())
+        			),
+    			Elements.newElement("br"),
+        		table);
 
-		return panel.makePanel();
+		return new FhirPanel("Mappings Group", panelContents).makePanel();
 	}
 
 	private Element labelledValueCell(String label, String value, int colspan, boolean alwaysBig, boolean alwaysBold) {
