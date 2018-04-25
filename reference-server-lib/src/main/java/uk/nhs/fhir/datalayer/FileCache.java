@@ -348,14 +348,20 @@ public class FileCache {
      * @return
      */
     private static Map<String, ResourceMetadata> buildExampleListByName(Map<String, List<ResourceMetadata>> oldList) {
-    	return 
-    		oldList
-    			.values()
-    			.stream()
-    			.flatMap(metadatas -> metadatas.stream())
-    			.collect(Collectors.toConcurrentMap(
-    				example -> example.getResourceName(),
-    				example -> example));
+    	Map<String, ResourceMetadata> resourceMap = Maps.newConcurrentMap();
+    	
+    	for (List<ResourceMetadata> entry : oldList.values()) {
+    		for (ResourceMetadata resource : entry) {
+    			if (resourceMap.containsKey(resource.getResourceName())) {
+    				LOG.error("Multiple resources have name \"" + resource.getResourceName() + "\": " + resource.getResourceID() + " and " + resourceMap.get(resource.getResourceName()).getResourceID());
+    				LOG.error("Leaving out resource " + resource.getResourceID() + " from loaded examples (if it is also a supported resource, it should still appear)");
+    			} else {
+    				resourceMap.put(resource.getResourceName(), resource);
+    			}
+    		}
+    	}
+    	
+    	return resourceMap;
     }
     
     /**
