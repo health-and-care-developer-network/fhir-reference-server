@@ -46,11 +46,16 @@ public class FileProcessor {
 		WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
 		
 		// Persist a copy of the xml file with a rendered version embedded in the text section
-		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);		
+		Path outDirPath = rendererFileLocator.getRenderingTempOutputDirectory(resource);
 		File outDirFile = outDirPath.toFile();
-		if (!outDirFile.exists() && !outDirFile.mkdirs()) {
-        	throw new IllegalStateException("Failed to create directory [" + outDirPath.toString() + "]");
+		if (!outDirFile.exists()) {
+			if (outDirFile.mkdirs()) {
+				LOG.info("Created directory " + outDirFile.getAbsolutePath());
+			} else {
+				throw new IllegalStateException("Failed to create directory [" + outDirPath.toString() + "]");
+			}
         }
+		
 		Path outFilePath = outDirPath.resolve(RendererContext.forThread().getCurrentSource().getName());
 		
 		LOG.debug("Generating " + outFilePath.toString());	    
@@ -67,7 +72,11 @@ public class FileProcessor {
 	    String renderedTextSection = HTMLUtil.docToEscapedString(new Document(textSection), true, false);
 	    
         String augmentedResource = prepareAndSerialise(resource, renderedTextSection, newBaseURL);
-        FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes(FileLoader.DEFAULT_ENCODING));
+        if (FhirFileUtils.writeFile(outFilePath.toFile(), augmentedResource.getBytes(FileLoader.DEFAULT_ENCODING))) {
+        	LOG.debug("Wrote file to " + outFilePath.toAbsolutePath().toString());
+        } else {
+        	LOG.error("Failed to write file to " + outFilePath.toAbsolutePath().toString());
+        }
 	}
 	
 	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, Optional<String> newBaseURL) {

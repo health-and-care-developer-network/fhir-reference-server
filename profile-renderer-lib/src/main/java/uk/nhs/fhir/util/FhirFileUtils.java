@@ -111,7 +111,9 @@ public class FhirFileUtils {
     private static Path makeTempDir(String tmpDirName) {
 		Path tmpDir = getTempDir(tmpDirName);
     	
-		if (!tmpDir.toFile().mkdir()) {
+		if (tmpDir.toFile().mkdir()) {
+			logger.info("Created temp directory for rendered artifacts at " + tmpDir.toAbsolutePath());
+		} else {
 			throw new IllegalStateException("Failed to create temp directory at " + tmpDir.toString());
 		}
 		

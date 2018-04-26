@@ -47,6 +47,11 @@ public class VersionedFilePreprocessor {
 		String outputDirectory = ensureVersionedFolderExists(fhirVersion, resourceType);
 		
         String resourcePath = fhirFileLocator.getSourcePathForResourceType(resourceType, fhirVersion).toString();
+        
+        String logMessage = "Copying resources from root " + resourcePath + " to versioned directory " + outputDirectory; 
+        LOG.info(logMessage);
+        addMessage(logMessage);
+        
 		List<File> fileList = resourceFileFinder.findFiles(resourcePath);
         
         for (File thisFile : fileList) {

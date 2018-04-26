@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -353,7 +352,7 @@ public class FileCache {
     	for (List<ResourceMetadata> entry : oldList.values()) {
     		for (ResourceMetadata resource : entry) {
     			if (resourceMap.containsKey(resource.getResourceName())) {
-    				LOG.error("Multiple resources have name \"" + resource.getResourceName() + "\": " + resource.getResourceID() + " and " + resourceMap.get(resource.getResourceName()).getResourceID());
+    				LOG.error("Multiple example resources have name \"" + resource.getResourceName() + "\": " + resource.getResourceID() + " and " + resourceMap.get(resource.getResourceName()).getResourceID());
     				LOG.error("Leaving out resource " + resource.getResourceID() + " from loaded examples (if it is also a supported resource, it should still appear)");
     			} else {
     				resourceMap.put(resource.getResourceName(), resource);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -81,6 +82,7 @@ public class FhirProfileRenderer {
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
 	}
+	
 	private static Path makeRenderedArtefactTempDirectory() {
 		try {
 			return FhirFileUtils.makeTempDir(RENDERER_TEMP_DIR_PREFIX + System.currentTimeMillis(), true);
@@ -122,6 +124,9 @@ public class FhirProfileRenderer {
     	if (localQdomains.isPresent()) {
     		FhirURL.setLocalQDomains(localQdomains.get());
     	}
+    	
+    	LOG.info("The following qualified domains will be treated as local: " + FhirURL.getLocalQDomains().stream().collect(Collectors.joining(" ")));
+    	
     	final Set<String> oldPermittedMissingExtensionPrefixes = RendererContext.forThread().getPermittedMissingExtensionPrefixes();
 		RendererContext.forThread().setPermittedMissingExtensionPrefixes(permittedMissingExtensionPrefixes);
     	
@@ -295,6 +300,7 @@ public class FhirProfileRenderer {
 		Path generationTempDirectory = rendererFileLocator.getRenderingTempOutputDirectory();
 		Path outputDirectory = rendererFileLocator.getRenderingFinalOutputDirectory();
 		
+		LOG.debug("Copying generated artefacts from " + generationTempDirectory.toAbsolutePath().toString() + " to " + outputDirectory.toAbsolutePath().toString());
 		FileUtils.copyDirectory(generationTempDirectory.toFile(), outputDirectory.toFile());
 	}
 

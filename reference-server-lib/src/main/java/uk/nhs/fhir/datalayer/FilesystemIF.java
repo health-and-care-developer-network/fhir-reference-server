@@ -56,7 +56,7 @@ public class FilesystemIF {
     }
     
     /**
-     * Gets a specific one, optionally also with a specific version (DSTU2 variant)
+     * Gets a specific resource, optionally also with a specific version
      * @param id
      * @return 
      */
