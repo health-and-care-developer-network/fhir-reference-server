@@ -11,7 +11,7 @@ VAR_FILE_PATH=$1
 VARIABLE_NAME=$2
 VARIABLE_VALUE=$3
 
-if [ -e $VAR_FILE_PATH && ! -f $VAR_FILE_PATH ]; then
+if [ -e $VAR_FILE_PATH ] && [ ! -f $VAR_FILE_PATH ]; then
     echo "$VAR_FILE_PATH exists but is not a regular file"
 	exit 1
 elif [ ! -e $VAR_FILE_PATH ]; then
