@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Usage:
 # build.sh registryhostname tagname
@@ -6,15 +6,10 @@
 REGISTRY_HOST=$1
 TAG_NAME=$2
 
-if [ "$JENKINS_BUILD" = "true" ]; then
-  if (( $# < 2 )); then
-    echo "Expected at least two arguments because JENKINS_BUILD=$JENKINS_BUILD"
-    exit 1
-  fi
+if [ "$JENKINS_BUILD" = "true" ] && (( $# < 2 )); then
+  echo "Expected at least two arguments (registry host and tag name) for a Jenkins build"
+  exit 1
 fi
-
-# Copy jars
-cp -R ../target .
 
 # Resolve image name
 IMAGE_NAME="nhsd/fhir-make-html"
@@ -34,14 +29,14 @@ echo "DOCKER_CMD=$DOCKER_CMD"
 
 # Build the publisher image
 set -e # Stop on error
-$DOCKER_CMD build -t $IMAGE_NAME .
+echo "$DOCKER_CMD build -t $IMAGE_NAME ."
 
 if [ ! -z $REGISTRY_HOST ]
 then
   REGISTRY_URL=$REGISTRY_HOST:5000
   echo "REGISTRY_URL=$REGISTRY_URL"
   
-  $DOCKER_CMD tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME
-  $DOCKER_CMD push $REGISTRY_URL/$IMAGE_NAME
-  $DOCKER_CMD $IMAGE_NAME
+  echo "$DOCKER_CMD tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME"
+  echo "$DOCKER_CMD push $REGISTRY_URL/$IMAGE_NAME"
+  echo "$DOCKER_CMD $IMAGE_NAME"
 fi
