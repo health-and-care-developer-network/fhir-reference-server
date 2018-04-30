@@ -1,33 +1,40 @@
 #!/bin/bash -xe
 
 # Usage:
-# build.sh registryhostname tagname
+# build.sh tagname registryhostname
 
-REGISTRY_HOST=$1
-TAG_NAME=$2
+# assign arguments
+TAG_NAME=$1
+REGISTRY_HOST=$2
 
+# load utility scripts
+SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+. $SCRIPT_DIR/sharedUtils.sh
+# use utility script to set $DOCKER_CMD variable
+setDockerCmd
+
+echo "DOCKER_CMD=$DOCKER_CMD"
+if [ -z $DOCKER_CMD ]; then
+  echo "Exiting: docker command not set"
+  exit 1
+fi
+
+# validate args
 if [ "$JENKINS_BUILD" = "true" ] && (( $# < 2 )); then
-  echo "Expected at least two arguments (registry host and tag name) for a Jenkins build"
+  echo "Expected at least two arguments (tag name and registry host) for a Jenkins build"
   exit 1
 fi
 
 # Resolve image name
 IMAGE_NAME="nhsd/fhir-make-html"
-if [ ! -z $TAG_NAME ]
-then
+if [ ! -z $TAG_NAME ]; then
   IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
-fi
-
-# Include tlsverify if we have supplied a host
-if [ -z $REGISTRY_HOST ]; then
-  DOCKER_CMD="docker"
-else
-  DOCKER_CMD="docker --tlsverify -H $REGISTRY_HOST:2376"
 fi
 
 # Build the publisher image
 $DOCKER_CMD build -t $IMAGE_NAME .
 
+# If a registry was supplied, push to registry and remove image locally
 if [ ! -z $REGISTRY_HOST ]; then
   REGISTRY_URL=$REGISTRY_HOST:5000
   
