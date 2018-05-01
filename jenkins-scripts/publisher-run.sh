@@ -1,10 +1,9 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Usage:
 # publishResources.sh github_url branch path url_to_replace new_url_to_insert registryhostname targethostname out_path docker_tagname
 
-# Note: If copy_only is passed as "true" then the renderer will not be called, the specified files will just be copied directly to
-# the output directory. This would typically be used to copy examples across.
+. ./utils.sh
 
 GITHUB_URL=${GITHUB_URL:-${1}}
 BRANCH=${BRANCH:-${2}}
@@ -17,38 +16,25 @@ OUT_PATH=${OUT_PATH:-${8}}
 TAG_NAME=${TAG_NAME:-${9}}
 RENDERER_FLAGS=${RENDERER_FLAGS:-${10}}
 
-IMAGE_NAME="nhsd/fhir-make-html"
+IMAGE_NAME="nhsd/fhir-profile-renderer"
 CONTAINER_NAME="fhir-publisher"
 
-if [ ! -z $TAG_NAME ]
-then
-  IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
-fi
-
-if [ -z $REGISTRY_HOST ]
-then
-  REGISTRY_PREFIX=""
-  SOURCE=$IMAGE_NAME
-else
-  REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
-  SOURCE=$REGISTRY_HOST:5000/$IMAGE_NAME
-fi
-
-if [ -z $TARGET_HOST ]
-then
-  TARGET_PREFIX=""
-else
-  TARGET_PREFIX="--tlsverify -H $TARGET_HOST:2376"
-fi
+SOURCE=$(qualifiedImage $IMAGE_NAME $TAG_NAME $REGISTRY_HOST)
+TARGET_DOCKER_CMD=$(dockerCmd $TARGET_HOST)
 
 # Run the publisher to generate the FHIR content
 if [ ! -z $REGISTRY_HOST ]
 then
-	docker $TARGET_PREFIX pull $SOURCE
+	$TARGET_DOCKER_CMD pull $SOURCE
 fi
 
-docker $TARGET_PREFIX rm $CONTAINER_NAME
-docker $TARGET_PREFIX run --name $CONTAINER_NAME \
+# Note: the ':' prevents the overall script failing if there is nothing to delete
+$TARGET_DOCKER_CMD rm $CONTAINER_NAME || :
+
+# create a container from the image, mounting in host directories for the location to download to
+# and location to output to
+$TARGET_DOCKER_CMD run \
+  --name $CONTAINER_NAME \
 	-v /docker-data/fhir-server-temp:/source \
 	-v /docker-data/fhir-profiles:/generated \
 	-e "RENDERER_FLAGS=$RENDERER_FLAGS" \

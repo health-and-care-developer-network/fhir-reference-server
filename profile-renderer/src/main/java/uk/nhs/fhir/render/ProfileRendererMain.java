@@ -15,21 +15,27 @@
  */
 package uk.nhs.fhir.render;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.nhs.fhir.event.RendererLoggingEventHandler;
 
 /**
  * @author tim.coates@hscic.gov.uk
  */
 public class ProfileRendererMain {
+	private static final Logger LOG = LoggerFactory.getLogger(ProfileRendererMain.class);
+	
 	/**
      * Main entry point.
      *
      * @param args the command line arguments
      */
-    public static int main(String[] args) {
+    public static void main(String[] args) {
     	RendererCliArgs cliArgs = new RendererCliArgsParser().parseArgs(args);
     	if (cliArgs == null) {
-    		return 1;
+    		LOG.error("Failed to parse renderer arguments. Exiting.");
+    		System.exit(1);
     	}
     	
     	FhirProfileRenderer renderer = new FhirProfileRenderer(
@@ -41,6 +47,6 @@ public class ProfileRendererMain {
     		cliArgs.getLocalDomains());
     	
     	RendererExitStatus exitStatus = renderer.process();
-    	return exitStatus.exitCode();
+    	System.exit(exitStatus.exitCode());
     }
 }

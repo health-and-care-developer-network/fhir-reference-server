@@ -3,48 +3,34 @@
 # Usage:
 # build.sh registryhostname targethostname tagname
 
-REGISTRY_HOST=$1
-TARGET_HOST=$2
-PORT=${PORT:-8080}
-TAG_NAME=$3
+# load utility functions
+. ./utils.sh
 
-IMAGE_NAME=fhir-server
+# location where docker image has been published
+REGISTRY_HOST=$1
+# host which will run the container
+TARGET_HOST=$2
+FHIR_SERVER_PORT=${FHIR_SERVER_PORT:-8080}
+IMAGE_NAME=$3
+TAG_NAME=$4
+
 CONTAINER_NAME=${CONTAINER_NAME:-fhir-server}
 CONFIG_FILE=${CONFIG_FILE}
 
-if [ ! -z $TAG_NAME ]
-then
-  IMAGE_NAME="$IMAGE_NAME:$TAG_NAME"
-fi
-
-if [ -z $TARGET_HOST ]
-then
-  TARGET_PREFIX=""
-else
-  TARGET_PREFIX="--tlsverify -H $TARGET_HOST:2376"
-fi
-
-if [ -z $REGISTRY_HOST ]
-then
-  REGISTRY_PREFIX=""
-  SOURCE=$IMAGE_NAME
-else
-  REGISTRY_PREFIX="--tlsverify -H $REGISTRY_HOST:2376"
-  SOURCE=$REGISTRY_HOST:5000/$IMAGE_NAME
-fi
+TARGET_DOCKER_CMD=$(dockerCmd $TARGET_HOST)
+SOURCE=$(qualifiedImage $IMAGE_NAME $TAG_NAME $REGISTRY_HOST)
 
 MEMORYFLAG=2g
 CPUFLAG=768
 
-echo "Pull and run FHIR server"
 if [ ! -z $REGISTRY_HOST ]
 then
-  docker $TARGET_PREFIX pull $SOURCE
+  $TARGET_DOCKER_CMD pull $SOURCE
 fi
 
-docker $TARGET_PREFIX stop $CONTAINER_NAME
-docker $TARGET_PREFIX rm $CONTAINER_NAME
-docker $TARGET_PREFIX run -p $PORT:8080 --name $CONTAINER_NAME \
+$TARGET_DOCKER_CMD stop $CONTAINER_NAME
+$TARGET_DOCKER_CMD rm $CONTAINER_NAME
+$TARGET_DOCKER_CMD run -p $FHIR_SERVER_PORT:8080 --name $CONTAINER_NAME \
 	--restart=on-failure:5 \
         -m $MEMORYFLAG \
 	-c $CPUFLAG \

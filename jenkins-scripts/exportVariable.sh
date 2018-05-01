@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 # usage: exportVariable.sh filepath name value
 # append a variable to a file so that it can be imported again later
 

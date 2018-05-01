@@ -10,13 +10,21 @@ public class RendererCliArgs {
 	private final Optional<String> newBaseUrl;
 	private final Optional<Set<String>> allowedMissingExtensionPrefixes;
 	private final Optional<Set<String>> localDomains;
+	private final boolean copyOnError;
 	
-	public RendererCliArgs(Path inputDir, Path outputDir, Optional<String> newBaseUrl, Optional<Set<String>> allowedMissingExtensionPrefixes, Optional<Set<String>> localDomains) {
+	public RendererCliArgs(
+			Path inputDir, 
+			Path outputDir, 
+			Optional<String> newBaseUrl, 
+			Optional<Set<String>> allowedMissingExtensionPrefixes, 
+			Optional<Set<String>> localDomains,
+			boolean copyOnError) {
 		this.inputDir = inputDir;
 		this.outputDir = outputDir;
 		this.newBaseUrl = newBaseUrl;
 		this.allowedMissingExtensionPrefixes = allowedMissingExtensionPrefixes;
 		this.localDomains = localDomains;
+		this.copyOnError = copyOnError;
 	}
 
 	public Path getInputDir() {
@@ -37,5 +45,9 @@ public class RendererCliArgs {
 	
 	public Optional<Set<String>> getLocalDomains() {
 		return localDomains;
+	}
+	
+	public boolean getCopyOnError() {
+		return copyOnError;
 	}
 }

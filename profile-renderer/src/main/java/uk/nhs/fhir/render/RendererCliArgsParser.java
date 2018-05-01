@@ -30,6 +30,7 @@ public class RendererCliArgsParser {
 		"missing-ext-prefix", "p");
 	public static final CliStringSetArg ARG_LOCAL_DOMAINS = new CliStringSetArg("localdomain", 
 		"Local domains (for resources hosted on this FHIR server)", "local-domains", "l");
+	public static final RendererCliFlag FLAG_COPY_ON_ERROR = new RendererCliFlag("copy-on-error", "", "force-copy", "f");
 	
 	private final RendererArgSpec spec = getArgSpec();
 	
@@ -46,8 +47,9 @@ public class RendererCliArgsParser {
         Optional<Set<String>> allowedMissingExtensionPrefixes = Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT));
         Optional<String> newBaseUrl = Optional.ofNullable(parsedArgs.get(ARG_NEW_PATH));
         Optional<Set<String>> localDomains = Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS));
+        boolean copyOnError = parsedArgs.get(FLAG_COPY_ON_ERROR);
 		
-		return new RendererCliArgs(inputDir, outputDir, newBaseUrl, allowedMissingExtensionPrefixes, localDomains);
+		return new RendererCliArgs(inputDir, outputDir, newBaseUrl, allowedMissingExtensionPrefixes, localDomains, copyOnError);
 	}
 	
 	private RendererArgSpec getArgSpec() {
@@ -59,7 +61,9 @@ public class RendererCliArgsParser {
 				.addArg(ARG_NEW_PATH)
 				.addArg(ARG_MISSING_EXT)
 				.addArg(ARG_LOCAL_DOMAINS)
-				.build();
+			.booleanFlag()
+				.addFlag(FLAG_COPY_ON_ERROR)
+			.build();
 	}
 
 	private RendererCliArgs error(String message) {
@@ -75,7 +79,8 @@ class RendererArgSpecBuilder {
 		NEW,
 		REQUIRED_POSITIONAL,
 		OPTIONAL_POSITIONAL,
-		OPTIONAL_FLAGGED
+		OPTIONAL_FLAGGED,
+		BOOLEAN_FLAG
 	}
 	
 	private RendererArgSpecBuilderState state = RendererArgSpecBuilderState.NEW;
@@ -83,6 +88,7 @@ class RendererArgSpecBuilder {
 	private final List<RendererCliArg<?>> requiredPositionalArgs = Lists.newArrayList();
 	private final List<RendererCliArg<?>> optionalPositionalArgs = Lists.newArrayList();
 	private final List<RendererCliArg<?>> optionalFlaggedArgs = Lists.newArrayList();
+	private final List<RendererCliFlag> booleanFlags = Lists.newArrayList();
 	
 	public RendererArgSpecBuilder requiredPositional() {
 		setState(RendererArgSpecBuilderState.REQUIRED_POSITIONAL);
@@ -99,13 +105,19 @@ class RendererArgSpecBuilder {
 		return this;
 	}
 	
+	public RendererArgSpecBuilder booleanFlag() {
+		setState(RendererArgSpecBuilderState.BOOLEAN_FLAG);
+		return this;
+	}
+	
 	private RendererArgSpecBuilder setState(RendererArgSpecBuilderState state) {
 		this.state = state;
 		return this;
 	}
 	
 	public RendererArgSpecBuilder addArg(RendererCliArg<?> arg) {
-		boolean hasLabelOrFlag = arg.getLabel().isPresent() || arg.getFlag().isPresent();
+		boolean hasLabelOrFlag = arg.getLabel().isPresent()
+			|| arg.getFlag().isPresent();
 		
 		boolean expectFlags = state.equals(RendererArgSpecBuilderState.OPTIONAL_FLAGGED);
 		if (!expectFlags && hasLabelOrFlag) {
@@ -124,6 +136,8 @@ class RendererArgSpecBuilder {
 			case OPTIONAL_FLAGGED:
 				optionalFlaggedArgs.add(arg);
 				break;
+			case BOOLEAN_FLAG:
+				throw new IllegalStateException("State was " + state.toString() + ". Can only add boolean flags.");
 			case NEW:
 				throw new IllegalStateException("State was " + state.toString() + ". Arg type needs to be specified.");
 			default:
@@ -133,8 +147,13 @@ class RendererArgSpecBuilder {
 		return this;
 	}
 	
+	public RendererArgSpecBuilder addFlag(RendererCliFlag flag) {
+		booleanFlags.add(flag);
+		return this;
+	}
+	
 	protected RendererArgSpec build() {
-		return new RendererArgSpec(requiredPositionalArgs, optionalPositionalArgs, optionalFlaggedArgs);
+		return new RendererArgSpec(requiredPositionalArgs, optionalPositionalArgs, optionalFlaggedArgs, booleanFlags);
 	}
 }
 
@@ -142,23 +161,29 @@ class RendererArgSpec {
 	private final List<RendererCliArg<?>> requiredPositionalArgs;
 	private final List<RendererCliArg<?>> optionalPositionalArgs;
 	private final List<RendererCliArg<?>> optionalArgs;
+	private final List<RendererCliFlag> booleanFlags;
 	
-	protected RendererArgSpec(List<RendererCliArg<?>> requiredPositionalArgs, List<RendererCliArg<?>> optionalPositionalArgs, List<RendererCliArg<?>> optionalArgs) {
+	protected RendererArgSpec(
+			List<RendererCliArg<?>> requiredPositionalArgs,
+			List<RendererCliArg<?>> optionalPositionalArgs,
+			List<RendererCliArg<?>> optionalArgs,
+			List<RendererCliFlag> booleanFlags) {
 		this.requiredPositionalArgs = ImmutableList.copyOf(requiredPositionalArgs);
 		this.optionalPositionalArgs = ImmutableList.copyOf(optionalPositionalArgs);
 		this.optionalArgs = ImmutableList.copyOf(optionalArgs);
+		this.booleanFlags = booleanFlags;
 	}
 	
-	private Map<String, RendererCliArg<?>> getOptionalFlaggedArgs() {
-		return optionalArgs.stream()
+	private Map<String, RendererCliConfig<?>> getOptionalFlaggedArgs() {
+		return Streams.concat(optionalArgs.stream(), booleanFlags.stream())
 			.filter(arg -> arg.getFlag().isPresent())
 			.collect(Collectors.toMap(
 				arg -> arg.getFlag().get(), 
 				arg -> arg));
 	}
 	
-	private Map<String, RendererCliArg<?>> getOptionalLabeledArgs() {
-		return optionalArgs.stream()
+	private Map<String, RendererCliConfig<?>> getOptionalLabeledArgs() {
+		return Streams.concat(optionalArgs.stream(), booleanFlags.stream())
 			.filter(arg -> arg.getLabel().isPresent())
 			.collect(Collectors.toMap(
 				arg -> arg.getLabel().get(), 
@@ -287,35 +312,50 @@ class RendererArgSpec {
 			String arg = args[ix];
 			ix++;
 			if (arg.startsWith("--")) {
-				RendererCliArg<?> labelSpec = getOptionalLabeledArgs().get(arg);
+				RendererCliConfig<?> labelSpec = getOptionalLabeledArgs().get(arg);
 				if (labelSpec == null) {
 					throw new ArgParsingFailed("Unrecognised label " + arg);
 				}
-				
-				if (ix >= args.length) {
-					throw new ArgParsingFailed("Expected a value for label " + arg + " but there was no more input");
+				if (labelSpec instanceof RendererCliArg) {
+					RendererCliArg<?> argLabelSpec = (RendererCliArg<?>)labelSpec;
+					if (ix >= args.length) {
+						throw new ArgParsingFailed("Expected a value for label " + arg + " but there was no more input");
+					}
+					
+					String value = args[ix];
+					ix++;
+					argLabelSpec.validate(value);
+					parsedArgs.put(argLabelSpec, value);
+				} else if (labelSpec instanceof RendererCliFlag) {
+					RendererCliFlag flagLabelSpec = (RendererCliFlag)labelSpec;
+					booleanFlags.add(flagLabelSpec);
+				} else {
+					throw new IllegalStateException("Unexpected config class: " + labelSpec.getClass().getSimpleName());
 				}
 				
-				String value = args[ix];
-				ix++;
-				labelSpec.validate(value);
-				parsedArgs.put(labelSpec, value);
-				
 			} else if (arg.startsWith("-")) {
-				Map<String, RendererCliArg<?>> optionalFlaggedArgs = getOptionalFlaggedArgs();
-				RendererCliArg<?> flagSpec = optionalFlaggedArgs.get(arg);
+				Map<String, RendererCliConfig<?>> optionalFlaggedArgs = getOptionalFlaggedArgs();
+				RendererCliConfig<?> flagSpec = optionalFlaggedArgs.get(arg);
 				if (flagSpec == null) {
 					throw new ArgParsingFailed("Unrecognised flag " + arg);
 				}
 				
-				if (ix >= args.length) {
-					throw new ArgParsingFailed("Expected a value for flag " + arg + " but there was no more input");
+				if (flagSpec instanceof RendererCliArg) {
+					RendererCliArg<?> argFlagSpec = (RendererCliArg<?>)flagSpec;
+					if (ix >= args.length) {
+						throw new ArgParsingFailed("Expected a value for flag " + arg + " but there was no more input");
+					}
+					
+					String value = args[ix];
+					ix++;
+					argFlagSpec.validate(value);
+					parsedArgs.put(argFlagSpec, value);
+				} else if (flagSpec instanceof RendererCliFlag) {
+					RendererCliFlag booleanFlagSpec = (RendererCliFlag)flagSpec;
+					booleanFlags.add(booleanFlagSpec);
+				} else {
+					throw new IllegalStateException("Unexpected config class: " + flagSpec.getClass().getSimpleName());
 				}
-				
-				String value = args[ix];
-				ix++;
-				flagSpec.validate(value);
-				parsedArgs.put(flagSpec, value);
 			} else {
 				throw new ArgParsingFailed("Expected flag or label, found: " + arg);
 			}
@@ -325,11 +365,12 @@ class RendererArgSpec {
 	}
 
 	private boolean isRecognisedFlag(String arg) {
-		Stream<RendererCliArg<?>> argsStream = 
+		Stream<RendererCliConfig<?>> argsStream = 
 			Streams.concat(
 				requiredPositionalArgs.stream(), 
 				optionalPositionalArgs.stream(), 
-				optionalArgs.stream());
+				optionalArgs.stream(),
+				booleanFlags.stream());
 		
 		Optional<String> argForComparison = Optional.of(arg);
 		
@@ -345,11 +386,20 @@ class RendererArgSpec {
 
 class ParsedArgs {
 	private Map<RendererCliArg<?>, String> map = Maps.newHashMap();
+	private Set<RendererCliFlag> flags = Sets.newHashSet();
 	
 	public void put(RendererCliArg<?> argSpec, String arg) {
 		map.put(argSpec, arg);
 	}
 	
+	public void foundFlag(RendererCliFlag flag) {
+		flags.add(flag);
+	}
+	
+	public boolean get(RendererCliFlag flag) {
+		return flags.contains(flag);
+	}
+
 	public <T> T get(RendererCliArg<T> argSpec) {
 		if (map.containsKey(argSpec)) {
 			String arg = map.get(argSpec);
@@ -360,33 +410,18 @@ class ParsedArgs {
 	}
 }
 
-abstract class RendererCliArg<T> {
-	
-	public abstract T convert(String arg);
-	public abstract String example();
+abstract class RendererCliConfig<T> {
 
 	private final String id;
 	private final String desc;
 	private final Optional<String> label;
 	private final Optional<String> flag;
-
-	public RendererCliArg(String id, String desc) {
-		this(id, desc, Optional.empty(), Optional.empty());
-	}
 	
-	public RendererCliArg(String id, String desc, Optional<String> label, Optional<String> flag) throws InvalidConfiguration {
+	public RendererCliConfig(String id, String desc, Optional<String> label, Optional<String> flag) throws InvalidConfiguration {
 		this.id = id;
 		this.desc = desc;
 		this.label = validateLabel(label).map(l -> "--" + l);
 		this.flag = validateFlag(flag).map(f -> "-" + f);
-	}
-	
-	public void validate(String arg) throws ArgParsingFailed {
-		try {
-			convert(arg);
-		} catch (Exception e) {
-			throw new ArgParsingFailed("Arg for type " + getClass().getSimpleName() + " failed to convert: \"" + arg + "\"");
-		}
 	}
 
 	private Optional<String> validateFlag(Optional<String> flag) throws InvalidConfiguration {
@@ -430,6 +465,28 @@ abstract class RendererCliArg<T> {
 	
 	public Optional<String> getFlag() {
 		return flag;
+	}
+}
+
+abstract class RendererCliArg<T> extends RendererCliConfig<T> {
+	
+	public abstract T convert(String arg);
+	public abstract String example();
+
+	public RendererCliArg(String id, String desc) {
+		this(id, desc, Optional.empty(), Optional.empty());
+	}
+	
+	public RendererCliArg(String id, String desc, Optional<String> label, Optional<String> flag) throws InvalidConfiguration {
+		super(id, desc, label, flag);
+	}
+	
+	public void validate(String arg) throws ArgParsingFailed {
+		try {
+			convert(arg);
+		} catch (Exception e) {
+			throw new ArgParsingFailed("Arg for type " + getClass().getSimpleName() + " failed to convert: \"" + arg + "\"");
+		}
 	}
 }
 
@@ -496,5 +553,12 @@ class CliStringSetArg extends RendererCliArg<Set<String>> {
 	@Override
 	public String example() {
 		return "string1;string2;string3";
+	}
+}
+
+class RendererCliFlag extends RendererCliConfig<Boolean> {
+
+	public RendererCliFlag(String id, String desc, String label, String flag) {
+		super(id, desc, Optional.of(label), Optional.of(flag));
 	}
 }

@@ -1,7 +1,10 @@
 */.project
 */.classpath
-*/.settings/
+*.settings/
 */target/
 */bin/
 */dependency-reduced-pom.xml
-publisher-deploy/
+profile-renderer/dependency-reduced-pom.xml
+reference-server-deploy/
+profile-renderer-deploy
+/bin/
