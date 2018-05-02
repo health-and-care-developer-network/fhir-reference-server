@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Usage:
 # build.sh registryhostname targethostname tagname
@@ -7,36 +7,37 @@
 . ./utils.sh
 
 # location where docker image has been published
-REGISTRY_HOST=$1
+REGISTRY_HOST="$1"
 # host which will run the container
-TARGET_HOST=$2
-FHIR_SERVER_PORT=${FHIR_SERVER_PORT:-8080}
-IMAGE_NAME=$3
-TAG_NAME=$4
+TARGET_HOST="$2"
+IMAGE_NAME="$3"
+TAG_NAME="$4"
 
-CONTAINER_NAME=${CONTAINER_NAME:-fhir-server}
-CONFIG_FILE=${CONFIG_FILE}
+# These variables may optionally be set by a calling script
+FHIR_SERVER_PORT="${FHIR_SERVER_PORT:-8080}"
+CONTAINER_NAME="${CONTAINER_NAME:-fhir-server}"
+CONFIG_FILE="${CONFIG_FILE}"
 
-TARGET_DOCKER_CMD=$(dockerCmd $TARGET_HOST)
-SOURCE=$(qualifiedImage $IMAGE_NAME $TAG_NAME $REGISTRY_HOST)
+TARGET_DOCKER_CMD="$(dockerCmd $TARGET_HOST)"
+SOURCE="$(qualifiedImage $IMAGE_NAME $TAG_NAME $REGISTRY_HOST)"
 
-MEMORYFLAG=2g
-CPUFLAG=768
+MEMORYFLAG="2g"
+CPUFLAG="768"
 
-if [ ! -z $REGISTRY_HOST ]
-then
+if [ ! -z $REGISTRY_HOST ]; then
   $TARGET_DOCKER_CMD pull $SOURCE
 fi
 
-$TARGET_DOCKER_CMD stop $CONTAINER_NAME
-$TARGET_DOCKER_CMD rm $CONTAINER_NAME
-$TARGET_DOCKER_CMD run -p $FHIR_SERVER_PORT:8080 --name $CONTAINER_NAME \
-	--restart=on-failure:5 \
-        -m $MEMORYFLAG \
-	-c $CPUFLAG \
-	-e "CONFIG_FILE=$CONFIG_FILE" \
-	-v /docker-data/fhir-profiles:/opt/fhir \
-	-v /docker-data/fhir-server-temp:/tmp/jetty \
-	-d $SOURCE
-
+$TARGET_DOCKER_CMD stop $CONTAINER_NAME || :
+$TARGET_DOCKER_CMD rm $CONTAINER_NAME || :
+$TARGET_DOCKER_CMD run \
+  -p $FHIR_SERVER_PORT:8080 \
+  --name $CONTAINER_NAME \
+  --restart=on-failure:5 \
+  -m $MEMORYFLAG \
+  -c $CPUFLAG \
+  -e "CONFIG_FILE=$CONFIG_FILE" \
+  -v /docker-data/fhir-profiles:/opt/fhir \
+  -v /docker-data/fhir-server-temp:/tmp/jetty \
+  -d $SOURCE
 

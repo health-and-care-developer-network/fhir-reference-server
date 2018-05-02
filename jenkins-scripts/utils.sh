@@ -36,5 +36,19 @@ qualifiedImage()
 # Extract version from maven. Fails first time if dependencies need downloading
 mavenVersion()
 {
-  mvn help:evaluate -Dexpression=project.version | grep -v "^\["
+  mavenEvaluate "project.version"
+}
+mavenFileExtension()
+{
+  mavenEvaluate "project.packaging"
+}
+mavenEvaluate()
+{
+  local pom_path=${1:?"Specify a '.'-delimited path within the pom.xml"}
+  mvn help:evaluate -Dexpression=$pom_path | grep -v "^\["
+}
+
+trimVersion()
+{
+  echo ${REFERENCE_SERVER_MVN_VERSION%-SNAPSHOT}
 }
