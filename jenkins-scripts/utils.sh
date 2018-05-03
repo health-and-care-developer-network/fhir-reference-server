@@ -45,6 +45,9 @@ mavenFileExtension()
 mavenEvaluate()
 {
   local pom_path=${1:?"Specify a '.'-delimited path within the pom.xml"}
+  # if we don't have all dependencies available, we get messages about any packages being downloaded. Get that out the way.
+  mvn help:evaluate -Dexpression=$pom_path > /dev/null
+  # this time allow the evaluated data to be emitted
   mvn help:evaluate -Dexpression=$pom_path | grep -v "^\["
 }
 
