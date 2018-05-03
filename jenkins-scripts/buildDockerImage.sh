@@ -16,12 +16,9 @@ REGISTRY_HOST="$4"
 DEPLOYABLE_TARGET_NAME="$5"
 
 # Version from the project root pom
-cd ..
 MVN_VERSION=$(mavenVersion)
 # File extension from the project pom
-cd ./$PROJECT
-DEPLOYABLE_EXTENSION=$(mavenFileExtension)
-cd ../jenkins-scripts
+DEPLOYABLE_EXTENSION=$(mavenFileExtension "$PROJECT")
 
 # collect required artefacts for server image build
 DEPLOY_DIR="../$PROJECT-deploy"

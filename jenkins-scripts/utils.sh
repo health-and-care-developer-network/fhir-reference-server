@@ -33,19 +33,24 @@ qualifiedImage()
   echo $image_name
 }
 
-# Extract version from maven. Fails first time if dependencies need downloading
 mavenVersion()
 {
+  # to root directory
+  cd ..
   mavenEvaluate "project.version"
+  cd ./jenkins-scripts
 }
 mavenFileExtension()
 {
+  local project=${1:?"Specify a project name"}
+  cd ../$project
   mavenEvaluate "project.packaging"
+  cd ../jenkins-scripts
 }
 mavenEvaluate()
 {
   local pom_path=${1:?"Specify a '.'-delimited path within the pom.xml"}
-  # if we don't have all dependencies available, we get messages about any packages being downloaded. Get that out the way.
+  # if we don't have all dependencies in ~/.m2, we get messages about any packages being downloaded. Get that out the way.
   mvn help:evaluate -Dexpression=$pom_path > /dev/null
   # this time allow the evaluated data to be emitted
   mvn help:evaluate -Dexpression=$pom_path | grep -v "^\["

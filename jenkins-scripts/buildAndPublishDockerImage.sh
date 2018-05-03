@@ -1,10 +1,10 @@
 #!/bin/bash -xe
 # Usage:
-# prepareAndBuildDockerImage.sh project_name [deployable_target_name] [tag_name] [registry_host]
+# prepareAndBuildDockerImage.sh project_name [tag_name] [registry_host] [deployable_target_name]
 
 . ./utils.sh
 
-if (( $# < 2 )); then
+if (( $# < 1 )); then
   echo "Exiting: no project name supplied"
   exit 1
 fi
