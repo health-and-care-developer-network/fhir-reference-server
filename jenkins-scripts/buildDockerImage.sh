@@ -19,7 +19,7 @@ DEPLOYABLE_TARGET_NAME="$5"
 cd ..
 MVN_VERSION=$(mavenVersion)
 # File extension from the project pom
-cd ../$PROJECT
+cd ./$PROJECT
 DEPLOYABLE_EXTENSION=$(mavenFileExtension)
 cd ../jenkins-scripts
 
