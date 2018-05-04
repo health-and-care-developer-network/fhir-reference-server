@@ -10,8 +10,9 @@
 REGISTRY_HOST="$1"
 # host which will run the container
 TARGET_HOST="$2"
-IMAGE_NAME="$3"
-TAG_NAME="$4"
+TAG_NAME="$3"
+
+IMAGE_NAME="nhsd/fhir-reference-server"
 
 # These variables may optionally be set by a calling script
 FHIR_SERVER_PORT="${FHIR_SERVER_PORT:-8080}"
