@@ -328,7 +328,7 @@ class RendererArgSpec {
 					parsedArgs.put(argLabelSpec, value);
 				} else if (labelSpec instanceof RendererCliFlag) {
 					RendererCliFlag flagLabelSpec = (RendererCliFlag)labelSpec;
-					booleanFlags.add(flagLabelSpec);
+					parsedArgs.foundFlag(flagLabelSpec);
 				} else {
 					throw new IllegalStateException("Unexpected config class: " + labelSpec.getClass().getSimpleName());
 				}
@@ -352,7 +352,7 @@ class RendererArgSpec {
 					parsedArgs.put(argFlagSpec, value);
 				} else if (flagSpec instanceof RendererCliFlag) {
 					RendererCliFlag booleanFlagSpec = (RendererCliFlag)flagSpec;
-					booleanFlags.add(booleanFlagSpec);
+					parsedArgs.foundFlag(booleanFlagSpec);
 				} else {
 					throw new IllegalStateException("Unexpected config class: " + flagSpec.getClass().getSimpleName());
 				}

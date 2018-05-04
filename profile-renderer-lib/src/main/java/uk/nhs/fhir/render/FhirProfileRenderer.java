@@ -42,20 +42,11 @@ public class FhirProfileRenderer {
     private final Optional<String> newBaseURL;
     private final Set<String> permittedMissingExtensionPrefixes;
     private final AbstractRendererEventHandler eventHandler;
-    private boolean continueOnFail = false;
-    private boolean allowCopyOnError = false;
+    private final boolean allowCopyOnError;
     private final Optional<Set<String>> localQdomains;
 
-    public void setContinueOnFail(boolean continueOnFail) {
-    	this.continueOnFail = continueOnFail;
-    }
-    
-    public void setAllowCopyOnError(boolean allowCopyOnError) {
-    	this.allowCopyOnError = allowCopyOnError;
-    }
-
-	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler) {
-		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty());
+	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler, boolean copyOnError) {
+		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty(), copyOnError);
 	}
 	
 	public FhirProfileRenderer(RendererCliArgs args) {
@@ -65,7 +56,8 @@ public class FhirProfileRenderer {
 			args.getNewBaseUrl(),
 			args.getAllowedMissingExtensionPrefixes(),
 			new RendererLoggingEventHandler(),
-			args.getLocalDomains());
+			args.getLocalDomains(),
+			args.getCopyOnError());
 	}
     
 	public FhirProfileRenderer(
@@ -74,13 +66,15 @@ public class FhirProfileRenderer {
 		Optional<String> newBaseURL, 
 		Optional<Set<String>> permittedMissingExtensionPrefixes, 
 		AbstractRendererEventHandler errorHandler, 
-		Optional<Set<String>> localQdomains) 
+		Optional<Set<String>> localQdomains,
+		boolean copyOnError) 
 	{
 		this.rendererFileLocator = new DefaultRendererFileLocator(inputDirectory, makeRenderedArtefactTempDirectory(), outPath);
 		this.newBaseURL = newBaseURL;
 		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
+		this.allowCopyOnError = copyOnError;
 	}
 	
 	private static Path makeRenderedArtefactTempDirectory() {
@@ -193,7 +187,7 @@ public class FhirProfileRenderer {
 	        			
 	        		
 	    			if (causedException 
-	    			  && !continueOnFail) {
+	    			  && !allowCopyOnError) {
 	    				break;
 	    			}
 	

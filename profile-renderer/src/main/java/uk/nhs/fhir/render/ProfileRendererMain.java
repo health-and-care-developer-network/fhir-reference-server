@@ -44,7 +44,8 @@ public class ProfileRendererMain {
     		cliArgs.getNewBaseUrl(), 
     		cliArgs.getAllowedMissingExtensionPrefixes(), 
     		new RendererLoggingEventHandler(), 
-    		cliArgs.getLocalDomains());
+    		cliArgs.getLocalDomains(),
+    		cliArgs.getCopyOnError());
     	
     	RendererExitStatus exitStatus = renderer.process();
     	System.exit(exitStatus.exitCode());
