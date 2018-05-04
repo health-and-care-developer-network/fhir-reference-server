@@ -49,3 +49,5 @@ fi
 cd jenkins-scripts
 ./publisher-run.sh "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$PREPROCESS_ARTEFACTS_OLD_URL" "$PREPROCESS_ARTEFACTS_NEW_URL" "$REGISTRY_HOST" "$TARGET_HOST" "$OUT_PATH" "$TAG_NAME" "$RENDERER_FLAGS"
 
+# return to root directory
+cd ..

@@ -16,8 +16,7 @@ DEPLOYABLE_TARGET_NAME="$4"
 
 # preserve docker tag name if it has been supplied, otherwise default to trimmed mvn version
 if [ -z "$TAG_NAME" ]; then
-  REFERENCE_SERVER_MVN_VERSION=$(mavenVersion)
-  TAG_NAME=$(trimVersion $REFERENCE_SERVER_MVN_VERSION)
+  TAG_NAME=$(trimmedMavenVersion)
 fi
 
 IMAGE_NAME="nhsd/fhir-$PROJECT"

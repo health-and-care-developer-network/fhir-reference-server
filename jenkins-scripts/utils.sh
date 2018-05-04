@@ -33,6 +33,12 @@ qualifiedImage()
   echo $image_name
 }
 
+trimmedMavenVersion()
+{
+  local version=$(mavenVersion)
+  # remove suffix of -SNAPSHOT if present
+  echo ${REFERENCE_SERVER_MVN_VERSION%-SNAPSHOT}
+}
 mavenVersion()
 {
   # to root directory
@@ -54,9 +60,4 @@ mavenEvaluate()
   mvn help:evaluate -Dexpression=$pom_path > /dev/null
   # this time allow the evaluated data to be emitted
   mvn help:evaluate -Dexpression=$pom_path | grep -v "^\["
-}
-
-trimVersion()
-{
-  echo ${REFERENCE_SERVER_MVN_VERSION%-SNAPSHOT}
 }
