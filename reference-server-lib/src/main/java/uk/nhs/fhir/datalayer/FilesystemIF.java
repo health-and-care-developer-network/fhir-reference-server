@@ -51,10 +51,6 @@ public class FilesystemIF {
     	FileCache.invalidateCache();
     }
     
-    public static void clearCache() {
-    	FileCache.clearCache();
-    }
-    
     /**
      * Gets a specific resource, optionally also with a specific version
      * @param id

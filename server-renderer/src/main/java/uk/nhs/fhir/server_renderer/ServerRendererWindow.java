@@ -94,7 +94,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					FilesystemIF.clearCache();
+					FilesystemIF.invalidateCache();
 					try {
 						FileUtils.cleanDirectory(renderedFileDir.toFile());
 						FileUtils.cleanDirectory(importedFileDir.toFile());

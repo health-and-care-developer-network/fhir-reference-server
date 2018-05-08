@@ -2,7 +2,6 @@ package uk.nhs.fhir.load;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +12,12 @@ import com.google.common.collect.Lists;
 public class XmlFileFinder {
 	private static final String XML_EXTENSION = ".xml";
 	
-	public static final FilenameFilter XML_FILE_FILTER = new FilenameFilter() {
-		public boolean accept(File dir, String name) {
-            return name.toLowerCase(Locale.UK).endsWith(XML_EXTENSION);
-        }
+	public static final FileFilter XML_FILE_FILTER = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return f.isFile() 
+			  && f.getName().toLowerCase(Locale.UK).endsWith(XML_EXTENSION);
+		}
 	};
     
 	private static final FileFilter directoryFileFilter = new FileFilter() {
@@ -55,7 +56,9 @@ public class XmlFileFinder {
 		File[] localXmlFiles = searchDirectory.listFiles(XML_FILE_FILTER);
 		if (localXmlFiles != null) {
 			for (File xmlFile : localXmlFiles) {
-	        	xmlFiles.add(xmlFile);
+				if (xmlFile.isFile()) {
+					xmlFiles.add(xmlFile);
+				}
 	        }
 		} else {
 			throw new IllegalStateException("IOException finding XML files within " + searchDirectory.getPath());

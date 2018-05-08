@@ -64,8 +64,7 @@ public class ResourcePageRenderer {
     	// Examples
     	List<ResourceMetadata> examplesList = resourceWebHandler.getExamples(fhirVersion, resourceType.getHAPIName() + "/" + resourceID.getIdPart());
     	Optional<List<ResourceMetadata>> examples = 
-    		(examplesList == null 
-    		  || examplesList.isEmpty()) ? 
+    		(examplesList.isEmpty()) ? 
     			Optional.empty() : 
     			Optional.of(examplesList);
     	
