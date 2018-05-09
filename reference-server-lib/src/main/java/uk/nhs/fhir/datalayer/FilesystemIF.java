@@ -18,6 +18,7 @@ package uk.nhs.fhir.datalayer;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -259,7 +260,7 @@ public class FilesystemIF {
 		return FileCache.getExamples(fhirVersion, resourceTypeAndID);
 	}
 	
-	public ResourceMetadata getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
+	public Optional<ResourceMetadata> getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
 		return FileCache.getExampleByName(fhirVersion, resourceFilename);
 	}
 

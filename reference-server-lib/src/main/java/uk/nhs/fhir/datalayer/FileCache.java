@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -46,6 +47,11 @@ import uk.nhs.fhir.util.FhirVersion;
 public class FileCache {
     private static final Logger LOG = LoggerFactory.getLogger(FileCache.class.getName());
     
+    // Allows cache update to be performed atomically (i.e. once started replacing cached data collections, 
+    // no data can be requested until the replacement is finished). Not bomb-proof as a request could technically 
+    // get something before and something else after replacement.
+    private static final Object CACHE_SYNCH_OBJ = new Object();
+    
     private static AbstractFhirFileLocator fhirFileLocator = new PropertiesFhirFileLocator();
     public static void setVersionedFileLocator(AbstractFhirFileLocator versionedFileLocator) {
     	FileCache.fhirFileLocator = versionedFileLocator;
@@ -70,10 +76,11 @@ public class FileCache {
 					
 					LOG.info("Finished caching resources. Updating cached resource maps.");
 					
-					
-					resourceListByFhirVersion = fileCacher.getResourceListByFhirVersion();
-					examplesListByFhirVersion = fileCacher.getExamplesListByFhirVersion();
-					examplesListByName = fileCacher.getExamplesListByName();
+					synchronized (CACHE_SYNCH_OBJ) {
+						resourceListByFhirVersion = fileCacher.getResourceListByFhirVersion();
+						examplesListByFhirVersion = fileCacher.getExamplesListByFhirVersion();
+						examplesListByName = fileCacher.getExamplesListByName();
+					}
 				} finally {
 					updatingCache.set(false);
 				}
@@ -96,7 +103,7 @@ public class FileCache {
      */
     public static List<String> getResourceNameList(FhirVersion fhirVersion, ResourceType resourceType) {
         HashSet<String> names = new HashSet<String>();
-        for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+        for (ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType
         	  && !names.contains(entry.getLatest().getResourceName())) {
     			names.add(entry.getLatest().getResourceName());
@@ -113,7 +120,7 @@ public class FileCache {
     public static List<ResourceMetadata> getExtensions(FhirVersion fhirVersion)  {
     	List<ResourceMetadata> results = Lists.newArrayList();
     	
-		for(ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+		for(ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
         	if (entry.getLatest().isExtension())
         		results.add(entry.getLatest());
         }
@@ -134,7 +141,7 @@ public class FileCache {
         HashMap<String, List<ResourceMetadata>> result = new HashMap<String, List<ResourceMetadata>>();
         try {
             for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
-	        	for(ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+	        	for(ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
 	            	if (entry.getLatest().getResourceType().equals(resourceType)) {
 		            	boolean isExtension = entry.getLatest().isExtension();
 		                String group = entry.getLatest().getDisplayGroup();
@@ -172,7 +179,7 @@ public class FileCache {
         // Load each resource file and put them in a list to return
         int counter = 0;
         List<IBaseResource> allFiles = Lists.newArrayList();
-        for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+        for (ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
         	if (entry.getLatest().getResourceType() == resourceType) {
         		if (counter >= theFromIndex && counter < theToIndex) {
 	        		IBaseResource vs = FHIRUtils.loadResourceFromFile(fhirVersion, entry.getLatest().getResourceFile());
@@ -185,7 +192,7 @@ public class FileCache {
     }
     
     public static ResourceMetadata getSingleResourceByID(FhirVersion fhirVersion, IIdType type) {
-    	for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+    	for (ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
     		if (entry.getResourceID().equals(type.getIdPart())
     		  && entry.getResourceType().equals(ResourceType.getTypeFromHAPIName(type.getResourceType()))) {
     			if (type.getVersionIdPart() != null) {
@@ -203,7 +210,7 @@ public class FileCache {
     }
     
     public static ResourceEntityWithMultipleVersions getversionsByID(FhirVersion fhirVersion, String idPart, ResourceType resourceType) {    	
-    	for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+    	for (ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
     		if (entry.getResourceID().equals(idPart)
     		  && entry.getResourceType().equals(resourceType)) {
     			return entry;
@@ -214,7 +221,7 @@ public class FileCache {
     }
     
     public static ResourceMetadata getSingleResourceByName(FhirVersion fhirVersion, String name, ResourceType resourceType) {
-        for (ResourceEntityWithMultipleVersions entry : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+        for (ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
         	if (entry != null
         	  && entry.getResourceName().equals(name)
     		  && entry.getResourceType().equals(resourceType)) {
@@ -228,7 +235,7 @@ public class FileCache {
 	public static List<ResourceMetadata> getResourceList(FhirVersion fhirVersion) {
 		List<ResourceMetadata> latestResourcesList = Lists.newArrayList();
 		
-		for (ResourceEntityWithMultipleVersions item : resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList())) {
+		for (ResourceEntityWithMultipleVersions item : resourcesForFhirVersion(fhirVersion)) {
 			if (item != null) {
 				latestResourcesList.add(item.getLatest());
 			}
@@ -236,12 +243,22 @@ public class FileCache {
 		
 		return latestResourcesList;
 	}
+    
+    private static List<ResourceEntityWithMultipleVersions> resourcesForFhirVersion(FhirVersion fhirVersion) {
+    	synchronized (CACHE_SYNCH_OBJ) {
+    		return Lists.newArrayList(resourceListByFhirVersion.getOrDefault(fhirVersion, Lists.newArrayList()));
+    	}
+    }
 	
 	public static List<ResourceMetadata> getExamples(FhirVersion fhirVersion, String resourceTypeAndID) {
-		return examplesListByFhirVersion.get(fhirVersion).get(resourceTypeAndID);
+		synchronized (CACHE_SYNCH_OBJ) {
+			return Lists.newArrayList(examplesListByFhirVersion.getOrDefault(fhirVersion, Maps.newHashMap()).getOrDefault(resourceTypeAndID, Lists.newArrayList()));
+		}
 	}
 	
-	public static ResourceMetadata getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
-		return examplesListByName.get(fhirVersion).get(resourceFilename);
+	public static Optional<ResourceMetadata> getExampleByName(FhirVersion fhirVersion, String resourceFilename) {
+		synchronized (CACHE_SYNCH_OBJ) {
+			return Optional.ofNullable(examplesListByName.getOrDefault(fhirVersion, Maps.newHashMap()).get(resourceFilename));
+		}
 	}
 }

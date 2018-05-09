@@ -36,11 +36,11 @@ public class ServletStreamExample {
 		// Parse the URL
 		String exampleName = uriAfterBase.substring("/Examples/".length());
 		
-		ResourceMetadata exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
+		Optional<ResourceMetadata> exampleEntity = dataSource.getExampleByName(fhirVersion, exampleName);
 		
-		if (exampleEntity != null) {
+		if (exampleEntity.isPresent()) {
 			// We've found a matching example - stream it back
-			File srcFile = exampleEntity.getResourceFile();
+			File srcFile = exampleEntity.get().getResourceFile();
 			
 			String fileContent = FileLoader.loadFile(srcFile);
 			MimeType mimeType = null;
@@ -63,7 +63,7 @@ public class ServletStreamExample {
 				mimeType = MimeType.UNKNOWN_MIME;
 			}
 			
-			String wrappedContent = new RawResourceTemplate(Optional.of(ResourceType.EXAMPLES), Optional.of(exampleName), fileContent, mimeType).getHtml("FHIR Server: Example resource (" + exampleEntity.getResourceName() + ")" );
+			String wrappedContent = new RawResourceTemplate(Optional.of(ResourceType.EXAMPLES), Optional.of(exampleName), fileContent, mimeType).getHtml("FHIR Server: Example resource (" + exampleEntity.get().getResourceName() + ")" );
 			
 			ServletUtils.setResponseContentForSuccess(response, "text/html", wrappedContent);
 		} else {
