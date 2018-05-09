@@ -8,22 +8,30 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.datalayer.FilesystemIF;
 
 @SuppressWarnings("serial")
 public class ServerRendererWindow extends JFrame implements RendererListener {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ServerRendererWindow.class);
+	
 	private final Path renderedFileDir;
 	private final Path importedFileDir;
 
@@ -41,6 +49,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final JPanel main = new JPanel();
 	
 	private final JPanel mainPanel = new JPanel();
+	
 	private final JPanel rendererRootFilePathRow = new JPanel(); 
 	private final JLabel rendererRootFilePathLabel = new JLabel("Renderer root file path:");
 	private final JTextField rendererRootfilePathText = new JTextField();
@@ -50,6 +59,8 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final JPanel buttonsBar = new JPanel();
 	private final JButton runRendererButton = new JButton("Run renderer");
 	private final JButton clearCacheButton = new JButton("Clear server cache");
+	private final JButton exportToZipButton = new JButton("Export rendered items");
+	private final JFileChooser exportToZipChooser = new JFileChooser();
 	
 	private void initWindow() {
 		setTitle("Local FHIR Server");
@@ -76,6 +87,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 		buttonsBar.setLayout(new FlowLayout());
 		buttonsBar.add(runRendererButton);
 		buttonsBar.add(clearCacheButton);
+		buttonsBar.add(exportToZipButton);
 		main.add(buttonsBar, BorderLayout.SOUTH);
 		
 		this.add(main, BorderLayout.CENTER);
@@ -94,13 +106,13 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 			new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					FilesystemIF.invalidateCache();
 					try {
 						FileUtils.cleanDirectory(renderedFileDir.toFile());
 						FileUtils.cleanDirectory(importedFileDir.toFile());
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
+					FilesystemIF.invalidateCache();
 				}
 			});
 		
@@ -110,8 +122,36 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 			public void actionPerformed(ActionEvent e) {
 				int option = rootDirectoryChooser.showOpenDialog(ServerRendererWindow.this);
 				if (option == JFileChooser.APPROVE_OPTION) {
-			       File rootDirectory = rootDirectoryChooser.getSelectedFile();
-			       rendererRootfilePathText.setText(rootDirectory.getPath());
+					File rootDirectory = rootDirectoryChooser.getSelectedFile();
+					LOG.info("Exporting rendered artefacts to " + rootDirectory.getAbsolutePath());
+					rendererRootfilePathText.setText(rootDirectory.getPath());
+				}
+			}
+		});
+		
+		exportToZipChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		exportToZipChooser.setFileFilter(new FileNameExtensionFilter("ZIP archive", ".zip"));
+		
+		exportToZipButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int option = exportToZipChooser.showSaveDialog(ServerRendererWindow.this);
+				if (option == JFileChooser.APPROVE_OPTION) {
+					if (importedFileDir.toFile().list().length > 0) {
+						File zip = exportToZipChooser.getSelectedFile();
+						Optional<String> errorMessage = new ZipExporter(importedFileDir.toFile()).export(zip);
+						
+						if (errorMessage.isPresent()) {
+							JOptionPane.showMessageDialog(ServerRendererWindow.this, errorMessage.get(), "Export error", JOptionPane.ERROR_MESSAGE);
+						}
+					} else {
+						JOptionPane.showMessageDialog(
+							ServerRendererWindow.this, 
+							"Nothing has been rendered yet",
+							"Nothing rendered",
+							JOptionPane.WARNING_MESSAGE);
+						return;
+					}
 				}
 			}
 		});
@@ -127,6 +167,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 
 				chooseRootDirectoryButton.setEnabled(false);
 				clearCacheButton.setEnabled(false);
+				exportToZipButton.setEnabled(false);
 			}});
 	}
 
@@ -147,6 +188,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 				runRendererButton.setText("Run renderer");
 				
 				clearCacheButton.setEnabled(true);
+				exportToZipButton.setEnabled(true);
 			}});
 	}
 }
