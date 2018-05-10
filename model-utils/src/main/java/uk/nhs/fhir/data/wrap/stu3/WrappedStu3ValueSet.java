@@ -121,7 +121,7 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 
 	@Override
 	public Optional<Boolean> getExperimental() {
-		return Optional.ofNullable(definition.getExtensibleElement().getValue());
+		return Optional.ofNullable(definition.getExperimentalElement().getValue());
 	}
 
 	@Override

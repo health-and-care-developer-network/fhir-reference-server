@@ -37,15 +37,18 @@ public enum ArtefactType {
 	CODESYSTEM_FILTERS("filters.html", ResourceType.CODESYSTEM, "Filters", 10, false),
 	
 	MESSAGE_METADATA("metadata.html", ResourceType.MESSAGEDEFINITION, "Metadata", -1, true),
-	MESSAGE_FOCUS("focus.html", ResourceType.MESSAGEDEFINITION, "Message Payload", 0, false)
+	MESSAGE_FOCUS("focus.html", ResourceType.MESSAGEDEFINITION, "Message Payload", 0, false),
+	
+	SEARCH_PARAM_METADATA("metadata.html", ResourceType.SEARCHPARAMETER, "Metadata", -1, true),
+	SEARCH_PARAM_DETAILS("details.html", ResourceType.SEARCHPARAMETER, "Definition", 0, false)
 	;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ArtefactType.class.getName());
 	
 	private ArtefactType(String filename, ResourceType relatesToResourceType, String displayName, int weight, boolean metadata) {
-		this.displayName = displayName;
-		this.relatesToResourceType = relatesToResourceType;
 		this.filename = filename;
+		this.relatesToResourceType = relatesToResourceType;
+		this.displayName = displayName;
 		this.weight = weight;
 		this.metadata = metadata;
 	}
