@@ -148,7 +148,8 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		ResourceType.OPERATIONDEFINITION,
 		ResourceType.CONCEPTMAP,
 		ResourceType.CODESYSTEM,
-		ResourceType.MESSAGEDEFINITION);
+		ResourceType.MESSAGEDEFINITION,
+		ResourceType.SEARCHPARAMETER);
 	
 	public static boolean isIndexedType(ResourceType type) {
 		return INDEXED_TYPES.contains(type);

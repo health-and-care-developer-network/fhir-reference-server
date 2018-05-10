@@ -29,6 +29,7 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3MessageDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3SearchParameter;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
 import uk.nhs.fhir.event.EventHandlerContext;
@@ -37,6 +38,23 @@ import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.util.FhirContexts;
 import uk.nhs.fhir.util.FhirVersion;
 import uk.nhs.fhir.util.StringUtil;
+
+/*
+ * ADDING NEW RESOURCE TYPES
+ * 
+ * To add a new resource type, create a new subclass of this class.
+ * That subclass should be of the form WrappedX where X is the FHIR resource name.
+ * This should then be extended by subclasses of the form WrappedStuNX where n is the FHIR version (following the existing pattern).
+ * 
+ * The type needs adding to the ResourceType enum.
+ * On the implementation class itself, all fields that are not present in NHS Digital examples should be checked for and warned if encountered.
+ * fromBaseResource() needs updating below
+ * Formatters need creating and adding to ResourceFormatterFactory
+ * ArtefactType needs updating with each new artefact
+ * FhirBrowserRequestServlet INDEXED_TYPES needs the type to be added
+ * The reference server hl7-velocity-templates/home.vm and velocity-templates/home.vm need updating
+ * ResourcePageRenderer getFirstTabName() needs an entry adding
+ */
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {
 
@@ -196,6 +214,10 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			return new WrappedStu3MessageDefinition((org.hl7.fhir.dstu3.model.MessageDefinition)resource);
 		}
 		
+		else if (resource instanceof org.hl7.fhir.dstu3.model.SearchParameter) {
+			return new WrappedStu3SearchParameter((org.hl7.fhir.dstu3.model.SearchParameter)resource);
+		}
+		
 		else {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}
@@ -248,6 +270,16 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 			if (o != null) {
 				throw new IllegalStateException("Expected " + path + " to be empty");
 			}
+		}
+	}
+	
+	protected void checkInfoPresent(Object o, String path) {
+		if (o instanceof Collection<?>) {
+			if (((Collection<?>)o).isEmpty()) {
+				throw new IllegalStateException("Expected " + path + " to contain some data");
+			}
+		} else if (o == null) {
+			throw new IllegalStateException("Expected " + path + " to be present");
 		}
 	}
 }

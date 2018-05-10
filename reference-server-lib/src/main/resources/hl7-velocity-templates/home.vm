@@ -1,6 +1,6 @@
 <div class='fhirServerGeneratedContent'>
 
-	<h3>StructureDefinition</h3>
+	<h3>StructureDefinitions</h3>
 	<ul>
 		<li><a href="/StructureDefinition">List all StructureDefinitions
 				#set( $count = $counts.get("StructureDefinition") )
@@ -12,7 +12,7 @@
 				</a>
 		</li>
 	</ul>
-	<h3>ValueSet</h3>
+	<h3>ValueSets</h3>
 	<ul>
 		<li><a href="/ValueSet">List all ValueSets
 				#set( $countVS = $counts.get("ValueSet") )
@@ -24,7 +24,7 @@
 				</a>
 		</li>
 	</ul>
-	<h3>OperationDefinition</h3>
+	<h3>OperationDefinitions</h3>
 	<ul>
 		<li><a href="/OperationDefinition">List all OperationDefinitions
 				#set( $countOD = $counts.get("OperationDefinition") )
@@ -36,7 +36,7 @@
 				</a>
 		</li>
 	</ul>
-	<h3>CodeSystem</h3>
+	<h3>CodeSystems</h3>
 	<ul>
 		<li><a href="/CodeSystem">List all CodeSystems
 				#set( $countCS = $counts.get("CodeSystem") )
@@ -48,12 +48,36 @@
 				</a>
 		</li>
 	</ul>
-	<h3>ConceptMap</h3>
+	<h3>ConceptMaps</h3>
 	<ul>
 		<li><a href="/ConceptMap">List all ConceptMaps
 				#set( $countCM = $counts.get("ConceptMap") )
 				#if( $countCM )
 				  ($countCM)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>MessageDefinitions</h3>
+	<ul>
+		<li><a href="/MessageDefinition">List all MessageDefinitions
+				#set( $countMD = $counts.get("MessageDefinition") )
+				#if( $countMD )
+				  ($countMD)
+				#else
+				  (0)
+				#end
+				</a>
+		</li>
+	</ul>
+	<h3>SearchParameters</h3>
+	<ul>
+		<li><a href="/SearchParameter">List all SearchParameters
+				#set( $countSP = $counts.get("SearchParameter") )
+				#if( $countSP )
+				  ($countSP)
 				#else
 				  (0)
 				#end

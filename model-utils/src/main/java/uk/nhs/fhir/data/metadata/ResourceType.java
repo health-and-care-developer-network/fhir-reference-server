@@ -17,13 +17,16 @@ public enum ResourceType {
 	CONCEPTMAP("ConceptMap", "ConceptMap", "ConceptMap", "ConceptMaps", "ConceptMap"),
 	CODESYSTEM("CodeSystem", "CodeSystem", "CodeSystem", "CodeSystems", "CodeSystem"),
 	MESSAGEDEFINITION("MessageDefinition", "MessageDefinition", "MessageDefinition", "MessageDefinitions", "MessageDefinition"),
+	SEARCHPARAMETER("SearchParameter", "SearchParameter", "SearchParameter", "SearchParameters", "SearchParameter"),
 	
 	EXTENSION("Extension", null, "Extensions", "Extension Registry", "Extensions"),
 	EXAMPLES("Example", "Examples", "Examples", "Examples", "Examples"),
 	OTHER("Other", "Other", "Other", null, null);
 
-	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
-	private static final ResourceType[] STU3_TYPES = new ResourceType[]{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION};
+	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]
+		{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
+	private static final ResourceType[] STU3_TYPES = new ResourceType[]
+		{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION, SEARCHPARAMETER};
 	
 	public static List<ResourceType> typesForFhirVersion(FhirVersion fhirVersion) {
 		switch (fhirVersion) {
