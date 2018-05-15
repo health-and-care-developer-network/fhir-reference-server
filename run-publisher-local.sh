@@ -33,7 +33,7 @@ TAG_NAME="1.3.0"
 # Container to create
 CONTAINER_NAME="fhir-renderer"
 
-# Build up flags to 
+# Build up flags to pass to the renderer application
 RENDERER_FLAGS=""
 if [ ! -z "$LOCAL_DOMAINS" ]; then
   RENDERER_FLAGS="$RENDERER_FLAGS -l $LOCAL_DOMAINS"
