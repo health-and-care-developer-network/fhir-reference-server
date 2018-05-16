@@ -27,7 +27,7 @@ public class FileProcessor {
     
     private final ResourceFormatterFactory resourceFormatterFactory = new ResourceFormatterFactory(); 
     
-	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, Optional<String> newBaseURL) throws Exception {
+	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, String repoName, String filename, Optional<String> newBaseURL) throws Exception {
 		
 	    WrappedResource<?> resource = RendererContext.forThread().getCurrentParsedResource().get();
 		String inFilePath = RendererContext.forThread().getCurrentSource().getPath();
@@ -36,7 +36,7 @@ public class FileProcessor {
 	    
 	    saveAugmentedResource(rendererFileLocator, newBaseURL);
 		
-		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator)) {
+		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator,  repoName, filename)) {
 			LOG.debug("Generating " + formatter.getOutputPath(inFilePath).toString());
 			formatter.formatAndSave(inFilePath);
 		}

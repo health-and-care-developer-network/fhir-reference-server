@@ -21,6 +21,7 @@ import uk.nhs.fhir.render.format.codesys.CodeSystemMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapTableFormatter;
+import uk.nhs.fhir.render.format.githistory.GitHistoryFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionFocusTableFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionMetadataFormatter;
@@ -52,7 +53,7 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator) {
+	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator, String repoName, String filename) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
 		Path outputDirectory = rendererFileLocator.getRenderingTempOutputDirectory(wrappedResource);
@@ -81,6 +82,9 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingsTableFormatter(wrappedStructureDefinition), outputDirectory, "bindings.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
+			if (repoName != null) {
+				formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter(repoName, filename), outputDirectory, "git-history.html"));
+			}
 			
 			if (!wrappedStructureDefinition.isExtension()) {
 				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition), outputDirectory, "differential.html"));

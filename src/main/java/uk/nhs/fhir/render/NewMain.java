@@ -59,6 +59,7 @@ public class NewMain {
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
     private final Optional<Set<String>> localQdomains;
+    private final String repoName;
     
     public void setContinueOnFail(boolean continueOnFail) {
     	this.continueOnFail = continueOnFail;
@@ -95,6 +96,9 @@ public class NewMain {
 		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
+		
+		// TODO: Make this a CLI argument
+		this.repoName = "nhsconnect/STU3-FHIR-Assets";
 	}
 
 	/**
@@ -192,7 +196,7 @@ public class NewMain {
 	        		
 	        		try {
 	        			try {
-							fileProcessor.processFile(rendererFileLocator, newBaseURL);
+							fileProcessor.processFile(rendererFileLocator, repoName, rendererContext.getCurrentSource().getName(), newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;
