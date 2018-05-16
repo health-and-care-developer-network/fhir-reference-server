@@ -18,7 +18,6 @@ import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
-import uk.nhs.fhir.data.wrap.WrappedNull;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
