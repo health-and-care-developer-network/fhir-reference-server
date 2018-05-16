@@ -48,5 +48,4 @@ public interface FhirCSS {
 	
 	// This is used by javascript to identify links that are intended to switch tabs
 	public static final String TAB_LINK = "tabLink";
-
 }

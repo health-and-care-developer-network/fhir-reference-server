@@ -53,7 +53,7 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator, String repoName, String filename) {
+	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator, String repoName, String filename, String cacheDir) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
 		Path outputDirectory = rendererFileLocator.getRenderingTempOutputDirectory(wrappedResource);
@@ -83,7 +83,7 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
 			if (repoName != null) {
-				formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter(repoName, filename), outputDirectory, "git-history.html"));
+				formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter(repoName, filename, cacheDir), outputDirectory, "git-history.html"));
 			}
 			
 			if (!wrappedStructureDefinition.isExtension()) {
