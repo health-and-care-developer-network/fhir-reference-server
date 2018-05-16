@@ -198,7 +198,8 @@ public class NewMain {
 	        		
 	        		try {
 	        			try {
-							fileProcessor.processFile(rendererFileLocator, repoName, rendererContext.getCurrentSource().getName(), cacheDir, newBaseURL);
+							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
+	        				fileProcessor.processFile(rendererFileLocator, repoName, filename, cacheDir, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;

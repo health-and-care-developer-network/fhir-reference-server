@@ -1,5 +1,6 @@
 package uk.nhs.fhir.render.format.githistory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -7,10 +8,15 @@ import org.jdom2.Element;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.extras.OkHttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
 
 import uk.nhs.fhir.data.wrap.WrappedNull;
 import uk.nhs.fhir.render.format.HTMLDocSection;
@@ -25,6 +31,7 @@ import uk.nhs.fhir.render.html.cell.ValueWithInfoCell;
 import uk.nhs.fhir.render.html.panel.FhirPanel;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.table.TableRow;
+import uk.nhs.fhir.render.html.table.TableTitle;
 
 public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	private static final Logger LOG = LoggerFactory.getLogger(GitHistoryFormatter.class.getName());
@@ -40,17 +47,17 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 		this.filename = filename;
 		this.cacheDir = cacheDir;
 		
+		LOG.info("Attempting to retrieve Git history for file: " + filename);
+		
 		try {
-			/*
 			Cache cache = new Cache(new File(cacheDir), 10 * 1024 * 1024); // 10MB cache
 			GitHub github = GitHubBuilder.fromCredentials()
 			    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(cache))))
 				.build();
-			*/
-			GitHub github = GitHub.connectAnonymously();
+			//GitHub github = GitHub.connectAnonymously();
 			repo = github.getRepository(this.repoName);
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			this.repo = null;
@@ -76,8 +83,6 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	}
 	
 	private Element buildHistoryPanel() throws IOException {
-		GitHistoryTableDataProvider tableData = new GitHistoryTableDataProvider(this.repoName, this.filename);
-		
 		List<TableRow> tableRows = Lists.newArrayList();
 		
 		for (GHCommit commit : repo.queryCommits().path(this.filename).list()) {
@@ -85,12 +90,24 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 			tableRows.add(getCommitRow(commit));
 		}
 		
-		Element historyTable = new Table(tableData.getColumns(), tableRows).makeTable();
-		return new FhirPanel("Git History for: "+this.filename, historyTable).makePanel();
+		Element historyTable = new Table(getColumns(), tableRows).makeTable();
+		return new FhirPanel("Git History Resource", historyTable).makePanel();
+	}
+	
+	public List<TableTitle> getColumns() {
+		return Lists.newArrayList(
+			new TableTitle("Date", "Date of Commit", "15%"),
+			new TableTitle("Author", "Author of change", "15%"),
+			new TableTitle("Committer", "User that committed the change", "15%"),
+			new TableTitle("Commit Comment", "Comment from Git Commit", "40%"),
+			new TableTitle("Commit Details Link", "Link to full details of commit", "15%"));
 	}
 	
 	private TableRow getCommitRow(GHCommit commit) throws IOException {
 		TableRow commitRow = new TableRow();
+		
+		// Date
+		commitRow.addCell(new SimpleTextCell(commit.getCommitDate().toString()));
 		
 		// Author
 		if (commit.getAuthor() == null) {
@@ -118,7 +135,7 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 		commitRow.addCell(new SimpleTextCell(commit.getCommitShortInfo().getMessage()));
 		
 		// Link
-		ExternalLinkCell link = new ExternalLinkCell(commit.getHtmlUrl().toString(), commit.getSHA1().substring(0,10));
+		ExternalLinkCell link = new ExternalLinkCell(commit.getHtmlUrl().toString(), commit.getSHA1().substring(0,10)+"...");
 		commitRow.addCell(link);
 		
 		return commitRow;
