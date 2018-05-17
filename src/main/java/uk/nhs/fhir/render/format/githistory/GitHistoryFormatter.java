@@ -21,6 +21,7 @@ import com.squareup.okhttp.OkUrlFactory;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
+import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.cell.CellWithAvatar;
 import uk.nhs.fhir.render.html.cell.ExternalLinkCell;
 import uk.nhs.fhir.render.html.cell.LinkCell;
@@ -90,7 +91,11 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 		}
 		
 		Element historyTable = new Table(getColumns(), tableRows).makeTable();
-		return new FhirPanel("Git History Resource", historyTable).makePanel();
+		Element spacer = Elements.newElement("br");
+		Element subText = Elements.withText("p", "Note: The above table shows the complete Git revision history for this file, so may include versions not yet published to the FHIR reference server");
+		Element bodyContent = Elements.withChildren("div", Lists.newArrayList(historyTable, spacer, subText));
+		
+		return new FhirPanel("Git History For Resource", bodyContent).makePanel();
 	}
 	
 	public List<TableTitle> getColumns() {

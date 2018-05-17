@@ -9,8 +9,14 @@
     	<!-- Added for Github history views -->
         <dependency>
 	  		<groupId>org.kohsuke</groupId>
-	  		<artifactId>github-api-fork</artifactId>
-	  		<version>1.94-FORK</version>
+	  		<artifactId>github-api</artifactId>
+	  		<version>1.93</version>
+	  		<exclusions>
+			    <exclusion>
+			      <groupId>commons-io</groupId>
+			      <artifactId>commons-io</artifactId>
+			    </exclusion>
+			</exclusions>
 	  	</dependency>
 	  	<dependency>
 		    <groupId>com.squareup.okhttp</groupId>
