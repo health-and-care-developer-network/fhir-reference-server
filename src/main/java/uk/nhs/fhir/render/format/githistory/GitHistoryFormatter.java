@@ -53,11 +53,10 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 		this.httpCacheDirectory = httpCacheDirectory;
 		this.filename = filename;
 		
-		LOG.info("Attempting to retrieve Git history for file: " + filename);
-		
-		try {
-			if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
-				GitHub github;
+		if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
+			LOG.debug("Creating Git connection for file: " + filename);
+			GitHub github;
+			try {
 				if (httpCacheDirectory.isPresent()) {
 					Cache cache = new Cache(new File(this.httpCacheDirectory.get()), 10 * 1024 * 1024); // 10MB cache
 					github = GitHubBuilder.fromEnvironment()
@@ -66,11 +65,17 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 				} else {
 					github = GitHubBuilder.fromEnvironment().build();
 				}
-				repo = github.getRepository(this.repositoryName.get());
+				this.repo = github.getRepository(this.repositoryName.get());
+			} catch (IOException e) {
+				try {
+					LOG.info("Unable to connect using Github credentials from the environment, fall back on anonymous access");
+					github = GitHub.connectAnonymously();
+					this.repo = github.getRepository(this.repositoryName.get());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					this.repo = null;
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.repo = null;
 		}
 	}
 
@@ -95,8 +100,8 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	private Element buildHistoryPanel() throws IOException {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
+		LOG.debug("Attempting to get git history for file: " + this.filename);
 		for (GHCommit commit : repo.queryCommits().from(this.repositoryBranch.get()).path(this.filename).list()) {
-			LOG.info("Attempting to get git history for file: " + this.filename);
 			tableRows.add(getCommitRow(commit));
 		}
 		
@@ -111,9 +116,9 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	public List<TableTitle> getColumns() {
 		return Lists.newArrayList(
 			new TableTitle("Date", "Date of Commit", "15%"),
-			new TableTitle("Author", "Author of change", "15%"),
+			//new TableTitle("Author", "Author of change", "15%"),
 			new TableTitle("Committer", "User that committed the change", "15%"),
-			new TableTitle("Commit Comment", "Comment from Git Commit", "40%"),
+			new TableTitle("Commit Comment", "Comment from Git Commit", "55%"),
 			new TableTitle("Commit Details Link", "Link to full details of commit", "15%"));
 	}
 	
@@ -124,7 +129,7 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 		commitRow.addCell(new SimpleTextCell(commit.getCommitDate().toString()));
 		
 		// Author
-		if (commit.getAuthor() == null) {
+		/*if (commit.getAuthor() == null) {
 			commitRow.addCell(new SimpleTextCell(commit.getCommitShortInfo().getAuthor().getName()));
 		} else {
 			CellWithAvatar authorCell = new CellWithAvatar(commit.getAuthor().getName());
@@ -132,7 +137,7 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 				authorCell.setAvatarUrl(commit.getAuthor().getAvatarUrl());
 			}
 			commitRow.addCell(authorCell);
-		}
+		}*/
 		
 		// Committer
 		if (commit.getCommitter() == null) {
