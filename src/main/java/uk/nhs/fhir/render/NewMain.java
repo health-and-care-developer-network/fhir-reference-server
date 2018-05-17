@@ -59,8 +59,9 @@ public class NewMain {
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
     private final Optional<Set<String>> localQdomains;
-    private final String repoName;
-    private final String cacheDir;
+    private final Optional<String> repositoryName;
+    private final Optional<String> repositoryBranch;
+    private final Optional<String> httpCacheDirectory;
     
     public void setContinueOnFail(boolean continueOnFail) {
     	this.continueOnFail = continueOnFail;
@@ -70,8 +71,15 @@ public class NewMain {
     	this.allowCopyOnError = allowCopyOnError;
     }
 
-	public NewMain(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler) {
-		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty());
+	public NewMain(Path inputDirectory, Path outputDirectory,
+							Optional<Set<String>> permittedMissingExtensionPrefixes,
+							Optional<String> repositoryName,
+							Optional<String> repositoryBranch,
+							Optional<String> httpCacheDirectory,
+							AbstractRendererEventHandler errorHandler) {
+		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
+				repositoryName, repositoryBranch, httpCacheDirectory,
+				errorHandler, Optional.empty());
 	}
 	
 	public NewMain(RendererCliArgs args) {
@@ -80,6 +88,9 @@ public class NewMain {
 			args.getOutputDir(),
 			args.getNewBaseUrl(),
 			args.getAllowedMissingExtensionPrefixes(),
+			args.getRepositoryName(),
+			args.getRepositoryBranch(),
+			args.getHttpCacheDirectory(),
 			new RendererLoggingEventHandler(),
 			args.getLocalDomains());
 	}
@@ -88,7 +99,10 @@ public class NewMain {
 		Path inputDirectory, 
 		Path outPath, 
 		Optional<String> newBaseURL, 
-		Optional<Set<String>> permittedMissingExtensionPrefixes, 
+		Optional<Set<String>> permittedMissingExtensionPrefixes,
+		Optional<String> repositoryName,
+		Optional<String> repositoryBranch,
+		Optional<String> httpCacheDirectory,
 		AbstractRendererEventHandler errorHandler, 
 		Optional<Set<String>> localQdomains) 
 	{
@@ -97,10 +111,9 @@ public class NewMain {
 		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
-		
-		// TODO: Make these CLI arguments
-		this.repoName = "nhsconnect/STU3-FHIR-Assets";
-		this.cacheDir = "/tmp/httpcache";
+		this.repositoryName = repositoryName;
+		this.repositoryBranch = repositoryBranch;
+		this.httpCacheDirectory = httpCacheDirectory;
 	}
 
 	/**
@@ -114,7 +127,9 @@ public class NewMain {
     		return;
     	}
     	
-    	NewMain instance = new NewMain(cliArgs.getInputDir(), cliArgs.getOutputDir(), cliArgs.getNewBaseUrl(), cliArgs.getAllowedMissingExtensionPrefixes(), 
+    	NewMain instance = new NewMain(cliArgs.getInputDir(), cliArgs.getOutputDir(), cliArgs.getNewBaseUrl(),
+    			cliArgs.getAllowedMissingExtensionPrefixes(),
+    			cliArgs.getRepositoryName(), cliArgs.getRepositoryBranch(), cliArgs.getHttpCacheDirectory(),
     			new RendererLoggingEventHandler(), cliArgs.getLocalDomains());
         instance.process();
     }
@@ -199,7 +214,8 @@ public class NewMain {
 	        		try {
 	        			try {
 							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
-	        				fileProcessor.processFile(rendererFileLocator, repoName, filename, cacheDir, newBaseURL);
+	        				fileProcessor.processFile(rendererFileLocator,
+	        							repositoryName, repositoryBranch, httpCacheDirectory, filename, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;

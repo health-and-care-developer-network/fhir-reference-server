@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.format;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -53,7 +54,12 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator, String repoName, String filename, String cacheDir) {
+	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource,
+					RendererFileLocator rendererFileLocator,
+					Optional<String> repositoryName,
+					Optional<String> repositoryBranch,
+					Optional<String> httpCacheDirectory,
+					String filename) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
 		Path outputDirectory = rendererFileLocator.getRenderingTempOutputDirectory(wrappedResource);
@@ -82,10 +88,6 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingsTableFormatter(wrappedStructureDefinition), outputDirectory, "bindings.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
-			if (repoName != null) {
-				formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter(repoName, filename, cacheDir), outputDirectory, "git-history.html"));
-			}
-			
 			if (!wrappedStructureDefinition.isExtension()) {
 				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition), outputDirectory, "differential.html"));
 			}
@@ -95,6 +97,12 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new MessageDefinitionFocusTableFormatter(wrappedMessageDefinition), outputDirectory, "focus.html"));
 		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
+		}
+		
+		// Generate the Github history view for all resource types if Git details have been provided.
+		if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
+			formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter(repositoryName, repositoryBranch,
+													httpCacheDirectory, filename), outputDirectory, "git-history.html"));
 		}
 		
 		return formatSpecs;

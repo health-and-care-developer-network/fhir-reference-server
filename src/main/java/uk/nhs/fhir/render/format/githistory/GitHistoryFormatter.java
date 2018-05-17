@@ -3,6 +3,7 @@ package uk.nhs.fhir.render.format.githistory;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.jdom2.Element;
 import org.kohsuke.github.GHCommit;
@@ -36,29 +37,38 @@ import uk.nhs.fhir.render.html.table.TableTitle;
 public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	private static final Logger LOG = LoggerFactory.getLogger(GitHistoryFormatter.class.getName());
 	
-	protected String repoName = null;
-	protected String filename = null;
-	protected String cacheDir = null;
+	private final Optional<String> repositoryName;
+	private final Optional<String> repositoryBranch;
+	private final Optional<String> httpCacheDirectory;
+	private final String filename;
 	private GHRepository repo = null;
 	
-	public GitHistoryFormatter(String repoName, String filename, String cacheDir) {
+	public GitHistoryFormatter(Optional<String> repositoryName,
+								Optional<String> repositoryBranch,
+								Optional<String> httpCacheDirectory,
+								String filename) {
 		super(null);
-		this.repoName = repoName;
+		this.repositoryName = repositoryName;
+		this.repositoryBranch = repositoryBranch;
+		this.httpCacheDirectory = httpCacheDirectory;
 		this.filename = filename;
-		this.cacheDir = cacheDir;
 		
 		LOG.info("Attempting to retrieve Git history for file: " + filename);
 		
 		try {
-			Cache cache = new Cache(new File(cacheDir), 10 * 1024 * 1024); // 10MB cache
-			GitHub github = GitHubBuilder.fromCredentials()
-			    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(cache))))
-				.build();
-			//GitHub github = GitHub.connectAnonymously();
-			repo = github.getRepository(this.repoName);
-			
+			if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
+				GitHub github;
+				if (httpCacheDirectory.isPresent()) {
+					Cache cache = new Cache(new File(this.httpCacheDirectory.get()), 10 * 1024 * 1024); // 10MB cache
+					github = GitHubBuilder.fromCredentials()
+					    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(cache))))
+						.build();
+				} else {
+					github = GitHub.connectAnonymously();
+				}
+				repo = github.getRepository(this.repositoryName.get());
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			this.repo = null;
 		}
@@ -85,14 +95,14 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 	private Element buildHistoryPanel() throws IOException {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
-		for (GHCommit commit : repo.queryCommits().path(this.filename).list()) {
+		for (GHCommit commit : repo.queryCommits().from(this.repositoryBranch.get()).path(this.filename).list()) {
 			LOG.info("Attempting to get git history for file: " + this.filename);
 			tableRows.add(getCommitRow(commit));
 		}
 		
 		Element historyTable = new Table(getColumns(), tableRows).makeTable();
 		Element spacer = Elements.newElement("br");
-		Element subText = Elements.withText("p", "Note: The above table shows the complete Git revision history for this file, so may include versions not yet published to the FHIR reference server");
+		Element subText = Elements.withText("p", "Note: The above table shows the complete Git revision history for this file published from branch '"+this.repositoryBranch.get()+"' - there may be multiple revisions listed here for each versioned release of this resource onto the FHIR reference server.");
 		Element bodyContent = Elements.withChildren("div", Lists.newArrayList(historyTable, spacer, subText));
 		
 		return new FhirPanel("Git History For Resource", bodyContent).makePanel();
