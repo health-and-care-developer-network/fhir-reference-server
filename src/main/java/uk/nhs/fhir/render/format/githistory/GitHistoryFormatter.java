@@ -60,11 +60,11 @@ public class GitHistoryFormatter extends TableFormatter<WrappedNull> {
 				GitHub github;
 				if (httpCacheDirectory.isPresent()) {
 					Cache cache = new Cache(new File(this.httpCacheDirectory.get()), 10 * 1024 * 1024); // 10MB cache
-					github = GitHubBuilder.fromCredentials()
+					github = GitHubBuilder.fromEnvironment()
 					    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(cache))))
 						.build();
 				} else {
-					github = GitHub.connectAnonymously();
+					github = GitHubBuilder.fromEnvironment().build();
 				}
 				repo = github.getRepository(this.repositoryName.get());
 			}
