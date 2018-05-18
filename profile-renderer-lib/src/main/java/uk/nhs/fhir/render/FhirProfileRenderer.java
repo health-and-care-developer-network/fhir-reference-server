@@ -41,7 +41,14 @@ public class FhirProfileRenderer {
     private boolean continueOnFail = false;
     private boolean allowCopyOnError = false;
     private final Optional<Set<String>> localQdomains;
+<<<<<<< HEAD:profile-renderer-lib/src/main/java/uk/nhs/fhir/render/FhirProfileRenderer.java
 
+=======
+    private final Optional<String> repositoryName;
+    private final Optional<String> repositoryBranch;
+    private final Optional<String> httpCacheDirectory;
+    
+>>>>>>> feature/git-history-view:src/main/java/uk/nhs/fhir/render/NewMain.java
     public void setContinueOnFail(boolean continueOnFail) {
     	this.continueOnFail = continueOnFail;
     }
@@ -50,8 +57,20 @@ public class FhirProfileRenderer {
     	this.allowCopyOnError = allowCopyOnError;
     }
 
+<<<<<<< HEAD:profile-renderer-lib/src/main/java/uk/nhs/fhir/render/FhirProfileRenderer.java
 	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty());
+=======
+	public NewMain(Path inputDirectory, Path outputDirectory,
+							Optional<Set<String>> permittedMissingExtensionPrefixes,
+							Optional<String> repositoryName,
+							Optional<String> repositoryBranch,
+							Optional<String> httpCacheDirectory,
+							AbstractRendererEventHandler errorHandler) {
+		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
+				repositoryName, repositoryBranch, httpCacheDirectory,
+				errorHandler, Optional.empty());
+>>>>>>> feature/git-history-view:src/main/java/uk/nhs/fhir/render/NewMain.java
 	}
 	
 	public FhirProfileRenderer(RendererCliArgs args) {
@@ -60,6 +79,9 @@ public class FhirProfileRenderer {
 			args.getOutputDir(),
 			args.getNewBaseUrl(),
 			args.getAllowedMissingExtensionPrefixes(),
+			args.getRepositoryName(),
+			args.getRepositoryBranch(),
+			args.getHttpCacheDirectory(),
 			new RendererLoggingEventHandler(),
 			args.getLocalDomains());
 	}
@@ -68,7 +90,10 @@ public class FhirProfileRenderer {
 		Path inputDirectory, 
 		Path outPath, 
 		Optional<String> newBaseURL, 
-		Optional<Set<String>> permittedMissingExtensionPrefixes, 
+		Optional<Set<String>> permittedMissingExtensionPrefixes,
+		Optional<String> repositoryName,
+		Optional<String> repositoryBranch,
+		Optional<String> httpCacheDirectory,
 		AbstractRendererEventHandler errorHandler, 
 		Optional<Set<String>> localQdomains) 
 	{
@@ -77,7 +102,32 @@ public class FhirProfileRenderer {
 		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
+		this.repositoryName = repositoryName;
+		this.repositoryBranch = repositoryBranch;
+		this.httpCacheDirectory = httpCacheDirectory;
 	}
+<<<<<<< HEAD:profile-renderer-lib/src/main/java/uk/nhs/fhir/render/FhirProfileRenderer.java
+=======
+
+	/**
+     * Main entry point.
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+    	RendererCliArgs cliArgs = new RendererCliArgsParser().parseArgs(args);
+    	if (cliArgs == null) {
+    		return;
+    	}
+    	
+    	NewMain instance = new NewMain(cliArgs.getInputDir(), cliArgs.getOutputDir(), cliArgs.getNewBaseUrl(),
+    			cliArgs.getAllowedMissingExtensionPrefixes(),
+    			cliArgs.getRepositoryName(), cliArgs.getRepositoryBranch(), cliArgs.getHttpCacheDirectory(),
+    			new RendererLoggingEventHandler(), cliArgs.getLocalDomains());
+        instance.process();
+    }
+
+>>>>>>> feature/git-history-view:src/main/java/uk/nhs/fhir/render/NewMain.java
 	private static Path makeRenderedArtefactTempDirectory() {
 		try {
 			return FhirFileUtils.makeTempDir("fhir-renderer-tmp-" + System.currentTimeMillis(), true);
@@ -157,7 +207,9 @@ public class FhirProfileRenderer {
 	        		
 	        		try {
 	        			try {
-							fileProcessor.processFile(rendererFileLocator, newBaseURL);
+							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
+	        				fileProcessor.processFile(rendererFileLocator,
+	        							repositoryName, repositoryBranch, httpCacheDirectory, filename, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;
