@@ -12,7 +12,8 @@ OLD_URL=$4
 NEW_URL=$5
 OUT_PATH=$6
 COPY_ONLY=$7
-ARGUMENTS=${ARGUMENTS}
+shift 7
+APP_ARGUMENTS="$@"
 
 # First, clone the repository with our source files
 rm -Rf /source/files
@@ -32,8 +33,9 @@ else
   cd /usr/makehtml
   jarName=`cat ./target/jarName.txt`
   echo "Using Jar name: $jarName"
-  echo "Running command: java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH"
+  echo "Additional command line arguments: $APP_ARGUMENTS"
+  echo "Running command: java -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH $APP_ARGUMENTS"
   ls ./target
-  java $ARGUMENTS -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH
+  java -jar ./target/$jarName /source/files/$REPO_PATH /generated/$OUT_PATH $APP_ARGUMENTS
 fi
 

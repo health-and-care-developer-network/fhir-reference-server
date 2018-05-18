@@ -64,7 +64,8 @@ public class RendererSupervisor {
 					Optional<Set<String>> allowedMissingExtensionPrefix = 
 						Optional.ofNullable(System.getProperty(WrappedElementDefinition.SYS_PROP_PERMITTED_MISSING_EXTENSION))
 							.map(prop -> Sets.newHashSet(prop));
-					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, new DeferredDialogEventAccumulator(parentWindow));
+					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, 
+							Optional.empty(), Optional.empty(), Optional.empty(), new DeferredDialogEventAccumulator(parentWindow));
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
 					

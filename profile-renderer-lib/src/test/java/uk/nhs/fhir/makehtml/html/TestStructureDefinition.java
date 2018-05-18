@@ -57,7 +57,8 @@ public class TestStructureDefinition {
 			Path dummyPath = Paths.get("this/path/isnt/used");
 			RendererFileLocator renderingFileLocator = new DefaultRendererFileLocator(dummyPath, dummyPath, dummyPath);
 			
-			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, renderingFileLocator)) {
+			//TODO: Improve the reponame and filename in the below test..
+			for (FormattedOutputSpec<?> formatSpec : new ResourceFormatterFactory().allFormatterSpecs(wrappedStructureDefinition, renderingFileLocator, null, null, null, null)) {
 				ResourceFormatter<?> formatter = formatSpec.getFormatter();
 				HTMLDocSection sectionHTML = formatter.makeSectionHTML();
 				if (sectionHTML != null) {

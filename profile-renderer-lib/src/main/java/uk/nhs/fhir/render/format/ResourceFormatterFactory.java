@@ -2,6 +2,7 @@ package uk.nhs.fhir.render.format;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -22,6 +23,7 @@ import uk.nhs.fhir.render.format.codesys.CodeSystemMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapMetadataFormatter;
 import uk.nhs.fhir.render.format.conceptmap.ConceptMapTableFormatter;
+import uk.nhs.fhir.render.format.githistory.GitHistoryFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionFocusTableFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionFormatter;
 import uk.nhs.fhir.render.format.message.MessageDefinitionMetadataFormatter;
@@ -58,7 +60,13 @@ public class ResourceFormatterFactory {
 		}
 	}
 	
-	public List<FormattedOutputSpec<?>> allFormatterSpecs(WrappedResource<?> wrappedResource, RendererFileLocator rendererFileLocator) {
+	public <T extends WrappedResource<T>> List<FormattedOutputSpec<?>> allFormatterSpecs(
+					T wrappedResource,
+					RendererFileLocator rendererFileLocator,
+					Optional<String> repositoryName,
+					Optional<String> repositoryBranch,
+					Optional<String> httpCacheDirectory,
+					String filename) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
 		Path outputDirectory = rendererFileLocator.getRenderingTempOutputDirectory(wrappedResource);
@@ -87,7 +95,6 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionBindingsTableFormatter(wrappedStructureDefinition), outputDirectory, "bindings.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDetailsFormatter(wrappedStructureDefinition), outputDirectory, "details.html"));
 			formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionFormatter(wrappedStructureDefinition), outputDirectory, "full.html"));
-			
 			if (!wrappedStructureDefinition.isExtension()) {
 				formatSpecs.add(new FormattedOutputSpec<>(new StructureDefinitionDifferentialFormatter(wrappedStructureDefinition), outputDirectory, "differential.html"));
 			}
@@ -101,6 +108,12 @@ public class ResourceFormatterFactory {
 			formatSpecs.add(new FormattedOutputSpec<>(new SearchParameterTableFormatter(wrappedSearchParameter), outputDirectory, "details.html"));
 		} else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
+		}
+		
+		// Generate the Github history view for all resource types if Git details have been provided.
+		if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
+			formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter<>(wrappedResource, repositoryName, repositoryBranch,
+													httpCacheDirectory, filename), outputDirectory, "git-history.html"));
 		}
 		
 		return formatSpecs;
