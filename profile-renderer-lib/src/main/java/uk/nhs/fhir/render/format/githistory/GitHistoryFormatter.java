@@ -1,6 +1,8 @@
 package uk.nhs.fhir.render.format.githistory;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -85,22 +87,15 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 			new TableTitle("Commit Details Link", "Link to full details of commit", "15%"));
 	}
 	
+	private static final SimpleDateFormat COMMIT_DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy HH:mm");
+	
 	private TableRow getCommitRow(GHCommit commit) throws IOException {
 		TableRow commitRow = new TableRow();
 		
 		// Date
-		commitRow.addCell(new SimpleTextCell(commit.getCommitDate().toString()));
-		
-		// Author
-		/*if (commit.getAuthor() == null) {
-			commitRow.addCell(new SimpleTextCell(commit.getCommitShortInfo().getAuthor().getName()));
-		} else {
-			CellWithAvatar authorCell = new CellWithAvatar(commit.getAuthor().getName());
-			if (commit.getAuthor().getAvatarUrl() != null) {
-				authorCell.setAvatarUrl(commit.getAuthor().getAvatarUrl());
-			}
-			commitRow.addCell(authorCell);
-		}*/
+		Date commitDate = commit.getCommitDate();
+		String formattedDate = COMMIT_DATE_FORMAT.format(commitDate);
+		commitRow.addCell(new SimpleTextCell(formattedDate));
 		
 		// Committer
 		if (commit.getCommitter() == null) {
