@@ -7,7 +7,9 @@ import java.util.Set;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
+import org.jdom2.IllegalDataException;
 import org.jdom2.Text;
+import org.jdom2.Verifier;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -25,7 +27,7 @@ public class Elements {
     }
     
     public static Element withAttributesAndText(String name, List<Attribute> attributes, String text) {
-    	Content child = new Text(text);
+    	Content child = text(text);
         return withAttributesAndChild(name, attributes, child);
     }
 	
@@ -87,4 +89,47 @@ public class Elements {
     	
     	return element;
     }
+    
+    public static Text text(String content) {
+    	try {
+    		return new Text(content);
+    	} catch (IllegalDataException e) {
+    		
+    		StringBuilder newContent = new StringBuilder();
+    		
+    		for (int i=0; i<content.length(); i++) {
+    			Character c = content.charAt(i);
+    			if (Verifier.isXMLCharacter((int)c)) {
+    				newContent.append(c);
+    			} else if (isValidSurrogatePair(content, i)) {
+    				i++;
+    				newContent.append(c).append(content.charAt(i));
+    			} else if (Verifier.isHighSurrogate(c)) {
+    				// invalid surrogate pair
+    				newContent.append(String.format("0x%d", (int)c));
+    				i++;
+    				if (i < content.length()) {
+    					newContent.append(String.format("0x%d", (int)content.charAt(i)));
+    				}
+    			} else {
+    				newContent.append(String.format("0x%x", (int)c));
+    			}
+    		}
+        	return new Text(newContent.toString());
+    	}
+    	
+    }
+    
+    private static boolean isValidSurrogatePair(String content, int i) {
+		if (i == content.length()-1) {
+			return false;
+		}
+		
+		Character c1 = content.charAt(i);
+		Character c2 = content.charAt(i+1);
+		
+		return Verifier.isHighSurrogate(c1)
+		  && Verifier.isLowSurrogate(c2)
+		  && Verifier.isXMLCharacter(Verifier.decodeSurrogatePair(c1, c2));
+	}
 }

@@ -6,7 +6,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
 
@@ -99,9 +98,9 @@ public class MessageDefinitionFocusTableFormatter extends TableFormatter<Wrapped
 			Elements.withAttributeAndChildren("div", 
 				new Attribute("class", FhirCSS.DATA_LABEL), 
 				Lists.newArrayList(
-					new Text("Focus Code: " + focus.getCode()),
+					Elements.text("Focus Code: " + focus.getCode()),
 					Elements.newElement("br"),
-					new Text("Focus Resource: "),
+					Elements.text("Focus Resource: "),
 					focusResourceUrlSpan)),
 			Elements.newElement("br"),
 			focusTable);
