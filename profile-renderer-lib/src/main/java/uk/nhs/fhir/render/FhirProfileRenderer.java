@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class FhirProfileRenderer {
 
     private final Optional<String> repositoryName;
     private final Optional<String> repositoryBranch;
-    private final Optional<String> httpCacheDirectory;
+    private final Optional<Path> httpCacheDirectory;
     
     public void setContinueOnFail(boolean continueOnFail) {
     	this.continueOnFail = continueOnFail;
@@ -62,7 +63,7 @@ public class FhirProfileRenderer {
 							Optional<Set<String>> permittedMissingExtensionPrefixes,
 							Optional<String> repositoryName,
 							Optional<String> repositoryBranch,
-							Optional<String> httpCacheDirectory,
+							Optional<Path> httpCacheDirectory,
 							AbstractRendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
 				repositoryName, repositoryBranch, httpCacheDirectory,
@@ -89,7 +90,7 @@ public class FhirProfileRenderer {
 		Optional<Set<String>> permittedMissingExtensionPrefixes,
 		Optional<String> repositoryName,
 		Optional<String> repositoryBranch,
-		Optional<String> httpCacheDirectory,
+		Optional<Path> httpCacheDirectory,
 		AbstractRendererEventHandler errorHandler, 
 		Optional<Set<String>> localQdomains) 
 	{
@@ -156,6 +157,19 @@ public class FhirProfileRenderer {
 			rendererContext.setFhirFileRegistry(fhirFileRegistry);
 			EventHandler oldEventHandler = EventHandlerContext.forThread();
 	    	EventHandlerContext.setForThread(eventHandler);
+
+	    	// Set HTTP page cache before we try connecting to github, so that we cache pages appropriately.
+	    	if (httpCacheDirectory.isPresent()) {
+	    		rendererContext.setCacheDirectory(httpCacheDirectory.get().toFile());
+	    	}
+	    	
+	    	List<GithubRepoDirectory> gitRepoDirectories = 
+	    		new GithubRepoFinder(rawArtefactDirectory)
+	    			.find();
+	    	// Sorted in order of length, so that we match longest path (i.e. most specific) first
+	    	gitRepoDirectories.sort(Comparator.comparing(repo -> repo.getLocation().toString().length()));
+	    	rendererContext.setGitRepos(gitRepoDirectories);
+	    	
 			List<File> potentialFhirFiles = new RootedXmlFileFinder(rawArtefactDirectory).findFilesRecursively();
 	    	
 			FhirFileParser parser = new FhirFileParser();
@@ -200,8 +214,7 @@ public class FhirProfileRenderer {
 	        		try {
 	        			try {
 							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
-	        				fileProcessor.processFile(rendererFileLocator,
-	        							repositoryName, repositoryBranch, httpCacheDirectory, filename, newBaseURL);
+	        				fileProcessor.processFile(rendererFileLocator, repositoryName, repositoryBranch, filename, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;
@@ -211,8 +224,7 @@ public class FhirProfileRenderer {
 		        		}
 	        		} catch (LoggedRenderingException loggedError) {
 	        			causedException = true;
-	        		} 
-	        			
+	        		}
 	        		
 	    			if (causedException 
 	    			  && !continueOnFail) {

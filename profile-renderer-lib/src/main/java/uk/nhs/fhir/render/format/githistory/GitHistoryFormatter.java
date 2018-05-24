@@ -1,25 +1,19 @@
 package uk.nhs.fhir.render.format.githistory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.jdom2.Element;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.extras.OkHttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.render.GithubRepoDirectory;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
@@ -38,47 +32,24 @@ import uk.nhs.fhir.render.html.table.TableTitle;
 public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableFormatter<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(GitHistoryFormatter.class.getName());
 	
-	private final Optional<String> repositoryName;
-	private final Optional<String> repositoryBranch;
-	private final Optional<String> httpCacheDirectory;
+	private final GithubRepoDirectory gitDirectory;
+	private final GHRepository gitRepo;
 	private final String filename;
-	private GHRepository repo = null;
 	
 	public GitHistoryFormatter(T resource,
-								Optional<String> repositoryName,
-								Optional<String> repositoryBranch,
-								Optional<String> httpCacheDirectory,
-								String filename) {
+								String filename,
+								GithubRepoDirectory gitDirectory,
+								GHRepository gitRepo) {
 		super(resource);
-		this.repositoryName = repositoryName;
-		this.repositoryBranch = repositoryBranch;
-		this.httpCacheDirectory = httpCacheDirectory;
+		Preconditions.checkNotNull(gitRepo);
+		Preconditions.checkNotNull(gitDirectory);
+		Preconditions.checkNotNull(filename);
+		
+		this.gitDirectory = gitDirectory;
+		this.gitRepo = gitRepo;
 		this.filename = filename;
 		
-		if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
-			LOG.debug("Creating Git connection for file: " + filename);
-			GitHub github;
-			try {
-				if (httpCacheDirectory.isPresent()) {
-					Cache cache = new Cache(new File(this.httpCacheDirectory.get()), 10 * 1024 * 1024); // 10MB cache
-					github = GitHubBuilder.fromEnvironment()
-					    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(cache))))
-						.build();
-				} else {
-					github = GitHubBuilder.fromEnvironment().build();
-				}
-				this.repo = github.getRepository(this.repositoryName.get());
-			} catch (IOException e) {
-				try {
-					LOG.info("Unable to connect using Github credentials from the environment, fall back on anonymous access");
-					github = GitHub.connectAnonymously();
-					this.repo = github.getRepository(this.repositoryName.get());
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					this.repo = null;
-				}
-			}
-		}
+		LOG.debug("Creating Git connection for file: " + filename);
 	}
 
 	@Override
@@ -93,8 +64,8 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 			addStyles(section);
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		return section;
 	}
@@ -103,13 +74,16 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 		List<TableRow> tableRows = Lists.newArrayList();
 		
 		LOG.debug("Attempting to get git history for file: " + this.filename);
-		for (GHCommit commit : repo.queryCommits().from(this.repositoryBranch.get()).path(this.filename).list()) {
+		for (GHCommit commit : gitRepo.queryCommits().from(this.gitDirectory.getBranch()).path(this.filename).list()) {
 			tableRows.add(getCommitRow(commit));
 		}
 		
 		Element historyTable = new Table(getColumns(), tableRows).makeTable();
 		Element spacer = Elements.newElement("br");
-		Element subText = Elements.withText("p", "Note: The above table shows the complete Git revision history for this file published from branch '"+this.repositoryBranch.get()+"' - there may be multiple revisions listed here for each versioned release of this resource onto the FHIR reference server.");
+		Element subText = Elements.withText("p", 
+			"Note: The above table shows the complete Git revision history for this file published from branch"
+			+ " '" + this.gitDirectory.getBranch() + "' - there may be multiple revisions listed here for each versioned release "
+			+ "of this resource onto the FHIR reference server.");
 		Element bodyContent = Elements.withChildren("div", Lists.newArrayList(historyTable, spacer, subText));
 		
 		return new FhirPanel("Git History For Resource", bodyContent).makePanel();

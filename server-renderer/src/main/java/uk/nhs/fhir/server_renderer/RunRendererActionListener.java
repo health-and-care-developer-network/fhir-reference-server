@@ -11,10 +11,11 @@ public class RunRendererActionListener implements ActionListener {
 
 	private final Supplier<Path> filePathSupplier;
 	private final Path outputDirectory;
+	private final Path githubCacheDir;
 	private final RendererSupervisor renderer;
 	private final JFrame mainAppWindow;
 	
-	public RunRendererActionListener(JFrame mainAppWindow, Supplier<Path> filePathSupplier, RendererOutputDisplay output, Path outputDirectory, RendererListener... listeners) {
+	public RunRendererActionListener(JFrame mainAppWindow, Supplier<Path> filePathSupplier, RendererOutputDisplay output, Path outputDirectory, Path githubCacheDir, RendererListener... listeners) {
 		if (filePathSupplier == null) {
 			throw new NullPointerException("File path supplier cannot be null");
 		}
@@ -24,10 +25,14 @@ public class RunRendererActionListener implements ActionListener {
 		if (outputDirectory == null) {
 			throw new NullPointerException("Output display cannot be null");
 		}
+		if (githubCacheDir == null) {
+			throw new NullPointerException("Github cache directory cannot be null");
+		}
 		
 		this.mainAppWindow = mainAppWindow;
 		this.filePathSupplier = filePathSupplier;
 		this.outputDirectory = outputDirectory;
+		this.githubCacheDir = githubCacheDir;
 		
 		this.renderer = new RendererSupervisor(output);
 		for (RendererListener listener : listeners) {
@@ -36,6 +41,6 @@ public class RunRendererActionListener implements ActionListener {
 	}
 	
 	public void actionPerformed(ActionEvent event) {
-		renderer.tryStartRendering(filePathSupplier.get(), outputDirectory, mainAppWindow);
+		renderer.tryStartRendering(filePathSupplier.get(), outputDirectory, githubCacheDir, mainAppWindow);
 	}
 }

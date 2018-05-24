@@ -30,7 +30,6 @@ public class FileProcessor {
 	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, 
 														Optional<String> repositoryName,
 														Optional<String> repositoryBranch,
-														Optional<String> httpCacheDirectory,
 														String filename,
 														Optional<String> newBaseURL) throws Exception {
 		
@@ -42,8 +41,7 @@ public class FileProcessor {
 	    
 	    saveAugmentedResource(rendererFileLocator, newBaseURL);
 		
-		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator, 
-							repositoryName, repositoryBranch, httpCacheDirectory, filename)) {
+		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator, filename)) {
 			LOG.debug("Generating " + formatter.getOutputPath(inFilePath).toString());
 			formatter.formatAndSave(inFilePath);
 		}

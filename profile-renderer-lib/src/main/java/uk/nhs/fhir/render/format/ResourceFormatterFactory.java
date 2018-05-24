@@ -2,7 +2,8 @@ package uk.nhs.fhir.render.format;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
+
+import org.kohsuke.github.GHRepository;
 
 import com.google.common.collect.Lists;
 
@@ -15,6 +16,8 @@ import uk.nhs.fhir.data.wrap.WrappedSearchParameter;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
 import uk.nhs.fhir.data.wrap.WrappedValueSet;
 import uk.nhs.fhir.render.FormattedOutputSpec;
+import uk.nhs.fhir.render.GithubRepoDirectory;
+import uk.nhs.fhir.render.RendererContext;
 import uk.nhs.fhir.render.RendererFileLocator;
 import uk.nhs.fhir.render.format.codesys.CodeSystemConceptTableFormatter;
 import uk.nhs.fhir.render.format.codesys.CodeSystemFiltersTableFormatter;
@@ -63,9 +66,6 @@ public class ResourceFormatterFactory {
 	public <T extends WrappedResource<T>> List<FormattedOutputSpec<?>> allFormatterSpecs(
 					T wrappedResource,
 					RendererFileLocator rendererFileLocator,
-					Optional<String> repositoryName,
-					Optional<String> repositoryBranch,
-					Optional<String> httpCacheDirectory,
 					String filename) {
 		List<FormattedOutputSpec<?>> formatSpecs = Lists.newArrayList();
 		
@@ -111,9 +111,13 @@ public class ResourceFormatterFactory {
 		}
 		
 		// Generate the Github history view for all resource types if Git details have been provided.
-		if (repositoryName.isPresent() && repositoryBranch.isPresent()) {
-			formatSpecs.add(new FormattedOutputSpec<>(new GitHistoryFormatter<>(wrappedResource, repositoryName, repositoryBranch,
-													httpCacheDirectory, filename), outputDirectory, "git-history.html"));
+		if (RendererContext.forThread().getCurrentGitRepoDirectory().isPresent()
+		  && RendererContext.forThread().getCurrentGitRepo().isPresent()) {
+			GithubRepoDirectory gitRepoDirectory = RendererContext.forThread().getCurrentGitRepoDirectory().get();
+			GHRepository gitRepo = RendererContext.forThread().getCurrentGitRepo().get();
+			
+			ResourceFormatter<T> gitHistoryFormatter = new GitHistoryFormatter<>(wrappedResource, filename, gitRepoDirectory, gitRepo);
+			formatSpecs.add(new FormattedOutputSpec<>(gitHistoryFormatter, outputDirectory, "git-history.html"));
 		}
 		
 		return formatSpecs;

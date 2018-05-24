@@ -35,7 +35,7 @@ public class RendererCliArgsParser {
 		"Github repository in the format: username/repository (e.g. nhsconnext/STU3-FHIR-Assets)", "repo-name", "r");
 	public static final CliStringArg ARG_REPO_BRANCH = new CliStringArg("repobranch", 
 		"Branch (or SHA) to retrieve history from (e.g. develop)", "repo-branch", "s");
-	public static final CliStringArg ARG_HTTP_CACHE = new CliStringArg("httpcache", 
+	public static final CliPathArg ARG_HTTP_CACHE = new CliPathArg("httpcache", 
 		"Directory to use to hold the HTTP cache, used when retrieving Git history (to avoid unecessary calls to Git)", "http-cache", "c");
 	
 	private final RendererArgSpec spec = getArgSpec();
@@ -56,7 +56,7 @@ public class RendererCliArgsParser {
 		
         Optional<String> repositoryName = Optional.ofNullable(parsedArgs.get(ARG_REPO_NAME));
         Optional<String> repositoryBranch = Optional.ofNullable(parsedArgs.get(ARG_REPO_BRANCH));
-        Optional<String> httpCacheDirectory = Optional.ofNullable(parsedArgs.get(ARG_HTTP_CACHE));
+        Optional<Path> httpCacheDirectory = Optional.ofNullable(parsedArgs.get(ARG_HTTP_CACHE));
         
 		return new RendererCliArgs(inputDir, outputDir, newBaseUrl,
 							allowedMissingExtensionPrefixes,

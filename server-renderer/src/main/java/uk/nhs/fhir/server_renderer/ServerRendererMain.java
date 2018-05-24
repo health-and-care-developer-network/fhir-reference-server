@@ -37,12 +37,17 @@ public class ServerRendererMain
 
 		Path renderedFileDir = tmpDir.resolve("rendered");
 		if (!renderedFileDir.toFile().mkdir()) {
-			throw new IllegalStateException("Failed to create temp directory at " + tmpDir.toString());
+			throw new IllegalStateException("Failed to create temp directory at " + renderedFileDir.toString());
 		}
 		
 		Path importedFileDir = tmpDir.resolve("imported");
 		if (!importedFileDir.toFile().mkdir()) {
-			throw new IllegalStateException("Failed to create temp directory at " + tmpDir.toString());
+			throw new IllegalStateException("Failed to create temp directory at " + importedFileDir.toString());
+		}
+
+		Path githubCacheDir = tmpDir.resolve("githubCache");
+		if (!githubCacheDir.toFile().mkdir()) {
+			throw new IllegalStateException("Failed to create temp directory at " + githubCacheDir.toString());
 		}
     	
     	Server server = makeServer();
@@ -56,7 +61,7 @@ public class ServerRendererMain
 			}
     	}
 
-		startWindow(renderedFileDir, importedFileDir);
+		startWindow(renderedFileDir, importedFileDir, githubCacheDir);
 		
 		// FileCache will look in rendered dir and output to imported dir when it runs an import
     	SimpleFhirFileLocator serverFilePreprocessingLocator = new SimpleFhirFileLocator(renderedFileDir, importedFileDir);
@@ -119,8 +124,8 @@ public class ServerRendererMain
         }
 	}
 
-	private static void startWindow(Path renderedFileDir, Path importedFileDir) {
-		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir);
+	private static void startWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir) {
+		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir, githubCacheDir);
 		window.setVisible(true);
 	}
 

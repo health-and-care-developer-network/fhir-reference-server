@@ -26,10 +26,12 @@ import uk.nhs.fhir.datalayer.FilesystemIF;
 public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final Path renderedFileDir;
 	private final Path importedFileDir;
+	private final Path githubCacheDir;
 
-	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir) {
+	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir) {
 		this.renderedFileDir = renderedFileDir;
 		this.importedFileDir = importedFileDir;
+		this.githubCacheDir = githubCacheDir;
 		
 		initWindow();
 		initPanel();
@@ -88,6 +90,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 				new FileChooserFilePathSupplier(rootDirectoryChooser),
 				new ConsolerRendererOutputDisplay(),
 				renderedFileDir,
+				githubCacheDir,
 				this));
 		
 		clearCacheButton.addActionListener(

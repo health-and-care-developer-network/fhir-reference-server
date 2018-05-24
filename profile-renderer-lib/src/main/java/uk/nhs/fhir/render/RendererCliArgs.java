@@ -12,13 +12,13 @@ public class RendererCliArgs {
 	private final Optional<Set<String>> localDomains;
     private final Optional<String> repositoryName;
     private final Optional<String> repositoryBranch;
-    private final Optional<String> httpCacheDirectory;
+    private final Optional<Path> httpCacheDirectory;
 	
 	public RendererCliArgs(Path inputDir, Path outputDir, Optional<String> newBaseUrl,
 				Optional<Set<String>> allowedMissingExtensionPrefixes,
 				Optional<String> repositoryName,
 				Optional<String> repositoryBranch,
-				Optional<String> httpCacheDirectory,
+				Optional<Path> httpCacheDirectory,
 				Optional<Set<String>> localDomains) {
 		this.inputDir = inputDir;
 		this.outputDir = outputDir;
@@ -58,7 +58,7 @@ public class RendererCliArgs {
 		return repositoryBranch;
 	}
 
-	public Optional<String> getHttpCacheDirectory() {
+	public Optional<Path> getHttpCacheDirectory() {
 		return httpCacheDirectory;
 	}
 }
