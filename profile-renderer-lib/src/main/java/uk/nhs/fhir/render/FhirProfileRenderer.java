@@ -158,9 +158,9 @@ public class FhirProfileRenderer {
 			EventHandler oldEventHandler = EventHandlerContext.forThread();
 	    	EventHandlerContext.setForThread(eventHandler);
 
-	    	// Set HTTP page cache before we try connecting to github, so that we cache pages appropriately.
+	    	// Set HTTP page cache before we try connecting to github, so that we configure it to cache pages appropriately.
 	    	if (httpCacheDirectory.isPresent()) {
-	    		rendererContext.setCacheDirectory(httpCacheDirectory.get().toFile());
+	    		rendererContext.github().setCacheDirectory(httpCacheDirectory.get().toFile());
 	    	}
 	    	
 	    	List<GithubRepoDirectory> gitRepoDirectories = 
@@ -168,7 +168,7 @@ public class FhirProfileRenderer {
 	    			.find();
 	    	// Sorted in order of length, so that we match longest path (i.e. most specific) first
 	    	gitRepoDirectories.sort(Comparator.comparing(repo -> repo.getLocation().toString().length()));
-	    	rendererContext.setGitRepos(gitRepoDirectories);
+	    	rendererContext.github().setGitRepos(gitRepoDirectories);
 	    	
 			List<File> potentialFhirFiles = new RootedXmlFileFinder(rawArtefactDirectory).findFilesRecursively();
 	    	
@@ -240,7 +240,12 @@ public class FhirProfileRenderer {
 	        	  && (!succeeded || eventHandler.foundWarnings())) {
 	        		LOG.info("Displaying event messages");
 	        		
-	        		eventHandler.displayOutstandingEvents();
+	        		try {
+	        			eventHandler.displayOutstandingEvents();
+	        		} catch (Exception e) {
+	        			LOG.error("Error displaying outstanding events:");
+	        			e.printStackTrace();
+	        		}
 	        	}
 	    		
 	        	if (succeeded || allowCopyOnError) {

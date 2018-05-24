@@ -2,8 +2,9 @@ package uk.nhs.fhir.render.format;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
-import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHCommit;
 
 import com.google.common.collect.Lists;
 
@@ -111,13 +112,16 @@ public class ResourceFormatterFactory {
 		}
 		
 		// Generate the Github history view for all resource types if Git details have been provided.
-		if (RendererContext.forThread().getCurrentGitRepoDirectory().isPresent()
-		  && RendererContext.forThread().getCurrentGitRepo().isPresent()) {
-			GithubRepoDirectory gitRepoDirectory = RendererContext.forThread().getCurrentGitRepoDirectory().get();
-			GHRepository gitRepo = RendererContext.forThread().getCurrentGitRepo().get();
+		if (RendererContext.forThread().github().getCurrentGitRepoDirectory().isPresent()) {
 			
-			ResourceFormatter<T> gitHistoryFormatter = new GitHistoryFormatter<>(wrappedResource, filename, gitRepoDirectory, gitRepo);
-			formatSpecs.add(new FormattedOutputSpec<>(gitHistoryFormatter, outputDirectory, "git-history.html"));
+			GithubRepoDirectory gitRepoDirectory = RendererContext.forThread().github().getCurrentGitRepoDirectory().get();
+			Optional<List<GHCommit>> artefactCommits = RendererContext.forThread().github().getGithubCommits(filename);
+			
+			if (artefactCommits.isPresent()) {
+				ResourceFormatter<T> gitHistoryFormatter = new GitHistoryFormatter<>(wrappedResource, gitRepoDirectory.getBranch(), artefactCommits.get());
+				formatSpecs.add(new FormattedOutputSpec<>(gitHistoryFormatter, outputDirectory, "git-history.html"));
+			}
+			
 		}
 		
 		return formatSpecs;

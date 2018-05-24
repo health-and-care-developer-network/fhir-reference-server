@@ -5,15 +5,11 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
-import uk.nhs.fhir.render.GithubRepoDirectory;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
@@ -30,26 +26,18 @@ import uk.nhs.fhir.render.html.table.TableRow;
 import uk.nhs.fhir.render.html.table.TableTitle;
 
 public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableFormatter<T> {
-	private static final Logger LOG = LoggerFactory.getLogger(GitHistoryFormatter.class.getName());
-	
-	private final GithubRepoDirectory gitDirectory;
-	private final GHRepository gitRepo;
-	private final String filename;
+	private final String branch;
+	private final List<GHCommit> commits;
 	
 	public GitHistoryFormatter(T resource,
-								String filename,
-								GithubRepoDirectory gitDirectory,
-								GHRepository gitRepo) {
+								String branch,
+								List<GHCommit> commits) {
 		super(resource);
-		Preconditions.checkNotNull(gitRepo);
-		Preconditions.checkNotNull(gitDirectory);
-		Preconditions.checkNotNull(filename);
+		Preconditions.checkNotNull(commits);
+		Preconditions.checkNotNull(branch);
 		
-		this.gitDirectory = gitDirectory;
-		this.gitRepo = gitRepo;
-		this.filename = filename;
-		
-		LOG.debug("Creating Git connection for file: " + filename);
+		this.branch = branch;
+		this.commits = commits;
 	}
 
 	@Override
@@ -73,8 +61,7 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 	private Element buildHistoryPanel() throws IOException {
 		List<TableRow> tableRows = Lists.newArrayList();
 		
-		LOG.debug("Attempting to get git history for file: " + this.filename);
-		for (GHCommit commit : gitRepo.queryCommits().from(this.gitDirectory.getBranch()).path(this.filename).list()) {
+		for (GHCommit commit : commits) {
 			tableRows.add(getCommitRow(commit));
 		}
 		
@@ -82,7 +69,7 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 		Element spacer = Elements.newElement("br");
 		Element subText = Elements.withText("p", 
 			"Note: The above table shows the complete Git revision history for this file published from branch"
-			+ " '" + this.gitDirectory.getBranch() + "' - there may be multiple revisions listed here for each versioned release "
+			+ " '" + branch + "' - there may be multiple revisions listed here for each versioned release "
 			+ "of this resource onto the FHIR reference server.");
 		Element bodyContent = Elements.withChildren("div", Lists.newArrayList(historyTable, spacer, subText));
 		
