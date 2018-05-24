@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.kohsuke.github.AbuseLimitHandler;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -63,7 +64,7 @@ public class GitHubContext {
 					try {
 						GithubAccess repo = new GithubAccess(github.get(), dir);
 						githubRepos.put(repo.getDirectory().getName(), repo);
-					} catch (IOException | GithubRateLimitedException e) {
+					} catch (IOException | GithubRateLimitOrAbuseException e) {
 						LOG.warn("Exception getting repository " + dir.getName() + " using GitHub API");
 						break;
 					}
@@ -79,7 +80,16 @@ public class GitHubContext {
 		public void onError(IOException e, HttpURLConnection uc) throws IOException {
 			exceededRateLimit = true;
 			LOG.warn("Exceeded rate limiting usage of GitHub API. Not going to attempt to access it again.");
-			throw new GithubRateLimitedException();
+			throw new GithubRateLimitOrAbuseException();
+		}
+	};
+	
+	private final AbuseLimitHandler githubAbuseLimitHandler = new AbuseLimitHandler() {
+		@Override
+		public void onError(IOException e, HttpURLConnection uc) throws IOException {
+			exceededRateLimit = true;
+			LOG.warn("Triggered GitHub API abuse response. Not going to attempt to access it again.");
+			throw new GithubRateLimitOrAbuseException();
 		}
 	};
 	
@@ -92,18 +102,22 @@ public class GitHubContext {
 				connection = GitHubBuilder.fromEnvironment()
 				    .withConnector(new OkHttpConnector(new OkUrlFactory(new OkHttpClient().setCache(httpCache.get()))))
 				    .withRateLimitHandler(githubRateLimitHandler)
+				    .withAbuseLimitHandler(githubAbuseLimitHandler)
 					.build();
 			} else {
 				connection = GitHubBuilder.fromEnvironment()
 				    .withRateLimitHandler(githubRateLimitHandler)
+				    .withAbuseLimitHandler(githubAbuseLimitHandler)
 				    .build();
 			}
 		} catch (IOException e) {
 			try {
 				LOG.info("Unable to connect using Github credentials from the environment, fall back on anonymous access "
 					+ "(likely to exceed permitted rate limit of 60 requests per hour)");
+				
 				connection = new GitHubBuilder()
 				    .withRateLimitHandler(githubRateLimitHandler)
+				    .withAbuseLimitHandler(githubAbuseLimitHandler)
 				    .build();
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -119,7 +133,7 @@ public class GitHubContext {
 			LOG.debug("Attempting to get git history for file: " + filename);
 			try {
 				return Optional.of(currentGitRepo.get().queryCommits().from(currentGitDir.get().getBranch()).path(filename).list().asList());
-			} catch (GithubRateLimitedException e) {}
+			} catch (GithubRateLimitOrAbuseException e) {}
 		}
 		
 		return Optional.empty();
