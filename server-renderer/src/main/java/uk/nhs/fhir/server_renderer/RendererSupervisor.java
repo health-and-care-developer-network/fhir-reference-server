@@ -28,7 +28,7 @@ public class RendererSupervisor {
 		listeners = Lists.newArrayList();
 	}
 
-	public void tryStartRendering(Path sourceDirectory, Path destinationDirectory, Path githubCacheDir, JFrame mainAppWindow) {
+	public void tryStartRendering(Path sourceDirectory, Path destinationDirectory, Path githubCacheDir, Optional<Path> logFileDir, JFrame mainAppWindow) {
 		final String outputDesc = " -> " + destinationDirectory.toString();
 		
 		if (sourceDirectory == null) {
@@ -38,7 +38,9 @@ public class RendererSupervisor {
 		} else if (!sourceDirectory.toFile().isDirectory()){
 			output.displayUpdate(sourceDirectory.toString() + " is not a directory.");
 		} else {
-			Thread renderer = createRenderMainThread(sourceDirectory, destinationDirectory, githubCacheDir, mainAppWindow);
+			long currentTimeMillis = System.currentTimeMillis();
+			Thread renderer = createRenderMainThread(sourceDirectory, destinationDirectory, githubCacheDir, 
+				logFileDir.map(dir -> dir.resolve("render" + currentTimeMillis + ".log")), mainAppWindow);
 			
 			if (isRendering.compareAndSet(false, true)) {
 				renderer.start();
@@ -53,7 +55,7 @@ public class RendererSupervisor {
 		this.listeners.add(listener);
 	}
 
-	private Thread createRenderMainThread(final Path sourceDirectory, final Path destinationDirectory, final Path githubCacheDir, final JFrame parentWindow) {
+	private Thread createRenderMainThread(final Path sourceDirectory, final Path destinationDirectory, final Path githubCacheDir, final Optional<Path> logFile, final JFrame parentWindow) {
 		return new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -65,7 +67,7 @@ public class RendererSupervisor {
 						Optional.ofNullable(System.getProperty(WrappedElementDefinition.SYS_PROP_PERMITTED_MISSING_EXTENSION))
 							.map(prop -> Sets.newHashSet(prop));
 					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, 
-							Optional.empty(), Optional.empty(), Optional.of(githubCacheDir), new DeferredDialogEventAccumulator(parentWindow));
+							Optional.empty(), Optional.empty(), Optional.of(githubCacheDir), new DeferredDialogEventAccumulator(parentWindow, logFile.map(Path::toFile)));
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
 					

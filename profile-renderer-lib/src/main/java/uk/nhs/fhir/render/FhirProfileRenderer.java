@@ -47,8 +47,6 @@ public class FhirProfileRenderer {
     private boolean allowCopyOnError = false;
     private final Optional<Set<String>> localQdomains;
 
-    private final Optional<String> repositoryName;
-    private final Optional<String> repositoryBranch;
     private final Optional<Path> httpCacheDirectory;
     
     public void setContinueOnFail(boolean continueOnFail) {
@@ -66,8 +64,7 @@ public class FhirProfileRenderer {
 							Optional<Path> httpCacheDirectory,
 							AbstractRendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
-				repositoryName, repositoryBranch, httpCacheDirectory,
-				errorHandler, Optional.empty());
+				httpCacheDirectory, errorHandler, Optional.empty());
 	}
 	
 	public FhirProfileRenderer(RendererCliArgs args) {
@@ -76,8 +73,6 @@ public class FhirProfileRenderer {
 			args.getOutputDir(),
 			args.getNewBaseUrl(),
 			args.getAllowedMissingExtensionPrefixes(),
-			args.getRepositoryName(),
-			args.getRepositoryBranch(),
 			args.getHttpCacheDirectory(),
 			new RendererLoggingEventHandler(),
 			args.getLocalDomains());
@@ -88,8 +83,6 @@ public class FhirProfileRenderer {
 		Path outPath, 
 		Optional<String> newBaseURL, 
 		Optional<Set<String>> permittedMissingExtensionPrefixes,
-		Optional<String> repositoryName,
-		Optional<String> repositoryBranch,
 		Optional<Path> httpCacheDirectory,
 		AbstractRendererEventHandler errorHandler, 
 		Optional<Set<String>> localQdomains) 
@@ -99,8 +92,6 @@ public class FhirProfileRenderer {
 		this.permittedMissingExtensionPrefixes = permittedMissingExtensionPrefixes.orElse(Sets.newHashSet());
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
-		this.repositoryName = repositoryName;
-		this.repositoryBranch = repositoryBranch;
 		this.httpCacheDirectory = httpCacheDirectory;
 	}
 	
@@ -214,7 +205,7 @@ public class FhirProfileRenderer {
 	        		try {
 	        			try {
 							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
-	        				fileProcessor.processFile(rendererFileLocator, repositoryName, repositoryBranch, filename, newBaseURL);
+	        				fileProcessor.processFile(rendererFileLocator, filename, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;

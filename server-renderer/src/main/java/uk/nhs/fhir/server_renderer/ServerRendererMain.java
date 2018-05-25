@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.security.CodeSource;
+import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
@@ -49,6 +50,11 @@ public class ServerRendererMain
 		if (!githubCacheDir.toFile().mkdir()) {
 			throw new IllegalStateException("Failed to create temp directory at " + githubCacheDir.toString());
 		}
+		
+		Path logFileDir = tmpDir.resolve("logs");
+		if (!logFileDir.toFile().mkdir()) {
+			throw new IllegalStateException("Failed to create temp directory at " + githubCacheDir.toString());
+		}
     	
     	Server server = makeServer();
     	startServer(server);
@@ -61,7 +67,7 @@ public class ServerRendererMain
 			}
     	}
 
-		startWindow(renderedFileDir, importedFileDir, githubCacheDir);
+		startWindow(renderedFileDir, importedFileDir, githubCacheDir, Optional.of(logFileDir));
 		
 		// FileCache will look in rendered dir and output to imported dir when it runs an import
     	SimpleFhirFileLocator serverFilePreprocessingLocator = new SimpleFhirFileLocator(renderedFileDir, importedFileDir);
@@ -124,8 +130,8 @@ public class ServerRendererMain
         }
 	}
 
-	private static void startWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir) {
-		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir, githubCacheDir);
+	private static void startWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir) {
+		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir, githubCacheDir, logFileDir);
 		window.setVisible(true);
 	}
 

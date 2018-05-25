@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.kohsuke.github.AbuseLimitHandler;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -126,13 +127,27 @@ public class GitHubContext {
 		
 		this.github = Optional.ofNullable(connection);
 	}
-
+	
 	public Optional<List<GHCommit>> getGithubCommits(String filename) {
+		return getGithubCommits(filename, 1);
+	}
+
+	public Optional<List<GHCommit>> getGithubCommits(String filename, int retries) {
 		if (currentGitRepo.isPresent()
 		  && githubAvailable()) {
 			LOG.debug("Attempting to get git history for file: " + filename);
 			try {
 				return Optional.of(currentGitRepo.get().queryCommits().from(currentGitDir.get().getBranch()).path(filename).list().asList());
+			} catch (GHException e) {
+				if (retries > 0) {
+					try {
+						// A requests occasionally fail for reasons other than intentional limiting. Allow for 1 retry. 
+						Thread.sleep(150);
+						return getGithubCommits(filename, retries-1);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
 			} catch (GithubRateLimitOrAbuseException e) {}
 		}
 		

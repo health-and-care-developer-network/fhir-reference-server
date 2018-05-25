@@ -27,9 +27,7 @@ public class FileProcessor {
     
     private final ResourceFormatterFactory resourceFormatterFactory = new ResourceFormatterFactory(); 
     
-	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator, 
-														Optional<String> repositoryName,
-														Optional<String> repositoryBranch,
+	public <T extends WrappedResource<T>> void processFile(RendererFileLocator rendererFileLocator,
 														String filename,
 														Optional<String> newBaseURL) throws Exception {
 		

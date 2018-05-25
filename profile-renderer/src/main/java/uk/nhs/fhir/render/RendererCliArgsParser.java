@@ -30,11 +30,6 @@ public class RendererCliArgsParser {
 		"missing-ext-prefix", "p");
 	public static final CliStringSetArg ARG_LOCAL_DOMAINS = new CliStringSetArg("localdomain", 
 		"Local domains (for resources hosted on this FHIR server)", "local-domains", "l");
-	
-	public static final CliStringArg ARG_REPO_NAME = new CliStringArg("reponame", 
-		"Github repository in the format: username/repository (e.g. nhsconnext/STU3-FHIR-Assets)", "repo-name", "r");
-	public static final CliStringArg ARG_REPO_BRANCH = new CliStringArg("repobranch", 
-		"Branch (or SHA) to retrieve history from (e.g. develop)", "repo-branch", "s");
 	public static final CliPathArg ARG_HTTP_CACHE = new CliPathArg("httpcache", 
 		"Directory to use to hold the HTTP cache, used when retrieving Git history (to avoid unecessary calls to Git)", "http-cache", "c");
 	
@@ -54,13 +49,10 @@ public class RendererCliArgsParser {
         Optional<String> newBaseUrl = Optional.ofNullable(parsedArgs.get(ARG_NEW_PATH));
         Optional<Set<String>> localDomains = Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS));
 		
-        Optional<String> repositoryName = Optional.ofNullable(parsedArgs.get(ARG_REPO_NAME));
-        Optional<String> repositoryBranch = Optional.ofNullable(parsedArgs.get(ARG_REPO_BRANCH));
         Optional<Path> httpCacheDirectory = Optional.ofNullable(parsedArgs.get(ARG_HTTP_CACHE));
         
 		return new RendererCliArgs(inputDir, outputDir, newBaseUrl,
-							allowedMissingExtensionPrefixes,
-							repositoryName, repositoryBranch, httpCacheDirectory,
+							allowedMissingExtensionPrefixes, httpCacheDirectory,
 							localDomains);
 	}
 	
@@ -73,8 +65,6 @@ public class RendererCliArgsParser {
 				.addArg(ARG_NEW_PATH)
 				.addArg(ARG_MISSING_EXT)
 				.addArg(ARG_LOCAL_DOMAINS)
-				.addArg(ARG_REPO_NAME)
-				.addArg(ARG_REPO_BRANCH)
 				.addArg(ARG_HTTP_CACHE)
 				.build();
 	}
