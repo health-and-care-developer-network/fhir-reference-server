@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.ResourceInfo;
+import uk.nhs.fhir.data.ResourceInfoType;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.CSSRule;
@@ -96,7 +97,8 @@ public class ValueWithInfoCell extends TableCell {
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {
 			String displayText;
-			if (StringUtil.looksLikeUrl(description)) {
+			if (StringUtil.looksLikeUrl(description) 
+			  || resourceInfo.getType().equals(ResourceInfoType.FIXED_VALUE)) {
 				//don't capitalise
 				displayText = description;
 			} else {
