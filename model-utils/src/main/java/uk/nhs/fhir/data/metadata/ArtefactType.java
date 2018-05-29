@@ -19,6 +19,7 @@ public enum ArtefactType {
 	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions", 20, false),
 	DIFFERENTIAL("differential.html", ResourceType.STRUCTUREDEFINITION, "Differential", 10, false),
 	GITHUB_HISTORY("git-history.html", ResourceType.STRUCTUREDEFINITION, "Git history", 40, false),
+	STRUCTURE_DEFINITION_FULL("full.html", ResourceType.STRUCTUREDEFINITION, "Full", -1, false),
 	
 	// The code in the renderer for OD artefacts is: uk.nhs.fhir.data.wrap.WrappedOperationDefinition
 	OPERATION_DETAILS("render.html", ResourceType.OPERATIONDEFINITION, "Details", 0, false), // Taken from resource text section
@@ -30,13 +31,13 @@ public enum ArtefactType {
 	
 	// The code in the renderer for CM artefacts is: uk.nhs.fhir.data.wrap.WrappedConceptMap
 	CONCEPT_MAP_METADATA("metadata.html", ResourceType.CONCEPTMAP, "Metadata", -1, true),
-	//CONCEPT_MAP_FULL("full.html", ResourceType.CONCEPTMAP, "Details", 0, false), // Taken from resource text section
+	CONCEPT_MAP_FULL("full.html", ResourceType.CONCEPTMAP, "Details", -1, false), // Taken from resource text section
 	CONCEPT_MAP_MAPPINGS("mappings.html", ResourceType.CONCEPTMAP, "Mappings", 10, false),
 	CONCEPT_MAP_GITHUB_HISTORY("git-history.html", ResourceType.CONCEPTMAP, "Git history", 40, false),
 	
 	// The code in the renderer for CS artefacts is: uk.nhs.fhir.data.wrap.WrappedCodeSystem
 	CODESYSTEM_METADATA("metadata.html", ResourceType.CODESYSTEM, "Metadata", -1, true),
-	//CODESYSTEM_DETAILS("codesystem-full.html", ResourceType.CODESYSTEM, "Details", 0, false),
+	CODESYSTEM_DETAILS("codesystem-full.html", ResourceType.CODESYSTEM, "Details", -1, false),
 	CODESYSTEM_CONCEPTS("concepts.html", ResourceType.CODESYSTEM, "Concepts", 0, false),
 	CODESYSTEM_FILTERS("filters.html", ResourceType.CODESYSTEM, "Filters", 10, false),
 	CODESYSTEM_GITHUB_HISTORY("git-history.html", ResourceType.CODESYSTEM, "Git history", 40, false),

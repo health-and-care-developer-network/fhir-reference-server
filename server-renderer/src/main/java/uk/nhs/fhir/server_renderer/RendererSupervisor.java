@@ -69,7 +69,7 @@ public class RendererSupervisor {
 
 					FhirProfileRenderer renderer = 
 						new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, 
-							logFile, new DeferredDialogEventAccumulator(parentWindow), true);
+							Optional.of(githubCacheDir), new DeferredDialogEventAccumulator(parentWindow, logFile.map(p -> p.toFile())), true);
 					
 					RendererExitStatus exitStatus = renderer.process();
 					output.displayUpdate("Renderer exited with code " + exitStatus.exitCode());

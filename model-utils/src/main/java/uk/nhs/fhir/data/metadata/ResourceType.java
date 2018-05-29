@@ -2,6 +2,9 @@ package uk.nhs.fhir.data.metadata;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import uk.nhs.fhir.util.FhirVersion;
 
@@ -23,18 +26,18 @@ public enum ResourceType {
 	EXAMPLES("Example", "Examples", "Examples", "Examples", "Examples"),
 	OTHER("Other", "Other", "Other", null, null);
 
-	private static final ResourceType[] DSTU2_TYPES = new ResourceType[]
-		{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE};
-	private static final ResourceType[] STU3_TYPES = new ResourceType[]
-		{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION, SEARCHPARAMETER};
+	private static final Map<FhirVersion, ResourceType[]> RESOURCE_TYPES = Maps.newHashMap();
+	static {
+		RESOURCE_TYPES.put(FhirVersion.DSTU2, new ResourceType[]
+			{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE});
+		RESOURCE_TYPES.put(FhirVersion.STU3, new ResourceType[]
+			{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION, SEARCHPARAMETER});
+	}
 	
 	public static List<ResourceType> typesForFhirVersion(FhirVersion fhirVersion) {
-		switch (fhirVersion) {
-		case DSTU2:
-			return Arrays.asList(DSTU2_TYPES);
-		case STU3:
-			return Arrays.asList(STU3_TYPES);
-		default:
+		if (RESOURCE_TYPES.containsKey(fhirVersion)) {
+			return Arrays.asList(RESOURCE_TYPES.get(fhirVersion));
+		} else {
 			throw new IllegalStateException("Don't know which resource types apply to version " + fhirVersion.toString());
 		}
 	}

@@ -120,7 +120,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 					}
 					FilesystemIF.invalidateCache();
 				}
-			});
+			}); 
 		
 		rootDirectoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		
@@ -143,7 +143,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 			public void actionPerformed(ActionEvent e) {
 				int option = exportToZipChooser.showSaveDialog(ServerRendererWindow.this);
 				if (option == JFileChooser.APPROVE_OPTION) {
-					if (importedFileDir.toFile().list().length > 0) {
+					if (checkContainsFiles(importedFileDir.toFile())) {
 						File zip = exportToZipChooser.getSelectedFile();
 						Optional<String> errorMessage = new ZipExporter(importedFileDir.toFile()).export(zip);
 						
@@ -153,12 +153,25 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 					} else {
 						JOptionPane.showMessageDialog(
 							ServerRendererWindow.this, 
-							"Nothing has been rendered yet",
+							"Nothing available to export",
 							"Nothing rendered",
 							JOptionPane.WARNING_MESSAGE);
 						return;
 					}
 				}
+			}
+			
+			private boolean checkContainsFiles(File f) {
+				for (File child : f.listFiles()) {
+					if (child.isFile()) {
+						return true;
+					} else if (child.isDirectory() 
+					  && checkContainsFiles(child)) {
+						return true;
+					}
+				}
+				
+				return false;
 			}
 		});
 	}
