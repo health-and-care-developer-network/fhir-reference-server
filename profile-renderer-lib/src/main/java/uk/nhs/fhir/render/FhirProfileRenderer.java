@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,9 +45,15 @@ public class FhirProfileRenderer {
     private final AbstractRendererEventHandler eventHandler;
     private final boolean allowCopyOnError;
     private final Optional<Set<String>> localQdomains;
-
-	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory, Optional<Set<String>> permittedMissingExtensionPrefixes, AbstractRendererEventHandler errorHandler, boolean copyOnError) {
-		this(inputDirectory, outputDirectory, Optional.empty(), permittedMissingExtensionPrefixes, errorHandler, Optional.empty(), copyOnError);
+    private final Optional<Path> httpCacheDirectory;
+    
+	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory,
+							Optional<Set<String>> permittedMissingExtensionPrefixes,
+							Optional<Path> httpCacheDirectory,
+							AbstractRendererEventHandler errorHandler,
+							boolean copyOnError) {
+		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
+				httpCacheDirectory, errorHandler, Optional.empty(), copyOnError);
 	}
 	
 	public FhirProfileRenderer(RendererCliArgs args) {
@@ -55,6 +62,7 @@ public class FhirProfileRenderer {
 			args.getOutputDir(),
 			args.getNewBaseUrl(),
 			args.getAllowedMissingExtensionPrefixes(),
+			args.getHttpCacheDirectory(),
 			new RendererLoggingEventHandler(),
 			args.getLocalDomains(),
 			args.getCopyOnError());
@@ -64,7 +72,8 @@ public class FhirProfileRenderer {
 		Path inputDirectory, 
 		Path outPath, 
 		Optional<String> newBaseURL, 
-		Optional<Set<String>> permittedMissingExtensionPrefixes, 
+		Optional<Set<String>> permittedMissingExtensionPrefixes,
+		Optional<Path> httpCacheDirectory,
 		AbstractRendererEventHandler errorHandler, 
 		Optional<Set<String>> localQdomains,
 		boolean copyOnError) 
@@ -75,6 +84,7 @@ public class FhirProfileRenderer {
 		this.eventHandler = errorHandler;
 		this.localQdomains = localQdomains.map(qdomains -> (Set<String>)ImmutableSet.copyOf(qdomains));
 		this.allowCopyOnError = copyOnError;
+		this.httpCacheDirectory = httpCacheDirectory;
 	}
 	
 	private static Path makeRenderedArtefactTempDirectory() {
@@ -130,6 +140,19 @@ public class FhirProfileRenderer {
 			rendererContext.setFhirFileRegistry(fhirFileRegistry);
 			EventHandler oldEventHandler = EventHandlerContext.forThread();
 	    	EventHandlerContext.setForThread(eventHandler);
+
+	    	// Set HTTP page cache before we try connecting to github, so that we configure it to cache pages appropriately.
+	    	if (httpCacheDirectory.isPresent()) {
+	    		rendererContext.github().setCacheDirectory(httpCacheDirectory.get().toFile());
+	    	}
+	    	
+	    	List<GithubRepoDirectory> gitRepoDirectories = 
+	    		new GithubRepoFinder(rawArtefactDirectory)
+	    			.find();
+	    	// Sorted in order of length, so that we match longest path (i.e. most specific) first
+	    	gitRepoDirectories.sort(Comparator.comparing(repo -> repo.getLocation().toString().length()));
+	    	rendererContext.github().setGitRepos(gitRepoDirectories);
+	    	
 			List<File> potentialFhirFiles = new RootedXmlFileFinder(rawArtefactDirectory).findFilesRecursively();
 	    	
 			FhirFileParser parser = new FhirFileParser();
@@ -173,7 +196,8 @@ public class FhirProfileRenderer {
 	        		
 	        		try {
 	        			try {
-							fileProcessor.processFile(rendererFileLocator, newBaseURL);
+							String filename = rendererContext.getCurrentSource().getAbsolutePath().substring(rawArtefactDirectory.toString().length());
+	        				fileProcessor.processFile(rendererFileLocator, filename, newBaseURL);
 		        		} catch (LoggedRenderingException loggedError) {
 		        			// Already passed to the event handler - just rethrow
 		        			throw loggedError;
@@ -183,8 +207,7 @@ public class FhirProfileRenderer {
 		        		}
 	        		} catch (LoggedRenderingException loggedError) {
 	        			causedException = true;
-	        		} 
-	        			
+	        		}
 	        		
 	    			if (causedException 
 	    			  && !allowCopyOnError) {
@@ -200,7 +223,12 @@ public class FhirProfileRenderer {
 	        	  && (!succeeded || eventHandler.foundWarnings())) {
 	        		LOG.info("Displaying event messages");
 	        		
-	        		eventHandler.displayOutstandingEvents();
+	        		try {
+	        			eventHandler.displayOutstandingEvents();
+	        		} catch (Exception e) {
+	        			LOG.error("Error displaying outstanding events:");
+	        			e.printStackTrace();
+	        		}
 	        	}
 	    		
 	        	if (succeeded || allowCopyOnError) {

@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -123,13 +122,13 @@ public class StructureDefinitionDetails {
 					Elements.withAttributeAndChildren("td", 
 						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
 						Lists.newArrayList(
-							new Text("See "),
+							Elements.text("See "),
 							Elements.withAttributesAndText("a",
 								Lists.newArrayList(
 									new Attribute("href", FhirURL.buildOrThrow(FhirURLConstants.HL7_FORMATS + "#choice", version).toLinkString()),
 									new Attribute("class", FhirCSS.LINK)), 
 								"Choice of Data Types"),
-							new Text(" for further information about how to use [x]")))));
+							Elements.text(" for further information about how to use [x]")))));
 		}
 	}
 
@@ -143,7 +142,7 @@ public class StructureDefinitionDetails {
 				Lists.newArrayList(
 					Elements.withAttribute("a", 
 						new Attribute("name", header)),
-					new Text(header))));
+					Elements.text(header))));
 	}
 
 	private void addDataIfPresent(List<Element> tableContent, String label, Optional<String> content) {
@@ -297,7 +296,7 @@ public class StructureDefinitionDetails {
 				}
 				constraintContent += " (xpath: " + constraint.getXPath() + ")";
 				constraintContent += " severity: " + constraint.getSeverity();
-				constraintInfos.add(new Text(constraintContent));
+				constraintInfos.add(Elements.text(constraintContent));
 			}
 		}
 	}
@@ -321,7 +320,7 @@ public class StructureDefinitionDetails {
 					Elements.withAttributeAndChildren("td", 
 						new Attribute("class", FhirCSS.DETAILS_DATA_CELL), 
 						Lists.newArrayList(
-							new Text("This element introduces a set of slices. The slicing rules are:"),
+							Elements.text("This element introduces a set of slices. The slicing rules are:"),
 							Elements.withAttributeAndChildren("ul", 
 								new Attribute("class", FhirCSS.LIST), 
 								renderedSlicingInfo)))));
@@ -349,7 +348,7 @@ public class StructureDefinitionDetails {
 				mappingInfos.add(Elements.newElement("br"));
 			}
 			mappingInfos.add(Elements.withText("b", mapping.getIdentity() + ": "));
-			mappingInfos.add(new Text(value));
+			mappingInfos.add(Elements.text(value));
 			
 			if (mapping.getLanguage().isPresent()) {
 				throw new IllegalStateException("How should we display mapping language?");

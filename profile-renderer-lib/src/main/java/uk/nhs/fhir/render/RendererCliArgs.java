@@ -11,18 +11,21 @@ public class RendererCliArgs {
 	private final Optional<Set<String>> allowedMissingExtensionPrefixes;
 	private final Optional<Set<String>> localDomains;
 	private final boolean copyOnError;
+    private final Optional<Path> httpCacheDirectory;
 	
 	public RendererCliArgs(
 			Path inputDir, 
 			Path outputDir, 
 			Optional<String> newBaseUrl, 
 			Optional<Set<String>> allowedMissingExtensionPrefixes, 
+			Optional<Path> httpCacheDirectory,
 			Optional<Set<String>> localDomains,
 			boolean copyOnError) {
 		this.inputDir = inputDir;
 		this.outputDir = outputDir;
 		this.newBaseUrl = newBaseUrl;
 		this.allowedMissingExtensionPrefixes = allowedMissingExtensionPrefixes;
+		this.httpCacheDirectory = httpCacheDirectory;
 		this.localDomains = localDomains;
 		this.copyOnError = copyOnError;
 	}
@@ -49,5 +52,9 @@ public class RendererCliArgs {
 	
 	public boolean getCopyOnError() {
 		return copyOnError;
+	}
+
+	public Optional<Path> getHttpCacheDirectory() {
+		return httpCacheDirectory;
 	}
 }

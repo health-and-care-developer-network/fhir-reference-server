@@ -42,7 +42,8 @@ public class ProfileRendererMain {
     		cliArgs.getInputDir(), 
     		cliArgs.getOutputDir(), 
     		cliArgs.getNewBaseUrl(), 
-    		cliArgs.getAllowedMissingExtensionPrefixes(), 
+    		cliArgs.getAllowedMissingExtensionPrefixes(),
+    		cliArgs.getHttpCacheDirectory(),
     		new RendererLoggingEventHandler(), 
     		cliArgs.getLocalDomains(),
     		cliArgs.getCopyOnError());

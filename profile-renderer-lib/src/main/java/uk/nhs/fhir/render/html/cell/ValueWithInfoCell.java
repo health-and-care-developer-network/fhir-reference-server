@@ -6,12 +6,12 @@ import java.util.Locale;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.ResourceInfo;
+import uk.nhs.fhir.data.ResourceInfoType;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.style.CSSRule;
@@ -50,7 +50,7 @@ public class ValueWithInfoCell extends TableCell {
 		
 		for (ResourceInfo resourceInfo : resourceInfos) {
 			List<Content> resourceInfoContent = Lists.newArrayList();
-			resourceInfoContent.add(new Text(getDisplayName(resourceInfo)));
+			resourceInfoContent.add(Elements.text(getDisplayName(resourceInfo)));
 			resourceInfoContent.addAll(getResourceInfoContents(resourceInfo));
 			
 			valueDataNodes.add(
@@ -97,24 +97,25 @@ public class ValueWithInfoCell extends TableCell {
 		List<Content> constraintInfoText = Lists.newArrayList();
 		if (hasText) {
 			String displayText;
-			if (StringUtil.looksLikeUrl(description)) {
+			if (StringUtil.looksLikeUrl(description) 
+			  || resourceInfo.getType().equals(ResourceInfoType.FIXED_VALUE)) {
 				//don't capitalise
 				displayText = description;
 			} else {
 				displayText = StringUtil.capitaliseLowerCase(description);
 			}
 			
-			constraintInfoText.add(new Text(displayText));
+			constraintInfoText.add(Elements.text(displayText));
 		}
 		
 		if (bracketLink) {
-			constraintInfoText.add(new Text(" ("));
+			constraintInfoText.add(Elements.text(" ("));
 		}
 		
 		if (hasLink) {
 			if (resourceInfo.getTextualLink()) {
 				// This URL would result in a broken link - it is only intended to be used as an identifier
-				constraintInfoText.add(new Text(fhirURL.toFullString()));
+				constraintInfoText.add(Elements.text(fhirURL.toFullString()));
 			} else {
 				constraintInfoText.add(
 					Elements.withAttributesAndText("a", 
@@ -126,7 +127,7 @@ public class ValueWithInfoCell extends TableCell {
 		}
 			
 		if (bracketLink) {
-			constraintInfoText.add(new Text(")"));
+			constraintInfoText.add(Elements.text(")"));
 		}
 		
 		return constraintInfoText;

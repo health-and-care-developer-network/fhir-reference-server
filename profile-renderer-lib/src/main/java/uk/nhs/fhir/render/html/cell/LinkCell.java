@@ -8,7 +8,6 @@ import java.util.Set;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.jdom2.Text;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -76,12 +75,12 @@ public class LinkCell extends TableCell {
 		if (!nestedLinks.isEmpty()
 		  // exclude child links for Extensions (these should be displayed as URLs in the ResourceInfos instead
 		  && !primaryLink.getText().equals("Extension")) {
-			children.add(new Text(" ("));
+			children.add(Elements.text(" ("));
 			
 			boolean first = true;
 			for (LinkData nestedLink : nestedLinks) {
 				if (!first) {
-					children.add(new Text(" | "));
+					children.add(Elements.text(" | "));
 				}
 				
 				children.add(makeLinkElement(nestedLink));
@@ -89,7 +88,7 @@ public class LinkCell extends TableCell {
 				first = false;
 			}
 			
-			children.add(new Text(")"));
+			children.add(Elements.text(")"));
 		}
 		
 		if (linkIconUrl.isPresent()) {
@@ -108,7 +107,7 @@ public class LinkCell extends TableCell {
 
 		for (Map.Entry<LinkData, List<LinkData>> link : linkDatas.links()) {
 			if (!cellContents.isEmpty()) {
-				cellContents.add(new Text(" | "));
+				cellContents.add(Elements.text(" | "));
 			}
 			
 			LinkData primaryLink = link.getKey();

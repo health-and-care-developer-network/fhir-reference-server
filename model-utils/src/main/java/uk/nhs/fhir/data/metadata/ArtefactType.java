@@ -18,29 +18,36 @@ public enum ArtefactType {
 	BINDINGS("bindings.html", ResourceType.STRUCTUREDEFINITION, "Bindings", 30, false),
 	DETAILS("details.html", ResourceType.STRUCTUREDEFINITION, "Detailed Descriptions", 20, false),
 	DIFFERENTIAL("differential.html", ResourceType.STRUCTUREDEFINITION, "Differential", 10, false),
+	GITHUB_HISTORY("git-history.html", ResourceType.STRUCTUREDEFINITION, "Git history", 40, false),
 	
 	// The code in the renderer for OD artefacts is: uk.nhs.fhir.data.wrap.WrappedOperationDefinition
 	OPERATION_DETAILS("render.html", ResourceType.OPERATIONDEFINITION, "Details", 0, false), // Taken from resource text section
+	OPERATION_GITHUB_HISTORY("git-history.html", ResourceType.OPERATIONDEFINITION, "Git history", 40, false),
 	
 	// The code in the renderer for VS artefacts is: uk.nhs.fhir.data.wrap.WrappedValueSet
 	VALUESET_DETAILS("render.html", ResourceType.VALUESET, "Details", 0, false), // Taken from resource text section
+	VALUESET_GITHUB_HISTORY("git-history.html", ResourceType.VALUESET, "Git history", 40, false),
 	
 	// The code in the renderer for CM artefacts is: uk.nhs.fhir.data.wrap.WrappedConceptMap
 	CONCEPT_MAP_METADATA("metadata.html", ResourceType.CONCEPTMAP, "Metadata", -1, true),
 	//CONCEPT_MAP_FULL("full.html", ResourceType.CONCEPTMAP, "Details", 0, false), // Taken from resource text section
 	CONCEPT_MAP_MAPPINGS("mappings.html", ResourceType.CONCEPTMAP, "Mappings", 10, false),
+	CONCEPT_MAP_GITHUB_HISTORY("git-history.html", ResourceType.CONCEPTMAP, "Git history", 40, false),
 	
 	// The code in the renderer for CS artefacts is: uk.nhs.fhir.data.wrap.WrappedCodeSystem
 	CODESYSTEM_METADATA("metadata.html", ResourceType.CODESYSTEM, "Metadata", -1, true),
 	//CODESYSTEM_DETAILS("codesystem-full.html", ResourceType.CODESYSTEM, "Details", 0, false),
 	CODESYSTEM_CONCEPTS("concepts.html", ResourceType.CODESYSTEM, "Concepts", 0, false),
 	CODESYSTEM_FILTERS("filters.html", ResourceType.CODESYSTEM, "Filters", 10, false),
+	CODESYSTEM_GITHUB_HISTORY("git-history.html", ResourceType.CODESYSTEM, "Git history", 40, false),
 	
 	MESSAGE_METADATA("metadata.html", ResourceType.MESSAGEDEFINITION, "Metadata", -1, true),
 	MESSAGE_FOCUS("focus.html", ResourceType.MESSAGEDEFINITION, "Message Payload", 0, false),
+	MESSAGE_GITHUB_HISTORY("git-history.html", ResourceType.MESSAGEDEFINITION, "Git history", 40, false),
 	
 	SEARCH_PARAM_METADATA("metadata.html", ResourceType.SEARCHPARAMETER, "Metadata", -1, true),
-	SEARCH_PARAM_DETAILS("details.html", ResourceType.SEARCHPARAMETER, "Definition", 0, false)
+	SEARCH_PARAM_DETAILS("details.html", ResourceType.SEARCHPARAMETER, "Definition", 0, false),
+	SEARCH_PARAM_GITHUB_HISTORY("git-history.html", ResourceType.SEARCHPARAMETER, "Git history", 40, false)
 	;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ArtefactType.class.getName());

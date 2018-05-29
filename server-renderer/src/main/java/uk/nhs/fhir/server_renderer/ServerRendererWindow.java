@@ -34,10 +34,14 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	
 	private final Path renderedFileDir;
 	private final Path importedFileDir;
+	private final Path githubCacheDir;
+	private final Optional<Path> logFileDir;
 
-	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir) {
+	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir) {
 		this.renderedFileDir = renderedFileDir;
 		this.importedFileDir = importedFileDir;
+		this.githubCacheDir = githubCacheDir;
+		this.logFileDir = logFileDir;
 		
 		initWindow();
 		initPanel();
@@ -100,6 +104,8 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 				new FileChooserFilePathSupplier(rootDirectoryChooser),
 				new ConsolerRendererOutputDisplay(),
 				renderedFileDir,
+				githubCacheDir,
+				logFileDir,
 				this));
 		
 		clearCacheButton.addActionListener(

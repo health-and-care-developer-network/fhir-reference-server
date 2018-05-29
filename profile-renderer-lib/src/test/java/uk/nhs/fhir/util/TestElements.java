@@ -8,8 +8,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 
 import org.jdom2.Document;
-import org.junit.Test;
+import org.jdom2.Text;
 import org.junit.Assert;
+import org.junit.Test;
 
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.HTMLUtil;
@@ -23,5 +24,24 @@ public class TestElements {
 		String expected = "<test xmlns=\"http://www.w3.org/1999/xhtml\">\n  <test2 />\n</test>\n";
 		String actual = HTMLUtil.docToString(doc, true, false);
 		Assert.assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testValidText() {
+		Elements.text("valid string");
+	}
+	
+	@Test
+	public void testReplaceControl() {
+		String stringWithControl = "My \u0013 text";
+		Text text = Elements.text(stringWithControl);
+		Assert.assertEquals("My 0x13 text", text.getText());
+	}
+	
+	@Test
+	public void testAllowSurrogatePair() {
+		String stringWithSurrogate = "My 😀 \u0013text";
+		Text text = Elements.text(stringWithSurrogate);
+		Assert.assertEquals("My 😀 0x13text", text.getText());
 	}
 }

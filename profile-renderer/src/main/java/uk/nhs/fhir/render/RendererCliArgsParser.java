@@ -31,6 +31,8 @@ public class RendererCliArgsParser {
 	public static final CliStringSetArg ARG_LOCAL_DOMAINS = new CliStringSetArg("localdomain", 
 		"Local domains (for resources hosted on this FHIR server)", "local-domains", "l");
 	public static final RendererCliFlag FLAG_COPY_ON_ERROR = new RendererCliFlag("copy-on-error", "", "force-copy", "f");
+	public static final CliPathArg ARG_HTTP_CACHE = new CliPathArg("httpcache", 
+		"Directory to use to hold the HTTP cache, used when retrieving Git history (to avoid unecessary calls to Git)", "http-cache", "c");
 	
 	private final RendererArgSpec spec = getArgSpec();
 	
@@ -45,11 +47,14 @@ public class RendererCliArgsParser {
 		Path inputDir = parsedArgs.get(ARG_INPUT);
 		Path outputDir = parsedArgs.get(ARG_OUTPUT);
         Optional<Set<String>> allowedMissingExtensionPrefixes = Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT));
+        Optional<Path> httpCacheDirectory = Optional.ofNullable(parsedArgs.get(ARG_HTTP_CACHE));
         Optional<String> newBaseUrl = Optional.ofNullable(parsedArgs.get(ARG_NEW_PATH));
         Optional<Set<String>> localDomains = Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS));
         boolean copyOnError = parsedArgs.get(FLAG_COPY_ON_ERROR);
 		
-		return new RendererCliArgs(inputDir, outputDir, newBaseUrl, allowedMissingExtensionPrefixes, localDomains, copyOnError);
+		return new RendererCliArgs(inputDir, outputDir, newBaseUrl,
+							allowedMissingExtensionPrefixes, httpCacheDirectory,
+							localDomains, copyOnError);
 	}
 	
 	private RendererArgSpec getArgSpec() {
@@ -61,6 +66,7 @@ public class RendererCliArgsParser {
 				.addArg(ARG_NEW_PATH)
 				.addArg(ARG_MISSING_EXT)
 				.addArg(ARG_LOCAL_DOMAINS)
+				.addArg(ARG_HTTP_CACHE)
 			.booleanFlag()
 				.addFlag(FLAG_COPY_ON_ERROR)
 			.build();
