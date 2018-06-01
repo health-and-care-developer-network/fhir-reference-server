@@ -26,7 +26,6 @@ import uk.nhs.fhir.event.AbstractRendererEventHandler;
 import uk.nhs.fhir.event.EventHandler;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.LoggedRenderingException;
-import uk.nhs.fhir.event.RendererLoggingEventHandler;
 import uk.nhs.fhir.load.FhirFileParser;
 import uk.nhs.fhir.load.RootedXmlFileFinder;
 import uk.nhs.fhir.util.FhirFileRegistry;
@@ -65,17 +64,6 @@ public class FhirProfileRenderer {
 							AbstractRendererEventHandler errorHandler) {
 		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
 				httpCacheDirectory, errorHandler, Optional.empty());
-	}
-	
-	public FhirProfileRenderer(RendererCliArgs args) {
-		this(
-			args.getInputDir(),
-			args.getOutputDir(),
-			args.getNewBaseUrl(),
-			args.getAllowedMissingExtensionPrefixes(),
-			args.getHttpCacheDirectory(),
-			new RendererLoggingEventHandler(),
-			args.getLocalDomains());
 	}
     
 	public FhirProfileRenderer(
