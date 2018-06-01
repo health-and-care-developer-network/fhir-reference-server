@@ -54,7 +54,7 @@ public class FileLoader {
 		}
 		
 	    LOG.debug("Loading file using encoding: " + charsetName);
-    	
+	    
 	    StringBuilder sb = new StringBuilder();
 	    
 		try (
@@ -74,8 +74,8 @@ public class FileLoader {
 			throw new IllegalStateException("Error reading file: " + file.getName(), e);
 		}
     }
-    
-    /**
+
+	/**
      * Return an appropriate charset which handles BOMs if necessary
      * @throws IOException 
      * @throws FileNotFoundException 
