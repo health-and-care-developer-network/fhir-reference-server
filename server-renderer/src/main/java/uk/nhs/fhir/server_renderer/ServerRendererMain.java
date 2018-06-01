@@ -33,6 +33,9 @@ public class ServerRendererMain
     	deleteOldTmpDirs();
     	
     	ServerRendererArgs cliArgs = new ServerRendererCliArgsParser().parseArgs(args);
+    	if (cliArgs == null) {
+    		return;
+    	}
     	
 		Path tmpDir = getTmpDir();
 		
