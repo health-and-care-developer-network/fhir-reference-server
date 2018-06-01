@@ -32,6 +32,8 @@ public class ServerRendererMain
     public static void main(String[] args) {
     	deleteOldTmpDirs();
     	
+    	ServerRendererArgs cliArgs = new ServerRendererCliArgsParser().parseArgs(args);
+    	
 		Path tmpDir = getTmpDir();
 		
 		registerShutdownHook(tmpDir);
@@ -67,8 +69,8 @@ public class ServerRendererMain
 			}
     	}
 
-		startWindow(renderedFileDir, importedFileDir, githubCacheDir, Optional.of(logFileDir));
-		
+		startWindow(renderedFileDir, importedFileDir, githubCacheDir, Optional.of(logFileDir), cliArgs);
+
 		// FileCache will look in rendered dir and output to imported dir when it runs an import
     	SimpleFhirFileLocator serverFilePreprocessingLocator = new SimpleFhirFileLocator(renderedFileDir, importedFileDir);
 		FileCache.setVersionedFileLocator(serverFilePreprocessingLocator);
@@ -130,8 +132,8 @@ public class ServerRendererMain
         }
 	}
 
-	private static void startWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir) {
-		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir, githubCacheDir, logFileDir);
+	private static void startWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir, ServerRendererArgs cliArgs) {
+		ServerRendererWindow window = new ServerRendererWindow(renderedFileDir, importedFileDir, githubCacheDir, logFileDir, cliArgs);
 		window.setVisible(true);
 	}
 

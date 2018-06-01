@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.swing.JFrame;
-
 public class RunRendererActionListener implements ActionListener {
 
 	private final Supplier<Path> filePathSupplier;
@@ -15,9 +13,9 @@ public class RunRendererActionListener implements ActionListener {
 	private final Path githubCacheDir;
 	private final Optional<Path> logFileDir;
 	private final RendererSupervisor renderer;
-	private final JFrame mainAppWindow;
+	private final ServerRendererWindow mainAppWindow;
 	
-	public RunRendererActionListener(JFrame mainAppWindow, Supplier<Path> filePathSupplier, RendererOutputDisplay output, Path outputDirectory, 
+	public RunRendererActionListener(ServerRendererWindow mainAppWindow, Supplier<Path> filePathSupplier, RendererOutputDisplay output, Path outputDirectory, 
 			Path githubCacheDir, Optional<Path> logFileDir, RendererListener... listeners) {
 		if (filePathSupplier == null) {
 			throw new NullPointerException("File path supplier cannot be null");
