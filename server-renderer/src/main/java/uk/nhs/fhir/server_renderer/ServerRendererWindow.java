@@ -49,15 +49,13 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final Path githubCacheDir;
 	private final Optional<Path> logFileDir;
 
-	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir) {
-		this(renderedFileDir, importedFileDir, githubCacheDir, logFileDir, false);
-	}
-
-	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir, boolean largeText) {
+	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir, ServerRendererArgs cliArgs) {
 		this.renderedFileDir = renderedFileDir;
 		this.importedFileDir = importedFileDir;
 		this.githubCacheDir = githubCacheDir;
 		this.logFileDir = logFileDir;
+		
+		boolean largeText = cliArgs.getLargeText();
 		
 		initWindow(largeText);
 		initPanel();
