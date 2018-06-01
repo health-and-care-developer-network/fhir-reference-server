@@ -56,16 +56,6 @@ public class FhirProfileRenderer {
     	this.allowCopyOnError = allowCopyOnError;
     }
     
-	public FhirProfileRenderer(Path inputDirectory, Path outputDirectory,
-							Optional<Set<String>> permittedMissingExtensionPrefixes,
-							Optional<String> repositoryName,
-							Optional<String> repositoryBranch,
-							Optional<Path> httpCacheDirectory,
-							AbstractRendererEventHandler errorHandler) {
-		this(inputDirectory, outputDirectory, Optional.empty(),permittedMissingExtensionPrefixes,
-				httpCacheDirectory, errorHandler, Optional.empty());
-	}
-    
 	public FhirProfileRenderer(
 		Path inputDirectory, 
 		Path outPath, 

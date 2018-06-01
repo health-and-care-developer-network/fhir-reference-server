@@ -9,9 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JFrame;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
-import uk.nhs.fhir.data.wrap.WrappedElementDefinition;
 import uk.nhs.fhir.render.FhirProfileRenderer;
 import uk.nhs.fhir.render.RendererExitStatus;
 
@@ -28,7 +26,10 @@ public class RendererSupervisor {
 		listeners = Lists.newArrayList();
 	}
 
-	public void tryStartRendering(Path sourceDirectory, Path destinationDirectory, Path githubCacheDir, Optional<Path> logFileDir, JFrame mainAppWindow) {
+	public void tryStartRendering(Path sourceDirectory, Path destinationDirectory, Path githubCacheDir, Optional<Path> logFileDir, ServerRendererWindow mainAppWindow) {
+		Optional<Set<String>> allowedMissingExtensionPrefixes = mainAppWindow.getAllowedMissingExtensionPrefixes();
+		Optional<Set<String>> localDomains = mainAppWindow.getLocalDomains();
+		
 		final String outputDesc = " -> " + destinationDirectory.toString();
 		
 		if (sourceDirectory == null) {
@@ -40,7 +41,8 @@ public class RendererSupervisor {
 		} else {
 			long currentTimeMillis = System.currentTimeMillis();
 			Thread renderer = createRenderMainThread(sourceDirectory, destinationDirectory, githubCacheDir, 
-				logFileDir.map(dir -> dir.resolve("render" + currentTimeMillis + ".log")), mainAppWindow);
+				logFileDir.map(dir -> dir.resolve("render" + currentTimeMillis + ".log")), mainAppWindow, allowedMissingExtensionPrefixes,
+				localDomains);
 			
 			if (isRendering.compareAndSet(false, true)) {
 				renderer.start();
@@ -55,7 +57,8 @@ public class RendererSupervisor {
 		this.listeners.add(listener);
 	}
 
-	private Thread createRenderMainThread(final Path sourceDirectory, final Path destinationDirectory, final Path githubCacheDir, final Optional<Path> logFile, final JFrame parentWindow) {
+	private Thread createRenderMainThread(final Path sourceDirectory, final Path destinationDirectory, final Path githubCacheDir, final Optional<Path> logFile, 
+		final JFrame parentWindow, final Optional<Set<String>> allowedMissingExtensionPrefixes, final Optional<Set<String>> localDomains) {
 		return new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -63,11 +66,11 @@ public class RendererSupervisor {
 						listener.startRender();
 					}
 					
-					Optional<Set<String>> allowedMissingExtensionPrefix = 
-						Optional.ofNullable(System.getProperty(WrappedElementDefinition.SYS_PROP_PERMITTED_MISSING_EXTENSION))
-							.map(prop -> Sets.newHashSet(prop));
-					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, allowedMissingExtensionPrefix, 
-							Optional.empty(), Optional.empty(), Optional.of(githubCacheDir), new DeferredDialogEventAccumulator(parentWindow, logFile.map(Path::toFile)));
+					Optional<String> newBaseUrl = Optional.empty();
+					
+					FhirProfileRenderer renderer = new FhirProfileRenderer(sourceDirectory, destinationDirectory, newBaseUrl, allowedMissingExtensionPrefixes, 
+							Optional.of(githubCacheDir), new DeferredDialogEventAccumulator(parentWindow, logFile.map(Path::toFile)),
+							localDomains);
 					renderer.setContinueOnFail(true);
 					renderer.setAllowCopyOnError(true);
 					

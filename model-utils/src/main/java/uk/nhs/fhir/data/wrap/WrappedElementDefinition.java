@@ -28,8 +28,6 @@ import uk.nhs.fhir.util.ResourceNotAvailableException;
 import uk.nhs.fhir.util.StructureDefinitionRepository;
 
 public abstract class WrappedElementDefinition implements HasConstraints {
-
-	public static final String SYS_PROP_PERMITTED_MISSING_EXTENSION = "uk.nhs.fhir.permitted_missing_extension_root";
 	
 	public abstract String getName();
 	public abstract LinkDatas getTypeLinks(Optional<StructureDefinitionRepository> structureDefinitions);

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -49,15 +50,20 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final Path githubCacheDir;
 	private final Optional<Path> logFileDir;
 
+	private Optional<Set<String>> allowedMissingExtensionPrefixes;
+	private Optional<Set<String>> localDomains;
+
 	public ServerRendererWindow(Path renderedFileDir, Path importedFileDir, Path githubCacheDir, Optional<Path> logFileDir, ServerRendererArgs cliArgs) {
 		this.renderedFileDir = renderedFileDir;
 		this.importedFileDir = importedFileDir;
 		this.githubCacheDir = githubCacheDir;
 		this.logFileDir = logFileDir;
-		
+	
 		boolean largeText = cliArgs.getLargeText();
+		this.allowedMissingExtensionPrefixes = cliArgs.getAllowedMissingExtensionPrefixes();
+		this.localDomains = cliArgs.getLocalDomains();
 		
-		initWindow(largeText);
+		initWindow();
 		initPanel();
 		initButtonActions();
 		
@@ -94,7 +100,7 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private final JButton runRendererButton = new JButton("Run renderer");
 	private final JButton clearCacheButton = new JButton("Clear server cache");
 	
-	private void initWindow(boolean largeText) {
+	private void initWindow() {
 		setTitle("Local FHIR Server");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
@@ -217,5 +223,13 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 				
 				clearCacheButton.setEnabled(true);
 			}});
+	}
+
+	public Optional<Set<String>> getAllowedMissingExtensionPrefixes() {
+		return allowedMissingExtensionPrefixes;
+	}
+
+	public Optional<Set<String>> getLocalDomains() {
+		return localDomains;
 	}
 }
