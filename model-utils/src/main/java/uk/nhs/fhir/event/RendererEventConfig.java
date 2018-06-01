@@ -26,6 +26,7 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.MISSING_TYPE_LINK, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.TYPELINK_STRING_WITH_PROFILE, RendererEventResponse.LOG_WARNING);
 		responses.put(RendererEventType.UNRECOGNISED_MESSAGE_ASSET_VERSION, RendererEventResponse.LOG_WARNING);
+		responses.put(RendererEventType.UNRECOGNISED_SEARCH_PARAM_FEATURE, RendererEventResponse.LOG_WARNING);
 		
 		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY, RendererEventResponse.IGNORE);
 		responses.put(RendererEventType.MULTIPLE_MAPPINGS_SAME_KEY_IGNORABLE, RendererEventResponse.IGNORE);
@@ -50,6 +51,8 @@ public class RendererEventConfig {
 		responses.put(RendererEventType.DSTU2_PARSE_VERSION_NUMBER_FAILURE, RendererEventResponse.LOG_WARNING);
 		
 		// Currently not hit
+		responses.put(RendererEventType.FILE_WITH_BOM, RendererEventResponse.LOG_WARNING);
+		
 		responses.put(RendererEventType.EMPTY_VALUE_SET, RendererEventResponse.THROW);
 		responses.put(RendererEventType.FIX_MISSING_TYPE_LINK, RendererEventResponse.THROW);
 		responses.put(RendererEventType.RESOURCE_WITHOUT_SNAPSHOT, RendererEventResponse.THROW);

@@ -1,7 +1,11 @@
 package uk.nhs.fhir.render;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.jdom2.Document;
@@ -10,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.event.EventHandlerContext;
+import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.load.FileLoader;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.ResourceFormatter;
@@ -33,15 +39,42 @@ public class FileProcessor {
 		
 	    @SuppressWarnings("unchecked")
 		T resource = (T)RendererContext.forThread().getCurrentParsedResource().get();
-		String inFilePath = RendererContext.forThread().getCurrentSource().getPath();
+		File currentSource = RendererContext.forThread().getCurrentSource();
+		String inFilePath = currentSource.getPath();
 	    
 		LOG.info("Processing file: " + inFilePath);
 	    
+		doBOMCheck(currentSource);
+		
 	    saveAugmentedResource(rendererFileLocator, newBaseURL);
 		
 		for (FormattedOutputSpec<?> formatter : resourceFormatterFactory.allFormatterSpecs(resource, rendererFileLocator, filename)) {
 			LOG.debug("Generating " + formatter.getOutputPath(inFilePath).toString());
 			formatter.formatAndSave(inFilePath);
+		}
+	}
+	
+    private static final int[] UTF8_BOM = {239, 187, 191};
+    
+    /**
+     * Adam has set up a Git commit hook that everyone should now have which ought to ensure any Byte Order Marks
+     * are removed at the point of committing. This should flag up if the system is not working.
+     */
+    private static void doBOMCheck(File file) {
+		if (file.length() < UTF8_BOM.length) {
+			return;
+		}
+		
+		int[] head = new int[UTF8_BOM.length];
+		try (InputStream input = new FileInputStream(file)) {
+			for (int i=0; i<UTF8_BOM.length; i++) {
+				head[i] = input.read();
+			}
+			if (Arrays.equals(head, UTF8_BOM)) {
+				EventHandlerContext.forThread().event(RendererEventType.FILE_WITH_BOM, "Found BOM");
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException("Caught exception while checking for BOM", e);
 		}
 	}
 	
