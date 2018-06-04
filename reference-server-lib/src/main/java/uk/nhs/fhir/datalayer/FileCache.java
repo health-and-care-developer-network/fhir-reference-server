@@ -87,9 +87,19 @@ public class FileCache {
 			}
 		};
 
+	static {
+		// load existing resources on startup
+		new Runnable() {
+			public void run() {
+				invalidateCache();
+			}
+		}.run();
+	}
+
 	// If a refresh is not already running, kick it off now in a new thread  
     public static void invalidateCache() {
 		if (updatingCache.compareAndSet(false, true)) {
+			LOG.info("Invalidating cache on thread " + Thread.currentThread().getName());
 			UPDATE_CACHE.run();
 		} else {
 			LOG.info("Would have triggered cache update, but it was already running (updatingCache is true)");
