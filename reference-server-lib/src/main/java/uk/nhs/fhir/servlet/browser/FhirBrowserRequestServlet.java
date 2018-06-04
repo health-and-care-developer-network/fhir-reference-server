@@ -157,11 +157,14 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 
 	private void serviceBrowserRequest(HttpServletRequest request, HttpServletResponse response) {
 		
+		// This is part of the solution when running in a server within eclipse, where the context path needs stripping.
+		// However there is still an issue getting the correct Servlet to handle the request.
 		String fullUri = request.getRequestURI();
 		String contextPath = request.getContextPath();
 		if (fullUri.startsWith(contextPath)) {
 			fullUri = fullUri.substring(contextPath.length());
 		}
+		
 		// trim trailing slash to avoid failure to handle e.g. .../StructureDefinition/
 		if (fullUri.endsWith("/") && !fullUri.equals("/")) {
 			fullUri = fullUri.substring(0, fullUri.length()-1);
