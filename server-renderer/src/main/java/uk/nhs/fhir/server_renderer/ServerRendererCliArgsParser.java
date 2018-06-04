@@ -1,7 +1,5 @@
 package uk.nhs.fhir.server_renderer;
 
-import java.util.Optional;
-
 import uk.nhs.fhir.util.RendererCliArg;
 import uk.nhs.fhir.util.cli.CliArgSpec;
 import uk.nhs.fhir.util.cli.CliArgSpecBuilder;
@@ -32,9 +30,9 @@ public class ServerRendererCliArgsParser extends CliArgsParser<ServerRendererArg
 	@Override
 	protected ServerRendererArgs extractArgs(ParsedArgs parsedArgs) {
 		return new ServerRendererArgs(
-			parsedArgs.get(ARG_LARGE_TEXT), 
-			Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT)), 
-			Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS)));
+			parsedArgs.get(ARG_LARGE_TEXT),
+			parsedArgs.get(ARG_LOCAL_DOMAINS), 
+			parsedArgs.get(ARG_MISSING_EXT));
 	}
 
 }

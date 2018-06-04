@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-public class CliStringSetArg extends CliArg<Set<String>> {
+public class CliStringSetArg extends CliArg<Optional<Set<String>>> {
 	public CliStringSetArg(String id, String desc) {
 		super(id, desc);
 	}
@@ -14,17 +14,21 @@ public class CliStringSetArg extends CliArg<Set<String>> {
 	}
 	
 	@Override
-	public Set<String> convert(String arg) {
-		Set<String> strings = Sets.newHashSet();
-		
-		for (String fragment : arg.split(";")) {
-			String trimmedFragment = fragment.trim();
-			if (!trimmedFragment.isEmpty()) {
-				strings.add(fragment);
+	public Optional<Set<String>> convert(String arg) {
+		if (arg == null || arg.isEmpty()) {
+			return Optional.empty();
+		} else {
+			Set<String> strings = Sets.newHashSet();
+			
+			for (String fragment : arg.split(";")) {
+				String trimmedFragment = fragment.trim();
+				if (!trimmedFragment.isEmpty()) {
+					strings.add(fragment);
+				}
 			}
+			
+			return Optional.of(strings);
 		}
-		
-		return strings;
 	}
 	
 	@Override

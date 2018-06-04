@@ -158,7 +158,10 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 	private void serviceBrowserRequest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String fullUri = request.getRequestURI();
-		
+		String contextPath = request.getContextPath();
+		if (fullUri.startsWith(contextPath)) {
+			fullUri = fullUri.substring(contextPath.length());
+		}
 		// trim trailing slash to avoid failure to handle e.g. .../StructureDefinition/
 		if (fullUri.endsWith("/") && !fullUri.equals("/")) {
 			fullUri = fullUri.substring(0, fullUri.length()-1);
