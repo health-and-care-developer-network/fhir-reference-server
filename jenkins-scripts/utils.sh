@@ -37,7 +37,7 @@ trimmedMavenVersion()
 {
   local version=$(mavenVersion)
   # remove suffix of -SNAPSHOT if present
-  echo ${REFERENCE_SERVER_MVN_VERSION%-SNAPSHOT}
+  echo ${version%-SNAPSHOT}
 }
 mavenVersion()
 {
