@@ -45,10 +45,10 @@ public class RendererCliArgsParser extends CliArgsParser<RendererCliArgs> {
 	protected RendererCliArgs extractArgs(ParsedArgs parsedArgs) {
 		Path inputDir = parsedArgs.get(ARG_INPUT);
 		Path outputDir = parsedArgs.get(ARG_OUTPUT);
-        Optional<Set<String>> allowedMissingExtensionPrefixes = parsedArgs.get(ARG_MISSING_EXT);
+        Optional<Set<String>> allowedMissingExtensionPrefixes = Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT));
         Optional<Path> httpCacheDirectory = Optional.ofNullable(parsedArgs.get(ARG_HTTP_CACHE));
         Optional<String> newBaseUrl = Optional.ofNullable(parsedArgs.get(ARG_NEW_PATH));
-        Optional<Set<String>> localDomains = parsedArgs.get(ARG_LOCAL_DOMAINS);
+        Optional<Set<String>> localDomains = Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS));
         boolean copyOnError = parsedArgs.get(FLAG_COPY_ON_ERROR);
 		
 		return new RendererCliArgs(inputDir, outputDir, newBaseUrl,

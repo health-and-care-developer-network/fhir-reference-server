@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionBindingComponent;
 import org.hl7.fhir.dstu3.model.ElementDefinition.ElementDefinitionConstraintComponent;
@@ -228,6 +230,21 @@ public class WrappedStu3ElementDefinition extends WrappedElementDefinition {
 		} else {
 			if (fixed instanceof PrimitiveType) {
 				return Optional.ofNullable(((PrimitiveType<?>)fixed).asStringValue());
+			} else if (fixed instanceof CodeableConcept) {
+				CodeableConcept fixedCc = (CodeableConcept)fixed;
+				List<Coding> codings = fixedCc.getCoding();
+				if (codings.isEmpty()){
+					throw new IllegalStateException("CodeableConcept fixed value without any codings: " + getPath().toString());
+				} else if (codings.size() == 1) {
+					Coding coding = codings.get(0);
+					return Optional.of("code=" + coding.getCode() + ", system=" + coding.getSystem());
+				} else {
+					return Optional.of(
+						codings
+							.stream()
+							.map(coding -> "[code=" + coding.getCode() + ", system=" + coding.getSystem() + "]")
+							.collect(Collectors.joining(", ")));
+				}
 			} else {
 				throw new IllegalStateException("Unhandled type for default value: " + fixed.getClass().getCanonicalName());
 			}
