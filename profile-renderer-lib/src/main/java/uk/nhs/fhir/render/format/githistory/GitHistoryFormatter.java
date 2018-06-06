@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.wrap.WrappedResource;
+import uk.nhs.fhir.render.GithubRateLimitOrAbuseException;
 import uk.nhs.fhir.render.format.HTMLDocSection;
 import uk.nhs.fhir.render.format.TableFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
@@ -53,7 +54,7 @@ public class GitHistoryFormatter<T extends WrappedResource<T>> extends TableForm
 			section.addBodyElement(historyPanel);
 			addStyles(section);
 
-		} catch (IOException e) {
+		} catch (IOException | GithubRateLimitOrAbuseException e) {
 			e.printStackTrace();
 			return null;
 		}
