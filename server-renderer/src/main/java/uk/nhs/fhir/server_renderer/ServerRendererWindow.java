@@ -100,15 +100,18 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private void applyLargeConfig() {
 		setContainerFonts(BIG_FONT, this);
 		setContainerFonts(BIG_FONT, rootDirectoryChooser);
+		setContainerFonts(BIG_FONT, exportToZipChooser);
 		
 		enlargeComponent(this);
 		enlargeComponent(rootDirectoryChooser);
+		enlargeComponent(exportToZipChooser);
 
 		rendererRootfilePathText.setColumns(25);
 	}
 	
 	private void enlargeComponent(Component c) {
-		if (c instanceof JLabel || c instanceof JTextField) {
+		if (c instanceof JLabel 
+		  || c instanceof JTextField) {
 			// labels already expand according to the font
 			return;
 		}
@@ -143,11 +146,6 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	}
 
 	private void initPanel() {
-		//BoxLayout mgr = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
-		
-		//int filePathPreferredHeight = rendererRootfilePathText.getPreferredSize().height;
-		//rendererRootfilePathText.setPreferredSize(new Dimension(300, filePathPreferredHeight));
-
 		int mainPadding = 4;
 		
 		rendererRootfilePathText.setEditable(false);
