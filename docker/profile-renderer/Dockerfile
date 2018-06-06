@@ -16,5 +16,5 @@ USER fhir
 
 VOLUME ["/source", "/generated"]
 
-ENTRYPOINT ["/bin/bash", "/usr/publisher/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-xe", "/usr/publisher/entrypoint.sh"]
 
