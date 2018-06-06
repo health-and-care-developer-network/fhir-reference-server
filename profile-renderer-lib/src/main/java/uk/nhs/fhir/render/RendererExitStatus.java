@@ -2,7 +2,7 @@ package uk.nhs.fhir.render;
 
 public enum RendererExitStatus {
 	FINISHED_OK(true),
-	FINISHED_WITH_WARNINGS(false),
+	FINISHED_WITH_WARNINGS(true),
 	FINISHED_WITH_ERRORS(false),
 	CAUGHT_EXCEPTION(false);
 	
