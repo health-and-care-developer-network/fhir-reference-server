@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,7 +16,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -36,16 +38,9 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServerRendererWindow.class);
 	
-	private static final String SYS_PROP_BIG_FONT_SIZE = "BigFontSize";
-	private static final String SYS_PROP_HEIGHT_SCALE = "BigHeightScale";
-	private static final String SYS_PROP_WIDTH_SCALE = "BigWidthScale";
-
-	private static final Optional<Integer> BIG_FONT_SIZE = Optional.ofNullable(System.getProperty(SYS_PROP_BIG_FONT_SIZE)).map(Integer::parseInt);
-	private static final Optional<Double> BIG_HEIGHT_SCALE = Optional.ofNullable(System.getProperty(SYS_PROP_HEIGHT_SCALE)).map(Double::parseDouble);
-	private static final Optional<Double> BIG_WIDTH_SCALE = Optional.ofNullable(System.getProperty(SYS_PROP_WIDTH_SCALE)).map(Double::parseDouble);
-	private static final Font BIG_FONT = new Font("Dialog", Font.BOLD, BIG_FONT_SIZE.isPresent() ? BIG_FONT_SIZE.get() : 50);
-	private static final double BIG_WINDOW_HEIGHT_FACTOR = BIG_HEIGHT_SCALE.isPresent() ? BIG_HEIGHT_SCALE.get() : 1.5;
-	private static final double BIG_WINDOW_WIDTH_FACTOR = BIG_WIDTH_SCALE.isPresent() ? BIG_WIDTH_SCALE.get() : 1.5;
+	private static final Font BIG_FONT = new Font("Dialog", Font.BOLD, 30);
+	private static final double BIG_WINDOW_HEIGHT_FACTOR = 1.5;
+	private static final double BIG_WINDOW_WIDTH_FACTOR = 1.5;
 	
 	private final Path renderedFileDir;
 	private final Path importedFileDir;
@@ -71,9 +66,9 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 		
 		if (largeText) {
 			LOG.info("Applying big settings to server/renderer window...");
-			LOG.info("Big Font size = " + BIG_FONT.getSize());
-			LOG.info("Big window height factor = " + BIG_WINDOW_HEIGHT_FACTOR);
-			LOG.info("Big window width factor = " + BIG_WINDOW_WIDTH_FACTOR);
+			LOG.info("Big Font size = " + BIG_FONT.getSize() 
+			  + ", Big window height factor = " + BIG_WINDOW_HEIGHT_FACTOR
+			  + ", Big window width factor = " + BIG_WINDOW_WIDTH_FACTOR);
 			
 			applyLargeConfig();
 		}
@@ -81,19 +76,9 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 		pack();
 	}
 
-	private void applyLargeConfig() {
-		setContainerFonts(BIG_FONT, main);
-		setContainerFonts(BIG_FONT, rootDirectoryChooser);
-		
-		enlargeContainer(main);
-		enlargeContainer(rootDirectoryChooser);
-	}
-
-	private final JPanel main = new JPanel();
-	
 	private final JPanel mainPanel = new JPanel();
-	
-	private final JPanel rendererRootFilePathRow = new JPanel(); 
+
+	private final JPanel rendererRootFilePathRow = new JPanel();
 	private final JLabel rendererRootFilePathLabel = new JLabel("Renderer root file path:");
 	private final JTextField rendererRootfilePathText = new JTextField();
 	private final JButton chooseRootDirectoryButton = new JButton("Select...");
@@ -108,15 +93,37 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	private void initWindow() {
 		setTitle("Local FHIR Server");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setResizable(false);
 		setLayout(new BorderLayout());
 	}
+
+	private void applyLargeConfig() {
+		setContainerFonts(BIG_FONT, this);
+		setContainerFonts(BIG_FONT, rootDirectoryChooser);
+		
+		enlargeComponent(this);
+		enlargeComponent(rootDirectoryChooser);
+
+		rendererRootfilePathText.setColumns(25);
+	}
 	
-	private void enlargeContainer(Container c) {
+	private void enlargeComponent(Component c) {
+		if (c instanceof JLabel || c instanceof JTextField) {
+			// labels already expand according to the font
+			return;
+		}
+		
 		Dimension preferredSize = c.getPreferredSize();
 		c.setPreferredSize(
 			new Dimension(
 				(int)(preferredSize.width * BIG_WINDOW_HEIGHT_FACTOR), 
 				(int)(preferredSize.height * BIG_WINDOW_WIDTH_FACTOR)));
+		
+		if (c instanceof Container) {
+			for (Component comp : ((Container)c).getComponents()) {
+				enlargeComponent(comp);
+			}
+		}
 	}
 
 	/**
@@ -136,28 +143,51 @@ public class ServerRendererWindow extends JFrame implements RendererListener {
 	}
 
 	private void initPanel() {
-		main.setLayout(new BorderLayout());
+		//BoxLayout mgr = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
 		
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		//int filePathPreferredHeight = rendererRootfilePathText.getPreferredSize().height;
+		//rendererRootfilePathText.setPreferredSize(new Dimension(300, filePathPreferredHeight));
+
+		int mainPadding = 4;
 		
-		int filePathPreferredHeight = rendererRootfilePathText.getPreferredSize().height;
-		rendererRootfilePathText.setPreferredSize(new Dimension(300, filePathPreferredHeight));
 		rendererRootfilePathText.setEditable(false);
 		
-		rendererRootFilePathRow.setLayout(new FlowLayout(FlowLayout.LEFT));
-		rendererRootFilePathRow.add(rendererRootFilePathLabel);
-		rendererRootFilePathRow.add(rendererRootfilePathText);
-		rendererRootFilePathRow.add(chooseRootDirectoryButton);
-		mainPanel.add(rendererRootFilePathRow);
-		main.add(mainPanel, BorderLayout.CENTER);
+		// add horizontal padding to text box
+		Box textWrapper = Box.createHorizontalBox();
+		textWrapper.add(Box.createHorizontalStrut(mainPadding));
+		textWrapper.add(rendererRootfilePathText);
+		textWrapper.add(Box.createHorizontalStrut(mainPadding));
+		
+		// Make text box expand to fill space
+		rendererRootFilePathRow.setLayout(new BorderLayout());
+		rendererRootFilePathRow.add(rendererRootFilePathLabel, BorderLayout.WEST);
+		rendererRootFilePathRow.add(textWrapper, BorderLayout.CENTER);
+		rendererRootFilePathRow.add(chooseRootDirectoryButton, BorderLayout.EAST);
+		
+		// Vertical centering if stretched (though we have now disabled resize, maybe it will be relevant in future).
+		mainPanel.setLayout(new GridBagLayout());
+		GridBagConstraints mainCons = new GridBagConstraints();
+		mainCons.fill = GridBagConstraints.HORIZONTAL;
+		mainCons.weightx = 1;
+		mainPanel.add(rendererRootFilePathRow, mainCons);
 		
 		buttonsBar.setLayout(new FlowLayout());
 		buttonsBar.add(runRendererButton);
 		buttonsBar.add(clearCacheButton);
 		buttonsBar.add(exportToZipButton);
-		main.add(buttonsBar, BorderLayout.SOUTH);
 		
-		this.add(main, BorderLayout.CENTER);
+		// horizontal and vertical padding around edge of main panel
+		Box mainPanelhWrapper = Box.createHorizontalBox();
+		mainPanelhWrapper.add(Box.createHorizontalStrut(mainPadding));
+		mainPanelhWrapper.add(mainPanel);
+		mainPanelhWrapper.add(Box.createHorizontalStrut(mainPadding));
+		Box mainPanelvWrapper = Box.createVerticalBox();
+		mainPanelvWrapper.add(Box.createVerticalStrut(mainPadding));
+		mainPanelvWrapper.add(mainPanelhWrapper);
+		mainPanelvWrapper.add(Box.createVerticalStrut(mainPadding));
+
+		this.add(buttonsBar, BorderLayout.SOUTH);
+		this.add(mainPanelvWrapper, BorderLayout.CENTER);
 	}
 
 	private void initButtonActions() {

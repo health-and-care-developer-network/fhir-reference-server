@@ -1,6 +1,7 @@
 package uk.nhs.fhir.servlet;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,6 +26,12 @@ public class StaticContentServlet extends HttpServlet {
         LOG.info("Requested URI: " + request.getRequestURI() + " handled by Static content Servlet");
         
         String requestedPath = request.getRequestURI();
+        
+        if (requestedPath.contains("/../")) {
+        	response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Request URL may not contain the string \"/../\"");
+        	return;
+        }
+        
         String stu3Prefix = "/STU3/";
 		if (requestedPath.startsWith(stu3Prefix)) {
 			requestedPath = requestedPath.substring(stu3Prefix.length());

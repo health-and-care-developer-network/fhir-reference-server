@@ -98,7 +98,9 @@ public class ValueWithInfoCell extends TableCell {
 		if (hasText) {
 			String displayText;
 			if (StringUtil.looksLikeUrl(description) 
-			  || resourceInfo.getType().equals(ResourceInfoType.FIXED_VALUE)) {
+			  || resourceInfo.getType().equals(ResourceInfoType.FIXED_VALUE)
+			  || resourceInfo.getType().equals(ResourceInfoType.EXAMPLE_VALUE)
+			  || resourceInfo.getType().equals(ResourceInfoType.DEFAULT_VALUE)) {
 				//don't capitalise
 				displayText = description;
 			} else {
