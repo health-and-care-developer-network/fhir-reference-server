@@ -23,21 +23,22 @@ Bash - (for docker scripts - but you can build/run on Windows with `mvn clean pa
 
 ### Subprojects:
 
-> ### [model-utils (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/model-utils)
+> #### [model-utils (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/model-utils)
 > Shared utilities, including loading and wrapping of versioned FHIR profiles
-> ### [profile-renderer-lib (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/profile-renderer-lib)
+> #### [profile-renderer-lib (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/profile-renderer-lib)
 > Renderers to output specification artefacts as HTML pages
-> ### [profile-renderer (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/profile-renderer)
+> #### [profile-renderer (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/profile-renderer)
 > Deployment wrapper for Profile Renderer
-> ### [reference-server-lib (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/reference-server-lib)
+> #### [reference-server-lib (library)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/reference-server-lib)
 > Runs multiple HAPI FHIR servlets alongside one another and reads rendered artefacts from a filesystem DB.
-> ### [reference-server (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/reference-server)
+> #### [reference-server (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/reference-server)
 > Deployment wrapper for Reference Server
-> ### [server-renderer (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/server-renderer)
+> #### [server-renderer (deployable)](https://github.com/health-and-care-developer-network/fhir-reference-server/tree/develop/server-renderer)
 > Local instance running both the reference server and profile renderer, primarily for testing and profile development purposes
 
 ### Quick Start (combined server/renderer application)
 
+Combined server/renderer running as a plain java process:
 ```
 git clone https://github.com/health-and-care-developer-network/fhir-reference-server.git
 cd fhir-reference-server
@@ -45,6 +46,20 @@ git checkout develop
 mvn clean package
 cd server-renderer/target
 java -jar server-renderer-*.jar
+```
+
+Dockerised standalone server and renderer:
+```
+git clone https://github.com/health-and-care-developer-network/fhir-reference-server.git
+cd fhir-reference-server
+# create tagged docker images for both the server (nhsd/fhir-reference-server) and renderer (nhsd/fhir-profile-renderer)
+./build-local.sh
+# create a dockerised instance of the fhir server (port and container name configurable, defaults to 8080, fhir-server)
+./deploy-server-local.sh
+# tweak parameters in run-publisher-local.sh to select an appropriate target repo/branch to publish
+./run-publisher-local.sh
+# Trigger the server to import the newly-rendered files and load them into the server's metadata cache
+./clear-server-cache-local.sh
 ```
 
 ### Populating the server
