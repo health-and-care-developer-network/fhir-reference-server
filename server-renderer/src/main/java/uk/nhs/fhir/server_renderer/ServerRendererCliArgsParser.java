@@ -28,8 +28,8 @@ public class ServerRendererCliArgsParser extends CliArgsParser<ServerRendererArg
 	@Override
 	protected ServerRendererArgs extractArgs(ParsedArgs parsedArgs) {
 		return new ServerRendererArgs(false, 
-			Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT)), 
-			Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS)));
+			Optional.ofNullable(parsedArgs.get(ARG_LOCAL_DOMAINS)), 
+			Optional.ofNullable(parsedArgs.get(ARG_MISSING_EXT)));
 	}
 
 }

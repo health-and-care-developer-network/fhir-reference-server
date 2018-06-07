@@ -20,6 +20,7 @@ public abstract class CliArgsParser<T> {
 		try {
 			 parsedArgs = spec.parseArgs(args);
 		} catch (ArgParsingFailed e) {
+			LOG.error("Caught ArgParseError");
 			return error(e.getMessage());
 		}
 		
