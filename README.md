@@ -5,13 +5,6 @@ A FHIR Server with a UI, to provide CareConnect and NHS Digital FHIR specificati
 
 ---
 
-- [Features](#Features)
-- [Requirements](#Requirements)
-- [Limitations](#Limitations)
-- [Contributing](#Contributing)
-- [Disclaimer](#Disclaimer)
-
-
 ### Features
 
 - [HAPI](hapifhir.io)-based FHIR server
@@ -162,7 +155,21 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 > - (C) handle exceptions arising when sorting events for event dialog
 > - improve logging in the event of a failure
 > - support MessageDefinition resources
-> - support accessing bindings on associated extension(s) for StructureDefinition nodes
+> - support accessing bindings on associated extension(s) for StructureD 	Organisation	
+￼
+Organisation whose environment you are publishing resources to.	
+ 	Environment	
+￼
+Environment to deploy the resources to.	
+ 	GIT_REPO	
+￼
+Repo to use as resources source	
+ 	GIT_BRANCH	
+￼￼
+Filter
+ 	PublisherVersion	
+￼
+￼Buildefinition nodes
 > - support identifying unavailable CodeSystem on ValueSets
 > - only HTML-escape text sections
 > - add command line arguments support
