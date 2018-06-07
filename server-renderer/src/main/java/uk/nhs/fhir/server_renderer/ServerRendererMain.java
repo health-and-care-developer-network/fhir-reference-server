@@ -34,7 +34,8 @@ public class ServerRendererMain
     	
     	ServerRendererArgs cliArgs = new ServerRendererCliArgsParser().parseArgs(args);
     	if (cliArgs == null) {
-    		return;
+    		LOG.error("Failed to parse server renderer args. Quitting.");
+    		System.exit(1);
     	}
     	
 		Path tmpDir = getTmpDir();
