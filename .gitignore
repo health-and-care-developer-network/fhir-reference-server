@@ -4,3 +4,5 @@
 */target/
 */bin/
 */dependency-reduced-pom.xml
+profile-renderer-deploy/
+reference-server-deploy/
