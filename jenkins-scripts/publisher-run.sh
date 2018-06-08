@@ -35,6 +35,7 @@ $TARGET_DOCKER_CMD rm $CONTAINER_NAME || :
 $TARGET_DOCKER_CMD run \
   --name $CONTAINER_NAME \
 	-v /docker-data/fhir-server-temp:/source \
+	-v /docker-data/fhir-server-httpcache:/tmp/git-http-cache \
 	-v /docker-data/fhir-profiles:/generated \
 	-e "RENDERER_FLAGS=$RENDERER_FLAGS" \
 	"$SOURCE" "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$OLD_URL" "$NEW_URL" "$OUT_PATH"
