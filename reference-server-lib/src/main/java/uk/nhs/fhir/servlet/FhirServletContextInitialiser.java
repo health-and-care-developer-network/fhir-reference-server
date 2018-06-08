@@ -2,6 +2,7 @@ package uk.nhs.fhir.servlet;
 
 import javax.servlet.ServletContext;
 
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 public class FhirServletContextInitialiser {
@@ -18,5 +19,17 @@ public class FhirServletContextInitialiser {
 		context.setAttribute(FhirServerProperties.SERVLET_CONTEXT_PROPERTY_PROPERTIES, sharedProperties);
 		
 		context.setAttribute(RequestErrorHandler.SERVLET_CONTEXT_KEY, new RequestErrorHandler());
+		
+		triggerCacheResourcesOnInit();
+	}
+
+	private void triggerCacheResourcesOnInit() {
+		// load existing resources on startup
+		new Thread(
+			new Runnable() {
+				public void run() {
+					FilesystemIF.invalidateCache();
+				}
+			}, "InitServerCache").start();;
 	}
 }

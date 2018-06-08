@@ -87,16 +87,6 @@ public class FileCache {
 			}
 		};
 
-	static {
-		// load existing resources on startup
-		new Thread(
-			new Runnable() {
-				public void run() {
-					invalidateCache();
-				}
-			}, "InitServerCache").start();;
-	}
-
 	// If a refresh is not already running, kick it off now in a new thread  
     public static void invalidateCache() {
 		if (updatingCache.compareAndSet(false, true)) {
