@@ -14,6 +14,8 @@ RUN chown -R fhir:fhir /usr/publisher
 
 USER fhir
 
+ENV GITHUB_OAUTH $GH_OAUTH
+
 VOLUME ["/source", "/generated"]
 
 ENTRYPOINT ["/bin/bash", "-xe", "/usr/publisher/entrypoint.sh"]
