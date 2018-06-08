@@ -69,12 +69,17 @@ public class VersionNumber implements Comparable<VersionNumber> {
 	}
 
 	public static final Comparator<VersionNumber> BY_MAJOR_MINOR = 
-		Comparator.comparing((VersionNumber version) -> version.major)
-			.thenComparing((VersionNumber version) -> version.minor);
+		Comparator.comparing(VersionNumber::getMajor)
+			.thenComparing(VersionNumber::getMinor);
+	
+	public static final Comparator<VersionNumber> BY_MAJOR_MINOR_PATCH = 
+			Comparator.comparing(VersionNumber::getMajor)
+				.thenComparing(VersionNumber::getMinor)
+				.thenComparing(VersionNumber::getPatch);
 	
 	@Override
 	public int compareTo(VersionNumber other) {
-		return BY_MAJOR_MINOR.compare(this, other);
+		return BY_MAJOR_MINOR_PATCH.compare(this, other);
 	}
 
 	@Override

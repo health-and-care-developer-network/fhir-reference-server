@@ -15,7 +15,7 @@ public class ResourceEntityWithMultipleVersions {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceEntityWithMultipleVersions.class.getName());
 
-	Map<VersionNumber,ResourceMetadata> metadataByVersion = new TreeMap<VersionNumber,ResourceMetadata>();
+	Map<VersionNumber,ResourceMetadata> metadataByVersion = new TreeMap<VersionNumber,ResourceMetadata>(VersionNumber.BY_MAJOR_MINOR);
 	VersionNumber latest = null;
 	VersionNumber latestActive = null;
 	VersionNumber latestDraft = null;
@@ -32,6 +32,29 @@ public class ResourceEntityWithMultipleVersions {
 	}
 	
 	public void add(ResourceMetadata entity) {
+		if (metadataByVersion.containsKey(entity.getVersionNo())) {
+			// resolve situation where two resources have matching major and minor versions
+			int compareResult = entity.getVersionNo().compareTo(metadataByVersion.get(entity.getVersionNo()).getVersionNo());
+			if (compareResult == 0) {
+				// Two separate versioned files with identical id and patch. Something is wrong.
+				throw new IllegalStateException("Found multiple versions of resource with id " + entity.getResourceID() + ": " 
+				+ entity.getResourceFile().getAbsolutePath() +" and " + metadataByVersion.get(entity.getVersionNo()).getResourceFile().getAbsolutePath());
+			} else if (compareResult < 0) {
+				// new entity is lower value
+				LOG.info("Ignoring resource at " + entity.getResourceFile().getAbsolutePath() + " since " + metadataByVersion.get(entity.getVersionNo()).getResourceFile().getAbsolutePath() + " has higher patch version");
+				return;
+			} else {
+				// new entiry is higher value
+				LOG.info("Resource at " + entity.getResourceFile().getAbsolutePath() + " will replace " + metadataByVersion.get(entity.getVersionNo()).getResourceFile().getAbsolutePath() + " since it has higher patch version");
+			}
+			
+			// if we don't remove, we'll still display the old version number!
+			metadataByVersion.remove(entity.getVersionNo());
+			metadataByVersion.put(entity.getVersionNo(), entity);
+		} else {
+			metadataByVersion.put(entity.getVersionNo(), entity);
+		}
+		
 		latest = largestVersion(latest, entity.getVersionNo());
 		
 		if (entity.getStatus().equals(ResourceStatus.active)) {
@@ -39,8 +62,6 @@ public class ResourceEntityWithMultipleVersions {
 		} else if (entity.getStatus().equals(ResourceStatus.draft)) {
 			latestDraft = largestVersion(latestDraft, entity.getVersionNo());
 		}
-		
-		metadataByVersion.put(entity.getVersionNo(), entity);
 	}
 	
 	public ResourceMetadata getLatest() {
