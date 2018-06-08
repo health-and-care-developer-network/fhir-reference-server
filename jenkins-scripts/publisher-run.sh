@@ -39,6 +39,6 @@ $TARGET_DOCKER_CMD run \
 	-v /docker-data/fhir-server-httpcache:/tmp/git-http-cache \
 	-v /docker-data/fhir-profiles:/generated \
 	-e "RENDERER_FLAGS=$RENDERER_FLAGS" \
-	-e "GH_OAUTH=$GH_OAUTH" \
+	-e "GITHUB_OAUTH=$GH_OAUTH" \
 	"$SOURCE" "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$OLD_URL" "$NEW_URL" "$OUT_PATH"
 

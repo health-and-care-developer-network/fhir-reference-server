@@ -45,9 +45,14 @@ if [ "$FORCE_COPY" -eq "true" ]; then
   RENDERER_FLAGS="$RENDERER_FLAGS -f"
 fi
 
+RENDERER_FLAGS="$RENDERER_FLAGS -c /tmp/git-http-cache"
+
+# You can use a github account for calls into github to get commit histories - to do that and avoid the anonymous call limit, provide a token here:
+GITHUB_OAUTH=""
+
 # Publish all the profiles
 cd jenkins-scripts
-./publisher-run.sh "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$PREPROCESS_ARTEFACTS_OLD_URL" "$PREPROCESS_ARTEFACTS_NEW_URL" "$REGISTRY_HOST" "$TARGET_HOST" "$OUT_PATH" "$TAG_NAME" "$RENDERER_FLAGS"
+./publisher-run.sh "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$PREPROCESS_ARTEFACTS_OLD_URL" "$PREPROCESS_ARTEFACTS_NEW_URL" "$REGISTRY_HOST" "$TARGET_HOST" "$OUT_PATH" "$TAG_NAME" "$RENDERER_FLAGS" "$GITHUB_OAUTH"
 
 # return to root directory
 cd ..

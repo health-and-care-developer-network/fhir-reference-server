@@ -14,7 +14,7 @@ RUN chown -R fhir:fhir /usr/publisher
 
 USER fhir
 
-ENV GITHUB_OAUTH $GH_OAUTH
+ENV GITHUB_OAUTH ""
 
 VOLUME ["/source", "/generated"]
 
