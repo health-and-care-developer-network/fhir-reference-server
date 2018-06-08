@@ -93,7 +93,7 @@ public class VersionNumberTest {
 		VersionNumber vn1, vn2;
 		vn1 = new VersionNumber("1.1.2");
 		vn2 = new VersionNumber("1.1.3");
-		assertTrue(vn2.compareTo(vn1) == 0);
+		assertTrue(VersionNumber.BY_MAJOR_MINOR.compare(vn2, vn1) == 0);
 	}
 	
 	@Test
