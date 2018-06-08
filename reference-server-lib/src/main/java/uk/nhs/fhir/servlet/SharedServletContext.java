@@ -5,6 +5,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.util.FhirServerProperties;
 
 @WebListener
@@ -32,6 +33,21 @@ public class SharedServletContext implements ServletContextListener {
 			throw new IllegalStateException("FHIR Server recorded multiple contextInitialised events");
 		}
 		
+		postContextInitialised();
+	}
+
+	private void postContextInitialised() {
+		cacheResourcesAsync();
+	}
+
+	private void cacheResourcesAsync() {
+		// load existing resources on startup
+		new Thread(
+			new Runnable() {
+				public void run() {
+					FilesystemIF.invalidateCache();
+				}
+			}, "InitServerCache").start();
 	}
 
 	public static boolean initialised() {
