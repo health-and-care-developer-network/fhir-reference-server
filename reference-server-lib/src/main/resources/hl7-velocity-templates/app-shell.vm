@@ -46,7 +46,7 @@
 	
 			<footer>
 				<div class="links">
-					<a href="http://www.hl7.org.uk/">&copy;2017 HL7 UK.</a>
+					<a href="http://www.hl7.org.uk/">&copy;2018 HL7 UK.</a>
 					HL7&reg; and FHIR&reg; are the registered trademarks of Health Level Seven International.
 				</div>
 			</footer>
@@ -55,5 +55,29 @@
 		<!-- JQuery UI and site scripts -->
 		<script src="/js/jquery-ui/jquery-ui.js"></script>
 		<script src="/js/site-functions.js"></script>
+
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+		    var _gaq = _gaq || [];
+		    _gaq.push(
+		        ['_setAccount', 'UA-38028819-4'],
+			['_gat._anonymizeIp'],
+		        ['_trackPageview'],
+		        ['b._setAccount', 'UA-1283645-1'],
+		        ['b._trackPageview']
+		    );
+		    (function() {
+		        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		    })();
+		</script>
+
+   <script type="text/javascript">
+     _uacct = "UA-2010094-1";
+     urchinTracker();
+   </script>
+
+
 	</body>
 </html>
