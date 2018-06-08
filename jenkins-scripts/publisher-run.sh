@@ -15,6 +15,7 @@ TARGET_HOST="${TARGET_HOST:-${7}}"
 OUT_PATH="${OUT_PATH:-${8}}"
 TAG_NAME="${TAG_NAME:-${9}}"
 RENDERER_FLAGS="${RENDERER_FLAGS:-${10}}"
+GH_OAUTH="${GH_OAUTH:-${11}}"
 
 IMAGE_NAME="nhsd/fhir-profile-renderer"
 CONTAINER_NAME="fhir-publisher"
@@ -35,7 +36,9 @@ $TARGET_DOCKER_CMD rm $CONTAINER_NAME || :
 $TARGET_DOCKER_CMD run \
   --name $CONTAINER_NAME \
 	-v /docker-data/fhir-server-temp:/source \
+	-v /docker-data/fhir-server-httpcache:/tmp/git-http-cache \
 	-v /docker-data/fhir-profiles:/generated \
 	-e "RENDERER_FLAGS=$RENDERER_FLAGS" \
+	-e "GITHUB_OAUTH=$GH_OAUTH" \
 	"$SOURCE" "$GITHUB_URL" "$BRANCH" "$IN_PATH" "$OLD_URL" "$NEW_URL" "$OUT_PATH"
 
