@@ -166,6 +166,11 @@ public class FhirProfileRenderer {
 	    	
 	        FileProcessor fileProcessor = new FileProcessor();
 	        try {
+	        	if (!fhirFileRegistry.iterator().hasNext()) {
+	        		throw new IllegalStateException("Rendering job has nothing to render. Are these the correct local prefixes?\n" +
+        				FhirURL.getLocalQDomains().stream().collect(Collectors.joining(" ")));
+	        	}
+	        	
 	        	for (Map.Entry<File, WrappedResource<?>> e : fhirFileRegistry) {
 	        		rendererContext.setCurrentSource(e.getKey());
 	        		rendererContext.setCurrentParsedResource(Optional.of(e.getValue()));
