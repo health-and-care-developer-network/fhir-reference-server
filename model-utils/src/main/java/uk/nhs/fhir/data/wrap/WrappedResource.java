@@ -54,6 +54,7 @@ import uk.nhs.fhir.util.StringUtil;
  * FhirBrowserRequestServlet INDEXED_TYPES needs the type to be added
  * The reference server hl7-velocity-templates/home.vm and velocity-templates/home.vm need updating
  * ResourcePageRenderer getFirstTabName() needs an entry adding
+ * The appropriate [FHIRVERSION]HapiRequestHandler class(es) will need handlers adding for non-browser requests
  */
 
 public abstract class WrappedResource<T extends WrappedResource<T>> {
