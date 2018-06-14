@@ -23,6 +23,7 @@ import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
+import uk.nhs.fhir.interceptor.CORSInterceptor;
 import uk.nhs.fhir.interceptor.ConformanceInterceptor;
 import uk.nhs.fhir.resourcehandlers.ResourceProvider;
 import uk.nhs.fhir.servlet.IndexServlet;
@@ -82,12 +83,13 @@ public abstract class HapiRequestHandler extends RestfulServer {
 	@Override
     protected void initialize() throws ServletException {
         setResourceProviders();
-        addInterceptor();
+        addInterceptors();
         addPagingProvider();
     }
 	
-	private void addInterceptor() {
+	private void addInterceptors() {
 		registerInterceptor(new ConformanceInterceptor(fhirVersion));
+		registerInterceptor(new CORSInterceptor());
 	}
 
 	private void addPagingProvider() {
