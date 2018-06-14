@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.StringJoiner;
 
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -55,8 +56,6 @@ public class FileLoader {
 		
 	    LOG.debug("Loading file using encoding: " + charsetName);
 	    
-	    StringBuilder sb = new StringBuilder();
-	    
 		try (
 			ByteArrayOutputStream bOutStream = new ByteArrayOutputStream();
 			InputStream fis = new FileInputStream(file);
@@ -64,12 +63,14 @@ public class FileLoader {
 			Reader streamReader = new InputStreamReader(bomInputStream, charsetName);
 			BufferedReader in = new BufferedReader(streamReader);) {
 			
+			StringJoiner sj = new StringJoiner("\n");
+			
 			String str;
 			while ((str = in.readLine()) != null) {
-			    sb.append(str);
+			    sj.add(str);
 			}
 			
-			return sb.toString();
+			return sj.toString();
 		} catch (IOException e) {
 			throw new IllegalStateException("Error reading file: " + file.getName(), e);
 		}
