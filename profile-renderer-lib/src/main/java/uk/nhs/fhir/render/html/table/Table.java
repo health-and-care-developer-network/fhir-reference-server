@@ -61,6 +61,41 @@ public class Table {
 					rowElements)));
 	}
 	
+	// ALP4-298 Changes -- Anand 11-July
+	
+    public Element makeTable_collapse() {
+        List<Element> titleElements = Lists.newArrayList();
+        cols.forEach((TableTitle col) -> titleElements.add(col.makeTitleCell()));
+        
+        List<Element> rowElements = Lists.newArrayList();
+        rows.forEach((TableRow row) -> rowElements.add(row.makeRow()));
+        String treeName = "treetable" + (int )(Math. random() * 50 + 1);  // Anand comments - Generating random tablename
+        List<String> classes = Lists.newArrayList(FhirCSS.TABLE);
+        classes.addAll(additionalClasses);
+        Element tableContent =  Elements.withAttributesAndChildren("table",
+            Lists.newArrayList(new Attribute("class", "treetable ig-treetable"),new Attribute("id", treeName)),
+            Lists.newArrayList(
+                Elements.withChild("thead",
+                    Elements.withAttributeAndChildren("tr", 
+                        new Attribute("class", FhirCSS.TABLE_HEADER_ROW), 
+                        titleElements)),
+                Elements.withChildren("tbody",
+                    rowElements)
+                ));
+        List<Element> contentElements = Lists.newArrayList();
+        contentElements.add(Elements.withAttributeAndText("script", new  Attribute("src","/js/jquery-ui/treetable.min.js"),"null"));
+        contentElements.add( Elements.withAttributesAndText("link", Lists.newArrayList(new Attribute("href","/js/jquery-ui/igViewer.min.css"),new Attribute("rel","stylesheet")) ,""));
+        contentElements.add(Elements.withAttributeAndText("button", new  Attribute("onclick","resourceTreeTable.expandAll(\"" + treeName + "\");resourceTreeTable.init(\"" + treeName + "\")"),"ExpandAll"));
+        contentElements.add(tableContent);
+        contentElements.add(Elements.withAttributeAndText("script", new Attribute("language","javascript"),"var resourceTreeTable = new BaseTreeTable();\n" + 
+                " resourceTreeTable.init(\"" + treeName + "\");"));
+        
+        
+        Element finalContent = Elements.withChildren("br", contentElements);
+        
+        return finalContent;
+        
+    }
 	/*private Element applyMaxWidths(Element row) {
 		List<Element> children = row.getChildren();
 		

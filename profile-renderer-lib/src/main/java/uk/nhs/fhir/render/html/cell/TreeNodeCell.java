@@ -26,6 +26,9 @@ public class TreeNodeCell extends TableCell {
 	private final Optional<String> mouseOverText;
 	private final boolean removed;
 	
+	public static String static_nodeKey;
+	public static int data_serial_nr;
+	
 	public TreeNodeCell(List<FhirTreeIcon> treeIcons, FhirIcon fhirIcon, String name, String backgroundClass, boolean removed, String nodeKey, Optional<String> mouseOverText) {
 		super(false, false, removed);
 
@@ -41,7 +44,9 @@ public class TreeNodeCell extends TableCell {
 	@Override
 	public Element makeCell() {
 		List<Content> contents = Lists.newArrayList();
-		
+		static_nodeKey = nodeKey;
+		data_serial_nr++;
+		/*
 		for (FhirTreeIcon icon : treeIcons) {
 			//contents.add(Elements.withAttributes("img", Lists.newArrayList(new Attribute("class", icon.getCssClass()))));
 			contents.add(
@@ -49,7 +54,7 @@ public class TreeNodeCell extends TableCell {
 					Lists.newArrayList(
 						new Attribute("src", icon.getNhsSrc()),
 						new Attribute("class", FhirCSS.TREE_ICON))));
-		}
+		}*/
 		
 		contents.add(Elements.withAttributes("img", 
 			Lists.newArrayList(
@@ -57,7 +62,8 @@ public class TreeNodeCell extends TableCell {
 				new Attribute("class", FhirCSS.TREE_RESOURCE_ICON))));
 		
 		List<Attribute> elementNameAttributes = Lists.newArrayList();
-		List<String> elementNameClasses = Lists.newArrayList(cellClasses);
+		//List<String> elementNameClasses = Lists.newArrayList(cellClasses); Removed default cell classes
+		List<String> elementNameClasses = Lists.newArrayList();
 		
 		if (!removed) {
 			elementNameClasses.add(FhirCSS.LINK);

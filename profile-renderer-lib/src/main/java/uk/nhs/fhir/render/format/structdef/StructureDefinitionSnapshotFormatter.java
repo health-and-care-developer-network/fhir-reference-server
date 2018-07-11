@@ -59,7 +59,8 @@ public class StructureDefinitionSnapshotFormatter extends TreeTableFormatter<Wra
 		FhirTreeTable<SnapshotData, SnapshotTreeNode> snapshotTree = new FhirTreeTable<>(snapshotTreeData, getResourceVersion());
 		
 		Table snapshotTable = snapshotTree.asTable();
-		Element snapshotHtmlTable = snapshotTable.makeTable();
+//		Element snapshotHtmlTable = snapshotTable.makeTable();
+		Element snapshotHtmlTable = snapshotTable.makeTable_collapse();
 
 		addStyles(section);
 		getTableBackgroundStyles(snapshotHtmlTable).forEach(section::addStyle);
