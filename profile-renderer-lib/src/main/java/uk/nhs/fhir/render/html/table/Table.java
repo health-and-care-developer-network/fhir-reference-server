@@ -69,7 +69,7 @@ public class Table {
         
         List<Element> rowElements = Lists.newArrayList();
         rows.forEach((TableRow row) -> rowElements.add(row.makeRow()));
-        String treeName = "treetable" + (int )(Math. random() * 50 + 1);  // Anand comments - Generating random tablename
+        String treeName = "treetable" + (int )(Math. random() * 5000 + 1);  // Anand comments - Generating random tablename
         List<String> classes = Lists.newArrayList(FhirCSS.TABLE);
         classes.addAll(additionalClasses);
         Element tableContent =  Elements.withAttributesAndChildren("table",

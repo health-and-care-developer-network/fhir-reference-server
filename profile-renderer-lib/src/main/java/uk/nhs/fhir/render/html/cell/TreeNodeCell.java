@@ -67,8 +67,7 @@ public class TreeNodeCell extends TableCell {
 		
 		if (!removed) {
 			elementNameClasses.add(FhirCSS.LINK);
-			elementNameClasses.add(FhirCSS.TAB_LINK);
-			
+			elementNameClasses.add(FhirCSS.TAB_LINK);			
 			elementNameAttributes.add(new Attribute("href", "details.html#" + nodeKey));
 		}
 		

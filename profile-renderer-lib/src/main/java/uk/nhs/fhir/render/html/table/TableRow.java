@@ -48,10 +48,8 @@ public class TableRow {
         String parentNode = "-1";
         tableCells.forEach((TableCell cell) -> {
             cells.add(cell.makeCell());
-            System.out.println("elements are11:  " +   TreeNodeCell.static_nodeKey);    
         });
         parentNode = "-1";
-        System.out.print(TreeNodeCell.static_nodeKey.contains("."));
         if(TreeNodeCell.static_nodeKey.contains("."))
             {
                 parentNode =  TreeNodeCell.static_nodeKey.substring(0, TreeNodeCell.static_nodeKey.lastIndexOf("."));
@@ -62,6 +60,5 @@ public class TableRow {
                 return Elements.withAttributesAndChildren("tr", Lists.newArrayList(new Attribute("class","rootnode"), new Attribute("data-id",TreeNodeCell.static_nodeKey)), cells); // Anand added root node
             }
             
-    }
-    //return Elements.withChildren("tr", cells); }
+    }    
 }
