@@ -82,3 +82,12 @@ $( document ).ready(function() {
 	loadMetadata();
 	loadInitialTab();
 });
+
+$(window).bind("load", function() {
+    console.log("i am loaded");
+    if ( window.location.hash.length > 0 & resourceType  == "StructureDefinition")     
+    {
+        $('#ui-id-2').click();
+        anchorToJumpTo = window.location.hash.substr(1);
+    }
+  });
