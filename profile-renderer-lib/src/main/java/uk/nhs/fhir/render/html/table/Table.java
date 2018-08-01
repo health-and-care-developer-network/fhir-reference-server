@@ -85,7 +85,7 @@ public class Table {
         List<Element> contentElements = Lists.newArrayList();
         contentElements.add(Elements.withAttributeAndText("script", new  Attribute("src","/js/jquery-ui/treetable.min.js"),"null"));
         contentElements.add( Elements.withAttributesAndText("link", Lists.newArrayList(new Attribute("href","/js/jquery-ui/igViewer.min.css"),new Attribute("rel","stylesheet")) ,""));
-        contentElements.add(Elements.withAttributeAndText("button", new  Attribute("onclick","resourceTreeTable.expandAll(\"" + treeName + "\");resourceTreeTable.init(\"" + treeName + "\")"),"ExpandAll"));
+        contentElements.add(Elements.withAttributesAndText("button", Lists.newArrayList(new Attribute("id", "expandall"), new  Attribute("onclick","resourceTreeTable.expandAll(\"" + treeName + "\");resourceTreeTable.init(\"" + treeName + "\")")),"Expand All"));
         contentElements.add(tableContent);
         contentElements.add(Elements.withAttributeAndText("script", new Attribute("language","javascript"),"var resourceTreeTable = new BaseTreeTable();\n" + 
                 " resourceTreeTable.init(\"" + treeName + "\");"));

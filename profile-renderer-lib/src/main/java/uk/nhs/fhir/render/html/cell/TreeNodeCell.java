@@ -55,6 +55,9 @@ public class TreeNodeCell extends TableCell {
 						new Attribute("src", icon.getNhsSrc()),
 						new Attribute("class", FhirCSS.TREE_ICON))));
 		}*/
+		Element anchorElement = Elements.withAttribute("a", 
+				new Attribute("name", nodeKey+"1"));   // Created new anchor tag for ALP4-415, the tag names are conflicting hence suffixed with "1"
+		contents.add(anchorElement);
 		
 		contents.add(Elements.withAttributes("img", 
 			Lists.newArrayList(
@@ -76,6 +79,8 @@ public class TreeNodeCell extends TableCell {
 		}
 		
 		elementNameAttributes.add(new Attribute("class", String.join(" ", elementNameClasses)));
+		
+		
 		
 		Element nameElement = 
 			Elements.withAttributesAndText(

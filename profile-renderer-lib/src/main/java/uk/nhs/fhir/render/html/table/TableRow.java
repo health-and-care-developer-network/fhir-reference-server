@@ -54,6 +54,7 @@ public class TableRow {
             {
                 parentNode =  TreeNodeCell.static_nodeKey.substring(0, TreeNodeCell.static_nodeKey.lastIndexOf("."));
                 return Elements.withAttributesAndChildren("tr", Lists.newArrayList( new Attribute("data-id",TreeNodeCell.static_nodeKey),new Attribute("class","treenode collapsed"),new Attribute("data-parentid",parentNode),new Attribute("data-serial-nr",String.valueOf(TreeNodeCell.data_serial_nr))), cells); // Anand added Parent node, data node and data serial nr
+                //return Elements.withAttributesAndChildren("tr", Lists.newArrayList( new Attribute("data-id",TreeNodeCell.static_nodeKey),new Attribute("class"," "),new Attribute("data-parentid",parentNode),new Attribute("data-serial-nr",String.valueOf(TreeNodeCell.data_serial_nr))), cells); // Anand added Parent node, data node and data serial nr
             }
         else
             {

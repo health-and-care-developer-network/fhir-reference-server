@@ -82,12 +82,15 @@ $( document ).ready(function() {
 	loadMetadata();
 	loadInitialTab();
 });
-
 $(window).bind("load", function() {
-    console.log("i am loaded");
-    if ( window.location.hash.length > 0 & resourceType  == "StructureDefinition")     
+	if ( window.location.hash.length > 0 & resourceType  == "StructureDefinition")     
     {
-        $('#ui-id-2').click();
-        anchorToJumpTo = window.location.hash.substr(1);
+	 setTimeout(function () {
+ 	 $('#expandall').click();}, 300);
+	 var hash = window.location.hash;
+     window.location.hash = "";
+     setTimeout(function () {
+     window.location.hash = hash+"1";
+     window.location.hash = hash;},300);     
     }
   });
