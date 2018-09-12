@@ -48,7 +48,10 @@ public enum ArtefactType {
 	
 	SEARCH_PARAM_METADATA("metadata.html", ResourceType.SEARCHPARAMETER, "Metadata", -1, true),
 	SEARCH_PARAM_DETAILS("details.html", ResourceType.SEARCHPARAMETER, "Definition", 0, false),
-	SEARCH_PARAM_GITHUB_HISTORY("git-history.html", ResourceType.SEARCHPARAMETER, "Git history", 40, false)
+	SEARCH_PARAM_GITHUB_HISTORY("git-history.html", ResourceType.SEARCHPARAMETER, "Git history", 40, false),
+	
+	NAMING_SYSTEM("render.html",  ResourceType.NAMINGSYSTEM , "Details", 0, false), // Taken from resource text section
+	NAMING_SYSTEM_GITHUB_HISTORY("git-history.html", ResourceType.NAMINGSYSTEM, "Git history", 40, false)	
 	;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ArtefactType.class.getName());

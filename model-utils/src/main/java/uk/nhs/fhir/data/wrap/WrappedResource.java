@@ -32,6 +32,7 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3SearchParameter;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3NamingSystem;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.load.FileLoader;
@@ -218,7 +219,9 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		else if (resource instanceof org.hl7.fhir.dstu3.model.SearchParameter) {
 			return new WrappedStu3SearchParameter((org.hl7.fhir.dstu3.model.SearchParameter)resource);
 		}
-		
+		else if (resource instanceof org.hl7.fhir.dstu3.model.NamingSystem ) {
+            return new WrappedStu3NamingSystem((org.hl7.fhir.dstu3.model.NamingSystem)resource);
+        }
 		else {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}

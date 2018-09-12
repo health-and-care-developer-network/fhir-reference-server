@@ -1,0 +1,24 @@
+<div class='fhirServerGeneratedContent'>
+<table height="400px" width="100%">
+	<tr><td style="vertical-align:top"> 
+	<table id="namingSystemTable" width=100%>
+		<tr>
+			<th width="140">Version</th>
+			<th>ID</th>
+			<th>Description</th>
+			<th>Kind</th>
+		</tr>
+		
+		#foreach( $namingsystem in $namingsystems )
+		<tr>
+			<td>$namingsystem.getStatus().getStatusLabel() </td>
+			<td><a href="/$namingsystem.getFhirVersion().getUrlPrefix()NamingSystem/$namingsystem.getResourceID()">$namingsystem.getResourceName()</a></td>
+			<td>$namingsystem.getExtensionDescription()</td> 
+			<td>$namingsystem.getExtensionCardinality()</td>
+		</tr>
+		#end
+		
+	</table>
+	</td></tr>
+	</table>
+</div>

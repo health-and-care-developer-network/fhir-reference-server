@@ -50,6 +50,10 @@ public class TableRow {
             cells.add(cell.makeCell());
         });
         parentNode = "-1";
+        if (TreeNodeCell.static_nodeKey == null) {
+            return Elements.withChildren("tr", cells);
+        }
+        else {
         if(TreeNodeCell.static_nodeKey.contains("."))
             {
                 parentNode =  TreeNodeCell.static_nodeKey.substring(0, TreeNodeCell.static_nodeKey.lastIndexOf("."));
@@ -59,7 +63,7 @@ public class TableRow {
         else
             {
                 return Elements.withAttributesAndChildren("tr", Lists.newArrayList(new Attribute("class","rootnode"), new Attribute("data-id",TreeNodeCell.static_nodeKey)), cells); // Anand added root node
-            }
+            }}
             
     }    
 }
