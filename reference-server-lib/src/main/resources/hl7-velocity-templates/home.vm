@@ -80,6 +80,16 @@
 		</li>
 	</ul>
 	#end
+	#set( $countNS = $counts.get("NamingSystem") )
+	#if( $countNS )
+	<h3>Naming Systems</h3>
+	<ul>
+		<li><a href="/NamingSystem">Naming System
+			  ($countNS)
+			</a>
+		</li>
+	</ul>
+	#end
 	#set( $countIG = $counts.get("ImplementationGuide") )
 	#if( $countIG )
 	<h3>ImplementationGuide</h3>

@@ -1,0 +1,1 @@
+#parse( "/velocity-templates/namingsystem.vm" )
