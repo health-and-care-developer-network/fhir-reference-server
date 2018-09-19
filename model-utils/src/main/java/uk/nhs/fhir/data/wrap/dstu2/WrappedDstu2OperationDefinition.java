@@ -113,12 +113,23 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
 	public String getIsInstance() {
 		return definition.getInstance().toString();
 	}
-
+	
 	@Override
 	public LinkData getInstanceTypeLink() {
 		return linkFactory.forDataType(definition.getInstanceElement());
 	}
+	
+	@Override
+	public String getIsType() { 
+		return definition.getType().toString();
+	}
+	
+	@Override
+	public LinkData getTypeLink() {
+		return linkFactory.forDataType(definition.getTypeFirstRep());
+	}
 
+	
 	@Override
 	public List<FhirOperationParameter> getInputParameters() {
 		return parametersOfType(OperationParameterUseEnum.IN);

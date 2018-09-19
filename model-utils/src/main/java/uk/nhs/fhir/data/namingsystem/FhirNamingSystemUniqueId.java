@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import uk.nhs.fhir.data.ResourceInfo;
 import uk.nhs.fhir.data.url.LinkData;
+import uk.nhs.fhir.data.url.LinkDatas;
 
 public class FhirNamingSystemUniqueId {
 	
