@@ -82,3 +82,15 @@ $( document ).ready(function() {
 	loadMetadata();
 	loadInitialTab();
 });
+$(window).bind("load", function() {
+	if ( window.location.hash.length > 0 & resourceType  == "StructureDefinition")     
+    {
+	 setTimeout(function () {
+ 	 $('#expandall').click();}, 300);
+	 var hash = window.location.hash;
+     window.location.hash = "";
+     setTimeout(function () {
+     window.location.hash = hash+"1";
+     window.location.hash = hash;},300);     
+    }
+  });

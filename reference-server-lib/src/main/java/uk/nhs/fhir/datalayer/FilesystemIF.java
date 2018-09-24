@@ -203,6 +203,22 @@ public class FilesystemIF {
     }
     
     /**
+     * Get a list of all Naming System to show in the Naming System registry
+     * @return
+     */
+    public List<ResourceMetadata> getNamingSystem()  {
+    	LOG.info("Getting all Naming System");
+        
+    	List<ResourceMetadata> result = Lists.newArrayList();
+    	
+    	for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
+    		result.addAll(FileCache.getNamingSystem(fhirVersion));
+    	}
+    	
+    	return result;
+    }
+    
+    /**
      * Gets a full list of names grouped by base resource for the web view 
      * of /StructureDefinition requests.
      * 
@@ -270,7 +286,8 @@ public class FilesystemIF {
 			List<ResourceMetadata> list = FileCache.getResourceList(fhirVersion);
 			for (ResourceMetadata entry : list) {
 				String type = entry.getResourceType().toString();
-				if (entry.isExtension()) {
+				if (entry.isExtension() && !type.equals("NamingSystem")) // Excluding Naming system resource type as isExtension is true for this 
+				{
 					type = "Extension";
 				}
 				if (results.containsKey(type)) {

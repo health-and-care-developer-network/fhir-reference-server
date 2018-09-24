@@ -67,6 +67,8 @@ public class FhirReflectionUtils {
 	public static String expectUrlByReflection(IBaseResource resource) {
 		Optional<String> url = getUrlByReflection(resource, true);
 		
+		if(resource.getClass().getSimpleName().equals("NamingSystem")) return "NA"; //url is always null for Naming System.
+		
 		// method might still have returned null, so check
 		if (url.isPresent()) {
 			return url.get();
