@@ -4,7 +4,7 @@
 	
     <groupId>uk.nhs.interoperability</groupId>
     <artifactId>reference-server</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4-SNAPSHOT</version>
 	
     <name>reference-server</name>
     <packaging>war</packaging>
@@ -22,7 +22,7 @@
     	<dependency>
     		<groupId>uk.nhs.interoperability</groupId>
   			<artifactId>reference-server-lib</artifactId>
-  			<version>1.3.3</version>
+  			<version>1.3.4-SNAPSHOT</version>
   		</dependency>
   		
         <dependency>
