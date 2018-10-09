@@ -5,7 +5,9 @@ RUN apt-get update && apt-get install -y git
 COPY . /usr/publisher
 WORKDIR /usr/publisher
 COPY entrypoint.sh /usr/publisher/entrypoint.sh
+COPY reprocess-entrypoint.sh /usr/publisher/reprocess-entrypoint.sh
 RUN chmod +x entrypoint.sh
+RUN chmod +x reprocess-entrypoint.sh
 
 # Create a non-root user for our FHIR publisher to run as
 RUN groupadd -r fhir -g 1000 && \
