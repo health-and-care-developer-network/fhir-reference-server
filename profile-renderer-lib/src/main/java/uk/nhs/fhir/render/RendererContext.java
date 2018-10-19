@@ -74,6 +74,13 @@ public class RendererContext {
 	}
 
 	public Optional<WrappedResource<?>> getCurrentParsedResource() {
+		//return currentParsedResource;
+		// TODO: Move this into an abstract class somewhere
+		if (currentParsedResource.isPresent()) {
+			if (currentParsedResource.get() instanceof uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) {
+				return Optional.of(((uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) currentParsedResource.get()).upgradeToFullWrappedResource());
+			}
+		}
 		return currentParsedResource;
 	}
 

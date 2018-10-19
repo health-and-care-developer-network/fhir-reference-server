@@ -25,6 +25,7 @@ import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition;
 import uk.nhs.fhir.event.AbstractEventHandler;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
@@ -163,7 +164,19 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		possibleFileNames.add(StringUtil.getTrimmedFileName(xmlFile).toLowerCase(Locale.UK));
 		
 		if (FhirFileParser.isSupported(parsedFile)) {
-			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResource(parsedFile);
+			
+			WrappedResource<?> wrappedResource = null;
+			WrappedResource<?> fullwrappedResource = WrappedResource.fromBaseResource(parsedFile);
+			
+			if (fullwrappedResource.getResourceType().equals(ResourceType.STRUCTUREDEFINITION)
+					&& fullwrappedResource.isStu3()) {
+				// Replace this with a skeleton version to reduce memory usage
+				LOG.info("Adding a skeleton STU3 StructureDefinition to the registry");
+				wrappedResource = new SkeletonWrappedStu3StructureDefinition((org.hl7.fhir.dstu3.model.StructureDefinition)parsedFile, xmlFile);
+			} else {
+				LOG.info("Adding a FULL " + fullwrappedResource.getResourceType() + " to the registry");
+				wrappedResource = fullwrappedResource;
+			}
 			
 			if (wrappedResource.getUrl().isPresent()
 			  && FhirURL.startsWithLocalQDomain(wrappedResource.getUrl().get())) {
@@ -195,8 +208,33 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 				if (!resourcesByUrl.containsKey(extractedUrl)) {
 					resourcesByUrl.put(extractedUrl, wrappedResource); 
 				} else {
-					throw new IllegalStateException("Found multiple resources with URL " + extractedUrl
-						+ " (need to add support for multiple versions of same resource)");
+					/* We have multiple versions of the same resource which there isn't
+					 * an obvious way of dealing with. For now, we'll only do something
+					 * with StructureDefinitions. If they an extension we'll check the
+					 * type and datatype and if they match we can just ignore other
+					 * versions. If they don't however we will have to throw an
+					 * exception
+					 */
+					if (wrappedResource.getResourceType().equals(ResourceType.STRUCTUREDEFINITION)) {
+						
+						WrappedStructureDefinition newDefinition = (WrappedStructureDefinition)wrappedResource;
+						WrappedStructureDefinition cachedDefinition = (WrappedStructureDefinition)resourcesByUrl.get(extractedUrl);
+						if (newDefinition.getExtensionType() == null && cachedDefinition.getExtensionType() == null) {
+							// Both null types, so we can safely ignore the new version
+						} else {
+							if (newDefinition.getExtensionType().equals(cachedDefinition.getExtensionType())) {
+								// The new version is the same extension type so we can safely ignore it
+							} else {
+								throw new IllegalStateException("Found multiple StructureDefinitions with URL " + extractedUrl
+									 	+ " - they are different extension types so we can't safely determine"
+									 	+ " which to use in references from other resources");
+							}
+						}
+						
+					} else {
+						throw new IllegalStateException("Found multiple resources with URL " + extractedUrl
+							 	+ " (can't safely determine which to use in references from other resources)");
+					}
 				}
 				
 				if (wrappedResource.getResourceType().equals(ResourceType.STRUCTUREDEFINITION)) {
