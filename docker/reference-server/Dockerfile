@@ -1,6 +1,8 @@
 # Dockerfile to run my WAR file
 # This uses a base image from jetty, which can run war files...
-FROM jetty:9.3.12-jre8-alpine
+FROM jetty:9.4.12-jre8-alpine
+
+USER root
 
 ENV CONFIG_FILE ""
 
