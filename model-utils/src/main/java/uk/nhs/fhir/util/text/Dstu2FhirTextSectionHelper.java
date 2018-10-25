@@ -18,7 +18,7 @@ public class Dstu2FhirTextSectionHelper implements FhirTextSectionHelper {
     	
     	// Clear out the generated text
         NarrativeDt textElement = new NarrativeDt();
-        textElement.setStatus(NarrativeStatusEnum.GENERATED);
+        textElement.setStatusAsString("");
         textElement.setDiv("");
         baseResource.setText(textElement);
     	return baseResource;

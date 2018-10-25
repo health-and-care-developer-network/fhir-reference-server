@@ -19,7 +19,7 @@ public class Stu3FhirTextSectionHelper implements FhirTextSectionHelper {
     	
     	// Clear out the generated text
     	Narrative textElement = new Narrative();
-        textElement.setStatus(NarrativeStatus.GENERATED);
+        textElement.setStatusAsString("");
         textElement.setDivAsString("");
         domainResource.setText(textElement);
     	return domainResource;
