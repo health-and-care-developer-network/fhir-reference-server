@@ -145,8 +145,17 @@ public class WrappedStu3NamingSystem extends WrappedNamingSystem{
 
 	@Override
 	public void addHumanReadableText(String textSection) {
-		// TODO Auto-generated method stub
-		
+		try {
+			Narrative textElement = Factory.newNarrative(NarrativeStatus.GENERATED, textSection);
+	        definition.setText(textElement);
+		} catch (IOException | FHIRException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override

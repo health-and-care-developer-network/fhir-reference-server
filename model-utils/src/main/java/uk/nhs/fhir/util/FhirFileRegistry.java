@@ -165,19 +165,8 @@ public class FhirFileRegistry implements Iterable<Map.Entry<File, WrappedResourc
 		
 		if (FhirFileParser.isSupported(parsedFile)) {
 			
-			WrappedResource<?> wrappedResource = null;
-			WrappedResource<?> fullwrappedResource = WrappedResource.fromBaseResource(parsedFile);
-			
-			if (fullwrappedResource.getResourceType().equals(ResourceType.STRUCTUREDEFINITION)
-					&& fullwrappedResource.isStu3()) {
-				// Replace this with a skeleton version to reduce memory usage
-				LOG.info("Adding a skeleton STU3 StructureDefinition to the registry");
-				wrappedResource = new SkeletonWrappedStu3StructureDefinition((org.hl7.fhir.dstu3.model.StructureDefinition)parsedFile, xmlFile);
-			} else {
-				LOG.info("Adding a FULL " + fullwrappedResource.getResourceType() + " to the registry");
-				wrappedResource = fullwrappedResource;
-			}
-			
+			WrappedResource<?> wrappedResource = WrappedResource.fromBaseResourceAsSkeletonIfAvailable(parsedFile, xmlFile);
+						
 			if (wrappedResource.getUrl().isPresent()
 			  && FhirURL.startsWithLocalQDomain(wrappedResource.getUrl().get())) {
 				

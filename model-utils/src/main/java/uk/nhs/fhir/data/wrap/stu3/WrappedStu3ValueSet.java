@@ -89,6 +89,11 @@ public class WrappedStu3ValueSet extends WrappedValueSet {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	public Optional<String> getUrl() {

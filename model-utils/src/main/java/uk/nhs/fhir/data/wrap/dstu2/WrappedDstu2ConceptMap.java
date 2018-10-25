@@ -153,5 +153,10 @@ public class WrappedDstu2ConceptMap extends WrappedConceptMap {
         textElement.setDiv(textSection);
         definition.setText(textElement);
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 }

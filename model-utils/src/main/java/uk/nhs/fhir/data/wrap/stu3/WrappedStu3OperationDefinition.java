@@ -222,6 +222,11 @@ private final OperationDefinition definition;
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	public String getStatus() {

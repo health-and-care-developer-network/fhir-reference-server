@@ -37,10 +37,10 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WrappedStu3StructureDefinition.class);
 	
-	private StructureDefinition definition;
+	private final StructureDefinition definition;
 	
 	public WrappedStu3StructureDefinition() {
-		
+		this.definition = null;
 	}
 	
 	public WrappedStu3StructureDefinition(StructureDefinition definition) {
@@ -229,6 +229,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 		} catch (IOException | FHIRException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override
