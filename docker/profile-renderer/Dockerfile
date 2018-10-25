@@ -10,8 +10,8 @@ RUN chmod +x entrypoint.sh
 RUN chmod +x reprocess-entrypoint.sh
 
 # Create a non-root user for our FHIR publisher to run as
-RUN groupadd -r fhir -g 1000 && \
-    useradd -u 1000 -r -g fhir fhir
+RUN groupadd -r fhir -g 100 && \
+    useradd -u 100 -r -g fhir fhir
 RUN chown -R fhir:fhir /usr/publisher
 
 USER fhir
