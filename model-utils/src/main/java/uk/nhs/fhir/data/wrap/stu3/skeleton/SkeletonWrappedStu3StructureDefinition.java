@@ -31,86 +31,45 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	private static final Logger LOG = LoggerFactory.getLogger(SkeletonWrappedStu3StructureDefinition.class.getName());
 	private final FhirFileParser parser = new FhirFileParser();
 	
-	private String url = null;
-	private String version = null;
+	private Optional<String> url = null;
 	private String name = null;
-	private String constrainedType = null;
+	private Optional<String> version = null;
+	private Optional<String> constrainedType = null;
 	private FhirCardinality rootCardinality = null;
 	private List<String> useLocationContexts = null;
-	private String differentialRootDescription = null;
+	private Optional<String> differentialRootDescription = null;
 	private String differentialRootDefinition = null;
-	private String extensionBaseTypeDesc = null;
+	private Optional<String> extensionBaseTypeDesc = null;
 	private String status = null;
-	private ExtensionType extensionType = null;
 	private String kind = null;
-	private String kindDisplay = null;
-	private Boolean isAbstract = null;
+	private ExtensionType extensionType = null;
 	private boolean missingSnapshot;
-	
 	private File originalFile = null;
 	
-	/*
-	private final StructureDefinition definition;
-	
-	*/
 	public SkeletonWrappedStu3StructureDefinition(StructureDefinition definition, File originalFile) {
 		super();
 
 		this.originalFile = originalFile;		
-		this.url = definition.getUrl();
-		this.version = definition.getVersion();
-		this.name = definition.getName();
-		this.constrainedType = definition.getType();
 		
-		Integer min = definition.getSnapshot().getElementFirstRep().getMin();
-		String max = definition.getSnapshot().getElementFirstRep().getMax();
-		this.rootCardinality = new FhirCardinality(min, max);
+		WrappedStu3StructureDefinition fullWrapped = new WrappedStu3StructureDefinition(definition);
 		
-		this.useLocationContexts = Lists.newArrayList();
-		for (StringType context : definition.getContext()) {
-			this.useLocationContexts.add(context.getValue());
-		}
-		
-		this.differentialRootDescription = definition.getDifferential().getElementFirstRep().getShort();
-		this.differentialRootDefinition = definition.getDifferential().getElementFirstRep().getDefinition();
-		
-		
-		List<ElementDefinition> diffElements = definition.getDifferential().getElement();
-		if (diffElements.size() == 3
-		  && diffElements.get(1).getPath().equals("Extension.url")) {
-			// It is a simple extension, so we can also find a type
-			List<TypeRefComponent> typeList = diffElements.get(2).getType();
-			if (typeList.size() == 1) {
-				this.extensionBaseTypeDesc = typeList.get(0).getCode();
-			} else {
-				this.extensionBaseTypeDesc = "(choice)";
-			}
-		} else {
-			this.extensionBaseTypeDesc = "(complex)";
-		}
-		
-		this.status = definition.getStatus().getDisplay();
-		
-		if (isExtension()) {
-			if (definition
-					.getSnapshot()
-					.getElement()
-					.stream()
-					.anyMatch(element -> element.getPath().equals("Extension.extension.url"))) {
-				this.extensionType = ExtensionType.COMPLEX;
-			} else {
-				this.extensionType = ExtensionType.SIMPLE;
-			}
-		}
-		
-		this.kind = definition.getKind().toCode();
-		this.kindDisplay = definition.getKind().getDisplay();
-		this.isAbstract = definition.getAbstract();
-		this.missingSnapshot = definition.getSnapshot().isEmpty();
+		this.url = fullWrapped.getUrl();
+		this.name = fullWrapped.getName();
+		this.constrainedType = fullWrapped.getConstrainedType();
+		this.rootCardinality = fullWrapped.getRootCardinality();
+		this.useLocationContexts = fullWrapped.getUseLocationContexts();
+		this.differentialRootDescription = fullWrapped.getDifferentialRootDescription();
+		this.differentialRootDefinition = fullWrapped.getDifferentialRootDefinition();
+		this.extensionBaseTypeDesc = fullWrapped.extensionBaseTypeDesc();
+		this.version = fullWrapped.getVersion();
+		this.status = fullWrapped.getStatus();
+		this.kind = fullWrapped.getKind();
+		this.extensionType = fullWrapped.getExtensionType();
+		this.missingSnapshot = fullWrapped.missingSnapshot();
 	}
 	
 	public WrappedStu3StructureDefinition upgradeToFullWrappedResource() {
-		LOG.info("Upgrading cached skeleton resource to full resource!");
+		LOG.debug("Upgrading cached skeleton resource to full resource!");
 		IBaseResource parsedFile;
 		try {
 			parsedFile = parser.parseFile(this.originalFile);
@@ -122,7 +81,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	
 	@Override
 	public IBaseResource getWrappedResource() {
-		LOG.info("Re-parsing StructureDefinition to return full wrapped resource object");
+		LOG.debug("Re-parsing StructureDefinition to return full wrapped resource object");
 		WrappedStu3StructureDefinition fullWrappedResource = this.upgradeToFullWrappedResource();
 		return fullWrappedResource.getWrappedResource();
 	}
@@ -139,7 +98,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	
 	@Override
 	public Optional<String> getUrl() {
-		return Optional.ofNullable(this.url);
+		return this.url;
 	}
 	
 	@Override
@@ -149,7 +108,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 
 	@Override
 	public String getKindDisplay() {
-		return this.kindDisplay;
+		throw new NotImplementedException("This is a Skeleton resource only so this method is not supported!");
 	}
 
 	@Override
@@ -159,12 +118,12 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	
 	@Override
 	public Boolean getAbstract() {
-		return this.isAbstract;
+		throw new NotImplementedException("This is a Skeleton resource only so this method is not supported!");
 	}
 	
 	@Override
 	public Optional<String> getConstrainedType() {
-		return Optional.ofNullable(this.constrainedType);
+		return this.constrainedType;
 	}
 	
 	@Override
@@ -174,7 +133,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	
 	@Override
 	public Optional<String> getVersion() {
-		return Optional.ofNullable(this.version);
+		return this.version;
 	}
 
 	@Override
@@ -264,9 +223,6 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 
 	@Override
 	public ExtensionType getExtensionType() {
-		if (!isExtension()) {
-			return null;
-		}
 		return this.extensionType;
 	}
 	
@@ -277,7 +233,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 	
 	@Override
 	public Optional<String> getDifferentialRootDescription() {		
-		return Optional.ofNullable(this.differentialRootDescription);
+		return this.differentialRootDescription;
 	}
 	
 	@Override
@@ -287,10 +243,7 @@ public class SkeletonWrappedStu3StructureDefinition extends WrappedStu3Structure
 
 	@Override
 	public Optional<String> extensionBaseTypeDesc() {
-		if (!isExtension()) {
-			return Optional.empty();
-		}
-		return Optional.of(this.extensionBaseTypeDesc);
+		return this.extensionBaseTypeDesc;
 	}
 	
 }

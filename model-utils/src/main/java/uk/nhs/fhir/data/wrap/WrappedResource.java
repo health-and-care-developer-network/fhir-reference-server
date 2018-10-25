@@ -227,6 +227,15 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		}
 	}
 	
+	public static Optional<WrappedResource<?>> getFullWrappedResourceIfSkeleton(Optional<WrappedResource<?>> wrappedResource) {
+		if (wrappedResource.isPresent()) {
+			if (wrappedResource.get() instanceof uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) {
+				return Optional.of(((uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) wrappedResource.get()).upgradeToFullWrappedResource());
+			}
+		}
+		return wrappedResource;
+	}
+	
 	public IParser newXmlParser() {
 		return FhirContexts.xmlParser(getImplicitFhirVersion());
 	}
