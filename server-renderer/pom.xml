@@ -4,7 +4,7 @@
 
   <groupId>uk.nhs.interoperability</groupId>
   <artifactId>server-renderer</artifactId>
-  <version>1.3.3</version>
+  <version>1.4.0</version>
 
   <name>server-renderer</name>
   <url>http://maven.apache.org</url>
@@ -32,12 +32,12 @@
     <dependency>
       <groupId>uk.nhs.interoperability</groupId>
       <artifactId>reference-server-lib</artifactId>
-      <version>1.3.3</version>
+      <version>1.4.0</version>
     </dependency>
     <dependency>
       <groupId>uk.nhs.interoperability</groupId>
       <artifactId>profile-renderer-lib</artifactId>
-      <version>1.3.3</version>
+      <version>1.4.0</version>
     </dependency>
     
     <!-- given we have jetty, probably shouldn't need this -->
@@ -51,16 +51,16 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>9.4.7.v20170914</version>
+      <version>9.4.12.v20180830</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>9.4.7.v20170914</version>
+      <version>9.4.12.v20180830</version>
     </dependency><dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-annotations</artifactId>
-      <version>9.4.7.v20170914</version>
+      <version>9.4.12.v20180830</version>
     </dependency>
   </dependencies>
   <dependencyManagement>

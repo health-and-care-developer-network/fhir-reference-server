@@ -52,7 +52,7 @@ public class ResourceProvider implements IResourceProvider {
      */
     @Search
 	public IBundleProvider searchByName(@RequiredParam(name = "name") StringParam theNamePart) {
-    	LOG.debug("Request for resources matching name: " + theNamePart);
+    	LOG.info("Request for resources matching name: " + theNamePart);
     	return new PagedBundleProvider(PagedBundleProvider.SEARCH_BY_NAME, dataSource,
 										fhirVersion, resourceType, theNamePart.getValue());
     }
@@ -66,7 +66,7 @@ public class ResourceProvider implements IResourceProvider {
      */
     @Search
     public IBundleProvider searchByURL(@RequiredParam(name = "url") StringParam theURL) {
-    	LOG.debug("Request for resources matching URL: " + theURL);
+    	LOG.info("Request for resources matching URL: " + theURL);
     	return new PagedBundleProvider(PagedBundleProvider.SEARCH_BY_URL, dataSource,
     									fhirVersion, resourceType, theURL.getValue());
     }

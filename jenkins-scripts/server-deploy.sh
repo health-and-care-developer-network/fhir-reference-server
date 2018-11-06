@@ -22,8 +22,9 @@ CONFIG_FILE="${CONFIG_FILE}"
 TARGET_DOCKER_CMD="$(dockerCmd $TARGET_HOST)"
 SOURCE="$(qualifiedImage $IMAGE_NAME $TAG_NAME $REGISTRY_HOST)"
 
-MEMORYFLAG="3g"
-CPUFLAG="768"
+MEMORYFLAG="${MEMORYFLAG:-3g}"
+JDKOPTIONS="${JDKOPTIONS}"
+CPUFLAG="${CPUFLAG:-768}"
 
 if [ ! -z $REGISTRY_HOST ]; then
   $TARGET_DOCKER_CMD pull $SOURCE
@@ -38,6 +39,7 @@ $TARGET_DOCKER_CMD run \
   -m $MEMORYFLAG \
   -c $CPUFLAG \
   -e "CONFIG_FILE=$CONFIG_FILE" \
+  -e JDKOPTIONS="$JDKOPTIONS" \
   -v /docker-data/fhir-profiles:/opt/fhir \
   -v /docker-data/fhir-server-temp:/tmp/jetty \
   -d $SOURCE
