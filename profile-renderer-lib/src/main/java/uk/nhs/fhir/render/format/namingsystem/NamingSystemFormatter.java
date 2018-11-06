@@ -39,7 +39,7 @@ public class NamingSystemFormatter extends ResourceFormatter<WrappedNamingSystem
 					new Attribute("id", "fhir-ref-operation-definition-structure"),
 					Lists.newArrayList(
 						buildMetaDataPanel(wrappedResource),
-						buildIdentifierPanel("Identifiers(s)", wrappedResource.getUniqueIds())
+						buildIdentifierPanel("Identifier(s)", wrappedResource.getUniqueIds())
 						));
 			
 			HTMLDocSection section = new HTMLDocSection();
