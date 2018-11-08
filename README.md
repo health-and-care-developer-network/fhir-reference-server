@@ -154,6 +154,22 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 
 #### (C) refers to combined server/renderer
 
+
+> ### v1.4.0 
+> - Below are the new features added to FHIR reference server
+> - ALP4-331 - Change to Message Definition rendering - Added sub-tabs to the main tab: StructureDefinition, Extension, ValueSet, CodeSystem, All
+> - ALP4-415 - Anchors for data elements- Added anchor elements to navigate to a specified location in the StructureDefinition page
+		Ex: http://<server>:<port>/STU3/StructureDefinition/CareConnect-GPC-AllergyIntolerance-1#AllergyIntolerance.identifier
+> - ALP4-327 - Conformance Statement version
+		Modification for softwarename and verion 
+> - ALP4-298 - Collapsible branches on Structure Definitions: The Structure Definition treenodes can be expanded and collapsable.
+> - ALP4-63 - Render NamingSystem resource
+		Added a new naming Stystem resource type
+> - ALP4-450 - Enhancement to Operation Definition rendering
+		Added Type attribute.
+
+
+
 > ### v1.3.0 (branch jenkins-config)
 > - project restructure: everything combined into a single git repo, single parent pom with subprojects for libraries and executables
 > - docker scripts migrated to their own folder, new Jenkins job and config screen
