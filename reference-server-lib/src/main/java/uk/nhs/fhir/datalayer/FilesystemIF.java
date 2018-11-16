@@ -97,8 +97,8 @@ public class FilesystemIF {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(FhirVersion fhirVersion, String id) {
-    	return getResourceByID(fhirVersion, new IdDt(id));
+    public IBaseResource getResourceByID(FhirVersion fhirVersion, String id, ResourceType resourceType) {
+    	return getResourceByID(fhirVersion, new IdDt(id).withResourceType(resourceType.toString()));
     }
     
     /**
@@ -118,7 +118,7 @@ public class FilesystemIF {
         int counter = 0;
         for(ResourceMetadata entity : matchingIDs) {
         	if (counter >= theFromIndex && counter < theToIndex) {
-        		list.add(getResourceByID(fhirVersion, entity.getResourceID()));
+        		list.add(getResourceByID(fhirVersion, entity.getResourceID(), resourceType));
         	}
         	counter++;
         }
@@ -146,7 +146,7 @@ public class FilesystemIF {
         for (ResourceMetadata entry : resourceList) {
         	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
         		if (counter >= theFromIndex && counter < theToIndex) {
-        			matches.add(getResourceByID(fhirVersion, entry.getResourceID()));
+        			matches.add(getResourceByID(fhirVersion, entry.getResourceID(), resourceType));
         		}
         		counter++;
         	}
@@ -246,7 +246,7 @@ public class FilesystemIF {
      * @return a list of IDs of matching resources
      */
     public List<ResourceMetadata> getAllResourceIDforResourcesMatchingNamePattern(FhirVersion fhirVersion, ResourceType resourceType, String theNamePart) {
-        LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
+        LOG.info("Getting all " + resourceType + " resources containing: " + theNamePart + " in their name");
         
         // Get full list of profiles first
         List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);

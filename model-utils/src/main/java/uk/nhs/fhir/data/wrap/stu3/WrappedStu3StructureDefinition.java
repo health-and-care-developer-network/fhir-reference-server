@@ -18,6 +18,8 @@ import org.hl7.fhir.dstu3.model.UsageContext;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.instance.model.api.IBaseMetaType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -27,12 +29,19 @@ import uk.nhs.fhir.data.structdef.FhirCardinality;
 import uk.nhs.fhir.data.structdef.FhirContacts;
 import uk.nhs.fhir.data.structdef.FhirMapping;
 import uk.nhs.fhir.data.wrap.WrappedStructureDefinition;
+import uk.nhs.fhir.util.FhirFileRegistry;
 import uk.nhs.fhir.util.FhirRelease;
 import uk.nhs.fhir.util.FhirVersion;
 
 public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 
+	private static final Logger LOG = LoggerFactory.getLogger(WrappedStu3StructureDefinition.class);
+	
 	private final StructureDefinition definition;
+	
+	public WrappedStu3StructureDefinition() {
+		this.definition = null;
+	}
 	
 	public WrappedStu3StructureDefinition(StructureDefinition definition) {
 		this.definition = definition;
@@ -220,6 +229,11 @@ public class WrappedStu3StructureDefinition extends WrappedStructureDefinition {
 		} catch (IOException | FHIRException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override
