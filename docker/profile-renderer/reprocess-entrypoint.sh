@@ -8,7 +8,8 @@ RENDERER_FLAGS=${RENDERER_FLAGS}
 # First, copy all the previously rendered profiles to be re-rendered
 rm -Rf /source/files
 
-resourceTypes=("CodeSystem" "ConceptMap" "ImplementationGuide" "MessageDefinition" "NamingSystem" "OperationDefinition" "SearchParameter" "StructureDefinition" "ValueSet")
+#resourceTypes=("CodeSystem" "ConceptMap" "ImplementationGuide" "MessageDefinition" "NamingSystem" "OperationDefinition" "SearchParameter" "StructureDefinition"
+resourceTypes=("StructureDefinition")
 for resourceType in "${resourceTypes[@]}"
 do
   DIR=/generated/$OUT_PATH/STU3/$resourceType/versioned
@@ -18,7 +19,8 @@ do
   fi
 done
 
-resourceTypes=("ImplementationGuide" "OperationDefinition" "StructureDefinition" "ValueSet")
+#resourceTypes=("ImplementationGuide" "OperationDefinition" "StructureDefinition" "ValueSet")
+resourceTypes=("StructureDefinition")
 for resourceType in "${resourceTypes[@]}"
 do  
   DIR=/generated/$OUT_PATH/DSTU2/$resourceType/versioned
