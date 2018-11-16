@@ -218,6 +218,11 @@ public class WrappedDstu2OperationDefinition extends WrappedOperationDefinition 
         textElement.setDiv(textSection);
         definition.setText(textElement);
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	public Optional<String> getUrl() {

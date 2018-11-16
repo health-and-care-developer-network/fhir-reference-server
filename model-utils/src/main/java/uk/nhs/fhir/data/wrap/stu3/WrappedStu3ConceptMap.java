@@ -180,4 +180,9 @@ public class WrappedStu3ConceptMap extends WrappedConceptMap {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 }

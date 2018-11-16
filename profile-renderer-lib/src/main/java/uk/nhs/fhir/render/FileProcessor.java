@@ -116,8 +116,11 @@ public class FileProcessor {
 	}
 	
 	public String prepareAndSerialise(WrappedResource<?> resource, String textSection, Optional<String> newBaseURL) {
+		/*
 		textSection = EscapeUtils.escapeTextSection(textSection);
 		resource.addHumanReadableText(textSection);
+		*/
+		resource.clearHumanReadableText();
 		
 		if (newBaseURL.isPresent()) {
 			String replacementUrl = newBaseURL.get();

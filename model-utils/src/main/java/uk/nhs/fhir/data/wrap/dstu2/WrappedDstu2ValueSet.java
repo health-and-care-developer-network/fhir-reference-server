@@ -100,6 +100,11 @@ public class WrappedDstu2ValueSet extends WrappedValueSet {
         textElement.setDiv(textSection);
         definition.setText(textElement);
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	public List<WrappedConceptMap> getConceptMaps(FhirFileRegistry otherResources) {

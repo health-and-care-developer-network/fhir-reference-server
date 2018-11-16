@@ -118,6 +118,11 @@ public class WrappedStu3MessageDefinition extends WrappedMessageDefinition {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	protected ResourceMetadata getMetadataImpl(File source) {
