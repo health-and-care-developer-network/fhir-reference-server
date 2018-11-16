@@ -158,6 +158,7 @@ DSTU2 artefacts will then be served from `./NHSDigital` and STU3 artefacts from 
 > - Below are the new features added to FHIR reference server
 > - Changes to profile renderer code to reduce memory usage by caching skeleton versions of some resources during rendering rather than full resources
 > - Fix for ReST API calls for resources to fix searches by name and by URL
+> - Removed generated text sections from all profile resources
 
 > ### v1.4.0 
 > - Below are the new features added to FHIR reference server
