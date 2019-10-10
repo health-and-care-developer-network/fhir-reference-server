@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -165,11 +166,24 @@ public class ServerRendererMain
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		handler.getMetaData().addContainerResource(fhirReferenceServerJar);
 		handler.setConfigurations(new Configuration[]{annotationConfiguration});
-		server.setHandler(handler);
-        return server;
+
+		WebAppContext wpContent = new WebAppContext();
+		wpContent.setContextPath("/wp-content");
+		wpContent.setBaseResource(Resource.newClassPathResource("/wp-content"));
+
+		WebAppContext wpIncludes = new WebAppContext();
+		wpIncludes.setContextPath("/wp-includes");
+		wpIncludes.setBaseResource(Resource.newClassPathResource("/wp-includes"));
+
+		HandlerCollection handlers = new HandlerCollection();
+		handlers.addHandler(wpContent);
+		handlers.addHandler(wpIncludes);
+		handlers.addHandler(handler);
+		server.setHandler(handlers);
+		return server;
 	}
 
 	private static void stopServer(Server server) {
