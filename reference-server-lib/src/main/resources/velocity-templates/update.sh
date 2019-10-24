@@ -13,12 +13,17 @@ then
 else
   wget --convert-links --output-document=devnet.html $DN_URL  # Download page
 
-# Add warning to file to say that it is generated
-sed -i '1 i\ ## WARNING - This file is generated using the update.sh script, so should not be edited directly! ** ' devnet.html
+  # Add warning to file to say that it is generated
+  sed -i '1 i\ ## WARNING - This file is generated using the update.sh script, so should not be edited directly! ** ' devnet.html
 
-# Fix any dodgy URLs
-sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
+  # Fix any dodgy URLs
+  sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
 
+  # Resolve wp-content localy
+  sed -i -- "s|https://$NEW_URL/wp-content|/wp-content|g" devnet.html
+
+  # Resolve wp-includes localy
+  sed -i -- "s|https://$NEW_URL/wp-includes|/wp-includes|g" devnet.html
 
   # Add custom styles
   sed -i '/\/wp-content\/themes\/HDN\/style.css/a\		<link href="\/js\/jquery-ui\/jquery-ui.css" rel="stylesheet"><link rel="stylesheet" href="\/style\/style.css"\/>' devnet.html
@@ -56,4 +61,3 @@ sed -i -- "s|$OLD_URL|$NEW_URL|g" devnet.html
 
   echo "Template updated"
 fi
-
