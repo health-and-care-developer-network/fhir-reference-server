@@ -1,6 +1,3 @@
-.idea
-*.iml
-
 */.project
 */.classpath
 *.settings/
@@ -10,5 +7,3 @@
 reference-server-deploy/
 profile-renderer-deploy
 /bin/
-
-/reference-server-lib/src/main/resources/velocity-templates/devnet.html
