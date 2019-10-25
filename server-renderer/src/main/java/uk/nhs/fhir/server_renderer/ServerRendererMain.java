@@ -153,8 +153,7 @@ public class ServerRendererMain
 	private static Server makeServer() {
         
 		Server server = new Server(8080);
-		WebAppContext handler = new WebAppContext();
-		handler.setContextPath("/");
+
 		AnnotationConfiguration annotationConfiguration = new AnnotationConfiguration();
 		CodeSource codeSource = FhirBrowserRequestServlet.class.getProtectionDomain().getCodeSource();
 		URL location = codeSource.getLocation();
@@ -167,20 +166,12 @@ public class ServerRendererMain
 			e.printStackTrace();
 		}
 
+		WebAppContext handler = new WebAppContext();
+		handler.setContextPath("/");
 		handler.getMetaData().addContainerResource(fhirReferenceServerJar);
 		handler.setConfigurations(new Configuration[]{annotationConfiguration});
 
-		WebAppContext wpContent = new WebAppContext();
-		wpContent.setContextPath("/wp-content");
-		wpContent.setBaseResource(Resource.newClassPathResource("/wp-content"));
-
-		WebAppContext wpIncludes = new WebAppContext();
-		wpIncludes.setContextPath("/wp-includes");
-		wpIncludes.setBaseResource(Resource.newClassPathResource("/wp-includes"));
-
 		HandlerCollection handlers = new HandlerCollection();
-		handlers.addHandler(wpContent);
-		handlers.addHandler(wpIncludes);
 		handlers.addHandler(handler);
 		server.setHandler(handlers);
 		return server;

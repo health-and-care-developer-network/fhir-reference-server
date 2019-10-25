@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import uk.nhs.fhir.servlethelpers.ServletStreamRawFile;
 
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = {"/favicon.ico", "/images/*", "/js/*", "/style/*"}, displayName = "Static content Servlet", loadOnStartup = 1)
+@WebServlet(urlPatterns = {"/favicon.ico", "/images/*", "/js/*", "/style/*","/wp-content/*", "/wp-includes/*"}, displayName = "Static content Servlet", loadOnStartup = 1)
 public class StaticContentServlet extends HttpServlet {
 	private static Logger LOG = LoggerFactory.getLogger(StaticContentServlet.class.getName());
 	
@@ -40,12 +40,20 @@ public class StaticContentServlet extends HttpServlet {
 		if(requestedPath.endsWith(".css")) {
             // Stylesheets
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "text/css", request.getRequestURI());
-        } else if (requestedPath.endsWith("favicon.ico")) {
+        } else if(requestedPath.endsWith(".svg")) {
+			// SVG
+			ServletStreamRawFile.streamRawFileFromClasspath(response, "image/svg+xml", request.getRequestURI());
+		} else if(requestedPath.endsWith(".map")) {
+			// JavaScript map file
+			ServletStreamRawFile.streamRawFileFromClasspath(response, "application/json", request.getRequestURI());
+		} else if (requestedPath.endsWith("favicon.ico")) {
         	// favicon.ico
         	ServletStreamRawFile.streamRawFileFromClasspath(response, "image/x-icon", SharedServletContext.getProperties().getFaviconPath());
-        } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/")) {
+        } else if (requestedPath.startsWith("/images/") || request.getRequestURI().startsWith("/js/") || request.getRequestURI().startsWith("/wp-content/") || request.getRequestURI().startsWith("/wp-includes/")) {
         	// Image and JS files
         	ServletStreamRawFile.streamRawFileFromClasspath(response, null, request.getRequestURI());
-        } 
+        }  else {
+			LOG.warn("Cannot load static resource: " + request.getRequestURI());
+		}
 	}
 }
