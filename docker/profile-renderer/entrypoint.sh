@@ -38,6 +38,8 @@ else
   exit 1
 fi
 
+echo "Hello"
+
 ls /source/files
 echo "Running command: java -jar $JAR_FILE /source/files/$REPO_PATH /generated/$OUT_PATH $RENDERER_FLAGS"
 # no quotes around flags so that they are treated as separate arguments
