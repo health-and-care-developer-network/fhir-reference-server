@@ -33,6 +33,8 @@ public class FhirServerProperties {
 	private static final String PROP_RESOURCE_ROOT_PATH = "defaultResourceRootPath";
 	private static final String PROP_RESOURCE_FOLDER_PREFIX = "resourceFolderPrefix";
 	private static final String PROP_VELOCITY_TEMPLATE_PATH = "velocityTemplateDirectory";
+	private static final String PROP_SOFTWARE_VERSION = "softwareVersion";
+    private static final String PROP_SOFTWARE_NAME = "softwareName";
 
 	private final Properties properties;
 	
@@ -100,5 +102,13 @@ public class FhirServerProperties {
     
     public String getResourceFolderPrefix() {
     	return (String)getProperty(PROP_RESOURCE_FOLDER_PREFIX);
+    }
+    
+    public String getResourceSoftwareVersion() {
+        return (String)getProperty(PROP_SOFTWARE_VERSION);
+    }
+    
+    public String getResourceSoftwareName() {
+        return (String)getProperty(PROP_SOFTWARE_NAME);
     }
 }

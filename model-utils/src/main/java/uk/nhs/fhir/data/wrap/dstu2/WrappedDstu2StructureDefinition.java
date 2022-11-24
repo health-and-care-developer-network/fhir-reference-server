@@ -38,6 +38,10 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
 		this.definition = definition;
 	}
 	
+	public WrappedDstu2StructureDefinition() {
+		this.definition = null;
+	}
+
 	@Override
 	public IBaseResource getWrappedResource() {
 		return definition;
@@ -239,6 +243,11 @@ public class WrappedDstu2StructureDefinition extends WrappedStructureDefinition 
         textElement.setStatus(NarrativeStatusEnum.GENERATED);
         textElement.setDiv(textSection);
         definition.setText(textElement);
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override

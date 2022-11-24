@@ -21,6 +21,7 @@ public enum ResourceType {
 	CODESYSTEM("CodeSystem", "CodeSystem", "CodeSystem", "CodeSystems", "CodeSystem"),
 	MESSAGEDEFINITION("MessageDefinition", "MessageDefinition", "MessageDefinition", "MessageDefinitions", "MessageDefinition"),
 	SEARCHPARAMETER("SearchParameter", "SearchParameter", "SearchParameter", "SearchParameters", "SearchParameter"),
+	NAMINGSYSTEM("NamingSystem", "NamingSystem", "NamingSystem", "NamingSystem", "NamingSystem"),
 	
 	EXTENSION("Extension", null, "Extensions", "Extension Registry", "Extensions"),
 	EXAMPLES("Example", "Examples", "Examples", "Examples", "Examples"),
@@ -31,7 +32,7 @@ public enum ResourceType {
 		RESOURCE_TYPES.put(FhirVersion.DSTU2, new ResourceType[]
 			{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE});
 		RESOURCE_TYPES.put(FhirVersion.STU3, new ResourceType[]
-			{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION, SEARCHPARAMETER});
+			{STRUCTUREDEFINITION, VALUESET, OPERATIONDEFINITION, IMPLEMENTATIONGUIDE, CONCEPTMAP, CODESYSTEM, MESSAGEDEFINITION, SEARCHPARAMETER, NAMINGSYSTEM});
 	}
 	
 	public static List<ResourceType> typesForFhirVersion(FhirVersion fhirVersion) {

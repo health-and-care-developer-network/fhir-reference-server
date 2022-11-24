@@ -74,7 +74,7 @@ public class RendererContext {
 	}
 
 	public Optional<WrappedResource<?>> getCurrentParsedResource() {
-		return currentParsedResource;
+		return WrappedResource.getFullWrappedResourceIfSkeleton(currentParsedResource);
 	}
 
 	public void setCurrentParsedResource(Optional<WrappedResource<?>> newParsedResource) {

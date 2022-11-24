@@ -6,7 +6,7 @@
 	#if( $hasGeneratedMetadataFromRenderer )
 		#parse( "/velocity-templates/resource-metadata-from-renderer.vm" )
 	#else
-		#if( $resourceType.getDisplayName() == "ValueSet" || $resourceType.getDisplayName() == "OperationDefinition" )
+		#if( $resourceType.getDisplayName() == "ValueSet" || $resourceType.getDisplayName() == "OperationDefinition" || $resourceType.getDisplayName() == "NamingSystem")
 			#parse( "/velocity-templates/minimal-metadata.vm" )
 		#else
 			#parse( "/velocity-templates/resource-metadata.vm" )

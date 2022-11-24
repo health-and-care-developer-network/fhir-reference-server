@@ -34,6 +34,7 @@ public class OperationDefinitionMetaDataTableDataProvider {
 			new OperationDefinitionMetaDataRowData("Description", source.getDescriptionTypeLink(), source.getDescription().map(desc -> StringUtil.capitaliseLowerCase(desc)).orElse("")),
 			new OperationDefinitionMetaDataRowData("Code", source.getCodeTypeLink(), source.getCode()),
 			new OperationDefinitionMetaDataRowData("System", source.getSystemTypeLink(), StringUtil.capitaliseLowerCase(source.getIsSystem())),
+			new OperationDefinitionMetaDataRowData("Type", source.getTypeLink(), StringUtil.capitaliseLowerCase(source.getIsType())),
 			new OperationDefinitionMetaDataRowData("Instance", source.getInstanceTypeLink(), StringUtil.capitaliseLowerCase(source.getIsInstance()))
 		);
 	}

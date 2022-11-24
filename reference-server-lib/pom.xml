@@ -4,7 +4,7 @@
 	
     <groupId>uk.nhs.interoperability</groupId>
     <artifactId>reference-server-lib</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.4.3</version>
 	
     <name>reference-server-lib</name>
     <packaging>jar</packaging>
@@ -14,7 +14,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    
+
     <!-- See: https://devcenter.heroku.com/articles/local-maven-dependencies -->
     <!-- Required to use the locally deployed (as part of the application) JAR
     file of HL7 structuredefinitions to validate against --> 
@@ -42,7 +42,7 @@
     	<dependency>
     		<groupId>uk.nhs.interoperability</groupId>
   			<artifactId>fhir-model-utils</artifactId>
-  			<version>1.3.4-SNAPSHOT</version>
+  			<version>1.4.3</version>
   		</dependency>
   		
         <!-- Next two are required for FHIR validation routines -->
@@ -153,5 +153,22 @@
 		    <version>1.7</version>
 		</dependency>
     </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/wp-content</directory>
+                <targetPath>wp-content</targetPath>
+            </resource>
+            <resource>
+                <directory>src/wp-includes</directory>
+                <targetPath>wp-includes</targetPath>
+            </resource>
+        </resources>
+    </build>
 
 </project>

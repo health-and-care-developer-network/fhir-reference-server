@@ -97,8 +97,8 @@ public class FilesystemIF {
      * @param id
      * @return 
      */
-    public IBaseResource getResourceByID(FhirVersion fhirVersion, String id) {
-    	return getResourceByID(fhirVersion, new IdDt(id));
+    public IBaseResource getResourceByID(FhirVersion fhirVersion, String id, ResourceType resourceType) {
+    	return getResourceByID(fhirVersion, new IdDt(id).withResourceType(resourceType.toString()));
     }
     
     /**
@@ -118,7 +118,7 @@ public class FilesystemIF {
         int counter = 0;
         for(ResourceMetadata entity : matchingIDs) {
         	if (counter >= theFromIndex && counter < theToIndex) {
-        		list.add(getResourceByID(fhirVersion, entity.getResourceID()));
+        		list.add(getResourceByID(fhirVersion, entity.getResourceID(), resourceType));
         	}
         	counter++;
         }
@@ -146,7 +146,7 @@ public class FilesystemIF {
         for (ResourceMetadata entry : resourceList) {
         	if (entry.getUrl().equals(theURL) && entry.getResourceType().equals(resourceType)) {
         		if (counter >= theFromIndex && counter < theToIndex) {
-        			matches.add(getResourceByID(fhirVersion, entry.getResourceID()));
+        			matches.add(getResourceByID(fhirVersion, entry.getResourceID(), resourceType));
         		}
         		counter++;
         	}
@@ -203,6 +203,22 @@ public class FilesystemIF {
     }
     
     /**
+     * Get a list of all Naming System to show in the Naming System registry
+     * @return
+     */
+    public List<ResourceMetadata> getNamingSystem()  {
+    	LOG.info("Getting all Naming System");
+        
+    	List<ResourceMetadata> result = Lists.newArrayList();
+    	
+    	for (FhirVersion fhirVersion : FhirVersion.getSupportedVersions()) {
+    		result.addAll(FileCache.getNamingSystem(fhirVersion));
+    	}
+    	
+    	return result;
+    }
+    
+    /**
      * Gets a full list of names grouped by base resource for the web view 
      * of /StructureDefinition requests.
      * 
@@ -230,7 +246,7 @@ public class FilesystemIF {
      * @return a list of IDs of matching resources
      */
     public List<ResourceMetadata> getAllResourceIDforResourcesMatchingNamePattern(FhirVersion fhirVersion, ResourceType resourceType, String theNamePart) {
-        LOG.info("Getting all StructureDefinition Names containing: " + theNamePart + " in their name");
+        LOG.info("Getting all " + resourceType + " resources containing: " + theNamePart + " in their name");
         
         // Get full list of profiles first
         List<ResourceMetadata> resourceList = FileCache.getResourceList(fhirVersion);
@@ -270,7 +286,8 @@ public class FilesystemIF {
 			List<ResourceMetadata> list = FileCache.getResourceList(fhirVersion);
 			for (ResourceMetadata entry : list) {
 				String type = entry.getResourceType().toString();
-				if (entry.isExtension()) {
+				if (entry.isExtension() && !type.equals("NamingSystem")) // Excluding Naming system resource type as isExtension is true for this 
+				{
 					type = "Extension";
 				}
 				if (results.containsKey(type)) {

@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.data.message.MessageDefinitionFocus;
 import uk.nhs.fhir.data.message.MessageResponse;
+import uk.nhs.fhir.data.message.MessageDefinitionAsset;
 import uk.nhs.fhir.data.url.FhirURL;
 import uk.nhs.fhir.data.url.LinkData;
 import uk.nhs.fhir.data.url.LinkDatas;
@@ -25,6 +26,7 @@ import uk.nhs.fhir.render.html.style.FhirCSS;
 import uk.nhs.fhir.render.html.table.Table;
 import uk.nhs.fhir.render.html.table.TableRow;
 import uk.nhs.fhir.render.html.table.TableTitle;
+import java.util.LinkedHashSet;
 
 public class MessageDefinitionFocusTableFormatter extends TableFormatter<WrappedMessageDefinition> {
 
@@ -88,22 +90,70 @@ public class MessageDefinitionFocusTableFormatter extends TableFormatter<Wrapped
 					focusResourceUrl));
 		}
 		
-		List<TableRow> tableRows =
-				new MessageDefinitionAssetsTableRowFormatter()
-					.formatRows(focus.getAssets(), getResourceVersion());
-			
-			Element focusTable = new Table(getColumns(), tableRows).makeTable();
+		// Building unique list of Asset types
 		
-		Element focusTableWrapper = Elements.withChildren("div", 
-			Elements.withAttributeAndChildren("div", 
-				new Attribute("class", FhirCSS.DATA_LABEL), 
-				Lists.newArrayList(
-					Elements.text("Focus Code: " + focus.getCode()),
-					Elements.newElement("br"),
-					Elements.text("Focus Resource: "),
-					focusResourceUrlSpan)),
-			Elements.newElement("br"),
-			focusTable);
+		LinkedHashSet<String> assetTypes=new LinkedHashSet<String>();
+		
+		for (MessageDefinitionAsset asset : focus.getAssets()) {
+			assetTypes.add(asset.getCode());
+		}
+		
+		List<Element> focusTable1 = Lists.newArrayList();
+		List<Element> buttonList = Lists.newArrayList();
+		List<TableRow> tableRows_SD = Lists.newArrayList();
+		Boolean hideflag = false;
+		for(String assetType :assetTypes)
+		{
+			
+			//List<TableRow> 
+			tableRows_SD  =
+					new MessageDefinitionAssetsTableRowFormatter()
+						.formatRows(focus.getAssets(), getResourceVersion(), assetType);
+			
+			 // Building the Tabs Array
+			buttonList.add(Elements.withAttributesAndText("BUTTON",Lists.newArrayList(new Attribute("onClick", "showTabs(this)"), new Attribute("id",assetType),  new Attribute("style", "float: left;  outline: none; cursor: pointer;  padding: 5px 5px; transition: 0.3s; font-size: 12px;")), assetType));
+			
+			// Building the Div Array
+			if (hideflag == false) 
+			{
+				focusTable1.add(Elements.withAttributesAndChild("div",Lists.newArrayList(new Attribute("id", assetType), new Attribute("class", "tabcontent"),  new Attribute("style", "display: block;")),new Table(getColumns(), tableRows_SD).makeTable()));
+				hideflag = true;
+			}
+			else 
+			{				
+				focusTable1.add(Elements.withAttributesAndChild("div",Lists.newArrayList(new Attribute("id", assetType), new Attribute("class", "tabcontent"),  new Attribute("style", "display: none;")),new Table(getColumns(), tableRows_SD).makeTable()));	
+			}	
+			
+			
+		}
+		
+		 // Building table with all types
+		 tableRows_SD  =
+					new MessageDefinitionAssetsTableRowFormatter()
+						.formatRows(focus.getAssets(), getResourceVersion(), "All");
+		// Building the All Tabs 
+			buttonList.add(Elements.withAttributesAndText("BUTTON",Lists.newArrayList(new Attribute("onClick", "showTabs(this)"), new Attribute("id","All"),  new Attribute("style", "float: left;  outline: none; cursor: pointer;  padding: 5px 5px; transition: 0.3s; font-size: 12px;")), "All"));
+					
+		// Building the All Div
+			focusTable1.add(Elements.withAttributesAndChild("div",Lists.newArrayList(new Attribute("id", "All"), new Attribute("class", "tabcontent"),  new Attribute("style", "display: none;")),new Table(getColumns(), tableRows_SD).makeTable()));
+		
+			Element focusTableWrapper = Elements.withChildren("div", 
+				Elements.withAttributeAndChildren("div", 
+					new Attribute("class", FhirCSS.DATA_LABEL), 
+					Lists.newArrayList(
+						Elements.text("Focus Code: " + focus.getCode()),
+						Elements.newElement("br"),
+						Elements.text("Focus Resource: "),
+						focusResourceUrlSpan)),
+						Elements.withAttributeAndText("script", new Attribute("language","javascript"),"function showTabs(id){ " 
+								+ " tabcontent = document.getElementsByClassName(\"tabcontent\"); "
+								+ " for (i = 0; i != tabcontent.length; i++) {"
+								+ " if (id.id==tabcontent[i].id) { tabcontent[i].style.display = \"block\"; } else {tabcontent[i].style.display = \"none\";}}}"),
+						Elements.withChildren("br",buttonList),
+						Elements.withChildren("br", focusTable1)
+							
+					);
+			
 		
 		return new FhirPanel("Bundle Assets", focusTableWrapper).makePanel();
 	}

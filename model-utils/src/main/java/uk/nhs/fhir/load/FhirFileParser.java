@@ -45,7 +45,8 @@ public class FhirFileParser {
 			org.hl7.fhir.dstu3.model.ConceptMap.class,
 			org.hl7.fhir.dstu3.model.CodeSystem.class,
 			org.hl7.fhir.dstu3.model.MessageDefinition.class,
-			org.hl7.fhir.dstu3.model.SearchParameter.class);
+			org.hl7.fhir.dstu3.model.SearchParameter.class,
+			org.hl7.fhir.dstu3.model.NamingSystem.class);
 	
 	public static boolean isSupported(IBaseResource resource) {
 		return supportedClasses.contains(resource.getClass());
@@ -167,6 +168,10 @@ public class FhirFileParser {
 			FhirVersion version = fromResourceUrl(urlByReflection.get());
 			return Optional.of(version);
 		}
+		
+		// Naming System doesn't carry Version either in URL or in method, Hence hard coded the version
+		if (resource.getClass().getSimpleName().equals("NamingSystem"))
+			return Optional.of(FhirVersion.STU3);
 		
 		// Some external resources might store the version for e.g. StructureDefinitions this way
 		Optional<String> fhirReleaseByReflection = FhirReflectionUtils.getFhirReleaseByReflection(resource);

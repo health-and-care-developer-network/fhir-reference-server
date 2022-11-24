@@ -115,6 +115,17 @@ private final OperationDefinition definition;
 	public String getIsInstance() {
 		return Boolean.toString(definition.getInstance());
 	}
+	
+	@Override
+	public String getIsType() {
+		return Boolean.toString(definition.getType());
+	}
+
+
+	@Override
+	public LinkData getTypeLink() {
+		return linkFactory.forDataType(definition.getTypeElement());
+	}
 
 	@Override
 	public LinkData getInstanceTypeLink() {
@@ -210,6 +221,11 @@ private final OperationDefinition definition;
 		} catch (IOException | FHIRException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override

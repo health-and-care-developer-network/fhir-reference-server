@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -152,8 +153,7 @@ public class ServerRendererMain
 	private static Server makeServer() {
         
 		Server server = new Server(8080);
-		WebAppContext handler = new WebAppContext();
-		handler.setContextPath("/");
+
 		AnnotationConfiguration annotationConfiguration = new AnnotationConfiguration();
 		CodeSource codeSource = FhirBrowserRequestServlet.class.getProtectionDomain().getCodeSource();
 		URL location = codeSource.getLocation();
@@ -165,11 +165,16 @@ public class ServerRendererMain
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
+		WebAppContext handler = new WebAppContext();
+		handler.setContextPath("/");
 		handler.getMetaData().addContainerResource(fhirReferenceServerJar);
 		handler.setConfigurations(new Configuration[]{annotationConfiguration});
-		server.setHandler(handler);
-        return server;
+
+		HandlerCollection handlers = new HandlerCollection();
+		handlers.addHandler(handler);
+		server.setHandler(handlers);
+		return server;
 	}
 
 	private static void stopServer(Server server) {

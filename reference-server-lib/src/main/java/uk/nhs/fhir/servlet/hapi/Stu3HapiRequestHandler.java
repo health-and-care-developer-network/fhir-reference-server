@@ -12,6 +12,7 @@ import org.hl7.fhir.dstu3.model.OperationDefinition;
 import org.hl7.fhir.dstu3.model.SearchParameter;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.dstu3.model.NamingSystem;
 
 import com.google.common.collect.Lists;
 
@@ -39,7 +40,9 @@ public class Stu3HapiRequestHandler extends HapiRequestHandler {
 			createResourceProvider(ResourceType.CODESYSTEM, CodeSystem.class),
 			createResourceProvider(ResourceType.CONCEPTMAP, ConceptMap.class),
 			createResourceProvider(ResourceType.MESSAGEDEFINITION, MessageDefinition.class),
-			createResourceProvider(ResourceType.SEARCHPARAMETER, SearchParameter.class));
+			createResourceProvider(ResourceType.SEARCHPARAMETER, SearchParameter.class),
+			createResourceProvider(ResourceType.NAMINGSYSTEM, NamingSystem.class)
+			);
 	}
 
 }

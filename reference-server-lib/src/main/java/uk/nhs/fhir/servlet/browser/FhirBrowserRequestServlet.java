@@ -37,6 +37,7 @@ import uk.nhs.fhir.datalayer.SharedDataSource;
 import uk.nhs.fhir.enums.ClientType;
 import uk.nhs.fhir.enums.MimeType;
 import uk.nhs.fhir.page.extensions.ExtensionsListRenderer;
+import uk.nhs.fhir.page.namingsystem.NamingSystemListRenderer;
 import uk.nhs.fhir.page.list.ResourceListTemplate;
 import uk.nhs.fhir.page.rendered.ResourcePageRenderer;
 import uk.nhs.fhir.page.searchresults.SearchResultsTemplate;
@@ -149,7 +150,8 @@ public class FhirBrowserRequestServlet extends HttpServlet {
 		ResourceType.CONCEPTMAP,
 		ResourceType.CODESYSTEM,
 		ResourceType.MESSAGEDEFINITION,
-		ResourceType.SEARCHPARAMETER);
+		ResourceType.SEARCHPARAMETER,
+		ResourceType.NAMINGSYSTEM);
 	
 	public static boolean isIndexedType(ResourceType type) {
 		return INDEXED_TYPES.contains(type);
@@ -185,6 +187,15 @@ public class FhirBrowserRequestServlet extends HttpServlet {
         	return;
         }
 		
+		if (fullUri.equals("/NamingSystem")) {
+        	try {
+        		NamingSystemListRenderer.loadNamingSystem(request, response);
+				//ExtensionsListRenderer.loadExtensions(request, response);
+			} catch (ServletException | IOException e) {
+				e.printStackTrace();
+			}
+        	return;
+		}
 		serviceVersionedRequest(request, response, fullUri);
 	}
 

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.nhs.interoperability</groupId>
     <artifactId>profile-renderer-lib</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.4.3</version>
     <packaging>jar</packaging>
     <dependencies>
     	<!-- Added for Github history views -->
@@ -32,7 +32,7 @@
     	<dependency>
     		<groupId>uk.nhs.interoperability</groupId>
   			<artifactId>fhir-model-utils</artifactId>
-  			<version>1.3.4-SNAPSHOT</version>
+  			<version>1.4.3</version>
   		</dependency>
   		
 		<dependency>

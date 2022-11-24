@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jdom2.Element;
+import org.jdom2.Attribute;
 
 import com.google.common.collect.Lists;
 
 import uk.nhs.fhir.render.html.Elements;
 import uk.nhs.fhir.render.html.cell.TableCell;
+import uk.nhs.fhir.render.html.cell.TreeNodeCell;
 
 public class TableRow {
 	private List<TableCell> tableCells = Lists.newArrayList();
@@ -35,9 +37,33 @@ public class TableRow {
 		return tableCells;
 	}
 	
-	public Element makeRow() {
+	/*public Element makeRow() {
 		List<Element> cells = Lists.newArrayList();
 		tableCells.forEach((TableCell cell) -> cells.add(cell.makeCell()));
 		return Elements.withChildren("tr", cells);
-	}
+	}*/
+	
+	public Element makeRow() {
+        List<Element> cells = Lists.newArrayList();
+        String parentNode = "-1";
+        tableCells.forEach((TableCell cell) -> {
+            cells.add(cell.makeCell());
+        });
+        parentNode = "-1";
+        if (TreeNodeCell.static_nodeKey == null) {
+            return Elements.withChildren("tr", cells);
+        }
+        else {
+        if(TreeNodeCell.static_nodeKey.contains("."))
+            {
+                parentNode =  TreeNodeCell.static_nodeKey.substring(0, TreeNodeCell.static_nodeKey.lastIndexOf("."));
+                return Elements.withAttributesAndChildren("tr", Lists.newArrayList( new Attribute("data-id",TreeNodeCell.static_nodeKey),new Attribute("class","treenode collapsed"),new Attribute("data-parentid",parentNode),new Attribute("data-serial-nr",String.valueOf(TreeNodeCell.data_serial_nr))), cells); // Anand added Parent node, data node and data serial nr
+                //return Elements.withAttributesAndChildren("tr", Lists.newArrayList( new Attribute("data-id",TreeNodeCell.static_nodeKey),new Attribute("class"," "),new Attribute("data-parentid",parentNode),new Attribute("data-serial-nr",String.valueOf(TreeNodeCell.data_serial_nr))), cells); // Anand added Parent node, data node and data serial nr
+            }
+        else
+            {
+                return Elements.withAttributesAndChildren("tr", Lists.newArrayList(new Attribute("class","rootnode"), new Attribute("data-id",TreeNodeCell.static_nodeKey)), cells); // Anand added root node
+            }}
+            
+    }    
 }

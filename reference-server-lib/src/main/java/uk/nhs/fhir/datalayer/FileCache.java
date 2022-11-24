@@ -133,6 +133,23 @@ public class FileCache {
     
     
     /**
+     * Get a list of all Naming System to show in the Naming System registry
+     * @return
+     */
+    public static List<ResourceMetadata> getNamingSystem(FhirVersion fhirVersion)  {
+    	List<ResourceMetadata> results = Lists.newArrayList();
+    	
+		for(ResourceEntityWithMultipleVersions entry : resourcesForFhirVersion(fhirVersion)) {
+			if (String.valueOf(entry.getResourceType()).equals("NamingSystem") )
+        		results.add(entry.getLatest());
+        }
+		
+		Collections.sort(results, ResourceMetadata.BY_RESOURCE_NAME);
+        
+		return results;
+	}
+    
+    /**
      * Return resource list grouped into sensible groups
      * @param resourceType
      * @return

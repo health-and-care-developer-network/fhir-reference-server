@@ -167,6 +167,11 @@ public class WrappedStu3SearchParameter extends WrappedSearchParameter {
 			throw new IllegalStateException(e);
 		}
 	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
+	}
 
 	@Override
 	public ResourceMetadata getMetadataImpl(File source) {

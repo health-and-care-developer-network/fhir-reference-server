@@ -28,6 +28,7 @@ import uk.nhs.fhir.data.metadata.ResourceType;
 import uk.nhs.fhir.datalayer.FilesystemIF;
 import uk.nhs.fhir.datalayer.collections.ResourceEntityWithMultipleVersions;
 import uk.nhs.fhir.page.extensions.ExtensionsListProvider;
+import uk.nhs.fhir.page.namingsystem.NamingSystemListProvider;
 import uk.nhs.fhir.page.home.ResourceCountsProvider;
 import uk.nhs.fhir.page.list.GroupedResourcesProvider;
 import uk.nhs.fhir.servlet.browser.FhirBrowserRequestServlet;
@@ -38,7 +39,7 @@ import uk.nhs.fhir.util.FhirVersion;
  * @author Tim Coates
  * @author Adam Hatherly
  */
-public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider, GroupedResourcesProvider {
+public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsListProvider, GroupedResourcesProvider, NamingSystemListProvider  {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceWebHandler.class.getName());
     
     FilesystemIF myDataSource = null;
@@ -76,6 +77,13 @@ public class ResourceWebHandler implements ResourceCountsProvider, ExtensionsLis
         LOG.debug("Called: ResourceWebHandler.getExtensions()");
         
         return myDataSource.getExtensions();
+    }
+    
+    @Override
+    public List<ResourceMetadata> getNamingSystem() {
+        LOG.debug("Called: ResourceWebHandler.getNamingSystem()");
+        
+        return myDataSource.getNamingSystem();
     }
     
     public ResourceEntityWithMultipleVersions getVersionsForID(FhirVersion fhirVersion, IIdType id) {

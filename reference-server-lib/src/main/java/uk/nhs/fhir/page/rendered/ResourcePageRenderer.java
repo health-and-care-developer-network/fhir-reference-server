@@ -95,6 +95,8 @@ public class ResourcePageRenderer {
 	        	return "Description";
 	        case SEARCHPARAMETER:
 	        	return "Description";
+	        case NAMINGSYSTEM:
+	        	return "Description";	
         	default:
 	        	throw new IllegalStateException("Unhandled resource type: " + resourceType.toString());
         }

@@ -122,6 +122,26 @@ div#versionMetadata {
 	padding-right: 15px;
 }
 
+
+#namingSystemTable {
+	width:100%;
+	margin-top: 20px;
+	font-size: 11px;
+    font-family: verdana;
+}
+
+#namingSystemTable th {
+	font-weight: bold;
+	border-bottom: solid thin lightgrey;
+	padding-right: 15px;
+}
+
+#namingSystemTable td {
+	border-bottom: solid thin lightgrey;
+	padding-right: 15px;
+	height: 50px;
+}
+
 #tabs ul {
 	margin-left: 0px;
 }

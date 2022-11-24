@@ -141,6 +141,8 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		return Optional.ofNullable(definition.getValueSet());
 	}
 
+	
+	
 	@Override
 	public void addHumanReadableText(String textSection) {
 		try {
@@ -149,6 +151,11 @@ public class WrappedStu3CodeSystem extends WrappedCodeSystem {
 		} catch (IOException | FHIRException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	@Override
+	public void clearHumanReadableText() {
+		definition.setText(null);
 	}
 
 	@Override

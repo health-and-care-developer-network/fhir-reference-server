@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import uk.nhs.fhir.data.wrap.WrappedCodeSystem;
 import uk.nhs.fhir.data.wrap.WrappedConceptMap;
 import uk.nhs.fhir.data.wrap.WrappedMessageDefinition;
+import uk.nhs.fhir.data.wrap.WrappedNamingSystem;
 import uk.nhs.fhir.data.wrap.WrappedOperationDefinition;
 import uk.nhs.fhir.data.wrap.WrappedResource;
 import uk.nhs.fhir.data.wrap.WrappedSearchParameter;
@@ -42,6 +43,7 @@ import uk.nhs.fhir.render.format.structdef.StructureDefinitionFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionMetadataFormatter;
 import uk.nhs.fhir.render.format.structdef.StructureDefinitionSnapshotFormatter;
 import uk.nhs.fhir.render.format.valueset.ValueSetFormatter;
+import uk.nhs.fhir.render.format.namingsystem.NamingSystemFormatter;
 
 public class ResourceFormatterFactory {
 	public ResourceFormatter<?> defaultFormatter(WrappedResource<?> wrappedResource) {
@@ -59,7 +61,10 @@ public class ResourceFormatterFactory {
 			return new MessageDefinitionFormatter((WrappedMessageDefinition) wrappedResource);
 		} else if (wrappedResource instanceof WrappedSearchParameter) { 
 			return new SearchParameterFormatter((WrappedSearchParameter) wrappedResource);
-		} else {
+		} else if (wrappedResource instanceof WrappedNamingSystem) {  
+			return new NamingSystemFormatter((WrappedNamingSystem) wrappedResource); 
+		}
+		else {
 			throw new IllegalStateException("Unexpected wrapped resource class " + wrappedResource.getClass().getName());
 		}
 	}
@@ -86,6 +91,11 @@ public class ResourceFormatterFactory {
 		} else if (wrappedResource instanceof WrappedOperationDefinition) {
 			WrappedOperationDefinition wrappedOperationDefinition = (WrappedOperationDefinition)wrappedResource;
 			formatSpecs.add(new FormattedOutputSpec<>(new OperationDefinitionFormatter(wrappedOperationDefinition), outputDirectory, "render.html"));
+	
+		} else if (wrappedResource instanceof WrappedNamingSystem) {
+			WrappedNamingSystem wrappedNamingSystem = (WrappedNamingSystem)wrappedResource;
+			formatSpecs.add(new FormattedOutputSpec<>(new NamingSystemFormatter(wrappedNamingSystem), outputDirectory, "render.html"));
+		
 		} else if (wrappedResource instanceof WrappedValueSet) {
 			WrappedValueSet wrappedValueSet = (WrappedValueSet)wrappedResource;
 			formatSpecs.add(new FormattedOutputSpec<>(new ValueSetFormatter(wrappedValueSet), outputDirectory, "render.html"));

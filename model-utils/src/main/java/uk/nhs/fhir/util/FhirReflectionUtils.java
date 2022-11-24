@@ -1,7 +1,9 @@
 package uk.nhs.fhir.util;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,10 +32,17 @@ public class FhirReflectionUtils {
 		Method method = getOrCacheMethod(resource, methodName);
 		Object result = invokeMethod(method, resource, methodName);
 		String resultString = castToString(result, methodName, resource);
+		
 		return Optional.ofNullable(resultString);
 		} catch (Exception e) {
 			if (throwOnError) {
-				throw e;
+				try {
+					throw e;
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					return Optional.empty();
+				}
 			} else {
 				return Optional.empty();
 			}
@@ -66,6 +75,9 @@ public class FhirReflectionUtils {
 
 	public static String expectUrlByReflection(IBaseResource resource) {
 		Optional<String> url = getUrlByReflection(resource, true);
+		
+		if(resource.getClass().getSimpleName().equals("NamingSystem")) 
+			return resource.getMeta().getProfile().get(0).getValue();	
 		
 		// method might still have returned null, so check
 		if (url.isPresent()) {

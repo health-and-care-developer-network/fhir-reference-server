@@ -46,7 +46,8 @@ public class StructureDefinitionDifferentialFormatter extends TreeTableFormatter
 
 		Table differentialTable = differentialTreeTable.asTable();
 		
-		Element differentialHtmlTable = differentialTable.makeTable();
+		//Element differentialHtmlTable = differentialTable.makeTable();
+		Element differentialHtmlTable = differentialTable.makeTable_collapse();
 		
 		getTableBackgroundStyles(differentialHtmlTable).forEach(section::addStyle);
 		

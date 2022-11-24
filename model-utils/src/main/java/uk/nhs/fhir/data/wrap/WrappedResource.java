@@ -25,6 +25,7 @@ import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ConceptMap;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2OperationDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2StructureDefinition;
 import uk.nhs.fhir.data.wrap.dstu2.WrappedDstu2ValueSet;
+import uk.nhs.fhir.data.wrap.dstu2.skeleton.SkeletonWrappedDstu2StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3CodeSystem;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ConceptMap;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3MessageDefinition;
@@ -32,6 +33,8 @@ import uk.nhs.fhir.data.wrap.stu3.WrappedStu3OperationDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3SearchParameter;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3StructureDefinition;
 import uk.nhs.fhir.data.wrap.stu3.WrappedStu3ValueSet;
+import uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition;
+import uk.nhs.fhir.data.wrap.stu3.WrappedStu3NamingSystem;
 import uk.nhs.fhir.event.EventHandlerContext;
 import uk.nhs.fhir.event.RendererEventType;
 import uk.nhs.fhir.load.FileLoader;
@@ -78,6 +81,7 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 	public abstract String getName();
 	
 	public abstract void addHumanReadableText(String textSection);
+	public abstract void clearHumanReadableText();
 
 	public Class<? extends IBaseResource> getFhirClass() {
 		return getWrappedResource().getClass();
@@ -182,6 +186,17 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		return Optional.empty();
 	}
 	
+	public static WrappedResource<?> fromBaseResourceAsSkeletonIfAvailable(IBaseResource resource, File originalFile) {
+		/*if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
+			return new SkeletonWrappedDstu2StructureDefinition((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource, originalFile);
+		} else*/ if (resource instanceof org.hl7.fhir.dstu3.model.StructureDefinition) {
+			return new SkeletonWrappedStu3StructureDefinition((org.hl7.fhir.dstu3.model.StructureDefinition)resource, originalFile);
+		} else {
+			// No skeleton, so just create a full wrapped resource
+			return fromBaseResource(resource);
+		}
+	}
+	
 	public static WrappedResource<?> fromBaseResource(IBaseResource resource) {
 		if (resource instanceof ca.uhn.fhir.model.dstu2.resource.StructureDefinition) {
 			return new WrappedDstu2StructureDefinition((ca.uhn.fhir.model.dstu2.resource.StructureDefinition)resource);
@@ -218,10 +233,23 @@ public abstract class WrappedResource<T extends WrappedResource<T>> {
 		else if (resource instanceof org.hl7.fhir.dstu3.model.SearchParameter) {
 			return new WrappedStu3SearchParameter((org.hl7.fhir.dstu3.model.SearchParameter)resource);
 		}
-		
+		else if (resource instanceof org.hl7.fhir.dstu3.model.NamingSystem ) {
+            return new WrappedStu3NamingSystem((org.hl7.fhir.dstu3.model.NamingSystem)resource);
+        }
 		else {
 			throw new IllegalStateException("Couldn't make a WrappedResource for " + resource.getClass().getCanonicalName());
 		}
+	}
+	
+	public static Optional<WrappedResource<?>> getFullWrappedResourceIfSkeleton(Optional<WrappedResource<?>> wrappedResource) {
+		if (wrappedResource.isPresent()) {
+			if (wrappedResource.get() instanceof uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) {
+				return Optional.of(((uk.nhs.fhir.data.wrap.stu3.skeleton.SkeletonWrappedStu3StructureDefinition) wrappedResource.get()).upgradeToFullWrappedResource());
+			} else if (wrappedResource.get() instanceof uk.nhs.fhir.data.wrap.dstu2.skeleton.SkeletonWrappedDstu2StructureDefinition) {
+				return Optional.of(((uk.nhs.fhir.data.wrap.dstu2.skeleton.SkeletonWrappedDstu2StructureDefinition) wrappedResource.get()).upgradeToFullWrappedResource());
+			}
+		}
+		return wrappedResource;
 	}
 	
 	public IParser newXmlParser() {

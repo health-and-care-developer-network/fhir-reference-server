@@ -16,31 +16,36 @@ import uk.nhs.fhir.util.FhirVersion;
 
 public class MessageDefinitionAssetsTableRowFormatter {
 
-	public List<TableRow> formatRows(List<MessageDefinitionAsset> assets, FhirVersion version) {
+	public List<TableRow> formatRows(List<MessageDefinitionAsset> assets, FhirVersion version, String assetType) {
 		
 		List<TableRow> rows = Lists.newArrayList();
 		
 		for (MessageDefinitionAsset asset : assets) {
+		// returning rows only for the specified assetType or All
+		 if (asset.getCode().equals(assetType) || assetType.equals("All"))
+		  {	
 			TableRow row = new TableRow();
 			
 			row.addCell(new SimpleTextCell(asset.getCode()));
 			
 			String structureDefinitionReference = asset.getStructureDefinitionReference();
 			Optional<String> anyPermittedType = getTypeFromPermitAnyOfType(structureDefinitionReference);
-			if (anyPermittedType.isPresent()) {
+			if (anyPermittedType.isPresent()) 
+			{
 				// row.addCell(new SimpleTextCell("Any " + anyPermittedType.get()));
 				row.addCell(new SimpleTextCell(structureDefinitionReference));
 			} else if (FhirURL.isLogicalUrl(structureDefinitionReference)) {
 				row.addCell(new SimpleTextCell(structureDefinitionReference));
-			} else {
+			} else 
+			{
 				row.addCell(new LinkCell(new LinkDatas(new LinkData(FhirURL.buildOrThrow(structureDefinitionReference, version), structureDefinitionReference))));
 			}
 			
 			row.addCell(new SimpleTextCell(asset.getStructureDefinitionVersion()));
 			
 			rows.add(row);
+		  }
 		}
-		
 		return rows;
 	}
 
