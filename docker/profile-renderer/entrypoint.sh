@@ -13,6 +13,10 @@ RENDERER_FLAGS=${RENDERER_FLAGS}
 # First, clone the repository with our source files
 rm -Rf /source/files
 git clone $GITHUB_URL /source/files
+
+chown 100:1000 /source/files
+chmod g=rwx,o= /source/files
+
 cd /source/files
 git checkout $BRANCH
 
@@ -37,8 +41,6 @@ else
   echo "Expected 1 *.jar file but found $JAR_FILE_COUNT"
   exit 1
 fi
-
-echo "Hello"
 
 ls /source/files
 echo "Running command: java -jar $JAR_FILE /source/files/$REPO_PATH /generated/$OUT_PATH $RENDERER_FLAGS"

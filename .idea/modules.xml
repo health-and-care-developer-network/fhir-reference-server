@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/model-utils/fhir-model-utils.iml" filepath="$PROJECT_DIR$/model-utils/fhir-model-utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/profile-renderer/profile-renderer.iml" filepath="$PROJECT_DIR$/profile-renderer/profile-renderer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/profile-renderer-lib/profile-renderer-lib.iml" filepath="$PROJECT_DIR$/profile-renderer-lib/profile-renderer-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reference-server/reference-server.iml" filepath="$PROJECT_DIR$/reference-server/reference-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reference-server-lib/reference-server-lib.iml" filepath="$PROJECT_DIR$/reference-server-lib/reference-server-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reference-server-parent.iml" filepath="$PROJECT_DIR$/reference-server-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server-renderer/server-renderer.iml" filepath="$PROJECT_DIR$/server-renderer/server-renderer.iml" />
+    </modules>
+  </component>
+</project>
