@@ -1,0 +1,20 @@
+
+<p>Project Description and Scope.
+The UK Core Implementation Guide as a project aims to provide UK wide FHIR implementation guidance that has applicability across jurisdictions and care settings. The guidance includes:</p>
+<ul>
+<li>	FHIR Resource profiles and extensions</li>
+<li>	FHIR Terminology components including ValueSets and CodeSystems</li>
+<li>	Other general guidance useful to FHIR implementers in the U</li>
+</ul>
+
+<p>The guidance does not form the basis for a completely described deployable service in and of itself but is the basis from which other FHIR implementation guides can be derived.
+
+Go to the Simplifier development platform for further information on the UK Core. </p>
+
+<a href="$link.setRelative('//velocity-templates/home.vm')">home1</a>
+<a href="/">Home2</a>
+
+
+
+
+

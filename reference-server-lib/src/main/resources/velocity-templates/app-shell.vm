@@ -114,6 +114,47 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
         </script>
         
 		<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="30398f35-a144-4edd-a779-05481f9da7b3" type="text/javascript" async></script>
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+			$(document).ready(function() {
+    $('#showHiddenBlock').click(function() {
+		$('#p1').show();
+		$('#new_home').hide();
+		
+		$('#p1').append(" <b>Appended text</b>.");
+    });
+	
+	
+});
+
+</script>
+<script>
+function showContent() {
+  var temp = document.getElementsByTagName("template")[0];
+  var clon = temp.content.cloneNode(true);
+  document.body.appendChild(clon);
+}
+</script>
+<script>
+$(document).ready(function(){
+  $('#btn1').click(function(){
+	$('#p1').append(" <b>Appended text</b>.");
+    $('#p1').load("/velocity-templates/include_home.html #div3");
+	
+  });
+});
+</script>
+<style>
+#p1 {
+    display: none;
+}
+</style>
+
 	</head>
 <body class="page-template page-template-apis page-template-apis-php page page-id-15216 page-parent ajax-zilla-likes">
     <header class="header">
@@ -161,10 +202,27 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
 		<div class="breadcrumbs">
 	<div class="wrapper">
 		<ul><li>	You are here: &nbsp;
-#parse( "/velocity-templates/breadcrumbs.vm" )
-</div><!--end breadcrumbs-->
+		#parse( "/velocity-templates/breadcrumbs.vm" )
+	</div><!--end breadcrumbs-->
 
-<div id="api_list"><div class="wrapper cf container">#parse($contentTemplateName)</div>
+<div id="api_list"> 
+
+#if ($contentTemplateName == "/velocity-templates/home.vm" )
+<p>inside if </p>
+<div id="new_home">#parse("/velocity-templates/new_home.vm")
+
+<input type="button" value="Show Hidden Block" id="showHiddenBlock" />
+<button id="btn1">Get External Content</button></div>
+<div class="wrapper cf container" id ="ct" > 
+hi $contentTemplateName  
+<div id="p1">#parse($contentTemplateName) </div></div>
+
+#else
+
+<div class="wrapper cf container" > #parse($contentTemplateName) 
+hi $contentTemplateName</div>
+#end
+
 		</div><!-- end api list -->
 	</div><!--end main_content-->
 </div><!-- end main -->
