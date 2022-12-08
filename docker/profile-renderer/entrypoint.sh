@@ -11,10 +11,11 @@ OUT_PATH=$6
 RENDERER_FLAGS=${RENDERER_FLAGS}
 
 # First, clone the repository with our source files
-rm -Rf /source/files
+sudo rm -Rf /source/files
+sudo chown -R fhir:fhir /source 
+
 git clone $GITHUB_URL /source/files
 
-chown 100:1000 /source/files
 chmod g=rwx,o= /source/files
 
 cd /source/files
@@ -25,6 +26,15 @@ cd /source/files/$REPO_PATH/
 if [ ! -z "$OLD_URL" ] && [ ! -z "$NEW_URL" ]; then
   echo "Doing URL replacement: OLD_URL=$OLD_URL NEW_URL=$NEW_URL"
   find . -name "*.xml" -type f -exec sed -i -e "s|$OLD_URL|$NEW_URL|g" {} \;
+fi
+
+#TODO check directory exists
+if [ -d /generated ]
+then
+  sudo chown -R fhir:fhir /generated
+else
+  sudo mkdir /generated
+  sudo chown -R fhir:fhir /generated
 fi
 
 mkdir -p /generated/$OUT_PATH
