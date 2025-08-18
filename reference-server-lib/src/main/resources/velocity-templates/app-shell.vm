@@ -103,6 +103,16 @@ var zilla_likes = {"ajaxurl":"https:\/\/developer.nhs.uk\/wp-admin\/admin-ajax.p
   ga('send', 'pageview');
 </script>
 <!-- END GADWP Universal Analytics -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VCZYKGSL8T"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VCZYKGSL8T');
+</script>
  
 		<script src="https://developer.nhs.uk/wp-content/themes/HDN/js/libs/modernizr-2.5.3.min.js"></script>
 		<script type='text/javascript' src='https://developer.nhs.uk/wp-content/plugins/wordpress-bootstrap-css/resources/bootstrap-3.3.7/js/bootstrap.min.js?ver=3.3.7-1'></script>
