@@ -1,5 +1,7 @@
 package uk.nhs.fhir.servlet;
 
+import java.io.IOException;
+
 import java.net.HttpURLConnection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +25,13 @@ public class RequestErrorHandler {
 		// Any 
 		try {
 			if (t instanceof FhirResourceNotFoundException) {
-				response.sendError(HttpURLConnection.HTTP_NOT_FOUND, t.getMessage());
+				String newURL = "https://simplifier.net/resolve?target=simplifier&canonical=" + requestURL;
+				try {
+					response.sendRedirect(newURL);
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+				//response.sendError(HttpURLConnection.HTTP_NOT_FOUND, t.getMessage());
 			} else if (t instanceof RequestIdMissingException) {
 				response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, t.getMessage());
 			} else if (t instanceof UnhandledFhirOperationException) {
