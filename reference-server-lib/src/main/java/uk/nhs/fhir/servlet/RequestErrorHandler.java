@@ -25,12 +25,7 @@ public class RequestErrorHandler {
 		// Any 
 		try {
 			if (t instanceof FhirResourceNotFoundException) {
-				String newURL = "https://simplifier.net/resolve?target=simplifier&canonical=" + requestURL;
-				try {
-					response.sendRedirect(newURL);
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
+				this.redirectToSimplifier(response, requestURL);
 				//response.sendError(HttpURLConnection.HTTP_NOT_FOUND, t.getMessage());
 			} else if (t instanceof RequestIdMissingException) {
 				response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, t.getMessage());
@@ -40,10 +35,34 @@ public class RequestErrorHandler {
 				response.sendError(HttpURLConnection.HTTP_NOT_FOUND, t.getMessage());
 			} else {
 				// default
-				response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
+				//response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
+				
+				// Redirect where additional path elements are not supported on reference server, e.g. England profiles
+				this.redirectToSimplifier(response, requestURL);
 			}
 		} catch (Exception e) {
 			LOG.error("Writing to response which has already been committed (" + response.getStatus() + ")");
+		}
+	}
+	
+	private void redirectToSimplifier(HttpServletResponse response, StringBuffer requestURL){
+		// Replace http with https in requestURL (canonical resolution does not work if the protocol does not match)
+		StringBuffer newURL = new StringBuffer("https://simplifier.net/resolve?target=simplifier&canonical=" + requestURL.replace(0,4,"https"));
+		
+		//Addition of project scope for recognised canonical patterns (can add or remove as needed)
+		if (requestURL.indexOf("fhir.hl7.org.uk") != -1){
+			newURL.append("&scope=project:HL7FHIRUKCoreR4");
+		} else if (requestURL.indexOf("fhir.nhs.uk/England") != -1){
+			newURL.append("&scope=project:NHS-England-Programme-Implementation-Guides");
+		} else if (requestURL.indexOf("NHSDigital") != -1){
+			newURL.append("&scope=project:NHSDigital");
+		}
+		
+		// Redirect
+		try {
+			response.sendRedirect(newURL.toString());
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 }
